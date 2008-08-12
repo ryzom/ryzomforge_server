@@ -1,0 +1,120 @@
+/** \file entity_manager.h
+ * base management for all entity in game, player , the pack animals, pets, bot and creatures
+ *
+ * $Id: entity_manager.h,v 1.25 2007/05/25 09:47:43 verquerre Exp $
+ */
+
+
+
+#ifndef ENTITY_MANAGER_H
+#define ENTITY_MANAGER_H
+
+//game share
+#include "game_share/ryzom_entity_id.h"
+#include "game_share/sentence_appraisal.h"
+#include "game_share/msg_ai_service.h"
+//
+#include "egs_mirror.h"
+
+class CEntityBase;
+
+
+/**
+ * Implementation of the entity info transport class
+ */
+class CAIInfosOnEntityMsgImp : public CAIInfosOnEntityMsg
+{
+public:
+	virtual void callback (const std::string &name, NLNET::TServiceId id);
+};
+
+/**
+ * Implementation of transport class
+ */
+class CQueryEgsImp : public CQueryEgs
+{
+	void callback (const std::string &name, NLNET::TServiceId id);
+};
+
+/**
+ * CEntityBaseManager
+ *
+ * \author Alain Saffray
+ * \author Nevrax France
+ * \date 2002
+ */
+class CEntityBaseManager
+{
+public:
+	/// exception thrown when entity is unknown
+	struct EEntity : public NLMISC::Exception
+	{
+		EEntity( const NLMISC::CEntityId& id ) : Exception ("The entity "+id.toString()+" doesn't exist") {};
+	};
+
+/*	// Success table for calculation of success probability and associate xp-gains
+	struct SSuccessXpLine
+	{
+		sint16	RelativeLevel;
+		uint16	SuccessProbability;
+		float	XpGain;
+		SENTENCE_APPRAISAL::ESentenceAppraisal DifficultyAppreciation;
+	};
+
+	struct TSuccessTable
+	{
+		float	MaxSuccess;
+		float	FadeSuccess;
+		uint8	FadeRoll;
+		
+		uint8	CraftFullSuccessRole;
+		float	CraftMinSuccess;
+		uint8	CraftMinSuccessRole;
+	};
+
+*/	/**
+	 * Constructor
+	 */
+	CEntityBaseManager::CEntityBaseManager();
+
+	/**
+	 * Add callback for entity management
+	 */
+	void addEntityCallback();
+
+	// getEntityPtr : return CEntityBase * ptr on Id corresponding entity
+	/*A*/static CEntityBase			*getEntityBasePtr	( const NLMISC::CEntityId& id );
+	/*A*/static CEntityBase			*getEntityBasePtr	( const	TDataSetRow	&entityRowId )	
+	{
+		if ( TheDataset.isAccessible( entityRowId ) )
+		{
+			return getEntityBasePtr( TheDataset.getEntityId( entityRowId ) );
+		}
+		return 0;
+	}
+	
+	/*A*/static NLMISC::CEntityId	getEntityId			( const	TDataSetRow	&entityRowId )	
+	{ 
+		if ( TheDataset.isAccessible( entityRowId ) ) //( entityRowId.isValid() && TheDataset.isDataSetRowStillValid(entityRowId) )
+			return TheDataset.getEntityId( entityRowId ); 
+		else
+			return NLMISC::CEntityId::Unknown;
+	}
+	
+	/**
+	 * GPMS connexion
+	 */
+	void gpmsConnexion();
+
+	/**
+	 * load table of success probability and xp gains
+	 * \param tableName is name of table contained success change and xp gain
+	 */
+//	void loadSuccessXpTable( const std::string& tableName );
+
+//	static std::vector< SSuccessXpLine >	_SuccessXpTable;
+//	static TSuccessTable					_SuccessTable;
+};
+
+
+#endif //CREATURE_MANAGER

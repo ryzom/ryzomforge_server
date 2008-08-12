@@ -1,0 +1,113 @@
+/** \file service_main.cpp
+ *
+ * $Id: service_main.cpp,v 1.7 2006/01/10 17:38:58 boucher Exp $
+ */
+
+//-----------------------------------------------------------------------------
+// include
+//-----------------------------------------------------------------------------
+
+// nel
+#include "nel/misc/types_nl.h"
+#include "nel/misc/time_nl.h"
+#include "nel/misc/common.h"
+#include "nel/net/service.h"
+
+// game share
+#include "game_share/ryzom_version.h"
+#include "game_share/tick_event_handler.h"
+#include "game_share/singleton_registry.h"
+#include "game_share/handy_commands.h"
+
+// local
+#include "service_main.h"
+
+
+//-----------------------------------------------------------------------------
+// namespaces
+//-----------------------------------------------------------------------------
+
+using namespace std;
+using namespace NLMISC;
+using namespace NLNET;
+
+
+//-----------------------------------------------------------------------------
+// methods CServiceClass 
+//-----------------------------------------------------------------------------
+
+void CServiceClass::init()
+{
+	setVersion (RYZOM_VERSION);
+
+	// if we are connecting to a shard then start by initializing the tick interface
+	if (IService::getInstance()->ConfigFile.getVarPtr("DontUseTS")==NULL || IService::getInstance()->ConfigFile.getVarPtr("DontUseTS")->asInt()==0)
+	{
+		bool useMirror = (IService::getInstance()->ConfigFile.getVarPtr("UseMirror")!=NULL && IService::getInstance()->ConfigFile.getVarPtr("UseMirror")->asBool());
+		if(useMirror)
+		{
+			nlwarning("Using the mirror to provide ticks to the service - ignoring state of the DontUseTS variable");
+		}
+		else
+		{
+			CTickEventHandler::init(CServiceClass::tickUpdate);
+		}
+}
+
+	CSingletonRegistry::getInstance()->init();
+}
+
+bool CServiceClass::update()
+{
+	CSingletonRegistry::getInstance()->serviceUpdate();
+	return true;
+}
+
+void CServiceClass::tickUpdate()
+{
+	CSingletonRegistry::getInstance()->tickUpdate();
+}
+
+void CServiceClass::release()
+{
+	CSingletonRegistry::getInstance()->release();
+}
+
+
+//-----------------------------------------------
+//	NLNET_SERVICE_MAIN
+//-----------------------------------------------
+
+static const char* getCompleteServiceName(const IService* theService)
+{
+	static std::string s;
+	s= "general_utilities_service";
+
+	if (theService->haveLongArg("gusname"))
+	{
+		s+= "_"+theService->getLongArg("gusname");
+	}
+
+	if (theService->haveLongArg("fullgusname"))
+	{
+		s= theService->getLongArg("fullgusname");
+	}
+
+	return s.c_str();
+}
+
+static const char* getShortServiceName(const IService* theService)
+{
+	static std::string s;
+	s= "GUS";
+
+	if (theService->haveLongArg("shortgusname"))
+	{
+		s= theService->getLongArg("shortgusname");
+	}
+	
+	return s.c_str();
+}
+
+NLNET_SERVICE_MAIN( CServiceClass, getShortServiceName(scn), getCompleteServiceName(scn), 0, EmptyCallbackArray, "", "" );
+

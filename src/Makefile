@@ -1,0 +1,59 @@
+
+BUILD_DIRS = \
+admin_modules \
+ryzom_admin_service \
+ryzom_naming_service \
+game_share \
+r2_share \
+r2_modules \
+mirror_service \
+ryzom_welcome_service \
+tick_service \
+frontend_service \
+gpm_service \
+pd_lib \
+input_output_service \
+gameplay_module_lib \
+entities_game_service \
+ai_share \
+ai_service \
+monitor_service \
+backup_service \
+pd_reference_builder \
+log_analyser_service \
+mail_forum_service \
+dynamic_scenario_service \
+pdr_util \
+shard_unifier_service \
+session_browser_server \
+pd_support_service \
+logger_service
+
+night: all
+
+all: $(foreach dir,$(BUILD_DIRS),$(dir)-all)
+
+%-all:
+	+make -k -C $* all
+
+clean: $(foreach dir,$(BUILD_DIRS),$(dir)-clean)
+
+%-clean:
+	+make -C $* clean
+
+cleansheets: $(foreach dir,$(BUILD_DIRS),$(dir)-cleansheets)
+
+%-cleansheets:
+	+make -C $* cleansheets
+
+update: $(foreach dir,$(BUILD_DIRS),$(dir)-update)
+
+%-update:
+	+make -C $* update
+
+touch: $(foreach dir,$(BUILD_DIRS),$(dir)-touch)
+
+%-touch:
+	+make -C $* touch
+
+.NOTPARALLEL: night all clean cleansheets update touch
