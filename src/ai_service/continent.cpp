@@ -1514,8 +1514,8 @@ bool CCellZone::findRestAndFoodFaunaZoneInCellList(CFaunaZone const*& rest, CPro
 	if (extensiveDebug) nldebug("ED0001.01: restActivity=%s foodActivity=%s", restActivity.toString().c_str(), foodActivity.toString().c_str());
 	
 	// Flags topology
-	typedef std::hash_map<uint,CCellChoice> TSearchMapCellChoice;
-	typedef std::hash_map<uint,TSearchMapCellChoice > TSearchMap;
+	typedef CHashMap<uint,CCellChoice> TSearchMapCellChoice;
+	typedef CHashMap<uint,TSearchMapCellChoice > TSearchMap;
 	TSearchMap	searchMap;
 	const	float	minimumScore=/*28*28*/24*24; // :FIXME: Put that in a config thing (like a config file)
 	

@@ -1,7 +1,5 @@
 
-#include "stdpch.h"
 #include <set>
-
 
 #include "session_browser_server.h"
 #include "nel/misc/command.h"

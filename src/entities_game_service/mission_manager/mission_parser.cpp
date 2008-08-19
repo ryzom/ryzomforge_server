@@ -39,7 +39,8 @@ bool CMissionParser::solveTextsParams(uint32 lineNum, TVectorParamCheck & txtPar
 		{
 			// remove quotes
 			txtParams[i].Identifier.erase(txtParams[i].Identifier.begin());
-			txtParams[i].Identifier.pop_back();
+			//txtParams[i].Identifier.pop_back();
+			txtParams[i].Identifier.resize(txtParams[i].Identifier.size()-1);
 			txtParams[i].Type = STRING_MANAGER::bot_name;
 		}
 		else

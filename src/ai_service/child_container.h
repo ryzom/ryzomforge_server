@@ -81,7 +81,7 @@ public:
 	
 	/// @name Special iterator skipping NULL elements
 	//@{
-	class base_iterator
+	class base_iterator : public std::iterator<std::forward_iterator_tag, TChld>
 	{
 	public:
 		explicit base_iterator()

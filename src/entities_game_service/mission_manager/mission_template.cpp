@@ -137,7 +137,7 @@ std::string buildHashKey(std::string const& content)
 	return NLMISC::toString("0x%08X", sum);
 }
 
-bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsingData & globalData, std::hash_map<uint,TAIAlias> & refMissions, const std::string &missionName, TAIAlias defautltNpcGiverAlias)
+bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsingData & globalData, CHashMap<uint,TAIAlias> & refMissions, const std::string &missionName, TAIAlias defautltNpcGiverAlias)
 {
 	// init default values
 	MonoTimer = 0;

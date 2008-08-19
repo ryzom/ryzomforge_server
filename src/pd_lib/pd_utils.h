@@ -112,12 +112,12 @@ const TIndexChecksum	VALID_INDEX_CHECKSUM = 0xdead;
 /**
  * Default Hashing Function
  */
-template<typename T>
+/*template<typename T>
 class CDefaultHash
 {
 public:
 	size_t	operator() (const T& value) const	{ return (uint32)value; }
-};
+};*/
 
 /**
  * Table Container Interface
@@ -483,14 +483,14 @@ class CSetMap
 public:
 
 	/// Hash Key
-	class CKeyHash
+	/*class CKeyHash
 	{
 	public:
 		size_t	operator() (const CColumnIndex& key) const	{ return (uint32)(key.hash()); }
-	};
+	};*/
 
 	/// Map of lists
-	typedef std::hash_map<CColumnIndex, TIndexList, CKeyHash>			TListMap;
+	typedef CHashMap<CColumnIndex, TIndexList>			TListMap;
 
 	/// An Accessor on a list
 	class CAccessor

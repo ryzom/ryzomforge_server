@@ -25,8 +25,8 @@
 #include "game_share/persistent_data.h"
 
 // ai share
-#include "ai_share/ai_share.h"
-#include "ai_share/ai_actions.h"
+#include "ai_share.h"
+#include "ai_actions.h"
 
 
 

@@ -509,7 +509,7 @@ void CCreatureManager::dumpUnaffectedFaunaGroups(NLMISC::CLog & log)
 //---------------------------------------------------
 void CCreatureManager::removeNpcFromGroup( TAIAlias groupAlias, TAIAlias npcAlias )
 {
-	std::hash_map< unsigned int,CNPCGroup >::iterator it = _NpcGroups.find( groupAlias );
+	CHashMap< unsigned int,CNPCGroup >::iterator it = _NpcGroups.find( groupAlias );
 	if ( it == _NpcGroups.end() )
 	{
 		nlwarning("<CCreatureManager removeNpcFromGroup> Invalid NPC group %s", CPrimitivesParser::aliasToString(groupAlias).c_str());

@@ -38,7 +38,7 @@ CNamedItems::CNamedItems()
 //-----------------------------------------------------------------------------
 void CNamedItems::loadNamedItemsFromFile(const std::string & fileName)
 {
-	std::hash_map<std::string, CGameItemPtr>::iterator it;
+	CHashMap<std::string, CGameItemPtr>::iterator it;
 	for (it = _NamedItems.begin(); it != _NamedItems.end(); ++it)
 	{
 		GameItemManager.destroyItem((*it).second);
@@ -120,7 +120,7 @@ CGameItemPtr CNamedItems::createNamedItem(const std::string & name, uint32 quant
 //-----------------------------------------------------------------------------
 CGameItemPtr CNamedItems::getNamedItemRef(const std::string &name)
 {
-	std::hash_map<std::string, CGameItemPtr>::iterator it = _NamedItems.find(name);
+	CHashMap<std::string, CGameItemPtr>::iterator it = _NamedItems.find(name);
 	if (it == _NamedItems.end())
 	{
 		nlwarning("<NAMED_ITEMS> cant find item '%s'", name.c_str());

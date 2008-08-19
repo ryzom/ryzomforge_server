@@ -30,15 +30,12 @@
 #include "nel/georges/u_form.h"
 #include "nel/georges/u_form_loader.h"
 
-// STL
-#include <hash_map>
-
-typedef std::hash_map< NLMISC::CSheetId, CStaticItem, NLMISC::CHashBySheetId > CAllStaticItems;
+typedef CHashMap< NLMISC::CSheetId, CStaticItem, NLMISC::CSheetIdHashMapTraits> CAllStaticItems;
 //typedef std::map< NLMISC::CSheetId, CStaticItem > CAllStaticItems;
-typedef std::hash_map< NLMISC::CSheetId, CStaticGameBrick, NLMISC::CHashBySheetId > CAllBrickSheets;
-typedef std::hash_map< NLMISC::CSheetId, CStaticBrick, NLMISC::CHashBySheetId > CAllStaticBricks;
-typedef std::hash_map< NLMISC::CSheetId, CStaticRolemasterPhrase, NLMISC::CHashBySheetId > CAllRolemasterPhrases;
-typedef std::hash_map< NLMISC::CSheetId, CStaticCreatures, NLMISC::CHashBySheetId > CAllStaticCreatures;
+typedef CHashMap< NLMISC::CSheetId, CStaticGameBrick, NLMISC::CSheetIdHashMapTraits> CAllBrickSheets;
+typedef CHashMap< NLMISC::CSheetId, CStaticBrick, NLMISC::CSheetIdHashMapTraits> CAllStaticBricks;
+typedef CHashMap< NLMISC::CSheetId, CStaticRolemasterPhrase, NLMISC::CSheetIdHashMapTraits> CAllRolemasterPhrases;
+typedef CHashMap< NLMISC::CSheetId, CStaticCreatures, NLMISC::CSheetIdHashMapTraits> CAllStaticCreatures;
 
 
 // For fast linear browsing (excluding .saiphrase). The string is the sheet name without extension.

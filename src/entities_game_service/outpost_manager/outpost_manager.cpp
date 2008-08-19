@@ -568,7 +568,7 @@ void COutpostManager::doOutpostGuildDBUpdates()
 		TAIAlias outpostAlias = _OutpostsWaitingGuildDBUpdate[i].first;
 		COutpostGuildDBUpdater::TDBPropSet dbPropSet = _OutpostsWaitingGuildDBUpdate[i].second;
 
-		std::hash_map<uint, NLMISC::CSmartPtr<COutpost> >::iterator it = _OutpostsByAlias.find(outpostAlias);
+		CHashMap<uint, NLMISC::CSmartPtr<COutpost> >::iterator it = _OutpostsByAlias.find(outpostAlias);
 		if (it == _OutpostsByAlias.end())
 			continue;
 
@@ -811,7 +811,7 @@ void COutpostManager::saveOutpost(NLMISC::CSmartPtr<COutpost> outpost)
 //----------------------------------------------------------------------------
 NLMISC::CSmartPtr<COutpost> COutpostManager::getOutpostFromAlias( TAIAlias alias )
 {
-	std::hash_map<uint, NLMISC::CSmartPtr<COutpost> >::iterator it = _OutpostsByAlias.find( alias );
+	CHashMap<uint, NLMISC::CSmartPtr<COutpost> >::iterator it = _OutpostsByAlias.find( alias );
 	if ( it == _OutpostsByAlias.end() )
 		return NULL;
 	return (*it).second;

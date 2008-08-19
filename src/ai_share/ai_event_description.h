@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "ai_share/ai_vector.h"
+#include "ai_vector.h"
 
 class	CTmpPropertyZone : public NLMISC::CRefCount
 {

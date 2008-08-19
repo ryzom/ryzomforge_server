@@ -265,7 +265,7 @@ private:
 
 	CAIEntity*	tryToGetEntity	(const	char*	str, TSearchType searchType=AI_UNDEFINED);
 	// Global map of entity in this shard
-	std::hash_map<int,NLMISC::CDbgPtr<CAIEntityPhysical> >	_CAIEntityByDataSetRow;
+	CHashMap<int,NLMISC::CDbgPtr<CAIEntityPhysical> >	_CAIEntityByDataSetRow;
 	
 	// the random number generator
 	static	NLMISC::CRandom	_random;

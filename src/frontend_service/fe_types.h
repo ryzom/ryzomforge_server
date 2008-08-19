@@ -60,21 +60,24 @@ typedef uint32 TUid;
 /**
  * CInetAddress hash function
  */
-struct TInetAddressHash : public std::hash<NLNET::CInetAddress>
+class CInetAddressHashMapTraits
 {
 public:
-
-	/// Hash function
-	size_t operator() ( const NLNET::CInetAddress& x ) const
+	static const size_t bucket_size = 4;
+	static const size_t min_buckets = 8;
+	inline size_t operator() ( const NLNET::CInetAddress& x ) const
 	{
 		//return x.port();
 		return x.internalIPAddress();
 	}
-
+// 	bool operator() (const NLNET::CInetAddress &x1, const NLNET::CInetAddress &x2) const
+// 	{
+// 		return classId1 < classId2;
+// 	}
 };
 
 /// Type of client map by address
-typedef std::hash_map<NLNET::CInetAddress,CClientHost*,TInetAddressHash> THostMap;
+typedef CHashMap<NLNET::CInetAddress,CClientHost*,CInetAddressHashMapTraits> THostMap;
 #define GETCLIENTA(it) (*it).second
 
 /// TEMP! fe/client time/tick types

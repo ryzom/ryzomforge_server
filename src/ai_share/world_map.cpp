@@ -227,7 +227,7 @@ private:
 // CDirectionLayer                                                          //
 //////////////////////////////////////////////////////////////////////////////
 
-void CDirectionLayer::serial(IStream& f)
+void CDirectionLayer::serial(NLMISC::IStream& f)
 {
 	uint i;
 	for (i=0; i<9; ++i)
@@ -255,7 +255,7 @@ void CDirectionLayer::serial(IStream& f)
 // CDirectionMap                                                            //
 //////////////////////////////////////////////////////////////////////////////
 
-void CDirectionMap::serial(IStream& f)
+void CDirectionMap::serial(NLMISC::IStream& f)
 {
 	NL_ALLOC_CONTEXT(AIDMAPS);
 	uint i;
@@ -362,7 +362,7 @@ void CRootCell::save(NLMISC::IStream& f, CRootCell* cell)
 // CComputeCell                                                             //
 //////////////////////////////////////////////////////////////////////////////
 
-void CComputeCell::serial(IStream& f)
+void CComputeCell::serial(NLMISC::IStream& f)
 {
 	// Version
 	// 0: initial version
@@ -380,7 +380,7 @@ void CComputeCell::serial(IStream& f)
 bool	CSingleLayerCell::_Initialized = false;
 uint16	CSingleLayerCell::_MaskMap[16];
 
-void CSingleLayerCell::serial(IStream& f)
+void CSingleLayerCell::serial(NLMISC::IStream& f)
 {
 	f.serialCheck((uint16)'SL');
 	
@@ -411,7 +411,7 @@ void CSingleLayerCell::serial(IStream& f)
 // CMultiLayerCell                                                          //
 //////////////////////////////////////////////////////////////////////////////
 
-void CMultiLayerCell::serial(IStream& f)
+void CMultiLayerCell::serial(NLMISC::IStream& f)
 {
 	NL_ALLOC_CONTEXT(AIMLCS);
 	f.serialCheck((uint16)'ML');
@@ -459,7 +459,7 @@ void CMultiLayerCell::serial(IStream& f)
 // CSuperCell                                                               //
 //////////////////////////////////////////////////////////////////////////////
 
-void CSuperCell::serial(IStream& f)
+void CSuperCell::serial(NLMISC::IStream& f)
 {
 	// Version
 	// 0: initial version
@@ -562,7 +562,7 @@ void	CWorldMap::clear()
 }
 
 
-void	CWorldMap::serial(IStream &f)
+void	CWorldMap::serial(NLMISC::IStream &f)
 {
 	NL_ALLOC_CONTEXT(AIWMS);
 	f.serialCheck((uint32)'WMAP');

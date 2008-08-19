@@ -136,8 +136,8 @@ public:
 	};
 
 	/// Container of entities (all entities are referenced by this container
-	typedef std::hash_map< NLMISC::CEntityId, CWorldEntity *, CEntityIdHash >		TWorldEntityContainerByEId;
-	typedef std::hash_map<TDataSetRow, CWorldEntity *, TDataSetRow::CHashCode>		TWorldEntityContainer;
+	typedef CHashMap< NLMISC::CEntityId, CWorldEntity *, CEntityIdHash >		TWorldEntityContainerByEId;
+	typedef CHashMap<TDataSetRow, CWorldEntity *, TDataSetRow::CHashCode>		TWorldEntityContainer;
 
 	typedef CCell																	**TWorldCellsMap;
 
@@ -155,7 +155,7 @@ public:
 
 	typedef std::list< CWorldEntity * >												TRemovedEntityContainer;
 	typedef std::set< NLMISC::CEntityId >											TSetId;
-	typedef std::hash_map< NLMISC::CEntityId, CAroundEntityInfo, CEntityIdHash >	TEntitiesAroundEntityContainer;
+	typedef CHashMap< NLMISC::CEntityId, CAroundEntityInfo, CEntityIdHash >	TEntitiesAroundEntityContainer;
 
 	//typedef std::hash_map<NLMISC::CEntityId, CPlayerInfos*, CEntityIdHash >			TMapIdToPlayerInfos;
 

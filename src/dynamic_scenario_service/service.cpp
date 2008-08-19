@@ -35,7 +35,7 @@ using namespace R2;
 
 // force admin module to link in
 extern void admin_modules_forceLink();
-void foo()
+static void foo()
 {
 	admin_modules_forceLink();
 }
@@ -67,12 +67,12 @@ void CDynamicScenarioService::forwardToStringManagerModule (CMessage &msgin)
 }
 
 
-static  void cbForwardToStringManagerModule(CMessage &msgin, const std::string &serviceName, uint16 sid)
+static  void cbForwardToStringManagerModule(CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
 	nldebug("forwardToStringManagerModule");
 	CDynamicScenarioService::instance().forwardToStringManagerModule(msgin);
 }
-static void cbForwardToStringManagerModuleWithArg(CMessage &msgin, const std::string &serviceName, uint16 sid)
+static void cbForwardToStringManagerModuleWithArg(CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
 	nldebug("forwardToStringManagerModuleWithArg");
 	IServerAnimationModule *imodule = CDynamicMapService::getInstance()->getAnimationModule();
@@ -87,7 +87,7 @@ void CDynamicScenarioService::forwardIncarnChat(TChanID id,TDataSetRow senderId,
 	nldebug("Forwarding dyn chat \"%s\" to dms",sentence.c_str());
 }
 
-static void cbDynChatForward(CMessage &msgin, const std::string &serviceName, uint16 sid)
+static void cbDynChatForward(CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
 
 	TChanID id;
@@ -103,7 +103,7 @@ static void cbDynChatForward(CMessage &msgin, const std::string &serviceName, ui
 	nldebug("forwarding dyn chat \"%s\"",sentence.c_str());
 }
 
-static void cbSessionAck(CMessage &msgin, const std::string &serviceName, uint16 sid)
+static void cbSessionAck(CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
 	CDynamicMapService* dms = CDynamicMapService::getInstance();
 	IServerAnimationModule *imodule = dms->getAnimationModule();
@@ -111,7 +111,7 @@ static void cbSessionAck(CMessage &msgin, const std::string &serviceName, uint16
 	module->onProcessModuleMessage(0, msgin);
 }
 
-static void cbDssStartAct(CMessage &msgin, const std::string &serviceName, uint16 sid)
+static void cbDssStartAct(CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
 	CDynamicScenarioService& service = CDynamicScenarioService::instance();
 	CDynamicMapService* dms = CDynamicMapService::getInstance();
@@ -126,10 +126,10 @@ static void cbDssStartAct(CMessage &msgin, const std::string &serviceName, uint1
 	module->scheduleStartAct(sessionId, actId);
 }
 
-static void cbExecCommandResult(CMessage &msgin, const std::string &serviceName, uint16 sid)
+static void cbExecCommandResult(CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
 	// treat the rely message sent back from a service whom we asked to execute a command
-	NLMISC::InfoLog->displayNL("EXEC_COMMAND_RESULT' Received from: %3d: %s",sid,serviceName.c_str());
+	NLMISC::InfoLog->displayNL("EXEC_COMMAND_RESULT' Received from: %3d: %s",sid.toString().c_str(),serviceName.c_str());
 
 	// retrieve the text from the input message
 	CSString txt;
@@ -146,7 +146,7 @@ static void cbExecCommandResult(CMessage &msgin, const std::string &serviceName,
 	}
 }	
 
-static void cbBotDespawnNotification(NLNET::CMessage &msgin, const std::string &serviceName, uint16 sid)
+static void cbBotDespawnNotification(NLNET::CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
 	TAIAlias alias;
 	CEntityId creatureId;
@@ -173,7 +173,7 @@ TUnifiedCallbackItem CbArray[]=
 	{"----", NULL}
 };
 
-void cbServiceUp(const std::string &serviceName, uint16 serviceId, void *)
+void cbServiceUp(const std::string &serviceName, TServiceId serviceId, void *)
 {
 	nlinfo( "DSS: %s Service up", serviceName.c_str() );
 	if( serviceName == "AIS" )
@@ -221,7 +221,7 @@ void cbServiceUp(const std::string &serviceName, uint16 serviceId, void *)
 	}
 }
 
-void cbServiceDown(const std::string &serviceName, uint16 serviceId, void *)
+void cbServiceDown(const std::string &serviceName, TServiceId serviceId, void *)
 {
 	nlinfo( "DSS: %s Service down", serviceName.c_str() );
 	if( serviceName == "AIS" )

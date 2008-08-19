@@ -13,12 +13,10 @@
 #include "game_share/misc_const.h"
 #include "game_share/ryzom_entity_id.h"
 
-#include <hash_map>
-
 
 /**
  * Singleton used to get a bot entity id from its AI id and vice-versa
- * Useful because AIIDs are guaranted to be the same between two server sessions
+ * Useful because AIIDs are guaranteed to be the same between two server sessions
  * \author Nicolas Brigand
  * \author Nevrax France
  * \date 2002
@@ -135,17 +133,17 @@ private:
 	static CAIAliasTranslator* _Instance;
 
 	/// hash table using AI id as keys
-	std::hash_map< uint, NLMISC::CEntityId >						_HashTableAiId;
-	std::hash_map< NLMISC::CEntityId, TAIAlias,NLMISC::CEidHash >	_HashTableEntityId;
+	CHashMap< uint, NLMISC::CEntityId >						_HashTableAiId;
+	CHashMap< NLMISC::CEntityId, TAIAlias,NLMISC::CEntityIdHashMapTraits>	_HashTableEntityId;
 	
 	/// map linking bot names to ids
-	std::hash_multimap< std::string, TAIAlias >		_BotNamesToIds;
+	CHashMultiMap< std::string, TAIAlias >		_BotNamesToIds;
 	/// map linking bot ids to names
-	std::hash_map< uint, std::string >			_BotIdsToNames;
+	CHashMap< uint, std::string >			_BotIdsToNames;
 	/// map linking mission names to ids
-	std::hash_map< std::string, TAIAlias >		_MissionNamesToIds;
+	CHashMap< std::string, TAIAlias >		_MissionNamesToIds;
 	/// map linking AI group names to IDS
-	std::hash_multimap< std::string, TAIAlias > _AIGroupNamesToIds;
+	CHashMultiMap< std::string, TAIAlias > _AIGroupNamesToIds;
 
 	/// bool set to true if the mission and bot names must be kept
 	bool _KeepNames;
@@ -158,8 +156,8 @@ inline void CAIAliasTranslator::getNPCAliasesFromName(const std::string & botNam
 {
 	ret.clear();
 	std::string lwr = NLMISC::strlwr(botName);
-	std::pair< std::hash_multimap< std::string, TAIAlias>::const_iterator, std::hash_multimap< std::string, TAIAlias>::const_iterator > result = _BotNamesToIds.equal_range(lwr);
-	for ( std::hash_multimap< std::string, TAIAlias>::const_iterator it = result.first; it != result.second; ++it )
+	std::pair< CHashMultiMap< std::string, TAIAlias>::const_iterator, CHashMultiMap< std::string, TAIAlias>::const_iterator > result = _BotNamesToIds.equal_range(lwr);
+	for ( CHashMultiMap< std::string, TAIAlias>::const_iterator it = result.first; it != result.second; ++it )
 	{
 		ret.push_back( (*it).second );
 	}
@@ -172,8 +170,8 @@ inline void CAIAliasTranslator::getNPCAliasesFromNameInSet(const std::string & b
 {
 	ret.clear();
 	std::string lwr = NLMISC::strlwr(botName);
-	std::pair< std::hash_multimap< std::string, TAIAlias>::const_iterator, std::hash_multimap< std::string, TAIAlias>::const_iterator > result = _BotNamesToIds.equal_range(lwr);
-	for ( std::hash_multimap< std::string, TAIAlias>::const_iterator it = result.first; it != result.second; ++it )
+	std::pair< CHashMultiMap< std::string, TAIAlias>::const_iterator, CHashMultiMap< std::string, TAIAlias>::const_iterator > result = _BotNamesToIds.equal_range(lwr);
+	for ( CHashMultiMap< std::string, TAIAlias>::const_iterator it = result.first; it != result.second; ++it )
 	{
 		ret.insert( (*it).second );
 	}
@@ -184,7 +182,7 @@ inline void CAIAliasTranslator::getNPCAliasesFromNameInSet(const std::string & b
 //-----------------------------------------------
 inline bool CAIAliasTranslator::getNPCNameFromAlias(TAIAlias alias,std::string & ret) const
 {
-	std::hash_map< uint,std::string >::const_iterator it = _BotIdsToNames.find(alias);
+	CHashMap< uint,std::string >::const_iterator it = _BotIdsToNames.find(alias);
 	if ( it == _BotIdsToNames.end() )
 		return false;
 	ret = (*it).second;
@@ -197,7 +195,7 @@ inline bool CAIAliasTranslator::getNPCNameFromAlias(TAIAlias alias,std::string &
 inline void CAIAliasTranslator::getGroupAliasesFromName(const std::string & name, std::vector< TAIAlias >& aliases) const
 {
 	std::string lwr = NLMISC::strlwr(name);
-	std::hash_multimap< std::string, TAIAlias>::const_iterator it = _AIGroupNamesToIds.find(lwr);
+	CHashMultiMap< std::string, TAIAlias>::const_iterator it = _AIGroupNamesToIds.find(lwr);
 	while ( it != _AIGroupNamesToIds.end() && (*it).first == lwr )
 	{
 		aliases.push_back( (*it).second );
@@ -211,7 +209,7 @@ inline void CAIAliasTranslator::getGroupAliasesFromName(const std::string & name
 inline TAIAlias CAIAliasTranslator::getMissionUniqueIdFromName(const std::string & missionName) const
 {
 	std::string lwr = NLMISC::strlwr(missionName);
-	std::hash_map< std::string, TAIAlias>::const_iterator it = _MissionNamesToIds.find(lwr);
+	CHashMap< std::string, TAIAlias>::const_iterator it = _MissionNamesToIds.find(lwr);
 	if ( it == _MissionNamesToIds.end() )
 		return Invalid;
 	return (*it).second;
@@ -221,7 +219,7 @@ inline const std::string &CAIAliasTranslator::getMissionNameFromUniqueId(TAIAlia
 {
 	static const std::string emptyString;
 
-	std::hash_map< std::string, TAIAlias>::const_iterator first(_MissionNamesToIds.begin()), last(_MissionNamesToIds.end());
+	CHashMap< std::string, TAIAlias>::const_iterator first(_MissionNamesToIds.begin()), last(_MissionNamesToIds.end());
 	for (; first != last; ++first)
 	{
 		if (first->second == alias)
@@ -268,7 +266,7 @@ inline void CAIAliasTranslator::removeAssociation(NLMISC::CEntityId& entityId)
 {
 	if ( entityId.getType() != RYZOMID::npc )
 		return;
-	std::hash_map< NLMISC::CEntityId, TAIAlias, NLMISC::CEidHash >::iterator itEid = _HashTableEntityId.find(entityId);
+	CHashMap< NLMISC::CEntityId, TAIAlias, NLMISC::CEntityIdHashMapTraits>::iterator itEid = _HashTableEntityId.find(entityId);
 	if ( itEid == _HashTableEntityId.end() )
 	{
 		// No warning because not always inserted, see updateAssociation() (+ other reason it's already commented out?)
@@ -288,7 +286,7 @@ inline void CAIAliasTranslator::removeAssociation(NLMISC::CEntityId& entityId)
 //-----------------------------------------------
 inline const NLMISC::CEntityId& CAIAliasTranslator::getEntityId(TAIAlias aiid) const
 {
-	std::hash_map< uint, NLMISC::CEntityId >::const_iterator it = _HashTableAiId.find(aiid);
+	CHashMap< uint, NLMISC::CEntityId >::const_iterator it = _HashTableAiId.find(aiid);
 	if(  it != _HashTableAiId.end() )
 		return (*it).second;
 #ifndef FINAL_VERSION

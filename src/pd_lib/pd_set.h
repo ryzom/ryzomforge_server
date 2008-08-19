@@ -9,6 +9,7 @@
 
 #include "nel/misc/types_nl.h"
 #include <set>
+#include <map>
 
 namespace RY_PDS
 {
@@ -26,8 +27,9 @@ class CPDSet
 public:
 
 	/// Constructor
-	CPDSet();
-
+	CPDSet()
+	{
+	}
 
 public:
 

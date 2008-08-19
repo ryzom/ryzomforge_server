@@ -213,7 +213,7 @@ public:
 	/// player selected a dyn chat answer
 	void dynChatChoice( CCharacter * user, const TDataSetRow & botRow,uint8 choice );	
 	/// const access to the template pool
-	const std::hash_map< uint,CMissionTemplate* > &getMissionTemplates()	{ return _MissionTemplates;}
+	const CHashMap< uint,CMissionTemplate* > &getMissionTemplates()	{ return _MissionTemplates;}
 
 	/// check the place constraints of a mission
 	void checkPlaceConstraints ( CMission* mission);
@@ -282,7 +282,7 @@ private:
 	/// singleton's instance
 	static CMissionManager*							_Instance;
 	/// The mission templates, mapped by alias
-	std::hash_map< uint,CMissionTemplate* >			_MissionTemplates;
+	CHashMap< uint,CMissionTemplate* >			_MissionTemplates;
 	/// the mission timers
 	std::list< CMission* >							_TimedMissions;
 	/// the mono missions
@@ -296,12 +296,12 @@ private:
 	static std::map< std::string, uint32 >			_Emotes;
 
 	/// map linking a referenced mission aliases to the real mission alias
-	std::hash_map<uint,TAIAlias>					_RefMissions;
+	CHashMap<uint,TAIAlias>					_RefMissions;
 
 	/// npc groups being escorted. The key is the group alias. The data is the Alias of the mission linked to the group
-	std::hash_map<uint,TAIAlias>					_EscortGroups;
+	CHashMap<uint,TAIAlias>					_EscortGroups;
 
-	std::hash_multimap<NLMISC::CEntityId, TAIAlias,NLMISC::CEidHash > _SoloEscorts;
+	CHashMultiMap<NLMISC::CEntityId, TAIAlias,NLMISC::CEntityIdHashMapTraits> _SoloEscorts;
 
 	typedef std::map<TDataSetRow,CSteps> CStepsByCharacter;
 
@@ -319,7 +319,7 @@ private:
 		TDataSetRow			Bot;
 	};
 	/// dyn chats store by players
-	std::hash_multimap<TDataSetRow, CDynChat,TDataSetRow::CHashCode>	_DynChats;
+	CHashMultiMap<TDataSetRow, CDynChat,TDataSetRow::CHashCode>	_DynChats;
 
 	/// structures used to check place constraints in missions
 	struct CPlaceChecker
@@ -349,11 +349,11 @@ private:
 inline CMissionTemplate* CMissionManager::getTemplate(TAIAlias  alias)
 {
 	//first check if it is a reference
-	std::hash_map<uint,TAIAlias>::iterator itRef = _RefMissions.find( alias );
+	CHashMap<uint,TAIAlias>::iterator itRef = _RefMissions.find( alias );
 	if ( itRef != _RefMissions.end() )
 		alias = (*itRef).second;
 
-	std::hash_map<uint,CMissionTemplate*>::iterator it = _MissionTemplates.find( alias );
+	CHashMap<uint,CMissionTemplate*>::iterator it = _MissionTemplates.find( alias );
 	if ( it != _MissionTemplates.end() )
 		return ( (*it).second );
 	return NULL;

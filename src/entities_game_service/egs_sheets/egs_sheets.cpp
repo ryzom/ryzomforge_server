@@ -178,7 +178,7 @@ template <class T> void loadSheetSet(const vector<string> &fileTypes,const char 
 
 
 template <class T>
-void loadSheetSetForHashMap(const vector<string> &fileTypes,const char *sheetFile, hash_map<CSheetId,T,CHashBySheetId> &sheetHashMap)
+void loadSheetSetForHashMap(const vector<string> &fileTypes,const char *sheetFile, CHashMap<CSheetId,T,CSheetIdHashMapTraits> &sheetHashMap)
 {
 	// clear out the previous sheet set	(just in case this is a re-read)
 	sheetHashMap.clear();
@@ -733,7 +733,7 @@ template <class T> void reloadSheetSet2(const string &fileType, T &sheetMap, con
 }
 
 template <class T>
-void reloadSheetSetForHashMap(const vector<string> &fileTypes, hash_map<CSheetId,T,CHashBySheetId> &sheetHashMap, const string &wildcardFilter)
+void reloadSheetSetForHashMap(const vector<string> &fileTypes, CHashMap<CSheetId,T,CSheetIdHashMapTraits> &sheetHashMap, const string &wildcardFilter)
 {
 	// clear out the previous sheet set	(just in case this is a re-read)
 	sheetHashMap.clear();

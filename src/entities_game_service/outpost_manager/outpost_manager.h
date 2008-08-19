@@ -156,7 +156,7 @@ private:
 	TOutposts	 _Outposts;
 
 	/// managed outposts, accessible by alias
-	std::hash_map<uint, NLMISC::CSmartPtr<COutpost> > _OutpostsByAlias;
+	CHashMap<uint, NLMISC::CSmartPtr<COutpost> > _OutpostsByAlias;
 	
 	/// managed outposts, accessible by sheet
 	std::map<NLMISC::CSheetId, NLMISC::CSmartPtr<COutpost> > _OutpostsBySheet;

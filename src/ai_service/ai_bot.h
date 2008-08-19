@@ -49,7 +49,7 @@ class CSpawnBot
 , public CDynSpawnBot
 {
 public:
-	typedef std::hash_map<size_t, uint32> TPropList;
+	typedef CHashMap<size_t, uint32> TPropList;
 	
 public:
 	

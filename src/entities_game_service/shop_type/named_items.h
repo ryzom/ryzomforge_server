@@ -75,7 +75,7 @@ private:
 	static CNamedItems * _Instance;
 
 	/// named items, sorted by names
-	std::hash_map<std::string, CGameItemPtr> _NamedItems;
+	CHashMap<std::string, CGameItemPtr> _NamedItems;
 };
 
 

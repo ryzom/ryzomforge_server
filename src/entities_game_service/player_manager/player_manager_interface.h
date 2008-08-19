@@ -34,7 +34,7 @@ public:
 
 	typedef uint32	TUserId;
 
-	typedef std::hash_map< TUserId, SCPlayer, CUint32Hash > TMapPlayers;
+	typedef CHashMap< TUserId, SCPlayer, CUint32Hash > TMapPlayers;
 
 
 	IPlayerManager()

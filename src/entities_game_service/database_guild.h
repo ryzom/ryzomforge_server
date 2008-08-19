@@ -948,19 +948,17 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		}
 	
 	};
-		
 
 	private:
 		ICDBStructNode	*_BranchNode;
 
-		TSP _SP[24];
+		TSP __SP[24];
 		TT _T[24];
-		
 
 	public:
 		void init(ICDBStructNode *parent);
 
-		// accessor to branch node
+		// accessors to branch node
 		ICDBStructNode *getCDBNode()
 		{
 			return _BranchNode;
@@ -969,7 +967,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		TSP &getSP(uint32 index)
 		{
 			nlassert(index < 24);
-			return _SP[index];
+			return __SP[index];
 		}
 		TT &getT(uint32 index)
 		{

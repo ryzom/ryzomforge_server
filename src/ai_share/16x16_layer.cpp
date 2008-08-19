@@ -15,7 +15,7 @@ using namespace NLMISC;
 /*
  * Loads a 16x16Layer and returns a pointer to it. Layer is automatically allocated.
  */
-I16x16Layer		*I16x16Layer::load(IStream &f)
+I16x16Layer		*I16x16Layer::load(NLMISC::IStream &f)
 {
 	NL_ALLOC_CONTEXT(AII16LL);
 	uint8	type = 0;
@@ -42,7 +42,7 @@ I16x16Layer		*I16x16Layer::load(IStream &f)
 /*
  * Saves a 16x16Layer.
  */
-void			I16x16Layer::save(IStream &f, I16x16Layer *layer)
+void			I16x16Layer::save(NLMISC::IStream &f, I16x16Layer *layer)
 {
 	uint8	type = 0;
 

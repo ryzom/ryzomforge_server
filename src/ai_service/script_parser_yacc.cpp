@@ -213,7 +213,7 @@ bool aiCompile (std::vector<size_t> &dest, const char *script, const char *scrip
 
 #ifdef NL_OS_WINDOWS
 	if (win32Report)
-		MessageBox (NULL, aiErrorMessage.c_str (), "AI Script Compiler", MB_OK|(error?MB_ICONEXCLAMATION:MB_ICONINFORMATION));
+		MessageBoxA (NULL, aiErrorMessage.c_str (), "AI Script Compiler", MB_OK|(error?MB_ICONEXCLAMATION:MB_ICONINFORMATION));
 #endif // NL_OS_WINDOWS
 
 	// Clean all

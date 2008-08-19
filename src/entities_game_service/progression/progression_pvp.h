@@ -205,7 +205,7 @@ protected:
 	void cbCreatureReferenceRemoved(TDataSetRow ownerRowId, TDataSetRow creatureRowId);
 
 private:
-	typedef std::hash_map<TDataSetRow, std::vector<TDataSetRow>, TDataSetRow::CHashCode>	TPlayersWoundedByEntity;
+	typedef CHashMap<TDataSetRow, std::vector<TDataSetRow>, TDataSetRow::CHashCode>	TPlayersWoundedByEntity;
 	typedef std::map<TTeamId, std::vector<TDataSetRow> >									TPlayersWoundedByTeam;
 
 	/// players wounded by team
@@ -359,7 +359,7 @@ private:
 		uint32				HoFPointLoss;
 	};
 
-	typedef std::hash_map<TDataSetRow, CDamageScoreTable, TDataSetRow::CHashCode>	TDamageScoreTablesByPlayer;
+	typedef CHashMap<TDataSetRow, CDamageScoreTable, TDataSetRow::CHashCode>	TDamageScoreTablesByPlayer;
 	typedef std::map<NLMISC::CEntityId, CPointLoss>									TPointLossByPlayer;
 
 	/// damage score tables by player

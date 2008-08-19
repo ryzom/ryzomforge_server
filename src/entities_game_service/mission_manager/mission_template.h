@@ -9,8 +9,6 @@
 #ifndef RY_MISSION_TEMPLATE_H
 #define RY_MISSION_TEMPLATE_H
 
-#include <hash_map>
-
 #include "nel/ligo/primitive.h"
 #include "nel/misc/string_mapper.h"
 
@@ -105,7 +103,7 @@ public:
 	const std::string &getMissionName() const;
 
 	/// build from a primitive
-	bool				build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsingData & globalData, std::hash_map<uint,TAIAlias> & refMissions, const std::string &missionName, TAIAlias defautltNpcGiverAlias);
+	bool				build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsingData & globalData, CHashMap<uint,TAIAlias> & refMissions, const std::string &missionName, TAIAlias defautltNpcGiverAlias);
 
 	/// return the highest step index among the step that are out of order with the specified index
 	inline uint32		getOutOfOrderSteps(uint32 firstStep);

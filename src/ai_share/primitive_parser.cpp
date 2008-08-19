@@ -272,21 +272,18 @@ static void lookForMissions(const IPrimitive *prim, std::vector<int> &missions, 
 //---------------------------------------------------------------------------------------
 // handy structures for dealing with folders and their sub-trees
 //---------------------------------------------------------------------------------------
-
 struct SFolderRef
 {
-	SFolderRef(){}
-	SFolderRef(const CAIAliasDescriptionNode *node,const IPrimitive *prim):
-		Prim(prim), Node(node)
-	{}
+	SFolderRef() { }
+	SFolderRef(const CAIAliasDescriptionNode *node,const IPrimitive *prim) : Prim(prim), Node(node) { }
 
 	const IPrimitive *Prim;
-	const NLMISC::CSmartPtr<const CAIAliasDescriptionNode> Node;
+ 	NLMISC::CSmartPtr<const CAIAliasDescriptionNode> Node;
 };
 
 
 
-// the following variables are setup by parsePrimGrpNpc() and refferenced by parsePrimNpcBot 
+// the following variables are setup by parsePrimGrpNpc() and referenced by parsePrimNpcBot 
 //oldlevel static std::string DefaultBotLevel;
 static std::string DefaultBotLook;
 static uint32	DefaultBotVerticalPos = vp_auto;
@@ -344,7 +341,7 @@ static const CAIAliasDescriptionNode *nextTreeNode(const CAIAliasDescriptionNode
 static	void	buildAliasTree(CAIAliasDescriptionNode *treeNode,CAIAliasDescriptionNode *rootNode,const IPrimitive *prim,std::vector<SFolderRef> &folders)
 {
 	NL_ALLOC_CONTEXT(AIS_buildAliasTree);
-	// run through the node children looking for nodes with types that we recognise
+	// run through the node children looking for nodes with types that we recognize
 	for	(uint i=0;i<prim->getNumChildren();++i)
 	{
 		// get a pointer to the child and make sure its valid
@@ -384,10 +381,10 @@ static	void	buildAliasTree(CAIAliasDescriptionNode *treeNode,CAIAliasDescription
 					parentNode->fullName().c_str(), name.c_str(),
 					treeNode->fullName().c_str());
 			}
-						  
+			  
 			// create a new tree node as a child of treeNode
 			NLMISC::CSmartPtr<CAIAliasDescriptionNode>	node=new CAIAliasDescriptionNode(name,uniqueId,type,parentNode);
-			
+
 			// parse this branch as a sub-tree of our new node
 			buildAliasTree(node,rootNode,child,folders);
 

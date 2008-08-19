@@ -163,7 +163,7 @@ IDestination * CBuildingTest::getRandomDestination()
 	do
 	{
 		sint32 randomNumber = RandomGenerator.rand( bm->_Triggers.size()-1 );
-		hash_map<sint,CBuildingManager::CTrigger>::iterator itTrigger = bm->_Triggers.begin();
+		CHashMap<sint,CBuildingManager::CTrigger>::iterator itTrigger = bm->_Triggers.begin();
 		for (sint32 i = 0; i < randomNumber; i++)
 		{
 			++itTrigger;

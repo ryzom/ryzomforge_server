@@ -87,7 +87,7 @@ private:
 	};
 
 	// table to map CEntityId to TCLEntityId
-	typedef std::hash_map<TEntityIndex, CLFECOMMON::TCLEntityId, CHash>	TCEIdMap;
+	typedef CHashMap<TEntityIndex, CLFECOMMON::TCLEntityId, CHash>	TCEIdMap;
 
 	/// Associates a CEntityId to a unique TCLEntityId
 	TCEIdMap		_ClientEntityIdMap;

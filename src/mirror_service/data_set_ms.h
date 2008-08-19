@@ -16,7 +16,8 @@
 #include "tick_proxy.h"
 #include <nel/net/service.h>
 
-#include <slist>
+//#include <slist>
+#define slist list
 
 #undef DISPLAY_DELTAS
 

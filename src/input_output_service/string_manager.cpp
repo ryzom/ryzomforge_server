@@ -242,7 +242,7 @@ void CStringManager::TSheetInfo::readGeorges (const NLMISC::CSmartPtr<NLGEORGES:
 		SheetName = SheetName.substr(0, SheetName.find(ext));
 		// remove ending '.'
 		if (!SheetName.empty() && *SheetName.rbegin() == '.')
-			SheetName.pop_back();
+			SheetName.resize(SheetName.size()-1);
 
 		std::string gender;
 

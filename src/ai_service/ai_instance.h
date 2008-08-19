@@ -55,7 +55,7 @@ public:
 	CAIInstance(CAIS* owner);
 	virtual ~CAIInstance();
 	
-	typedef	std::hash_map<NLMISC::TStringId, NLMISC::CDbgPtr<CNpcZone>, NLMISC::CStringIdHasher> TZoneList;
+	typedef	CHashMap<NLMISC::TStringId, NLMISC::CDbgPtr<CNpcZone>, NLMISC::CStringIdHashMapTraits> TZoneList;
 	TZoneList zoneList;
 	void addZone(std::string const& zoneName, CNpcZone* zone);
 	void removeZone(std::string const& zoneName, CNpcZone* zone);

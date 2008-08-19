@@ -24,7 +24,6 @@
 #include "r2_share/r2_share_itf.h"
 
 #include <map>
-#include <hash_map>
 #include <string>
 #include <list>
 
@@ -420,7 +419,7 @@ public:
 		uint32	ItemNameId;
 	};
 	// Ring user item container
-	typedef std::hash_map<NLMISC::CSheetId, std::vector<TRingUserItemInfo>, NLMISC::CHashBySheetId >	TRingUserItemInfos;
+	typedef CHashMap<NLMISC::CSheetId, std::vector<TRingUserItemInfo>, NLMISC::CSheetIdHashMapTraits >	TRingUserItemInfos;
 
 private:
 	/// A name ordered container to store the phrases.

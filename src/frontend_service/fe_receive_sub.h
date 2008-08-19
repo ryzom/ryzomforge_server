@@ -63,7 +63,7 @@ struct THackingDesc
 };
 
 /// Type of address set with counter
-typedef std::hash_map<NLNET::CInetAddress,THackingDesc,TInetAddressHash> THackingAddrSet;
+typedef CHashMap<NLNET::CInetAddress,THackingDesc,CInetAddressHashMapTraits> THackingAddrSet;
 
 /// Type of map of ip -> user id
 typedef std::map<uint32,TUid> TAutoUidMap;

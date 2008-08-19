@@ -260,9 +260,9 @@ class CPhraseManager : public NLMISC::CSingleton<CPhraseManager>
 {	
 public:
 	//typedef std::map<TDataSetRow, CEntityPhrases>				TMapIdToPhraseStruc;
-	typedef std::hash_map<TDataSetRow, TDataSetRow, TDataSetRow::CHashCode>				TRowRowMap;
-	typedef std::hash_map<TDataSetRow, std::set<TDataSetRow>, TDataSetRow::CHashCode>	TRowSetRowMap;
-	typedef std::hash_map<TDataSetRow, uint32, TDataSetRow::CHashCode>					TMapIdToIndex;
+	typedef CHashMap<TDataSetRow, TDataSetRow, TDataSetRow::CHashCode>				TRowRowMap;
+	typedef CHashMap<TDataSetRow, std::set<TDataSetRow>, TDataSetRow::CHashCode>	TRowSetRowMap;
+	typedef CHashMap<TDataSetRow, uint32, TDataSetRow::CHashCode>					TMapIdToIndex;
 public:
 /*	/// getInstance
 	static inline CPhraseManager *getInstance()

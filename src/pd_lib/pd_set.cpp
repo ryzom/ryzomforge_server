@@ -9,13 +9,4 @@
 namespace RY_PDS
 {
 
-
-/*
- * Constructor
- */
-CPDSet::CPDSet()
-{
-}
-
-
 }; // RY_PDS

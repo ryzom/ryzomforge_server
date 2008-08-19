@@ -8,7 +8,6 @@
 
 
 #include "nel/misc/types_nl.h"
-#include <hash_map>
 
 #include "nel/misc/singleton.h"
 #include "nel/misc/string_mapper.h"
@@ -59,7 +58,7 @@ class CDBStringUpdater : public NLMISC::CSingleton<CDBStringUpdater>
 		bool			ForceSending;
 	};
 
-	typedef std::hash_map<TBDStringLeaf, TStringLeafInfo, THashDBStringLeaf> TStringLeafs;
+	typedef CHashMap<TBDStringLeaf, TStringLeafInfo, THashDBStringLeaf> TStringLeafs;
 
 	// All the string leaf with non empty string
 	TStringLeafs			_StringLeafs;

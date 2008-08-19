@@ -730,7 +730,7 @@ tryWithEntityId:
 
 CAIEntityPhysical	*CAIS::getEntityPhysical(const TDataSetRow&	row)
 {
-	std::hash_map <int,NLMISC::CDbgPtr<CAIEntityPhysical> >::iterator	it(_CAIEntityByDataSetRow.find(row.getIndex()));
+	CHashMap<int,NLMISC::CDbgPtr<CAIEntityPhysical> >::iterator	it(_CAIEntityByDataSetRow.find(row.getIndex()));
 	
 	if	(it!=_CAIEntityByDataSetRow.end())
 		return	(*it).second;

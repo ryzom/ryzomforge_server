@@ -221,7 +221,7 @@ void CAIAliasTranslator::sendAliasToIOS() const
 	enum {Set=0, Add = 1, Delete=2  };
 	uint32 subcommand = static_cast<uint32>(Set);
 	msg.serial( subcommand );
-	typedef std::hash_map< uint, std::string > TContainer;
+	typedef CHashMap< uint, std::string > TContainer;
 	TContainer::const_iterator first(_BotIdsToNames.begin());
 	TContainer::const_iterator last(_BotIdsToNames.end());		
 	uint32 size = static_cast<uint32>(_BotIdsToNames.size());
@@ -239,7 +239,7 @@ void CAIAliasTranslator::sendAliasToIOS() const
 TAIAlias CAIAliasTranslator::getAIAlias(const NLMISC::CEntityId & entityId) const
 {
 
-	typedef std::hash_map< NLMISC::CEntityId, TAIAlias,NLMISC::CEidHash > TContainer;
+	typedef CHashMap< NLMISC::CEntityId, TAIAlias,NLMISC::CEntityIdHashMapTraits> TContainer;
 	TContainer::const_iterator it(_HashTableEntityId.find(entityId));	
 	if(  it != _HashTableEntityId.end() )
 		return (*it).second;

@@ -11,7 +11,7 @@
 #include "nel/misc/md5.h"
 
 #include "backup_service.h"
-#include "../game_share/persistent_data.h"
+#include "game_share/persistent_data.h"
 
 using namespace std;
 using namespace NLMISC;

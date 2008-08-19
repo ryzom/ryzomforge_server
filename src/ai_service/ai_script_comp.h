@@ -55,7 +55,7 @@ public:
 
 	void	add(CFightScriptCompReader	*reader);
 
-	typedef	std::hash_map<std::string, NLMISC::CSmartPtr<CFightScriptCompReader> >	TFightScriptMap;
+	typedef	CHashMap<std::string, NLMISC::CSmartPtr<CFightScriptCompReader> >	TFightScriptMap;
 
 	static	TFightScriptMap	_ScriptCompList;
 protected:	

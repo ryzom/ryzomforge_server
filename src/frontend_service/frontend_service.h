@@ -44,7 +44,7 @@ namespace CLFECOMMON
 }
 
 
-typedef std::hash_map< TDataSetIndex, std::string, std::hash<int> > TEntityNamesMap;
+typedef CHashMap< TDataSetIndex, std::string> TEntityNamesMap;
 
 extern NLMISC::CVariable<bool>			UseWebPatchServer;
 extern NLMISC::CVariable<bool>			AcceptClientsAtStartup;

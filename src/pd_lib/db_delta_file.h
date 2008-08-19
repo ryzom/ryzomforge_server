@@ -218,7 +218,7 @@ private:
 
 
 	/// Map of index position in file
-	typedef std::hash_map<uint32, uint32, RY_PDS::CDefaultHash<uint32> >	TIndexMap;
+	typedef CHashMap<uint32, uint32>	TIndexMap;
 	TIndexMap			_IndexMap;
 
 

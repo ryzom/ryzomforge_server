@@ -303,7 +303,7 @@ void CManagerPlayer::removeDespawnedPlayer(TDataSetRow const& dataSetRow)
 		// update team composition
 		if (player->getCurrentTeamId() != CTEAM::InvalidTeamId)
 		{
-			std::hash_map<int, std::set<TDataSetRow> >::iterator it(_teams.find(player->getCurrentTeamId()));
+			CHashMap<int, std::set<TDataSetRow> >::iterator it(_teams.find(player->getCurrentTeamId()));
 			if (it != _teams.end())
 			{
 				it->second.erase(dataSetRow);
@@ -324,7 +324,7 @@ void CManagerPlayer::updatePlayerTeam(TDataSetRow const& dataSetRow)
 		uint16 const oldTeam = it->second->getCurrentTeamId();
 		if (oldTeam!=CTEAM::InvalidTeamId)
 		{
-			std::hash_map<int, std::set<TDataSetRow> >::iterator it(_teams.find(oldTeam));
+			CHashMap<int, std::set<TDataSetRow> >::iterator it(_teams.find(oldTeam));
 			if (it != _teams.end())
 			{
 				it->second.erase(dataSetRow);

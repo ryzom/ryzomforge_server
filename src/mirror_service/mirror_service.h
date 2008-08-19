@@ -52,7 +52,7 @@ class TPropertiesInMirrorMS : public TMapOfPropertyInfoBase < TPropertyInfoMS, C
 /*
  * TDataSetsMS map with keys as string (name)
  */
-class TNDataSetsMS : public std::hash_map< std::string, CDataSetMS*, std::hash<std::string> >
+class TNDataSetsMS : public CHashMap< std::string, CDataSetMS* >
 {
 public:
 

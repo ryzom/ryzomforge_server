@@ -74,7 +74,7 @@ namespace ENTITYLOC
 		typedef uint32 TCharId;
 		typedef uint32 TShardId;
 
-		struct CHash
+/*		struct CHash
 		{
 			size_t	operator () (const uint32 id) const 
 			{
@@ -96,7 +96,7 @@ namespace ENTITYLOC
 			  return size_t(__h);
 			}
 		};
-
+*/
 		struct TCharInfo
 		{
 			TShardId	ShardId;
@@ -110,16 +110,16 @@ namespace ENTITYLOC
 		TLocatorClient		_LocatorClients;
 		TLocatorIndex		_LocatorIndex;
 
-		typedef hash_map<TUserId, TShardId, CHash>		TUserMap;
+		typedef CHashMap<TUserId, TShardId>		TUserMap;
 
 		// Current connected players
 		TUserMap			_ConnectedUsers;
 
-		typedef hash_map<TCharId, TCharInfo, CHash>		TCharMap;
+		typedef CHashMap<TCharId, TCharInfo>		TCharMap;
 		// current connected character
 		TCharMap			_ConnectedChars;
 
-		typedef hash_map<ucstring, TCharId, CHashUCString>	TCharNameMap;
+		typedef CHashMap<ucstring, TCharId, CUCStringHashMapTraits>	TCharNameMap;
 		// Index of connected character by name
 		TCharNameMap		_ConnectedCharsByName;
 

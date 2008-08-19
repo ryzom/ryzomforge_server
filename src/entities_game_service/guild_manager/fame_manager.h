@@ -234,7 +234,7 @@ private:
 	};
 
 
-	typedef std::hash_map<TDataSetRow, TFameOwnerWrite*, TDataSetRow::CHashCode>	TFameContainer;
+	typedef CHashMap<TDataSetRow, TFameOwnerWrite*, TDataSetRow::CHashCode>	TFameContainer;
 	/// storage for fame owner
 	TFameContainer			_FamesOwners;
 

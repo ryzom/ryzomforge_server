@@ -443,7 +443,7 @@ private:
 		size_t	operator() (const TKey& key) const	{ return ((uint32)key) ^ ((uint32)(key >> 32)); }
 	};
 
-	typedef std::hash_map<TKey, RY_PDS::CObjectIndex, CKeyHash>	TKeyMap;
+	typedef CHashMap<TKey, RY_PDS::CObjectIndex>	TKeyMap;
 	TKeyMap			_KeyMap;
 
 	/// Row Mapper link, in case of mapped table that inherit from another

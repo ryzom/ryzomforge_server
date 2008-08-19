@@ -112,7 +112,7 @@ private:
 		size_t	operator () ( NLMISC::CEntityId id ) const { return (uint32)id.getShortId(); }
 	};
 
-	typedef std::hash_map<NLMISC::CEntityId, TClientId, CIdHash>	TIdToClientMap;
+	typedef CHashMap<NLMISC::CEntityId, TClientId, CIdHash>	TIdToClientMap;
 
 	/// Access TClientId indexed by TEntityIndex (if the entity is a client connected on this FS)
 	TEntityIndexToClient		_EntityIndexToClient;

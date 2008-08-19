@@ -152,7 +152,7 @@ NLMISC_COMMAND(addSuccessfulMission,"add a successful mission to the player","<p
 	if (user)
 	{
 		TAIAlias alias = atoi( args[1].c_str() );
-		const std::hash_map< uint,CMissionTemplate* > &mts = CMissionManager::getInstance()->getMissionTemplates();
+		const CHashMap< uint,CMissionTemplate* > &mts = CMissionManager::getInstance()->getMissionTemplates();
 		if (mts.find(alias) == mts.end())
 		{
 			log.displayNL("Invalid mission");
@@ -223,8 +223,8 @@ NLMISC_COMMAND(clearMissionGlobalReplayTimer, "Clear the global replay timer of 
 {
 	CMissionManager *mm = CMissionManager::getInstance();
 
-	const std::hash_map< uint,CMissionTemplate* >&mts = mm->getMissionTemplates();
-	std::hash_map< uint,CMissionTemplate* >::const_iterator first(mts.begin()), last(mts.end());
+	const CHashMap< uint,CMissionTemplate* >&mts = mm->getMissionTemplates();
+	CHashMap< uint,CMissionTemplate* >::const_iterator first(mts.begin()), last(mts.end());
 	for (; first != last; ++first)
 	{
 		const CMissionTemplate *mt = first->second;

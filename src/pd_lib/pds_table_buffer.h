@@ -55,7 +55,7 @@ public:
 	typedef uint8*		TRowData;
 
 	/// Map of Rows
-	typedef std::hash_map<RY_PDS::TRowIndex, TRowData, RY_PDS::CDefaultHash<RY_PDS::TRowIndex> >	TRowMap;
+	typedef CHashMap<RY_PDS::TRowIndex, TRowData>	TRowMap;
 
 	/**
 	 * Row Accessor, embeds any row access

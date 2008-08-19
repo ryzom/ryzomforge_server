@@ -9,7 +9,6 @@
 #ifndef RY_BUILDING_MANAGER_H
 #define RY_BUILDING_MANAGER_H
 
-#include <hash_map>
 #include "nel/ligo/primitive.h"
 #include "building_enums.h"
 #include "egs_pd.h"
@@ -186,10 +185,10 @@ private:
 	}
 	
 	/// container of triggers
-	std::hash_map< sint,CTrigger >	_Triggers;
+	CHashMap< sint,CTrigger >	_Triggers;
 
 	/// trigger requests of the players
-	typedef std::hash_map< TDataSetRow , CTriggerRequest , TDataSetRow::CHashCode > TTriggerRequestCont;
+	typedef CHashMap< TDataSetRow , CTriggerRequest , TDataSetRow::CHashCode > TTriggerRequestCont;
 	TTriggerRequestCont		_TriggerRequests;
 
 	/// physical buildings by name

@@ -361,7 +361,7 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 		return;
 
 	/// get the trigger associated with the pacs trigger id
-	hash_map<sint,CTrigger>::iterator itTrigger =  _Triggers.find( triggerId );
+	CHashMap<sint,CTrigger>::iterator itTrigger =  _Triggers.find( triggerId );
 	if ( itTrigger == _Triggers.end() )
 	{
 		nlwarning("<BUILDING> trigger %u is invalid. There was probably errors encountered during parsing", triggerId);

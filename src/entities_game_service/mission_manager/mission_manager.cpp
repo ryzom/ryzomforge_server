@@ -278,7 +278,7 @@ CMissionManager::CMissionManager()
 	// build copy missions
 	for ( uint i = 0; i < globalData.CopyMissions.size(); i++ )
 	{
-		std::hash_map< uint,CMissionTemplate* >::iterator it = _MissionTemplates.find( globalData.CopyMissions[i].second );
+		CHashMap< uint,CMissionTemplate* >::iterator it = _MissionTemplates.find( globalData.CopyMissions[i].second );
 		if ( it == _MissionTemplates.end() )
 		{
 			MISLOG("copy mission alias %s references bad mission alias %s, which could not be built",
@@ -288,7 +288,7 @@ CMissionManager::CMissionManager()
 		}
 		else
 		{
-			std::hash_map< uint,CMissionTemplate* >::iterator itTest = _MissionTemplates.find( globalData.CopyMissions[i].first );
+			CHashMap< uint,CMissionTemplate* >::iterator itTest = _MissionTemplates.find( globalData.CopyMissions[i].first );
 			if ( itTest == _MissionTemplates.end() )
 			{
 				MISLOG("copy mission alias %s not found!!!", CPrimitivesParser::aliasToString(globalData.CopyMissions[i].first).c_str());
@@ -304,14 +304,14 @@ CMissionManager::CMissionManager()
 	// check consistency of reference missions
 	MISLOG("available reference missions:");
 	uint countRef = 0;
-	std::hash_map< uint, TAIAlias >::iterator itRef = _RefMissions.begin();
+	CHashMap< uint, TAIAlias >::iterator itRef = _RefMissions.begin();
 	for (; itRef != _RefMissions.end();  )
 	{
 		TAIAlias refAlias = (*itRef).first;
 		TAIAlias realAlias = (*itRef).second;
 		if ( _MissionTemplates.erase( refAlias ) != 0 )
 		{
-			std::hash_map< uint,CMissionTemplate* >::iterator it = _MissionTemplates.find( realAlias );
+			CHashMap< uint,CMissionTemplate* >::iterator it = _MissionTemplates.find( realAlias );
 			if ( it != _MissionTemplates.end() )
 			{
 				
@@ -335,7 +335,7 @@ CMissionManager::CMissionManager()
 		else
 			MISLOG("ref mission alias %s was not found!!!", CPrimitivesParser::aliasToString(refAlias).c_str() );
 		
-		std::hash_map< uint, TAIAlias >::iterator itDel = itRef;
+		CHashMap< uint, TAIAlias >::iterator itDel = itRef;
 		++itRef;
 		_RefMissions.erase( itDel );
 	}
@@ -365,7 +365,7 @@ CMissionManager::CMissionManager()
 	MISLOG("available missions:");
 
 	uint	count = 0;
-	std::hash_map< uint,CMissionTemplate* >::const_iterator it = _MissionTemplates.begin();
+	CHashMap< uint,CMissionTemplate* >::const_iterator it = _MissionTemplates.begin();
 	for ( ;it!= _MissionTemplates.end();++it )
 	{
 		std::map<TAIAlias,std::string>::iterator itName = globalData.NameMap.find( (*it).first );
@@ -386,7 +386,7 @@ CMissionManager::CMissionManager()
 CMissionManager::~CMissionManager()
 {
 	MissionLog.release();
-	hash_map<uint,CMissionTemplate*>::iterator it = _MissionTemplates.begin();
+	CHashMap<uint,CMissionTemplate*>::iterator it = _MissionTemplates.begin();
 	for ( ; it != _MissionTemplates.end(); ++it )
 		delete (*it).second;
 }// CMissionManager dtor
@@ -417,7 +417,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			badMissionCount++;
 			return false;
 		}
-		hash_map<uint,CMissionTemplate*>::iterator itAlias =  _MissionTemplates.find( templ->Alias );
+		CHashMap<uint,CMissionTemplate*>::iterator itAlias =  _MissionTemplates.find( templ->Alias );
 		if  (  itAlias != _MissionTemplates.end() )
 		{
 			
@@ -1152,7 +1152,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 	vector<TAIAlias> aliases;
 	// close all interfaces
 	// TODO nico : maybe this could be factored with 'removeAllUserChats' by using a predicate
-	hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
+	CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
 	for (; it!= _DynChats.end() && (*it).first == user->getEntityRowId(); ++it )
 	{
 		if (it->second.Bot != dynChat.Bot)
@@ -1184,7 +1184,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 	it = _DynChats.find(user->getEntityRowId());
 	while (it!= _DynChats.end() && (*it).first == user->getEntityRowId())
 	{
-		hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator tmpIt = it;
+		CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator tmpIt = it;
 		++ it;
 		if (tmpIt->second.Bot != dynChat.Bot)
 		{
@@ -1208,7 +1208,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 	bool openChat = true;	
 	while ( it!= _DynChats.end() && (*it).first == user->getEntityRowId() )
 	{
-		hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator tmpIt = it;
+		CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator tmpIt = it;
 		++ it;
 		if ( (*tmpIt).second.Bot == bot->getEntityRowId() )
 		{
@@ -1253,7 +1253,7 @@ void CMissionManager::switchDynChatSpeaker(CCharacter * user, const NLMISC::CEnt
 		nlwarning("<MISSIONS>invalid successorId %s", successorId.toString().c_str());
 		return;
 	}
-	std::hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
+	CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
 	// give all dynchat to the successor
 	bool open = true;
 	while ( it!= _DynChats.end() && (*it).first == user->getEntityRowId() )
@@ -1266,7 +1266,7 @@ void CMissionManager::switchDynChatSpeaker(CCharacter * user, const NLMISC::CEnt
 			 ( templ->Type == MISSION_DESC::Guild ) )
 
 		{
-			std::hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator itOld = it;
+			CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator itOld = it;
 			++it;
 			closeDynChat( user,(*itOld).second.Bot );
 			CCreature * bot = CreatureManager.getCreature( (*itOld).second.Bot );
@@ -1304,7 +1304,7 @@ void CMissionManager::removeAllUserDynChat(CCharacter * user)
 	nlassert(user);
 	vector<TAIAlias> aliases;
 	// close all interfaces
-	hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
+	CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
 	for (; it!= _DynChats.end() && (*it).first == user->getEntityRowId(); ++it )
 	{
 		// tell client to close the dyn chat interface
@@ -1340,10 +1340,10 @@ void CMissionManager::removeMissionDynChat(CCharacter * user, CMission * instanc
 	nlassert(instance);
 	std::set<TDataSetRow> bots;
 	
-	std::hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
+	CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
 	while ( it != _DynChats.end() && (*it).first == user->getEntityRowId()  )
 	{
-		std::hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator itold = it;
+		CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator itold = it;
 		++it;
 		if( (*itold).second.Mission == instance )
 		{
@@ -1392,7 +1392,7 @@ void CMissionManager::removeMissionDynChat(CCharacter * user, CMission * instanc
 
 void CMissionManager::dynChatChoice( CCharacter * user, const TDataSetRow & botRow,uint8 choice )
 {
-	std::hash_multimap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
+	CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
     while ( it!= _DynChats.end() && (*it).first == user->getEntityRowId() )
     {
         bool reStart=false;
@@ -2066,9 +2066,9 @@ void CMissionManager::unregisterEscort( TAIAlias group, const NLMISC::CEntityId 
 	_EscortGroups.erase( (uint)group );
 	if (  user != NLMISC::CEntityId::Unknown )
 	{
-		std::pair<std::hash_multimap<NLMISC::CEntityId, TAIAlias, NLMISC::CEidHash>::iterator,std::hash_multimap<NLMISC::CEntityId, TAIAlias, NLMISC::CEidHash>::iterator > bounds;
+		std::pair<CHashMultiMap<NLMISC::CEntityId, TAIAlias, NLMISC::CEntityIdHashMapTraits>::iterator, CHashMultiMap<NLMISC::CEntityId, TAIAlias, NLMISC::CEntityIdHashMapTraits>::iterator > bounds;
 		bounds = _SoloEscorts.equal_range( user );
-		for ( std::hash_multimap<NLMISC::CEntityId, TAIAlias, NLMISC::CEidHash>::iterator it = bounds.first; it != bounds.second; ++it )
+		for ( CHashMultiMap<NLMISC::CEntityId, TAIAlias, NLMISC::CEntityIdHashMapTraits>::iterator it = bounds.first; it != bounds.second; ++it )
 		{
 			if ( (*it).second == group )
 			{
@@ -2081,11 +2081,11 @@ void CMissionManager::unregisterEscort( TAIAlias group, const NLMISC::CEntityId 
 
 void CMissionManager::updateEscortTeam( const NLMISC::CEntityId & user )
 {
-	std::pair<std::hash_multimap<NLMISC::CEntityId, TAIAlias, NLMISC::CEidHash>::iterator,std::hash_multimap<NLMISC::CEntityId, TAIAlias, NLMISC::CEidHash>::iterator > bounds;
+	std::pair<CHashMultiMap<NLMISC::CEntityId, TAIAlias, NLMISC::CEntityIdHashMapTraits>::iterator, CHashMultiMap<NLMISC::CEntityId, TAIAlias, NLMISC::CEntityIdHashMapTraits>::iterator > bounds;
 	bounds = _SoloEscorts.equal_range( user );
 
 	CSetEscortTeamId msg;
-	for ( std::hash_multimap<NLMISC::CEntityId, TAIAlias, NLMISC::CEidHash>::iterator it = bounds.first; it != bounds.second; ++it )
+	for ( CHashMultiMap<NLMISC::CEntityId, TAIAlias, NLMISC::CEntityIdHashMapTraits>::iterator it = bounds.first; it != bounds.second; ++it )
 		msg.Groups.push_back( (*it).second );
 	if ( !msg.Groups.empty() )
 	{
@@ -2108,7 +2108,7 @@ void CMissionManager::updateEscortTeam( const NLMISC::CEntityId & user )
 
 void CMissionManager::checkEscortFailure( TAIAlias group , bool groupWiped)
 {
-	std::hash_map<uint,TAIAlias>::iterator it = _EscortGroups.find( (uint) group);
+	CHashMap<uint,TAIAlias>::iterator it = _EscortGroups.find( (uint) group);
 	if ( it != _EscortGroups.end() )
 	{
 		const CMissionTemplate * templ = getTemplate( (*it).second );
@@ -2502,8 +2502,8 @@ NLMISC_COMMAND(displayDynChats, "", "")
 	if (args.size() != 0)
 		return false;
 
-	const hash_multimap<TDataSetRow,CMissionManager::CDynChat,TDataSetRow::CHashCode> & dynChats = CMissionManager::getInstance()->_DynChats;
-	hash_multimap<TDataSetRow,CMissionManager::CDynChat,TDataSetRow::CHashCode>::const_iterator it;
+	const CHashMultiMap<TDataSetRow,CMissionManager::CDynChat,TDataSetRow::CHashCode> & dynChats = CMissionManager::getInstance()->_DynChats;
+	CHashMultiMap<TDataSetRow,CMissionManager::CDynChat,TDataSetRow::CHashCode>::const_iterator it;
 	for (it = dynChats.begin(); it != dynChats.end(); ++it)
 	{
 		const TDataSetRow & playerRowId = (*it).first;

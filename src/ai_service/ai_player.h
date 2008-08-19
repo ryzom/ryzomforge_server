@@ -119,7 +119,7 @@ class CManagerPlayer
 , public CChild<CAIInstance>
 {
 public:
-	typedef	std::hash_map<TDataSetRow, NLMISC::CDbgPtr<CBotPlayer>, TDataSetRow::CHashCode>	TPlayerMap;
+	typedef	CHashMap<TDataSetRow, NLMISC::CDbgPtr<CBotPlayer>, TDataSetRow::CHashCode>	TPlayerMap;
 	
 public:
 	CManagerPlayer(CAIInstance* owner)
@@ -164,7 +164,7 @@ public:
 private:
 	TPlayerMap _spawnedPlayers; // hum .. still usefull ?
 	/// Team composition.
-	typedef std::hash_map<int, std::set<TDataSetRow> > TTeamMap;
+	typedef CHashMap<int, std::set<TDataSetRow> > TTeamMap;
 	TTeamMap _teams;
 	
 private:

@@ -494,7 +494,7 @@ void CBankAccessor_GUILD::TGUILD::TOUTPOST::TO::TSQUADS::init(ICDBStructNode *pa
 	{
 		node  = parent->getNode( ICDBStructNode::CTextId(NLMISC::toString("SP%u", i)), false );
 		nlassert(node != NULL);
-		_SP[i].init(node, i);
+		__SP[i].init(node, i);
 	}
 	
 	for (uint i=0; i<24; ++i)

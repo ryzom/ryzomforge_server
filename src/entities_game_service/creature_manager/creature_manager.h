@@ -17,9 +17,6 @@
 #include "creature_manager/creature.h"
 #include "game_share/msg_ai_service.h"
 
-
-#include <hash_map>
-
 extern NLNET::TUnifiedCallbackItem	GenNpcDescCbTable[];
 
 
@@ -74,7 +71,7 @@ public:
 };
 
 
-typedef std::hash_map< NLMISC::CEntityId, CCreature *, NLMISC::CEidHash > TMapCreatures;
+typedef CHashMap< NLMISC::CEntityId, CCreature *, NLMISC::CEntityIdHashMapTraits> TMapCreatures;
 
 /**
  * CCreatureManager
@@ -207,7 +204,7 @@ public:
 	/// get a group of NPCS
 	CNPCGroup * getNPCGroup(TAIAlias alias)
 	{
-		std::hash_map< unsigned int,CNPCGroup>::iterator it = _NpcGroups.find( alias );
+		CHashMap< unsigned int,CNPCGroup>::iterator it = _NpcGroups.find( alias );
 		if ( it == _NpcGroups.end() )
 		{
 			return NULL;
@@ -221,7 +218,7 @@ public:
 	/// add an npc to a group or create it (can be called multiple times for the same bot)
 	void addNpcToGroup( TAIAlias groupAlias, TAIAlias npcAlias )
 	{
-		std::hash_map< unsigned int,CNPCGroup>::iterator it = _NpcGroups.find( groupAlias );
+		CHashMap< unsigned int,CNPCGroup>::iterator it = _NpcGroups.find( groupAlias );
 		if ( it == _NpcGroups.end() )
 		{
 			CNPCGroup npcs;
@@ -243,7 +240,7 @@ private:
 	uint32 _SlideUpdate;
 	uint32 _StartCreatureRegen;
 	/// map used to store the NPC groups
-	std::hash_map<unsigned int,CNPCGroup >	_NpcGroups;
+	CHashMap<unsigned int,CNPCGroup >	_NpcGroups;
 };
 
 extern CCreatureManager	CreatureManager;

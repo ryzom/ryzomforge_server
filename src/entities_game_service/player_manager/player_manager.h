@@ -54,7 +54,7 @@ public:
 };
 
 typedef std::set<uint32>								TUint32Set;
-typedef std::hash_map<NLNET::TServiceId, TUint32Set, CServiceIdHash>	TMapServiceIdToUint32Set;
+typedef CHashMap<NLNET::TServiceId, TUint32Set, CServiceIdHash>	TMapServiceIdToUint32Set;
 typedef std::map<uint32, CCharIdReplaced >				TMapUserCharFileReplaced;
 
 
@@ -85,7 +85,7 @@ class CPlayerManager
 {
 public:
 
-	typedef std::hash_map< uint32, NLNET::TServiceId, IPlayerManager::CUint32Hash >	TMapPlayerFrontEndId;
+	typedef CHashMap< uint32, NLNET::TServiceId, IPlayerManager::CUint32Hash >	TMapPlayerFrontEndId;
 	typedef std::vector< uint32 >							TVectorDisconnectedUser;
 
 	typedef std::map<uint32, NLMISC::CSmartPtr<CAsyncPlayerLoad> >				TAsyncLoadMap;
