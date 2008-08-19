@@ -81,7 +81,7 @@ protected:
 	typedef std::vector<CEntry>				TEntryTable;
 
 	/// The entry map type to find entry quickly
-	typedef CHashMultiMap<uint32, TEntryIndex>	TEntryMap;
+	typedef std::multimap<uint32, TEntryIndex>	TEntryMap;
 
 	/// The map of zone name (to zone id)
 	typedef std::map<std::string, sint32>	TZoneMap;
