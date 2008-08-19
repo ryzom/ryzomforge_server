@@ -14,8 +14,6 @@
 #include "game_share/entity_types.h"
 #include "game_share/mirror.h"
 #include <vector>
-#include <hash_map>
-
 
 typedef NLMISC::CBitMemStream TOutBox;
 

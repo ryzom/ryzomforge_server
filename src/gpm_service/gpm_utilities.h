@@ -22,7 +22,6 @@
 #include "game_share/player_vision_delta.h"
 
 #include <map>
-#include <hash_map>
 #include <set>
 #include <vector>
 #include <list>

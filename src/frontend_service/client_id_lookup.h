@@ -12,7 +12,6 @@
 #include "nel/misc/types_nl.h"
 #include "game_share/ryzom_entity_id.h"
 #include "fe_types.h"
-#include <hash_map>
 
 
 /**

@@ -10,7 +10,6 @@
 #define NL_CLIENT_ENTITY_ID_TRANSLATOR_H
 
 //#include <map>
-#include <hash_map>
 #include <vector>
 #include "nel/misc/types_nl.h"
 

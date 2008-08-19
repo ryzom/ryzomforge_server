@@ -16,7 +16,6 @@
 #include <exception>
 #include <utility>
 #include <deque>
-#include <hash_map>
 
 #include "nel/misc/common.h"
 #include "nel/misc/debug.h"
