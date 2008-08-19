@@ -3199,7 +3199,7 @@ NLMISC_COMMAND(moveCharAndOfflineCmdToHashTable, "Move all character and offline
 		{
 			//extract account id
 			vector<string> parts;
-			explode(CFile::getFilename(allChars[i]), "_", parts);
+			explode(CFile::getFilename(allChars[i]), string("_"), parts);
 			if (parts.size() == 4)
 			{
 				uint32 userId = atoi(parts[1].c_str());
@@ -3225,7 +3225,7 @@ NLMISC_COMMAND(moveCharAndOfflineCmdToHashTable, "Move all character and offline
 		{
 			//extract account id
 			vector<string> parts;
-			explode(CFile::getFilename(allCommands[i]), "_", parts);
+			explode(CFile::getFilename(allCommands[i]), string("_"), parts);
 			if (parts.size() == 4)
 			{
 				uint32 userId = atoi(parts[1].c_str());
@@ -3265,7 +3265,7 @@ NLMISC_COMMAND(loadAllPlayerAndReady,"Load all the player saves (all account, al
 
 		// account file name as the following form : 'account_<account_num>_<slot_num>*'
 		vector<string> parts;
-		explode(fileName, "_", parts, false);
+		explode(string(fileName), string("_"), parts, false);
 
 		if (parts.size() < 3)
 		{
@@ -3356,7 +3356,7 @@ NLMISC_COMMAND(convertAllOldCharacterSaves,"Load all the old (.bin) not already 
 
 		// account file name as the following form : 'account_<account_num>_<slot_num>*'
 		vector<string> parts;
-		explode(fileName, "_", parts, false);
+		explode(string(fileName), string("_"), parts, false);
 
 		if (parts.size() < 3)
 		{

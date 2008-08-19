@@ -581,7 +581,7 @@ namespace RSMGR
 			if (user != NULL)
 			{
 				vector<string> userPriv;
-				explode(user->getPrivilege(), ":", userPriv, true);
+				explode(user->getPrivilege(), string(":"), userPriv, true);
 				for (uint i=0; i<userPriv.size(); ++i)
 				{
 					if (PrivilegeForSessionAccess.toString().find(userPriv[i]) != string::npos)
@@ -647,7 +647,7 @@ namespace RSMGR
 			string accessString;
 			result->getField(0, accessString);
 
-			NLMISC::explode(accessString, ",", userAccessPriv, false);
+			NLMISC::explode(accessString, string(","), userAccessPriv, false);
 
 			return true;
 		}

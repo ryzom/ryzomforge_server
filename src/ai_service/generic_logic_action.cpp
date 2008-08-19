@@ -673,7 +673,7 @@ public:
 			return;
 		}
 		std::vector<std::string> strs;
-		NLMISC::explode(args[0], " ", strs, true);
+		NLMISC::explode(args[0], string(" "), strs, true);
 
 		if (strs[0] == "day_time" || strs[0] == "daytime")
 		{
@@ -773,7 +773,7 @@ public:
 		uint minute = 0;
 
 		vector<string>	parts;
-		explode(param, ":", parts, false);
+		explode(param, string(":"), parts, false);
 
 		if (parts.size() == 2)
 			minute = NLMISC::atoui(parts[1].c_str());
@@ -1522,7 +1522,7 @@ public:
 
 		// parse the argument string.
 		vector<string>	strs;
-		NLMISC::explode(args[0], " ", strs, true);
+		NLMISC::explode(args[0], string(" "), strs, true);
 
 		if (strs.size() != 3)
 		{
@@ -1615,7 +1615,7 @@ public:
 
 		// parse the argument string.
 		vector<string>	strs;
-		NLMISC::explode(args[0], " ", strs, true);
+		NLMISC::explode(args[0], string(" "), strs, true);
 
 		if (strs.size() != 3)
 		{

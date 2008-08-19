@@ -289,7 +289,7 @@ NLMISC_COMMAND( testRolemaster, "Test rolemaster phrases selection (list separat
 	{
 		const string& skillListS = args[0];
 		vector<string> skills;
-		explode( skillListS, ":", skills, true );
+		explode( skillListS, string(":"), skills, true );
 		for ( vector<string>::const_iterator isl=skills.begin(); isl!=skills.end(); ++isl )
 		{
 			CPlayerSkill ps;
@@ -303,7 +303,7 @@ NLMISC_COMMAND( testRolemaster, "Test rolemaster phrases selection (list separat
 		{
 			const string& brickList = args[1];
 			vector<string> bricks;
-			explode( brickList, ":", bricks, true );
+			explode( brickList, string(":"), bricks, true );
 			for ( vector<string>::iterator ibl=bricks.begin(); ibl!=bricks.end(); ++ibl )
 			{
 				if ( (*ibl).find( ".sbrick" ) == string::npos )

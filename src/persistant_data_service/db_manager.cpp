@@ -547,7 +547,7 @@ bool	CDbManager::parsePath(const string &strPath, CLocatePath &lpath)
 	// explode path into nodes formed like 'a_name' or 'an_array[a_key]' or 'a_set<a_key>'
 
 	vector<string>	nodes;
-	explode(strPath, ".", nodes, false);
+	explode(strPath, string("."), nodes, false);
 
 	uint	i;
 	for (i=0; i<nodes.size(); ++i)

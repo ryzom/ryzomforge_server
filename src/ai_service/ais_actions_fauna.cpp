@@ -142,7 +142,7 @@ DEFINE_ACTION(ContextFaunaGrp,PLXYRFAI)
 	}
 
 	std::vector<std::string> reachableIndicesStr;
-	NLMISC::explode(indexNext, ",", reachableIndicesStr);
+	NLMISC::explode(indexNext, string(","), reachableIndicesStr);
 	std::set<sint32> arcs;
 	for(uint k = 0; k < reachableIndicesStr.size(); ++k)
 	{			

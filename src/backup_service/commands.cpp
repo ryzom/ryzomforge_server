@@ -168,7 +168,7 @@ NLMISC_COMMAND ( dumpCharacterFile, "dump the content of the save file for a cha
 
 	// ok, now display the data
 	vector<string> lines;
-	explode(xml, "\n", lines);
+	explode(xml, string("\n"), lines);
 
 	bool logOn = !useFilter;
 

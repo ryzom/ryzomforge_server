@@ -79,7 +79,7 @@ NLMISC_COMMAND(listShopContent, "list the item of a shop category", "<shop_categ
 
 	// explode into shop elements
 	vector<string>	shops;
-	explode(line, ":", shops);
+	explode(line, string(":"), shops);
 
 	// remove leading/trailing white char
 	for (uint i=0; i<shops.size(); ++i)
@@ -245,7 +245,7 @@ void CShopTypeManager::initShopBase()
 			if ( cvShopAlias.asString(i) != "" )
 			{
 				CVectorSString	args;
-				explode(cvShopAlias.asString(i), ":", reinterpret_cast<vector<string> &>(args));
+				explode(cvShopAlias.asString(i), string(":"), reinterpret_cast<vector<string> &>(args));
 				
 				string aliasName = args[0].strip();
 				if (_ShopAliases.find(aliasName) != _ShopAliases.end())

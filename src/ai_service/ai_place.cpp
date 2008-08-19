@@ -110,7 +110,7 @@ bool  CFaunaGenericPlace::getActive() const
 	extern bool FAUNA_GRAPH_USES_DEBUG_TIME;
 	const CRyzomTime &rt = FAUNA_GRAPH_USES_DEBUG_TIME ? CTimeInterface::getRyzomDebugTime() : CTimeInterface::getRyzomTime();
 	std::vector<std::string> dayIntervals;
-	NLMISC::explode(_DayInterval, ",", dayIntervals, true);
+	NLMISC::explode(_DayInterval, std::string(","), dayIntervals, true);
 	std::string season = EGSPD::CSeason::toString(rt.getRyzomSeason());
 	std::string month = MONTH::toString((MONTH::EMonth) rt.getRyzomMonth());
 	std::string weekday = WEEKDAY::toString((WEEKDAY::EWeekDay) rt.getRyzomDay());	
@@ -182,7 +182,7 @@ bool  CFaunaGenericPlace::getActive() const
 	// If no interval is given then assume whole day
 	if (_TimeInterval.empty()) return true;
 	std::vector<std::string> timeIntervals;
-	NLMISC::explode(_TimeInterval, ",", timeIntervals, true);
+	NLMISC::explode(_TimeInterval, std::string(","), timeIntervals, true);
 	for (uint k = 0; k < dayIntervals.size(); ++k)
 	{				
 		uint startHour, endHour;

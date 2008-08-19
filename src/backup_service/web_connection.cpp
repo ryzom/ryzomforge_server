@@ -196,7 +196,7 @@ void	cbGetSaveList(CMemStream &msgin, TSockId host)
 
 	vector<string>	params;
 
-	explode(str, "%%", params, true);
+	explode(str, string("%%"), params, true);
 
 	string	incrementalDir = IncrementalBackupDirectory;
 	string	saveShardRoot = SaveShardRoot;
@@ -211,7 +211,7 @@ void	cbGetSaveList(CMemStream &msgin, TSockId host)
 	for (i=0; i<params.size(); ++i)
 	{
 		vector<string>	param;
-		explode(params[i], "=", param, false);
+		explode(params[i], string("="), param, false);
 
 		if (param.empty())
 			continue;
@@ -241,7 +241,7 @@ void	cbGetSaveList(CMemStream &msgin, TSockId host)
 	saveShardRoot = CPath::standardizePath(saveShardRoot);
 
 	vector<string>	extensions;
-	explode(extList, " ", extensions, false);
+	explode(extList, string(" "), extensions, false);
 
 	string	result = checkFile(saveShardRoot+templatePath, shard, userid, charid, extensions);
 
@@ -280,7 +280,7 @@ void	cbRestoreSave(CMemStream &msgin, TSockId host)
 
 	vector<string>	params;
 
-	explode(str, "%%", params, true);
+	explode(str, string("%%"), params, true);
 
 	string	saveShardRoot = SaveShardRoot;
 	string	templatePath = SaveTemplatePath;
@@ -294,7 +294,7 @@ void	cbRestoreSave(CMemStream &msgin, TSockId host)
 	for (i=0; i<params.size(); ++i)
 	{
 		vector<string>	param;
-		explode(params[i], "=", param, false);
+		explode(params[i], string("="), param, false);
 
 		if (param.empty())
 			continue;
@@ -355,7 +355,7 @@ void	cbCopyOverSave(CMemStream &msgin, TSockId host)
 
 	vector<string>	params;
 
-	explode(str, "%%", params, true);
+	explode(str, string("%%"), params, true);
 
 	string	saveShardRoot = SaveShardRoot;
 	string	templatePath = SaveTemplatePath;
@@ -370,7 +370,7 @@ void	cbCopyOverSave(CMemStream &msgin, TSockId host)
 	for (i=0; i<params.size(); ++i)
 	{
 		vector<string>	param;
-		explode(params[i], "=", param, false);
+		explode(params[i], string("="), param, false);
 
 		if (param.empty())
 			continue;
@@ -399,7 +399,7 @@ void	cbCopyOverSave(CMemStream &msgin, TSockId host)
 	saveShardRoot = CPath::standardizePath(saveShardRoot);
 
 	vector<string>	extensions;
-	explode(extList, " ", extensions, false);
+	explode(extList, string(" "), extensions, false);
 
 	for (i=0; i<extensions.size(); ++i)
 	{

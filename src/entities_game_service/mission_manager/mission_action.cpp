@@ -1175,7 +1175,7 @@ class CMissionActionLearnAction : public IMissionAction
 			return false;
 		}
 		vector<string>	args;
-		explode(script[1], ";", args, true);
+		explode(script[1], string(";"), args, true);
 		if (args.size() == 0)
 		{
 			MISLOGSYNTAXERROR("<action> *[;<action] [: npc_name] [: group]");
@@ -1316,7 +1316,7 @@ class CMissionActionLearnBrick : public IMissionAction
 			return false;
 		}
 		vector<string>	args;
-		explode(script[1], ";", args, true);
+		explode(script[1], string(";"), args, true);
 		if (args.size() == 0)
 		{
 			MISLOGSYNTAXERROR("<brick> *[;<brick>] [: npc_name] [: group]");
@@ -1932,7 +1932,7 @@ class CMissionActionCondJumpBrick : public CMissionActionJump
 		}
 
 		vector<string> bn;
-		explode(script[1], ";", bn, true);
+		explode(script[1], string(";"), bn, true);
 
 		if (bn.empty())
 		{
@@ -2012,7 +2012,7 @@ class CMissionActionCondJumpSkill : public CMissionActionJump
 		}
 
 		vector<string> sn;
-		explode(script[1], ";", sn, true);
+		explode(script[1], string(";"), sn, true);
 
 		if (sn.empty())
 		{
@@ -2025,7 +2025,7 @@ class CMissionActionCondJumpSkill : public CMissionActionJump
 			sint32			level;
 
 			vector<string> parts;
-			explode(sn[i], " ", parts, true);
+			explode(sn[i], string(" "), parts, true);
 
 			if (parts.size() != 2)
 			{
@@ -4531,7 +4531,7 @@ public:
 		}
 
 		vector<string>	args;
-		explode(script[1], ";", args, true);
+		explode(script[1], string(";"), args, true);
 		if (args.size() == 0)
 		{
 			MISLOGSYNTAXERROR("<item1> <qty1>[;<item2> <qty2> ...]:<label>");
@@ -4540,7 +4540,7 @@ public:
 		for (uint i=0; i<args.size(); ++i)
 		{
 			vector<string>	retList;
-			explode(args[i], " ", retList, true);
+			explode(args[i], string(" "), retList, true);
 			if ( retList.size() != 2 )
 			{
 				MISLOGSYNTAXERROR("<item1> <qty1>[;<item2> <qty2> ...]:<label>");

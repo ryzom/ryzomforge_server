@@ -348,7 +348,7 @@ void CStaticBrick::readStaticBrick( const NLGEORGES::UFormElm &root, const NLMIS
 	if( root.getValueByName (value, "Basics.Skill") )
 	{
 		vector<string> skills;
-		explode( value, ":", skills, true );
+		explode( value, string(":"), skills, true );
 		vector<string>::const_iterator isv;
 		for ( isv=skills.begin(); isv!=skills.end(); ++isv )
 		{
@@ -400,7 +400,7 @@ void CStaticBrick::readStaticBrick( const NLGEORGES::UFormElm &root, const NLMIS
 		nlwarning("<CStaticBrick::readGeorges> can't get the value 'LearnRequireOneOfSkills' for sheet %s", sheetId.toString().c_str() );
 	}
 	vector<string> skillsAndValues;
-	explode( value, ":", skillsAndValues, true );
+	explode( value, string(":"), skillsAndValues, true );
 	vector<string>::const_iterator isv;
 	for ( isv=skillsAndValues.begin(); isv!=skillsAndValues.end(); ++isv )
 	{
@@ -418,7 +418,7 @@ void CStaticBrick::readStaticBrick( const NLGEORGES::UFormElm &root, const NLMIS
 		nlwarning("<CStaticBrick::readGeorges> can't get the value 'LearnRequireBricks' for sheet %s", sheetId.toString().c_str() );
 	}
 	vector<string> requiredBricks;
-	explode( value, ":", requiredBricks, true );
+	explode( value, string(":"), requiredBricks, true );
 	vector<string>::const_iterator irb;
 	for ( irb=requiredBricks.begin(); irb!=requiredBricks.end(); ++irb )
 	{

@@ -873,7 +873,7 @@ bool CNameManager::loadCharacterNamesFromTxt()
 	TCharSlotToName charSlotToName;
 
 	vector<string> lines;
-	NLMISC::explode(input, "\n", lines, true);
+	NLMISC::explode(string(input), string("\n"), lines, true);
 
 	// scan the content
 //	while (!input.empty())
@@ -886,7 +886,7 @@ bool CNameManager::loadCharacterNamesFromTxt()
 //		CSString line=input.firstLine(true);
 		CSString line = lines[i];
 		vector<string> words;
-		NLMISC::explode(line, " ", words, true);
+		NLMISC::explode(string(line), string(" "), words, true);
 
 		if (words.empty())
 			continue;
@@ -1105,7 +1105,7 @@ bool CNameManager::loadGuildsNamesFromTxt()
 	TGuildSlotToName guildSlotToName;
 
 	vector<string> lines;
-	NLMISC::explode(input, "\n", lines, true);
+	NLMISC::explode(string(input), string("\n"), lines, true);
 
 	// scan the content
 //	while (!input.empty())
@@ -1117,7 +1117,7 @@ bool CNameManager::loadGuildsNamesFromTxt()
 			nldebug("Loading guild names : %u/%u (%.2f%%)", i+1, lines.size(), float(i+1)/float(lines.size())*100.0f);
 		CSString line = lines[i];
 		vector<string> words;
-		NLMISC::explode(line, " ", words, true);
+		NLMISC::explode(string(line), string(" "), words, true);
 
 		if (words.empty())
 			continue;

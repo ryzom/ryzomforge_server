@@ -1006,7 +1006,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 	{
 		if ( value.find(',') != string::npos )
 		{			
-			explode (value, ",", res);
+			explode (value, string(","), res);
 			if (res.size() >= 2)
 			{
 				x = atoi (res[0].c_str()) * 1000;

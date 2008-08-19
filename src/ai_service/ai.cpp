@@ -522,7 +522,7 @@ CAIEntity*	CAIS::tryToGetEntity(const	char*	str, TSearchType searchType)
 
 
 	vector<string>	parts;
-	explode(str, ":", parts, false);
+	explode(string(str), string(":"), parts, false);
 
 	if (parts.empty() || parts[0].empty())
 		return NULL;
