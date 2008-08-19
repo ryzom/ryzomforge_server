@@ -1,5 +1,5 @@
 /** \file fe_types.h
- * Front-end tyês
+ * Front-end types
  * $Id: fe_types.h,v 1.14 2004/03/01 19:21:52 lecroart Exp $
  */
 
