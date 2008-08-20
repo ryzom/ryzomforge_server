@@ -52,7 +52,7 @@ struct CAIAimedSlot
 {
 	CAIAimedSlot() : AiAimingType(AI_AIMING_TYPE::Random)
 	{}
-		
+
 	AI_AIMING_TYPE::TAiAimingType	AiAimingType;
 };
 
@@ -61,11 +61,11 @@ struct CAIAimedSlot
 template <class T, sint32 initValue> class CDynValue
 {
 public:
-	CDynValue(): PowerValue(0), 
+	CDynValue(): PowerValue(0),
 					MinValue( (T)initValue),
 					MaxValue( (T)initValue)
 	{}
-	
+
 	/// get apply value according to refValue
 	inline T applyValue(uint16 refValue)
 	{
@@ -73,7 +73,7 @@ public:
 		if (PowerValue>=refValue) return MaxValue; // so refValue cannot be = 0 as PowerValue is uint
 		return T( MinValue + (MaxValue - MinValue) * float(PowerValue)/refValue  );
 	}
-	
+
 	uint16	PowerValue;
 	T		MinValue;
 	T		MaxValue;
@@ -112,7 +112,7 @@ struct CArmorAborption : public CDynFactor
 	// homins armor type
 	ARMORTYPE::EArmorType			ArmorType;
 	// creature armor
-	EGSPD::CClassificationType::TClassificationType	CreatureType;		
+	EGSPD::CClassificationType::TClassificationType	CreatureType;
 };
 
 
@@ -144,10 +144,10 @@ public:
 public:
 	/// default Constructor
 	CCombatPhrase() { init(); _Attacker = NULL; }
-	
+
 	/// destructor
 	virtual ~CCombatPhrase();
-	
+
 	/// build the phrase
 	virtual bool build( const TDataSetRow & actorRowId, const std::vector< const CStaticBrick* >& bricks, bool buildToExecute = true );
 
@@ -207,7 +207,7 @@ public:
 
 	/**
 	 * set attacker
-	 * \param attacker 
+	 * \param attacker
 	 */
 //	inline void setAttacker( CCombatAttacker* attacker) { _Attacker = attacker; }
 
@@ -215,12 +215,12 @@ public:
 	/// set the disengageOnEnd flag
 	inline void disengageOnEnd(bool flag) { _DisengageOnEnd = flag; }
 	/// get the disengageOnEnd flag
-	inline bool disengageOnEnd() const { return _DisengageOnEnd; }	
+	inline bool disengageOnEnd() const { return _DisengageOnEnd; }
 
 	/// get PhraseSuccessDamageFactor
 //	inline float getPhraseSuccessDamageFactor() const { return _PhraseSuccessDamageFactor; }
 
-	/// set root sheet id for database entry 
+	/// set root sheet id for database entry
 	inline void setRootSheetId( const NLMISC::CSheetId &id) { _RootSheetId = id; }
 
 	/// get attacker weapon sabrina value
@@ -242,11 +242,11 @@ public:
 			return _Targets[index].InflictedNaturalDamage;
 		else
 			return 0;
-	}	
+	}
 
 	/// get attacker
 	inline const CCombatAttacker* getAttacker() const { return _Attacker; }
-	
+
 	/// get targets
 	inline const std::vector<TTargetInfos> & getTargets()
 	{
@@ -301,7 +301,7 @@ protected:
 protected:
 	/// init method
 	void init();
-	
+
 	/**
 	 * add a brick to the phrase
 	 * \param brick the added brick
@@ -390,11 +390,11 @@ protected:
 	/**
 	 * get hit localisation
 	 */
-	PHRASE_UTILITIES::TPairSlotShield getHitLocalisation(CCombatDefenderPtr &defender, const CCombatShield &shield, DMGTYPE::EDamageType dmgType);	
+	PHRASE_UTILITIES::TPairSlotShield getHitLocalisation(CCombatDefenderPtr &defender, const CCombatShield &shield, DMGTYPE::EDamageType dmgType);
 
 	/**
 	 * apply special effect due to localisation of the hit
-	 */ 
+	 */
 	void applyLocalisationSpecialEffect( CCombatDefenderPtr &defender, SLOT_EQUIPMENT::TSlotEquipment slot, sint32 damage, sint32 &lostStamina);
 
 	/**
@@ -443,7 +443,7 @@ protected:
 	}
 
 	/// compute delta level with given target
-	sint16 CCombatPhrase::computeDeltaLevel(CCombatDefenderPtr &combatDefender, bool rightHand);
+	sint16 computeDeltaLevel(CCombatDefenderPtr &combatDefender, bool rightHand);
 
 	/// return sabrina cost with relative cost added
 	uint16 sabrinaCost() const { return (uint16) ( _SabrinaCost * _SabrinaRelativeCost ); }
@@ -466,7 +466,7 @@ protected:
 
 	// Relative credit must be added to total credit
 	float					_SabrinaRelativeCredit;
-	
+
 	/// stamina cost of the attack
 	sint32					_StaminaCost;
 
@@ -487,14 +487,14 @@ protected:
 
 	/// latency factor
 	CDynValue<float,1>		_LatencyFactorDyn;
-	
+
 	/// modifier on dealt damage (whatever the success factor (the factor is applied on damage + damage mod afterwards))
 	sint32					_DamageModifier;
 
 	/// factor on dealt damage
 	float					_DamageFactor;
 
-	/// modifier on dealt damage 
+	/// modifier on dealt damage
 	CDamageFactor			_DamageFactorOnSuccess;
 
 	/// base damage, independent from target
@@ -535,12 +535,12 @@ protected:
 	CDynValue<sint8,0>		_CriticalHitChancesModifier;
 
 	/// weapon wear modifier
-	CDynValue<float,0>		_WeaponWearModifier;		
-	
+	CDynValue<float,0>		_WeaponWearModifier;
+
 	/// hit all melee aggressors ?
 	bool					_HitAllMeleeAggressors;
 	CDynValue<float,1>		_MultiTargetGlobalDamageFactor;
-	
+
 	// actor behaviour
 	MBEHAV::CBehaviour		_Behaviour;
 	/// behaviour weight (sabrina cost of associated brick or 0)
@@ -555,7 +555,7 @@ protected:
 	sint32					_AggroModifier;
 
 	//\name damage multipliers for ranged attacks
-	//@{	
+	//@{
 	float			 		_DamagePointBlank;
 	float			 		_DamageShortRange;
 	float			 		_DamageMediumRange;
@@ -564,7 +564,7 @@ protected:
 
 	/// vector of ai event report structures if target is managed by ai (ie. not a player)
 	//std::vector<CAiEventReport*>	_AiEventReports;
-	CAiEventReport			_AiEventReport;	
+	CAiEventReport			_AiEventReport;
 
 	/// \name temp vars
 	//@{
@@ -573,7 +573,7 @@ protected:
 	/// critical hit
 	bool					_CriticalHit;
 	/// skill used to attack
-	SKILLS::ESkills			_AttackSkill;	
+	SKILLS::ESkills			_AttackSkill;
 	/// validated flag
 	bool					_Validated;
 	/// \name flags indicated if an error message has been sent already (when in idle mode)

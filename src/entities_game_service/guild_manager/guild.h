@@ -28,9 +28,9 @@ class CGuildMember;
  * \author Nevrax France
  * \date 2004
  */
-class CGuild : 
+class CGuild :
 	public IGuild,
-	public EGSPD::CGuildPD, 
+	public EGSPD::CGuildPD,
 	public NLMISC::CRefCount
 {
 	NL_INSTANCE_COUNTER_DECL(CGuild);
@@ -41,11 +41,11 @@ public:
 	// At time of writing it evaluated to:
 	//	void store(CPersistentDataRecord &pdr) const;
 	//	void apply(CPersistentDataRecord &pdr);
-	
+
 	DECLARE_PERSISTENCE_METHODS
 
 	/// Test if this is a local or proxy guild
-	bool isProxy()	const		{ return _Proxy; } 
+	bool isProxy()	const		{ return _Proxy; }
 	void setProxy(bool proxy)	{ _Proxy = proxy; }
 
 	/// Set the guild proxy flag
@@ -105,7 +105,7 @@ public:
 	/// set the message of the day
 	void setMOTD( const std::string& motd, const NLMISC::CEntityId & eId);
 	//@}
-	
+
 	/// dump guild infos
 	void dumpGuildInfos( NLMISC::CLog & log );
 	/// register the guild in Game subsystems ( Fame, chat groups )
@@ -119,7 +119,7 @@ public:
 	/// rebuild the client database, use after a name unifier update
 //	void rebuildCliendDB();
 
-	
+
 	///\name Member management
 	//@{
 	/// add a new member to the guild
@@ -147,7 +147,7 @@ public:
 	/// flag a user online ( register it in other system, e.g. : chat group )
 	void setMemberOnline( CGuildMember * member, uint8 dynamicId );
 	/// add the member into the guild chat
-	void CGuild::addMemberToGuildChat(CGuildMember *member);
+	void addMemberToGuildChat(CGuildMember *member);
 	/// send a message to all members
 	void sendMessageToGuildMembers( const std::string &  msg, const TVectorParamCheck & params =  TVectorParamCheck() )const;
 	/// set information relative to a member in the guild client database
@@ -163,7 +163,7 @@ public:
 	/// get leader
 	CGuildMember * getLeader();
 	//@}
-	
+
 	///\name Mission management
 	//@{
 	void removeMission(CMissionGuild * mission, TMissionResult result);

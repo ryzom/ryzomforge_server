@@ -66,7 +66,7 @@ public:
 		float	MaxSuccess;
 		float	FadeSuccess;
 		uint8	FadeRoll;
-		
+
 		uint8	CraftFullSuccessRole;
 		float	CraftMinSuccess;
 		uint8	CraftMinSuccessRole;
@@ -75,7 +75,7 @@ public:
 */	/**
 	 * Constructor
 	 */
-	CEntityBaseManager::CEntityBaseManager();
+	CEntityBaseManager();
 
 	/**
 	 * Add callback for entity management
@@ -84,7 +84,7 @@ public:
 
 	// getEntityPtr : return CEntityBase * ptr on Id corresponding entity
 	/*A*/static CEntityBase			*getEntityBasePtr	( const NLMISC::CEntityId& id );
-	/*A*/static CEntityBase			*getEntityBasePtr	( const	TDataSetRow	&entityRowId )	
+	/*A*/static CEntityBase			*getEntityBasePtr	( const	TDataSetRow	&entityRowId )
 	{
 		if ( TheDataset.isAccessible( entityRowId ) )
 		{
@@ -92,15 +92,15 @@ public:
 		}
 		return 0;
 	}
-	
-	/*A*/static NLMISC::CEntityId	getEntityId			( const	TDataSetRow	&entityRowId )	
-	{ 
+
+	/*A*/static NLMISC::CEntityId	getEntityId			( const	TDataSetRow	&entityRowId )
+	{
 		if ( TheDataset.isAccessible( entityRowId ) ) //( entityRowId.isValid() && TheDataset.isDataSetRowStillValid(entityRowId) )
-			return TheDataset.getEntityId( entityRowId ); 
+			return TheDataset.getEntityId( entityRowId );
 		else
 			return NLMISC::CEntityId::Unknown;
 	}
-	
+
 	/**
 	 * GPMS connexion
 	 */

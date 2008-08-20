@@ -5,23 +5,24 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
 		-I/usr/include/libxml2 \
-		-I$(HOME)/cvs/code/nel/include \
-		-I$(HOME)/cvs/code/ryzom/src_v2 \
-		-I./ 
+        -I$(HOME)/code/nel/include \
+        -I$(RYZOM_PATH)/common/src \
+		-I.. \
+		-I.
 
-LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
+LDFLAGS      = 	$(LD_FLAGS_CMN) \
+        -L$(NEL_PATH)/lib \
+        -L$(RYZOM_PATH)/common/src/game_share \
 		-L../admin_modules \
-		-L$(HOME)/cvs/code/ryzom/src_v2/game_share \
-		-L$(HOME)/cvs/code/ryzom/src_v2/r2_share \
-		-L$(HOME)/cvs/code/ryzom/src_v2/r2_modules \
-		-L$(HOME)/cvs/code/ryzom/src_v2/pd_lib \
-		-L$(HOME)/cvs/code/ryzom/src_v2/gameplay_module_lib \
+		-L$(RYZOM_PATH)/common/src/r2_share \
+		-L$(RYZOM_PATH)/common/src/r2_modules \
+		-L../pd_lib \
+		-L../gameplay_module_lib \
 		-ladmin_modules \
 		-lpd_lib \
 		-lgame_share \
@@ -34,7 +35,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 		-lnelmisc \
 		-lpd_lib \
 		-lxml2 \
-		-lstlport \
 		-lrt\
 		-ldl
 
@@ -43,7 +43,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 
 # The list of targets to build
 TARGETS		= entities_game_service
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 PACKED_SHEETS = \
 	egs_action_xp_factor.packed_sheets \
 	egs_aiactions.packed_sheets \
@@ -77,10 +77,10 @@ all: exe packed_sheets
 exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
-		../game_share/libgame_share.a \
+	    ../../../common/src/game_share/libgame_share.a \
+	    ../../../common/src/r2_share/libr2_share.a \
+	    ../../../common/src/r2_modules/libr2_modules.a \
 		../pd_lib/libpd_lib.a \
-		../r2_share/libr2_share.a \
-		../r2_modules/libr2_modules.a\
 		../gameplay_module_lib/libgameplay_module_lib.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
@@ -93,4 +93,4 @@ packed_sheets: $(TARGETS)
 #############################################################################
 # Rules
 
-include ../Rules.mk
+include ../../../Rules.mk

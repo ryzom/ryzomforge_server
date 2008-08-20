@@ -63,7 +63,7 @@ const struct CDirection::CDirectionData CDirection::directionDatas[] =
 //	5 6 7
 //	4 8 0
 //	3 2 1
-const CDirection::TDirection	CDirection::table[]	= 
+const CDirection::TDirection	CDirection::table[]	=
 {
 	CDirection::SW, CDirection::S,			CDirection::SE,
 	CDirection::W,  CDirection::UNDEFINED,	CDirection::E,
@@ -78,12 +78,12 @@ class CABaseStarNode
 {
 public:
 	CABaseStarNode(uint father, float distance, bool open);
-	
+
 	void setOpen(bool open) { _Open = open; }
 	bool isOpened() const { return _Open; }
 	float getDistance() const { return _Distance; }
 	uint getFather() const { return _Father; }
-	
+
 private:
 	uint  _Father; ///< Parent node in the path from the start position
 	float _Distance;
@@ -106,9 +106,9 @@ class CAStarHeapNode : public CABaseStarNode
 {
 public:
 	explicit CAStarHeapNode(CTopology::TTopologyRef Ref, uint Father, float Distance, bool Open);
-	
+
 	CTopology::TTopologyRef const& getRef() const { return _Ref; }
-	
+
 private:
 	CTopology::TTopologyRef	_Ref;
 };
@@ -127,44 +127,28 @@ CAStarHeapNode::CAStarHeapNode(CTopology::TTopologyRef Ref, uint Father, float D
 class CAStarNode
 {
 public:
-	CAStarNode();
-	explicit CAStarNode(CWorldPosition const& pos);
-	explicit CAStarNode(CAStarNode const& other);
-	
+	CAStarNode() { }
+	explicit CAStarNode(CWorldPosition const& pos) :
+		_x(pos.xCoord().getUnitId()) , _y(pos.yCoord().getUnitId()), _slot(pos.slot())
+		{ }
+
+	CAStarNode(const CAStarNode & other) :
+		_x(other._x), _y(other._y), _slot(other._slot)
+		{ }
+
 	void updateMapPosition(CMapPosition& _mapPos) const;
-	
+
 	bool operator==(CAStarNode const& other) const;
 	bool operator!=(CAStarNode const& other) const;
 	bool operator<(CAStarNode const& other) const;
-	
+
 	CSlot const& slot() const { return _slot; }
-	
+
 private:
 	uint8 _x;
 	uint8 _y;
 	CSlot _slot;
 };
-
-inline
-CAStarNode::CAStarNode()
-{
-}
-
-inline
-CAStarNode::CAStarNode(CWorldPosition const& pos)
-: _x(pos.xCoord().getUnitId())
-, _y(pos.yCoord().getUnitId())
-, _slot(pos.slot())
-{
-}
-
-inline
-CAStarNode::CAStarNode(CAStarNode const& other)
-: _x(other._x)
-, _y(other._y)
-, _slot(other._slot)
-{
-}
 
 inline
 void CAStarNode::updateMapPosition(CMapPosition& _mapPos) const
@@ -202,21 +186,21 @@ class	CInsideAStarHeapNode	:	public	CABaseStarNode
 {
 public:
 	friend	class	CAStarNode;
-	
+
 	explicit	CInsideAStarHeapNode(const	CAStarNode	&node, uint Father, CDirection Direction, float Distance, bool Open) : _Node(node),	_Direction(Direction), CABaseStarNode(Father,Distance,Open)
 	{
 	}
-	
+
 	inline	const	CDirection	&getDirection()	const
 	{
 		return	_Direction;
 	}
-	
+
 	inline	const	CAStarNode	&getNode()	const
 	{
 		return	_Node;
 	}
-				
+
 private:
 	CDirection	_Direction;
 	CAStarNode	_Node;
@@ -237,10 +221,10 @@ void CDirectionLayer::serial(NLMISC::IStream& f)
 			delete Grid[0][i];
 			Grid[0][i] = NULL;
 		}
-		
+
 		bool	present = (Grid[0][i] != NULL);
 		f.serial(present);
-		
+
 		if (present)
 		{
 			if (f.isReading())
@@ -288,9 +272,9 @@ CRootCell* CRootCell::load(NLMISC::IStream& f, CWorldMap const& worldMap)
 	NL_ALLOC_CONTEXT(AIRCELD);
 	TCellType	type = Compute;
 	CRootCell	*result = NULL;
-	
+
 	f.serialEnum(type);
-	
+
 	switch (type)
 	{
 	case Compute:
@@ -313,12 +297,12 @@ CRootCell* CRootCell::load(NLMISC::IStream& f, CWorldMap const& worldMap)
 		nlassert(false);
 		nlwarning("Unknown type of cell %d to load, abort", type);
 		return result;
-		break;		
+		break;
 	}
-	
+
 	//	allow us to optimize access.
 	f.serialCont(result->_TopologiesNodes);
-	
+
 	return result;
 }
 
@@ -354,7 +338,7 @@ void CRootCell::save(NLMISC::IStream& f, CRootCell* cell)
 		nlwarning("Unknown type of cell to save, abort");
 		return;
 	}
-	
+
 	f.serialCont(cell->_TopologiesNodes);
 }
 
@@ -367,7 +351,7 @@ void CComputeCell::serial(NLMISC::IStream& f)
 	// Version
 	// 0: initial version
 	uint	version = f.serialVersion(0);
-	
+
 	for (uint32 i=0; i<16*16; ++i)
 		for (uint32 k=0; k<3; ++k)
 			f.serial(_Grid[i][k]);
@@ -383,16 +367,16 @@ uint16	CSingleLayerCell::_MaskMap[16];
 void CSingleLayerCell::serial(NLMISC::IStream& f)
 {
 	f.serialCheck((uint16)'SL');
-	
+
 	uint i;
 	for (i=0; i<16; ++i)
 		f.serial(_Map[i]);
-	
+
 	f.serial(_SLinks);
 	f.serial(_NLinks);
 	f.serial(_ELinks);
 	f.serial(_WLinks);
-	
+
 	if (f.isReading())
 	{
 		delete _Topologies;
@@ -415,9 +399,9 @@ void CMultiLayerCell::serial(NLMISC::IStream& f)
 {
 	NL_ALLOC_CONTEXT(AIMLCS);
 	f.serialCheck((uint16)'ML');
-	
+
 	uint slot;
-	
+
 	for (slot=0; slot<3; ++slot)
 	{
 		// delete layer if any previously
@@ -428,10 +412,10 @@ void CMultiLayerCell::serial(NLMISC::IStream& f)
 			delete _Layers[slot];
 			_Layers[slot] = NULL;
 		}
-		
+
 		bool	present = (_Layers[slot] != NULL);
 		f.serial(present);
-		
+
 		if (present)
 		{
 			if (f.isReading())
@@ -443,9 +427,9 @@ void CMultiLayerCell::serial(NLMISC::IStream& f)
 			{
 				I16x16Layer::save(f, _Layers[slot]->_HeightMap);
 			}
-			
+
 			nlassert(_Layers[slot] != NULL);
-			
+
 			for (uint32 i=0; i<16*16; ++i)
 			{
 				f.serial(_Layers[slot]->_Layer[i]);
@@ -464,7 +448,7 @@ void CSuperCell::serial(NLMISC::IStream& f)
 	// Version
 	// 0: initial version
 	uint	version = f.serialVersion(0);
-	
+
 	if (f.isReading())
 	{
 		for (uint32 i=0; i<16*16; ++i)
@@ -499,7 +483,7 @@ void CSuperCell::updateTopologyRef(CWorldMap* worldMap)
 		if (_Grid[i])
 			_Grid[i]->updateTopologyRef	(worldMap);
 	}
-}	
+}
 
 void CSuperCell::countCells(uint& compute, uint& white, uint& simple, uint& multi, uint& other) const
 {
@@ -578,7 +562,7 @@ void	CWorldMap::serial(NLMISC::IStream &f)
 		{
 			bool	present;
 			f.serial(present);
-			
+
 			if (present)
 			{
 				CSuperCell	*scell = _GridFastAccess[i];
@@ -586,7 +570,7 @@ void	CWorldMap::serial(NLMISC::IStream &f)
 					_GridFastAccess[i]	=	scell	=new	CSuperCell(*this);
 				f.serial(*scell);
 			}
-			
+
 		}
 
 		//	made to update RootCell pointers in TTopologyRef ..
@@ -603,25 +587,25 @@ void	CWorldMap::serial(NLMISC::IStream &f)
 			getBounds(min, max);
 			CMapPosition	scan, scanline;
 			NLMISC::CRandom	random;
-			
+
 			for (scan = min; scan.y() != max.y(); scan = scan.stepCell(0, 1))
 			{
 				for (scanline = scan; scanline.x()	!= max.x(); scanline = scanline.stepCell(1, 0))
 				{
-					CRootCell	*rootCell=getRootCell(scanline);					
-					
+					CRootCell	*rootCell=getRootCell(scanline);
+
 					if (!rootCell)
 						continue;
-					
+
 					CMapPosition	pos(scanline.x(),0xffff0000|scanline.y());
 
 					uint	ind=0;
 					uint	maxTries=256;
-					
+
 					for (;ind<4 && maxTries>0;maxTries--)
 					{
 						CWorldPosition	wpos;
-						
+
 						uint	i=	uint32(random.rand()) & 0xf;
 						uint	j=	uint32(random.rand()) & 0xf;
 #ifdef NL_DEBUG
@@ -634,13 +618,13 @@ void	CWorldMap::serial(NLMISC::IStream &f)
 #ifdef NL_DEBUG
 							nlassert(wpos.getRootCell()==rootCell);
 							nlassert(wpos.y()<=0 && wpos.x()>=0)
-#endif						
+#endif
 							rootCell->setWorldPosition(wpos, ind);
 							ind++;
 						}
-						
+
 					}
-					
+
 					// if we have found some valid positions but not all, fill the array with the last pos found.
 					if (ind<4 && ind>0)
 					{
@@ -649,15 +633,15 @@ void	CWorldMap::serial(NLMISC::IStream &f)
 							rootCell->setWorldPosition(rootCell->getWorldPosition(ind-1), ind);
 							ind++;
 						}
-						
+
 					}
-					
+
 				}
-				
+
 			}
 
 		}
-			
+
 	}
 	else
 	{
@@ -687,7 +671,7 @@ void	CWorldMap::setFlagOnPosAndRadius(const	CMapPosition	&pos,float	radius,	uint
 	float	maxy=pos.y()+radius;
 
 	const	float	radius2=radius*radius;
-	
+
 	for (float	ty=miny;ty<=maxy;ty++)
 	{
 		const	float	dy=ty-pos.y();
@@ -715,7 +699,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 		if (_GridFastAccess[i])
 			_GridFastAccess[i]->countCells(compute, white, simple, multi, other);
 	}
-	
+
 //		uint	i, j;
 //		for (i=0; i<256; ++i)
 //			for (j=0; j<256; ++j)
@@ -732,7 +716,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 		if (lnks.isSSlotValid())
 		{
 			neighbs.set(CDirection::S);
-			
+
 			const	CCellLinkage	&nlnk = wpos.getPosS().getCellLinkage();	//CWorldPosition(wpos.getPosS(),lnks.NSlot()));
 			if (nlnk.isESlotValid())
 				neighbs.set(CDirection::SE);
@@ -743,7 +727,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 		if (lnks.isNSlotValid())
 		{
 			neighbs.set(CDirection::N);
-			
+
 			const	CCellLinkage	&slnk = wpos.getPosN().getCellLinkage();
 			if (slnk.isESlotValid())
 				neighbs.set(CDirection::NE);
@@ -754,7 +738,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 		if (lnks.isESlotValid())
 		{
 			neighbs.set(CDirection::E);
-			
+
 			const	CCellLinkage	&elnk = wpos.getPosE().getCellLinkage();
 			if (elnk.isSSlotValid())
 				neighbs.set(CDirection::SE);
@@ -765,7 +749,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 		if (lnks.isWSlotValid())
 		{
 			neighbs.set(CDirection::W);
-			
+
 			const	CCellLinkage	&wlnk = wpos.getPosW().getCellLinkage();
 			if (wlnk.isSSlotValid())
 				neighbs.set(CDirection::SW);
@@ -779,7 +763,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 	//
 	bool	CWorldMap::customCheckDiagMove(const CWorldPosition &pos, const	CDirection	&direction, TAStarFlag denyFlags) const
 	{
-		H_AUTO(AI_WorldMap_move);		
+		H_AUTO(AI_WorldMap_move);
 		// get straight links
 		const	CCellLinkage	&lnk = pos.getCellLinkage();
 
@@ -808,14 +792,14 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 					CWorldPosition	tmpPos(pos);
 					if (!tmpPos.getCellLinkage().isESlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosE();
 					if ((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
-					
+
 					if (!tmpPos.getCellLinkage().isSSlotValid())
 						return	false;
-					
+
 //					tmpPos=tmpPos.getPosS();
 //					if	((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 //						return	false;
@@ -829,31 +813,31 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 					CWorldPosition	tmpPos(pos);
 					if (!tmpPos.getCellLinkage().isNSlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosN();
 					if ((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
-					
+
 					if (!tmpPos.getCellLinkage().isESlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosE();
 					if	((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
 				}
-				
+
 				{
 					CWorldPosition	tmpPos(pos);
 					if (!tmpPos.getCellLinkage().isESlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosE();
 					if ((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
-					
+
 					if (!tmpPos.getCellLinkage().isNSlotValid())
 						return	false;
-					
+
 //					tmpPos=tmpPos.getPosN();
 //					if	((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 //						return	false;
@@ -866,31 +850,31 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 					CWorldPosition	tmpPos(pos);
 					if (!tmpPos.getCellLinkage().isNSlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosN();
 					if ((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
-					
+
 					if (!tmpPos.getCellLinkage().isWSlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosW();
 					if	((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
 				}
-				
+
 				{
 					CWorldPosition	tmpPos(pos);
 					if (!tmpPos.getCellLinkage().isWSlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosW();
 					if ((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
-					
+
 					if (!tmpPos.getCellLinkage().isNSlotValid())
 						return	false;
-					
+
 //					tmpPos=tmpPos.getPosN();
 //					if	((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 //						return	false;
@@ -903,31 +887,31 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 					CWorldPosition	tmpPos(pos);
 					if (!tmpPos.getCellLinkage().isSSlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosS();
 					if ((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
-					
+
 					if (!tmpPos.getCellLinkage().isWSlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosW();
 					if	((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
 				}
-				
+
 				{
 					CWorldPosition	tmpPos(pos);
 					if (!tmpPos.getCellLinkage().isWSlotValid())
 						return	false;
-					
+
 					tmpPos=tmpPos.getPosW();
 					if ((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 						return	false;
-					
+
 					if (!tmpPos.getCellLinkage().isSSlotValid())
 						return	false;
-					
+
 //					tmpPos=tmpPos.getPosS();
 //					if	((tmpPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)
 //						return	false;
@@ -942,10 +926,10 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 /*
 	bool	CWorldMap::customCheckDiagMove(const CWorldPosition &pos, const	CDirection	&direction, TAStarFlag denyFlags) const
 	{
-		H_AUTO(AI_WorldMap_move);		
+		H_AUTO(AI_WorldMap_move);
 		// get straight links
 		const	CCellLinkage	&lnk = pos.getCellLinkage();
-		
+
 		switch	(direction.getVal())
 		{
 		case	CDirection::SE:
@@ -954,18 +938,18 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 					return	false;
 				if (!lnk.isESlotValid())
 					return	false;
-				
+
 				return	(	pos.getPosS().getCellLinkage().isESlotValid()
 					||	pos.getPosE().getCellLinkage().isSSlotValid());
 			}
-			
+
 		case	CDirection::NE:
 			{
 				if (!lnk.isNSlotValid())
 					return	false;
 				if (!lnk.isESlotValid())
 					return	false;
-				
+
 				return	(	pos.getPosN().getCellLinkage().isESlotValid()
 					||	pos.getPosE().getCellLinkage().isNSlotValid());
 			}
@@ -975,7 +959,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 					return	false;
 				if (!lnk.isWSlotValid())
 					return	false;
-				
+
 				return	(	pos.getPosN().getCellLinkage().isWSlotValid()
 					||	pos.getPosW().getCellLinkage().isNSlotValid());
 			}
@@ -985,11 +969,11 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 					return	false;
 				if (!lnk.isWSlotValid())
 					return	false;
-				
+
 				return	(	pos.getPosS().getCellLinkage().isWSlotValid()
 					||	pos.getPosW().getCellLinkage().isSSlotValid());
 			}
-			
+
 		}
 		return	false;
 	}
@@ -998,7 +982,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 	//
 	bool	CWorldMap::move(CWorldPosition &pos, const	CDirection	&direction) const
 	{
-		H_AUTO(AI_WorldMap_move);		
+		H_AUTO(AI_WorldMap_move);
 		// get straight links
 		const	CCellLinkage	&lnk = pos.getCellLinkage();
 
@@ -1067,7 +1051,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 						return	true;
 					}
 				}
-				
+
 				return	false;
 			}
 		case	CDirection::N:
@@ -1089,7 +1073,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 						temp.setPosN(pos);
 						return	true;
 					}
-				}				
+				}
 
 				if (lnk.isNSlotValid())
 				{
@@ -1100,7 +1084,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 						return	true;
 					}
 				}
-				
+
 				return	false;
 			}
 		case	CDirection::W:
@@ -1123,7 +1107,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 						return	true;
 					}
 				}
-				
+
 				if (lnk.isWSlotValid())
 				{
 					const	CWorldPosition	temp(pos.getPosW());
@@ -1144,7 +1128,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 	//
 	bool	CWorldMap::moveSecure(CWorldPosition &pos, const CDirection	&direction, uint16 maskFlags) const
 	{
-		H_AUTO(AI_WorldMap_moveSecure);		
+		H_AUTO(AI_WorldMap_moveSecure);
 		// get straight links
 
 		uint16	pflags = pos.getFlags();
@@ -1223,7 +1207,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 	//
 	bool	CWorldMap::moveDiagTestBothSide(CWorldPosition &pos, const	CDirection	&direction) const
 	{
-		H_AUTO(AI_WorldMap_move);		
+		H_AUTO(AI_WorldMap_move);
 		// get straight links
 		const	CCellLinkage	&lnk = pos.getCellLinkage();
 
@@ -1242,7 +1226,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 			{
 				if (!lnk.isSSlotValid() || !lnk.isESlotValid())
 					return	false;
-				
+
 				CSlot	eSlot=pos.getPosS().getCellLinkage().ESlot();
 				if (!eSlot.isValid())
 					return	false;
@@ -1267,15 +1251,15 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 			{
 				if (!lnk.isNSlotValid() || !lnk.isESlotValid())
 					return	false;
-				
+
 				CSlot	eSlot=pos.getPosN().getCellLinkage().ESlot();
 				if (!eSlot.isValid())
 					return	false;
-				
+
 				const	CWorldPosition	temp(pos.getPosE());
 				if (temp.getCellLinkage().NSlot()!=eSlot)
 					return	false;
-				
+
 				temp.setPosN(pos);
 				return	true;
 			}
@@ -1292,15 +1276,15 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 			{
 				if (!lnk.isNSlotValid() || !lnk.isWSlotValid())
 					return	false;
-				
+
 				CSlot	wSlot=pos.getPosN().getCellLinkage().WSlot();
 				if (!wSlot.isValid())
 					return	false;
-				
+
 				const	CWorldPosition	temp(pos.getPosW());
 				if (temp.getCellLinkage().NSlot()!=wSlot)
 					return	false;
-				
+
 				temp.setPosN(pos);
 				return	true;
 			}
@@ -1317,15 +1301,15 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 			{
 				if (!lnk.isSSlotValid() || !lnk.isWSlotValid())
 					return	false;
-				
+
 				CSlot	wSlot=pos.getPosS().getCellLinkage().WSlot();
 				if (!wSlot.isValid())
 					return	false;
-				
+
 				const	CWorldPosition	temp(pos.getPosW());
 				if (temp.getCellLinkage().SSlot()!=wSlot)
 					return	false;
-				
+
 				temp.setPosS(pos);
 				return	true;
 			}
@@ -1350,34 +1334,34 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 			nlwarning("Invalid endPos (NULL)");
 			return;
 		}
-		
+
 		const	CTopology	&startTopoNode=startPos.getTopologyRef().getCstTopologyNode();
 		const	CTopology	&endTopoNode=endPos.getTopologyRef().getCstTopologyNode();
 		TAStarFlag	startFlag=(TAStarFlag)(startTopoNode.getFlags()&WaterAndNogo);
 //		if	(!allowStartRestriction)
 			startFlag=Nothing;
-		
-		
+
+
 		for	(TAStarFlag	possibleFlag=Nothing;possibleFlag<=WaterAndNogo;possibleFlag=(TAStarFlag)(possibleFlag+2))	//	tricky !! -> to replace with a defined list of flags to checks.
 		{
 			const	uint32	incompatibilityFlags=(possibleFlag&(denyflags&~startFlag))&WaterAndNogo;
-			
+
 			if	(incompatibilityFlags)
 				continue;
-			
+
 			const	uint32	startMasterTopo=startTopoNode.getMasterTopo(possibleFlag);
 			const	uint32	endMasterTopo=endTopoNode.getMasterTopo(possibleFlag);
 			if	(	(startMasterTopo^endMasterTopo)!=0
 				||	startMasterTopo==~0)	// if not same masterTopo or invalid masterTopo then bypass ..
 				continue;
-			
+
 			res.set(possibleFlag, startMasterTopo);
 			res.setValid();
-			
+
 			if	(((possibleFlag&denyflags)&WaterAndNogo)==0)	//	it was the optimal case ?
 				break;
 		}
-		
+
 	}
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1394,7 +1378,7 @@ NLMISC_CATEGORISED_COMMAND(ais, dumpAStarSteps, "Dump the distribution of A* num
 	log.displayNL( "NbSteps\tNbOccurrences", MapAStarNbSteps.size() );
 	for( std::map<uint, uint>::const_iterator first=MapAStarNbSteps.begin(), last=MapAStarNbSteps.end(); first!=last; ++first )
 	{
-		log.displayNL( "%u\t%u", first->first, first->second );	
+		log.displayNL( "%u\t%u", first->first, first->second );
 	}
 	return true;
 }
@@ -1402,10 +1386,10 @@ NLMISC_CATEGORISED_COMMAND(ais, dumpAStarSteps, "Dump the distribution of A* num
 bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const& end, std::vector<CTopology::TTopologyRef>& path, TAStarFlag denyflags) const
 {
 	H_AUTO(findAStarPath1);
-	
+
 	// Clear destination path
 	path.clear();
-	
+
 	// Check start position validity
 	if (!start.isValid())
 	{
@@ -1418,15 +1402,15 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 		_LastFASPReason = FASPR_INVALID_END_POS;
 		return false;
 	}
-	
+
 	// Get start and end topologies
 	CTopology::TTopologyRef	startTopo = start.getTopologyRef();
 	CTopology::TTopologyRef	endTopo = end.getTopologyRef();
-	
+
 	// Get associated topology nodes
 	CTopology const& startTopoNode = startTopo.getCstTopologyNode();
 	CTopology const& endTopoNode = endTopo.getCstTopologyNode();
-	
+
 	// Check start point
 	if (!startTopo.isValid())
 	{
@@ -1439,7 +1423,7 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 		_LastFASPReason = FASPR_INVALID_END_TOPO;
 		return	false;
 	}
-	
+
 	// Check compatibility of start and end points depending on flags to avoid
 	RYAI_MAP_CRUNCH::CCompatibleResult res;
 	areCompatiblesWithoutStartRestriction(start, end, denyflags, res, true);
@@ -1448,44 +1432,44 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 		_LastFASPReason = FASPR_INCOMPATIBLE_POSITIONS;
 		return	false;
 	}
-	
+
 	// Get flags to use to compute the path
 	TAStarFlag movementFlags = res.movementFlags();
 	// Get the master topology inside which to compute the path (reminder: no path between different master topo)
 	uint32 choosenMasterTopo=res.choosenMasterTopo();
-	
+
 	// A list of A* nodes
 	vector<CAStarHeapNode> nodes;
 	// List of visited topologies, with associated node in 'nodes' vector
 	map<CTopology::TTopologyId, uint> visited;
-	
+
 	// The heap used to store A* nodes
 	// :TODO: Check if STL heap is not better suited, or if another data structure would be more useful in AIS
 	CHeap<float, uint> heap;
-	
+
 	// Get end position
 	CVector const& endPoint = endTopo.getCstTopologyNode().Position;
-	
+
 	// Create a heap node for the start point
 	CAStarHeapNode hnode(startTopo, 0xffffffff, 0.0f, true);
 	// Push it in the node list
 	nodes.push_back(hnode);
 	// Take it as first father
 	uint father = nodes.size()-1;
-	
+
 	// Add start topology to visited nodes (father holds start topo node index for the moment)
 	visited.insert(make_pair<CTopology::TTopologyId,uint>(startTopo, father));
 	// Push start node in the heap with a zero cost
 	heap.push(0.0f, father);
-	
+
 	// Boolean to notify that end point has been reached
 	bool found = false;
-	
+
 #ifdef CHECK_HEAP
 	static uint32 maxHeap = 65535;
 	static uint32 maxHeapMeasure = 0;
 #endif
-	
+
 	uint nbHeapSteps = 0;
 	while (!heap.empty())
 	{
@@ -1493,7 +1477,7 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 		if (heap.size()>maxHeap) // if too much calculs, not found (to remove when debugged).
 			break;
 	#endif
-		
+
 		++nbHeapSteps;
 
 		// Get best node (popping it)
@@ -1503,46 +1487,46 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 			father = heap.pop();
 		}
 		while (!nodes[father].isOpened() && !heap.empty());
-		
+
 		if (father==~0)
 			break;
-		
+
 		// Mark current node as closed
 		hnode.setOpen(false);
-		
+
 		// Make best node the current one
 		hnode = nodes[father];
-		
+
 		// Get the current node itself
 		CTopology::TTopologyRef const& current = hnode.getRef();
-		
+
 		// If we reached the end node, stop search
 		if (current==endTopo)
 		{
 			found=true;
 			break;
 		}
-		
+
 		// Get current node topology
 		CTopology const& ctp = current.getCstTopologyNode();
-		
+
 		// Get g(n) for current node
 		float dist = hnode.getDistance();
-		
+
 		// Examine each neighbour of the current node
 		for (vector<CTopology::CNeighbourLink>::const_iterator it=ctp.Neighbours.begin(), itEnd=ctp.Neighbours.end();it!=itEnd;++it)
 		{
 			// Get the neighbour topology node
 			CTopology::CNeighbourLink const& neighbourLink = (*it);
 			CTopology::TTopologyRef const& next = neighbourLink.getTopologyRef();
-			
+
 			// If it's not in the same master topo skip it
 			if	(next.getCstTopologyNode().getMasterTopo(movementFlags)!=choosenMasterTopo)
 				continue;
-				
+
 			// Compute neighbour node g(n)
 			float distance = dist + neighbourLink.getDistance();
-			
+
 			uint child;
 			// Check if node has already been visited
 			map<CTopology::TTopologyId, uint>::iterator	itv = visited.find(next);
@@ -1553,7 +1537,7 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 				// If that node's previous distance is better than the new one skip it
 				if (nodes[child].getDistance() <= distance)
 					continue;
-				
+
 				// Close the old node
 				nodes[child].setOpen(false);
 				// Remove it from visited
@@ -1570,7 +1554,7 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 			visited.insert(make_pair<CTopology::TTopologyId,uint>(next, child));
 		}
 	}
-	
+
 #ifdef	CHECK_HEAP
 	if (heap.size()>maxHeapMeasure)
 	{
@@ -1580,7 +1564,7 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 
 	++MapAStarNbSteps[nbHeapSteps];
 	LastAStarNbSteps = nbHeapSteps;
-	
+
 #ifdef NL_DEBUG
 	nlassert(found);
 #else
@@ -1589,14 +1573,14 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 		nlwarning("(!!Appeler StepH!!)Path not found from %s : %d to %s : %d", start.toString().c_str(), start.slot(), end.toString().c_str(), end.slot());
 	}
 #endif
-	
+
 	// If not found, return error
 	if (!found)
 	{
 		_LastFASPReason = FASPR_NOT_FOUND;
 		return false;
 	}
-	
+
 	// Backtrack path
 	while (father != 0xffffffff)
 	{
@@ -1604,10 +1588,10 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 		path.push_back(node.getRef());
 		father = node.getFather();
 	}
-	
+
 	// Reverse path container
 	std::reverse(path.begin(), path.end());
-	
+
 	_LastFASPReason = FASPR_NO_ERROR;
 	return true;
 }
@@ -1617,77 +1601,77 @@ bool	CWorldMap::findAStarPath(const CTopology::TTopologyId &start, const CTopolo
 {
 	H_AUTO(findAStarPath2)
 	path._TopologiesPath.clear();
-	
+
 	CTopology::TTopologyRef	startTopo = getTopologyRef(start);
 	CTopology::TTopologyRef	endTopo = getTopologyRef(end);
-	
+
 	// if not found start point or end point, abort
 	if	(!startTopo.isValid() || !endTopo.isValid())
 		return	false;
-	
+
 	vector<CAStarHeapNode>		nodes;
 	map<CTopology::TTopologyId, uint>	visited;	// topology + node index in vector
 	CHeap<float, uint>			heap;
-	
+
 	const	CVector	&endPoint =	endTopo.getCstTopologyNode().Position;
-	
+
 	// add current to heap
 	CAStarHeapNode	hnode(startTopo,0xffffffff,0.0f,true);
-	
+
 	nodes.push_back(hnode);
 	uint	father = nodes.size()-1;
-	
+
 	// add current to visited nodes
 	visited.insert(make_pair<CTopology::TTopologyId,uint>(startTopo, father));
 	heap.push(0.0f, father);
-	
+
 	bool	found=false;
-	
+
 	while (!heap.empty())
 	{
 		// pop best node
 		father = heap.pop();
 		hnode = nodes[father];
-		
+
 		const	CTopology::TTopologyRef		&current	=	hnode.getRef();
-		
+
 		// if reached end node, leave
 		if (current==endTopo)
 		{
 			found=true;
 			break;
 		}
-		
+
 		const CTopology	&ctp = current.getCstTopologyNode();
 		float			dist = hnode.getDistance();
-		
+
 		for (uint	i=0; i<ctp.Neighbours.size(); ++i)
 		{
 			const	CTopology::CNeighbourLink	&neightBourgLink=ctp.Neighbours[i];
-			
+
 			const	CTopology::TTopologyRef	&next=neightBourgLink.getTopologyRef();
-			
+
 			const CTopology	&ntp = next.getCstTopologyNode();
-			
+
 			// don't examine not accessible nodes
 			if ((ntp.Flags & denyflags) != 0)
 				continue;
-			
+
 			// compute actual node distance
 			float	distance = dist + neightBourgLink.getDistance();
-			
+
 			// if node is open or closed and previous visit has shorter path, skip node
 			map<CTopology::TTopologyId, uint>::iterator	itv = visited.find(next);
 			if (itv != visited.end() && nodes[(*itv).second].getDistance() <= distance)
 				continue;
-			
+
 			// compute heuristic
 			float	heuristic = distance + (endPoint-ntp.Position).norm();
-			
+
 			// setup node
 			CAStarHeapNode	cnode(next,father,distance,true);
 			uint			child;
-			
+
 			// setup node
 			if (itv == visited.end())
 			{
@@ -1701,17 +1685,17 @@ bool	CWorldMap::findAStarPath(const CTopology::TTopologyId &start, const CTopolo
 				child = (*itv).second;
 				nodes[child]=cnode;
 			}
-			
+
 			// add node to visited and to heap
 			heap.push(heuristic, child);
 			visited.insert(make_pair<CTopology::TTopologyId,uint>(next, child));
 		}
 	}
-	
+
 	// if not found, return error
 	if (!found)
 		return	false;
-	
+
 	// backtrack path
 	while (father != 0xffffffff)
 	{
@@ -1720,10 +1704,10 @@ bool	CWorldMap::findAStarPath(const CTopology::TTopologyId &start, const CTopolo
 		path._TopologiesPath.push_back(node.getRef());
 		father = node.getFather();
 	}
-	
+
 	// reverse path
 	reverse(path._TopologiesPath.begin(), path._TopologiesPath.end());
-	
+
 	return true;
 }
 
@@ -1732,7 +1716,7 @@ bool	CWorldMap::findAStarPath(const CTopology::TTopologyId &start, const CTopolo
 bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition const& end, std::vector<CDirection>& stepPath, TAStarFlag denyflags) const
 {
 	H_AUTO(findInsideAStarPath);
-	
+
 	// Check start and end position validity
 	if (!start.isValid())
 	{
@@ -1750,7 +1734,7 @@ bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition 
 		_LastFIASPReason = FIASPR_DIFFERENT_TOPO;
 		return false;
 	}
-	
+
 	// A list of A* nodes
 	vector<CInsideAStarHeapNode> nodes;
 	// List of visited nodes, with associated node index in 'nodes' vector
@@ -1758,24 +1742,24 @@ bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition 
 	// The heap used to store A* nodes
 	// :TODO: Check if STL heap is not better suited, or if another data structure would be more useful in AIS
 	CHeap<float, uint> heap;
-	
+
 	// Get end point
 	CVector endPoint = end.toVectorD();
 	// Build a node for the end point
 	CAStarNode endId(end);
 	// Build a node for the start point
 	CAStarNode startNode(start);
-	
+
 	// Create a heap node for the start point and push it in the node list
 	nodes.push_back(CInsideAStarHeapNode(startNode, 0xffffffff, CDirection(), 0.f, true));
 	// Take it as first father
 	uint father = nodes.size()-1;
-	
+
 	// Add start node to visited nodes (father holds start node index for the moment)
 	visited.insert(make_pair<CAStarNode, uint>(startNode, father));
 	// Push start node in the heap with a zero cost
 	heap.push(0.0f, father);
-	
+
 	// Boolean to notify that end point has been reached
 	bool found = false;
 
@@ -1787,60 +1771,60 @@ bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition 
 		CInsideAStarHeapNode& hnode = nodes[father];
 		// Get associated A* node
 		CAStarNode const& current = hnode.getNode();
-		
+
 		// If we reached the end node, stop search
 		if (current==endId)
 		{
 			found=true;
 			break;
 		}
-		
+
 		// Get g(n) for current node
 		float dist = hnode.getDistance();
-		
+
 		// Get current node slot
 		CSlot slot = current.slot();
 		// Compute a map position
 		CMapPosition pos = start; // The map has the same cell than the start pos (coz in same topo)
 		current.updateMapPosition(pos); // Just update the unit id
-		
+
 		// For each neighbour (8 directions)
 		CNeighbourhood neighbourhood = neighbours(getWorldPosition(pos,slot));
 		for (uint i=0; i<8; ++i)
 		{
 			// Compute a CDirection
 			CDirection dir((CDirection::TDirection)i);
-			
+
 			// If neighbour in that direction is not valid skip it
 			if (!neighbourhood.isValid(dir))
 				continue;
-			
+
 			// :TODO: Continue documentation
 			// If we cannot move in that direction skip it
 			CWorldPosition	mv(getWorldPosition(pos, slot));
 			if (!moveDiagTestBothSide(mv, dir))
 				continue;
-			
+
 			// If that new point is not in the same cell skip it
 			if (!mv.hasSameFullCellId(start))
 				continue;
-			
+
 			// If that point's flags are not compatible skip it
 			if ((denyflags & mv.getTopologyRef().getCstTopologyNode().getFlags()) != 0)
 				continue;
-			
+
 			// Build an A* node
 			CAStarNode next(mv);
-			
+
 			// Compute g(n) (diagonal)
 			float distance = dist + (((i & 1) != 0) ? 1.4142f : 1.0f);
-			
+
 			// If node has already been visited and previous distance was better skip it
 			map<CAStarNode, uint>::iterator	itv = visited.find(next);
 			if (	itv != visited.end()
 				&&	nodes[(*itv).second].getDistance() <= distance	)
 				continue;
-			
+
 			uint child;
 			// If node has already been visited update it
 			if (itv!=visited.end())
@@ -1862,19 +1846,19 @@ bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition 
 			visited.insert(make_pair<CAStarNode, uint>(next, child));
 		}
 	}
-	
+
 #ifdef NL_DEBUG
 	nlassert(found);
-#endif		
+#endif
 	// If not found, return error
 	if (!found)
 	{
 		_LastFIASPReason = FIASPR_NOT_FOUND;
 		return false;
 	}
-	
+
 	stepPath.clear();
-	
+
 	// Backtrack path
 	while (father != 0xffffffff)
 	{
@@ -1882,10 +1866,10 @@ bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition 
 			stepPath.push_back(nodes[father].getDirection());
 		father = nodes[father].getFather();
 	}
-	
+
 	// Reverse path container
 	std::reverse(stepPath.begin(), stepPath.end());
-	
+
 	_LastFIASPReason = FIASPR_NO_ERROR;
 	return true;
 }
@@ -1899,11 +1883,11 @@ bool CWorldMap::moveTowards(CWorldPosition& pos, CTopology::TTopologyRef const& 
 	CGridDirectionLayer const* layer = getGridDirectionLayer(pos, topology);
 	if (!layer)
 		return	false;
-	
+
 	CDirection	motion=layer->getDirection(pos);
 	if (!motion.isValid())
 		return	false;
-	
+
 	return	move(pos,motion);
 }
 
@@ -1912,12 +1896,12 @@ bool	CWorldMap::move(CWorldPosition &pos, CAStarPath &path, uint &currentstep) c
 {
 	if	(currentstep >= path._TopologiesPath.size())
 		return	false;
-	
+
 	CTopology::TTopologyRef	cid(pos);
-	
+
 	if	(!cid.isValid())
 		return false;
-	
+
 	if	(cid==path._TopologiesPath[currentstep])
 	{
 		++currentstep;
@@ -1937,17 +1921,17 @@ bool CWorldMap::move(CWorldPosition& pos, CMapPosition const& end, TAStarFlag co
 	//	not optimum but it will be rewrite for each specialized rootcell type.
 	const	sint32	x0	=	pos.x();
 	const	sint32	y0	=	pos.y();
-	
+
 	const	sint32	deltax	=	end.x() - x0;
 	const	sint32	deltay	=	end.y() - y0;
-	
+
 	const	sint32	d	=	std::max(abs(deltax), abs(deltay));
-	
+
 	for (sint32 i=1; i<=d; ++i)
 	{
 		const	sint	dx = x0 + (deltax*i)/d - pos.x();
 		const	sint	dy = y0 + (deltay*i)/d - pos.y();
-		
+
 
 		if	(	!move(tempPos, CDirection(dx,dy))
 			||	(tempPos.getTopologyRef().getCstTopologyNode().getFlags()&denyFlags)!=0)	//	Arghh !!
@@ -2237,13 +2221,13 @@ bool	CWorldMap::setWorldPosition(sint32 z, CWorldPosition	&wpos,	const CAIVector
 {
 	CSlot	slot;
 	const	CMapPosition	mapPos(pos);
-	
+
 	const CRootCell	*cell = originCell ? originCell : getRootCellCst(mapPos);
 	if (!cell)
 	{
 		return false;
 	}
-	
+
 	sint32 minDistZ = INT_MAX;
 	CSlot bestSlot;
 	sint32 bestZ;
@@ -2295,13 +2279,13 @@ bool	CWorldMap::setWorldPosition( double z, CWorldPosition	&wpos,	const CAIVecto
 	nlassert(false && "Double version of setWorldPosition isn't tested !!! Verify it's the same than above sint32 version !");
 	CSlot	slot;
 	const	CMapPosition	mapPos(pos);
-	
+
 	const CRootCell	*cell = originCell ? originCell : getRootCellCst(mapPos);
 	if (!cell)
 	{
 		return false;
 	}
-	
+
 	double minDistZ = DBL_MAX;
 	CSlot bestSlot;
 	double bestZ;

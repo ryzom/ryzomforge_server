@@ -45,7 +45,7 @@ extern NLMISC::CVariable<sint>	PDVerboseLevel;
 /**
  * PDS Resolve Unmapped rows
  * If true, PDS continue loading when it finds a row not mapped in a mapped table,
- * and keeps it unmapped. 
+ * and keeps it unmapped.
  * Otherwise, loading fails.
  */
 extern NLMISC::CVariable<bool>	ResolveUnmappedRows;
@@ -147,7 +147,7 @@ class CObjectIndex
 public:
 
 	/// Constructor of invalid index
-	explicit CObjectIndex(bool validateChecksum = false) : _Table(INVALID_TABLE_INDEX), _Row(INVALID_ROW_INDEX), _Checksum(~VALID_INDEX_CHECKSUM)
+	explicit CObjectIndex(bool validateChecksum = false) : _Table(INVALID_TABLE_INDEX), _Row(INVALID_ROW_INDEX), _Checksum((TIndexChecksum)~VALID_INDEX_CHECKSUM)
 	{
 		if (validateChecksum)
 			validate();
@@ -259,7 +259,7 @@ public:
 				invalidate();
 
 			return;
-		} 
+		}
 		else if (sscanf(str, "(%d:%d)", &table, &row) == 2)
 		{
 			_Table = (TTableIndex)table;
@@ -478,6 +478,17 @@ typedef std::vector<CObjectIndex>		TIndexList;
 
 //#define DEBUG_SETMAP_ACCESSOR
 
+struct CColumnIndexHashMapTraits
+{
+	static const size_t bucket_size = 4;
+	static const size_t min_buckets = 8;
+	CColumnIndexHashMapTraits() { }
+	size_t operator() (const CColumnIndex &id) const
+		{
+			return id.hash();
+		}
+};
+
 class CSetMap
 {
 public:
@@ -490,7 +501,7 @@ public:
 	};*/
 
 	/// Map of lists
-	typedef CHashMap<CColumnIndex, TIndexList>			TListMap;
+	typedef CHashMap<CColumnIndex, TIndexList, CColumnIndexHashMapTraits>			TListMap;
 
 	/// An Accessor on a list
 	class CAccessor
@@ -528,10 +539,10 @@ public:
 		{
 			nlassert(isValid());
 
-			TIndexList&                    iList = (*_It).second; 
-			TIndexList::iterator     itr; 			
-			for (itr=iList.begin(); itr!=iList.end(); ) 
-				itr = ((*itr == index) ? iList.erase(itr) : (itr+1)); 
+			TIndexList&                    iList = (*_It).second;
+			TIndexList::iterator     itr;
+			for (itr=iList.begin(); itr!=iList.end(); )
+				itr = ((*itr == index) ? iList.erase(itr) : (itr+1));
 
 			// gcc can't resolve this:
 			//(*_It).second.erase(std::remove((*_It).second.begin(), (*_It).second.end(), index), (*_It).second.end());
@@ -596,7 +607,7 @@ public:
 
 	/// Clear up whole map
 	void					clear()										{ _Map.clear(); }
-	
+
 private:
 
 	friend class CAccessor;
@@ -604,11 +615,6 @@ private:
 	TListMap		_Map;
 
 };
-
-
-
-
-
 
 
 

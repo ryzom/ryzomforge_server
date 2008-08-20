@@ -64,13 +64,13 @@ private:
 		};
 		std::vector<CSquadTemplateVariant>	Variants;
 	};
-	
+
 public:
 
 	COutpostManager();
 	/// return the singleton instance
 //	static COutpostManager & getInstance();
-	
+
 	/// load the outposts from primitives (static data)
 	void loadOutpostPrimitives();
 
@@ -81,7 +81,7 @@ public:
 	void loadOutpostSaveFiles();
 
 	// callback for each file loaded from the backup service
-	void COutpostManager::outpostFileCallback(const CFileDescription& fileDescription, NLMISC::IStream& dataStream);
+	void outpostFileCallback(const CFileDescription& fileDescription, NLMISC::IStream& dataStream);
 
 	/// Check all outpost against the list of loaded guilds. If any guild is missing,
 	/// update the outpost to a coherent state
@@ -105,9 +105,9 @@ public:
 	NLMISC::CSmartPtr<COutpost> getOutpostFromSheet( NLMISC::CSheetId sheet );
 	/// get an outpost short id from its alias
 	uint16 getOutpostShortId( TAIAlias alias );
-	/// get an outpost alias from its short id 
+	/// get an outpost alias from its short id
 	TAIAlias getOutpostAliasFromShortId( uint16 shortId );
-	
+
 	/// dump the complete list of loaded outposts
 	void dumpOutpostList(NLMISC::CLog & log) const;
 	/// dump the given outpost
@@ -117,10 +117,10 @@ public:
 	/// only valid during a part of loadOutposts().
 	/// Return true if a template was found.
 	bool fillSquadDescriptor( const std::string& squadName, bool isTribe, const std::string& variantContext, COutpostSquadDescriptor& squadDesc );
-	
+
 	/// call this when an outpost needs an update in guild database
 	void askOutpostGuildDBUpdate(TAIAlias outpostAlias, COutpostGuildDBUpdater::TDBPropSet dbPropSet);
-	
+
 	TAIAlias getOutpostFromUserPosition( CCharacter *user ) const;
 	void enterOutpostZone(CCharacter* user);
 	void leaveOutpostZone(CCharacter* user);
@@ -157,7 +157,7 @@ private:
 
 	/// managed outposts, accessible by alias
 	CHashMap<uint, NLMISC::CSmartPtr<COutpost> > _OutpostsByAlias;
-	
+
 	/// managed outposts, accessible by sheet
 	std::map<NLMISC::CSheetId, NLMISC::CSmartPtr<COutpost> > _OutpostsBySheet;
 

@@ -5,14 +5,14 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
 		-I/usr/include/libxml2 \
-		-I$(HOME)/cvs/code/nel/include \
-		-I.. \
+        -I$(HOME)/code/nel/include \
+        -I$(HOME)/code/ryzom/common/src \
+		-I..
 
 # The flags for the linker
 LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
@@ -27,7 +27,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 
 # The list of targets to build
 TARGETS		= libadmin_modules.a
-DSP_TARGET	= admin_modules.dsp
+DSP_TARGET	= admin_modules.vcproj
 
 # The default build rule
 all:			check-deps $(TARGETS)
@@ -38,5 +38,4 @@ libadmin_modules.a: $(OBJS)
 #############################################################################
 # Rules
 
-include ../Rules.mk
-
+include ../../../Rules.mk

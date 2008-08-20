@@ -5,17 +5,18 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
+        -I$(HOME)/code/nel/include \
+        -I$(RYZOM_PATH)/common/src \
 		-I/usr/include/libxml2 \
-		-I$(HOME)/cvs/code/nel/include \
 		-I..
 
-LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
-		-L../game_share \
+LDFLAGS      = 	$(LD_FLAGS_CMN) \
+        -L$(NEL_PATH)/lib \
+        -L$(RYZOM_PATH)/common/src/game_share \
 		-lgame_share \
 		-lnelnet \
 		-lnelmisc \
@@ -40,7 +41,7 @@ LDFLAGS2      = 	-L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 
 # The list of targets to build
 TARGETS		= libai_share.a
-DSP_TARGET	= ai_share.dsp
+DSP_TARGET	= ai_share.vcproj
 
 # The default build rule
 all:			check-deps $(TARGETS)
@@ -54,5 +55,4 @@ libai_share.a: $(OBJS)
 #############################################################################
 # Rules
 
-include ../Rules.mk
-
+include ../../../Rules.mk

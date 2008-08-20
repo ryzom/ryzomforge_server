@@ -1,21 +1,18 @@
 #############################################################################
-# Simple make file for compiling mirror service
-
-#############################################################################
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
 		-I/usr/include/libxml2 \
-		-I$(HOME)/cvs/code/nel/include \
-		-I$(HOME)/cvs/code/ryzom/src_v2
+        -I$(HOME)/code/nel/include \
+		-I$(RYZOM_PATH)/common/src
 
-LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
-		-L$(HOME)/cvs/code/ryzom/src_v2/game_share \
+LDFLAGS      = 	$(LD_FLAGS_CMN) \
+		-L$(NEL_PATH)/lib \
+		-L$(RYZOM_PATH)/common/src/game_share \
 		-L../admin_modules \
 		-lgame_share \
 		-ladmin_modules \
@@ -23,7 +20,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 		-lnelnet \
 		-lnelmisc \
 		-lxml2 \
-		-lstlport \
 		-lrt \
 		-ldl
 
@@ -32,7 +28,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 
 # The list of targets to build
 TARGETS		= mirror_service
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 PACKED_SHEETS = \
 	datasets.packed_sheets \
 
@@ -42,7 +38,7 @@ all: exe packed_sheets
 exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
-		../game_share/libgame_share.a
+	../../../common/src/game_share/libgame_share.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)
@@ -50,8 +46,7 @@ $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
 packed_sheets: $(TARGETS)
 	/bin/sh ../update_packed_sheets.sh ./$(TARGETS) $(PACKED_SHEETS)
 
-
 #############################################################################
 # Rules
 
-include ../Rules.mk
+include ../../../Rules.mk

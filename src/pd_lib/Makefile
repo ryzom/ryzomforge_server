@@ -5,21 +5,21 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
+        -I$(HOME)/code/nel/include \
+        -I$(RYZOM_PATH)/common/src \
 		-I/usr/include/libxml2 \
-		-I$(HOME)/cvs/code/nel/include \
-		-I$(HOME)/cvs/code/ryzom/src_v2 \
-		-I./ \
+		-I./
 
 # The flags for the linker
-LDFLAGS      = $(LD_FLAGS_CMN) 	-L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
+LDFLAGS      = $(LD_FLAGS_CMN) \
+        -L$(NEL_PATH)/lib \
+        -L$(RYZOM_PATH)/common/src/game_share \
 		-lnelnet \
 		-L/usr/lib \
-		-L$(HOME)/cvs/code/ryzom/src_v2/game_share \
 		-L/usr/X11R6/lib \
 		-lnelmisc \
 		-lxml2 \
@@ -32,7 +32,7 @@ LDFLAGS      = $(LD_FLAGS_CMN) 	-L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 
 # The list of targets to build
 TARGETS		= libpd_lib.a
-DSP_TARGET	= pd_lib.dsp
+DSP_TARGET	= pd_lib.vcproj
 
 # The default build rule
 all:			check-deps $(TARGETS)
@@ -47,5 +47,4 @@ libpd_lib.a: $(OBJS)
 #############################################################################
 # Rules
 
-include ../Rules.mk
-
+include ../../../Rules.mk

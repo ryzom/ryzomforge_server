@@ -42,24 +42,24 @@ public:
 
 	CDynamicSheetManager();
 	~CDynamicSheetManager();
-	
+
 	/** when adding a user model, first check if it's already present in the manager's structures
 	*/
 	//bool isAlreadyStored(const std::string &modelId);
-	bool CDynamicSheetManager::isAlreadyStored(CCustomElementId id);
+	bool isAlreadyStored(CCustomElementId id);
 
 	/** Add user models into manager's structures upon reception of the AIS msg
 	* @param msgin the AIS CMessage containing custom loot table info
 	* @param serviceId id of the AIS that sent the msg
 	*/
 	void getUserModelsFromMsg(NLNET::CMessage &f, NLNET::TServiceId serviceId);
-	
+
 	/** Add custom loot tables into manager's structures upon reception of the AIS msg
 	* @param msgin the AIS CMessage containing custom loot table info
 	* @param serviceId id of the AIS that sent the msg
 	*/
 	void getCustomLootTablesFromMsg(NLNET::CMessage &msgin, NLNET::TServiceId serviceId);
-	
+
 	/** Gets a copy of the base sheet, applies script-defined modifications and stores the modified sheet
 	* @param modelId id of the user model
 	* @param scriptData all script lines
@@ -67,7 +67,7 @@ public:
 	*/
 	//void instanciateDynamicSheet(const std::string &modelId, std::vector<std::string> scriptData, uint16 serviceId);
 	void instanciateDynamicSheet(CCustomElementId modelId, std::vector<std::string> scriptData, NLNET::TServiceId serviceId);
-	
+
 	/** Returns the modified CStaticCreature associated to a UserModel
 	* @param userModelId the id of the user model
 	*/
@@ -102,26 +102,26 @@ public:
 private:
 	static CDynamicSheetManager		*_Instance;
 	CScriptData						_ScriptData;
-	
+
 	/** structure used when receiving CUSTOMLT msg (serial)
 	*/
 	CCustomLootTableManager			_ReceivedCustomLootTables;
-	
+
 	/** contains complete custom loot tables. Key: CustomLootTableId, value: CStaticLootTable
 	* @see CStaticLootTable
 	*/
 	TCustomTables					_CustomLootTables;
-	
+
 	/** contains all usermodels. key: user model id, value: struct containing the AIservice id that sent the model,
 	* and a smartpointer towards the modified CStaticCreature
 	* @see CUserModels
 	*/
 	TModifiedCreaturesMap			_CreaturesMap;
-	
+
 	/** just a map for script error identification key: user model id, value: if there were any errors or not
 	*/
 	TScriptErrors					_LoadingSuccessful;
-	
+
 };
 
 

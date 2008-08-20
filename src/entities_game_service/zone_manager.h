@@ -69,7 +69,7 @@ public:
 	{
 		return _Continent;
 	}
-	
+
 	void setRegion( uint16 regionId )
 	{
 		_Region = regionId;
@@ -129,7 +129,7 @@ public:
 	 */
 	bool build(const NLLIGO::CPrimZone * zone,uint16 id, bool reportAutorised = true);
 	bool build(const NLLIGO::CPrimPath * zone,uint16 id);
-	
+
 	///\return the name of the place
 	inline const std::string &  getName() const{ return _Name; }
 	///\return the id of the place
@@ -257,7 +257,7 @@ class CContinent : public CPlace
 public:
 	/// continent names
 //	static const std::string ContNames [];
-	
+
 	/**
 	 * build the continent from a primitive file
 	 * \param prim: the source primitive
@@ -276,7 +276,7 @@ public:
 
 	///\return the regions contained in that continent
 	inline const std::vector< CRegion* > & getRegions(){return _Regions;}
-	
+
 private:
 	///\regions contained in this continent
 	std::vector< CRegion* > _Regions;
@@ -285,7 +285,7 @@ private:
 
 
 /**
- * Singleton used to manage zones in the EGS. 
+ * Singleton used to manage zones in the EGS.
  * Its purpose is to store the data concerning zones forbe used for gameplay rules linked to geographic position.
  * \author Nicolas Brigand
  * \author Nevrax France
@@ -468,7 +468,7 @@ public:
 	 * \param depName: name of the deposit to dump, or "ALL" for all deposits
 	 * \param extendedInfo: true to get more info on the raw materials of the deposit
 	 */
-	void CZoneManager::dumpDeposits( NLMISC::CLog & log, const std::string& depName, bool extendedInfo=false );
+	void dumpDeposits( NLMISC::CLog & log, const std::string& depName, bool extendedInfo=false );
 
 	/// Accessor for deposits
 	const std::vector< CDeposit* >& getDeposits() const { return _Deposits; }
@@ -476,7 +476,7 @@ public:
 	/// Used by CDeposit only.
 	void	registerDepositToAutoSpawnUpdate(CDeposit *);
 	void	unregisterDepositToAutoSpawnUpdate(CDeposit *);
-	
+
 	/// get a starting point for new character. NULL if invalid
 	const CTpSpawnZone * getStartPoint( uint16 startPointIdx, TAIAlias & bot, TAIAlias & mission )
 	{
@@ -517,7 +517,7 @@ public:
 	 * If not found, a NULL pointer is returned.
 	 */
 	ECOSYSTEM::EECosystem getEcotype( const NLMISC::CVector& pos );
-	
+
 	/*
 	 * Clear ecotype information
 	 */

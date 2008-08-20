@@ -6,6 +6,9 @@
 
 
 #include "stdpch.h"
+
+#include <functional>
+
 #include "child_container.h"
 #include "ai_mgr.h"
 #include "ai_entity_matrix.h"
@@ -165,11 +168,11 @@ static void initLinearMatrixIteratorTables(std::vector<CAIEntityMatrixIteratorTb
 	}
 
 	// setup the tables ...
-	ADD_TBL(16)	ADD_TBL(23)	
+	ADD_TBL(16)	ADD_TBL(23)
 	ADD_TBL(32)	ADD_TBL(36)	ADD_TBL(46)
-	ADD_TBL(48)	ADD_TBL(51)	ADD_TBL(58)	
+	ADD_TBL(48)	ADD_TBL(51)	ADD_TBL(58)
 	ADD_TBL(64)	ADD_TBL(66)	ADD_TBL(68)	ADD_TBL(72)
-	ADD_TBL(80)	ADD_TBL(82)	ADD_TBL(87)	ADD_TBL(91)	ADD_TBL(94)	
+	ADD_TBL(80)	ADD_TBL(82)	ADD_TBL(87)	ADD_TBL(91)	ADD_TBL(94)
 	ADD_TBL(96)	ADD_TBL(98)	ADD_TBL(102) ADD_TBL(103) ADD_TBL(108)
 	ADD_TBL(112) ADD_TBL(114) ADD_TBL(116) ADD_TBL(117) ADD_TBL(122) ADD_TBL(125)
 
@@ -183,7 +186,7 @@ bool	CAIS::markTagForDelete(const std::string &filename)
 	{
 		// first: tag the dynamic regions in the continents
 		for_each(it->continents().begin(), it->continents().end(),
-			bind2nd(mem_fun1(&CContinent::markTagForDelete), fileId));
+			bind2nd(mem_fun(&CContinent::markTagForDelete), fileId));
 
 		for_each(it->managers().begin(),it->managers().end(),
 			CAliasTreeRoot::CMarkTagForDelete(fileId));
@@ -198,7 +201,7 @@ void CAIS::deleteTaggedAlias(const std::string &filename)
 	{
 		// first: tag the dynamic regions in the continents
 		for_each(it->continents().begin(), it->continents().end(),
-			bind2nd(mem_fun1(&CContinent::deleteTaggedAlias),fileId));
+			bind2nd(mem_fun(&CContinent::deleteTaggedAlias),fileId));
 
 		for_each(it->managers().begin(),it->managers().end(),
 			CAliasTreeRoot::CDeleteTagged<CManager>(it->managers()));
@@ -220,7 +223,7 @@ uint32	CAIS::getEmotNumber(const std::string &name)
 bool CAIS::advanceUserTimer	(uint32 nbTicks)
 {
 	// for each manager, look for a timer event
-	for_each(AIList().begin(), AIList().end(), bind2nd(mem_fun1(&CAIInstance::advanceUserTimer),nbTicks) );
+	for_each(AIList().begin(), AIList().end(), bind2nd(mem_fun(&CAIInstance::advanceUserTimer),nbTicks) );
 	return	true;
 }
 
@@ -233,13 +236,13 @@ void	CAIS::initAI()
 //		return;
 //	_initialised=true;
 	nlinfo("---------- Initialising AI Singleton ----------");
-	
+
 	// setup the random number generator
 	_random.srand( (sint32)NLMISC::CTime::getLocalTime() );
 
 	// allocate RAM for the players
 	NL_ALLOC_CONTEXT(AIS_init);
-	
+
 	// setup the standard iterator tables for scanning the entity matrices
 	_matrixIterator2x2.push_back(-1,-1); _matrixIterator2x2.push_back(1,0);
 	_matrixIterator2x2.push_back(-1, 1); _matrixIterator2x2.push_back(1,0);
@@ -288,7 +291,7 @@ void	CAIS::destroyAIInstance(uint32 instanceNumber, bool displayWarningIfInstanc
 	CRefPtr<CAIInstance> aii = getAIInstance(instanceNumber);
 	if (aii == NULL)
 	{
-		if (displayWarningIfInstanceNotExist)		
+		if (displayWarningIfInstanceNotExist)
 		{
 			nlwarning("AI instance %u does not exist but it was asked to delete here", instanceNumber);
 		}
@@ -321,9 +324,9 @@ void CAIS::release ()
 	// release the client message callbacks
 	CAIClientMessages::release();
 
-	
+
 	// free up the vision matrix iterator tables
-	if	(!_matrixIteratorsByDistance.empty()) 
+	if	(!_matrixIteratorsByDistance.empty())
 	{
 		for	(uint i=0;i<_matrixIteratorsByDistance.size();)
 		{
@@ -368,10 +371,10 @@ extern	void	execBufferedCommands();
 extern	void	execNamedEntityChanges();
 
 void	CAIS::update()
-{	
+{
 	if (!EGSHasMirrorReady)
 		return;
-	
+
 	H_AUTO(AIUpdate);
 
 
@@ -379,19 +382,19 @@ void	CAIS::update()
 	AISStat::countersBegin();
 
 		// Execute buffered Task
-	uint32 tick = CTimeInterface::gameCycle();	
+	uint32 tick = CTimeInterface::gameCycle();
 	_TickedTaskList.execute(tick);
 
 	// Execute buffered functions that need to be executed in the correct context
 	execBufferedCommands();
 
-	
+
 	execNamedEntityChanges();
-	
+
 	// Update AI instances
 	FOREACH(it, CCont<CAIInstance>, CAIS::instance().AIList())
 		(*it)->CAIInstance::update();
-	
+
 	// Send systematic messages to EGS
 	if (EGSHasMirrorReady)
 	{
@@ -412,7 +415,7 @@ void	CAIS::update()
 			_CreatureChangeHPList.DeltaHp.clear();
 		}
 	}
-	
+
 	//
 	// update persistent variables every 1024 tick if AI script data manager is flagged
 	if ((tick & 0x3FF) == 0)
@@ -442,7 +445,7 @@ const CAIEntityMatrixIteratorTblLinear* CAIS::bestLinearMatrixIteratorTbl(uint32
 #if !FINAL_VERSION
 	nlassert(!_matrixIteratorsByDistance.empty());
 #endif
-	
+
 	if (distInMeters >= _matrixIteratorsByDistance.size())
 	{
 		//nlwarning("Try to access to a Vision Matrix to far %u the farest is only %u", distInMeters, _matrixIteratorsByDistance.size());
@@ -541,7 +544,7 @@ CAIEntity*	CAIS::tryToGetEntity(const	char*	str, TSearchType searchType)
 	aii = CAIS::AIList()[index];
 	if (!aii)
 		goto tryWithEntityId;
-	if (searchType==CAIS::AI_INSTANCE 
+	if (searchType==CAIS::AI_INSTANCE
 		|| (searchType == CAIS::AI_UNDEFINED && parts.size() == 1))
 		return aii;
 
@@ -678,7 +681,7 @@ CAIEntity*	CAIS::tryToGetEntity(const	char*	str, TSearchType searchType)
 
 	// what ?
 	return NULL;
-	
+
 tryWithEntityId:
 
 	CEntityId	entityId;
@@ -692,13 +695,13 @@ tryWithEntityId:
 	while (instanceIt!=instanceItEnd)
 	{
 		CAIInstance	*instancePtr=*instanceIt;
-		
+
 		CCont<CManager>::iterator it=instancePtr->managers().begin(), itEnd=instancePtr->managers().end();
-		
+
 		while (it!=itEnd)
-		{	
-			CManager *mgrPtr	=	*it;		
-			
+		{
+			CManager *mgrPtr	=	*it;
+
 			CGroup *grpPtr	=	mgrPtr->getNextValidGroupChild	();
 			while (grpPtr)
 			{
@@ -713,9 +716,9 @@ tryWithEntityId:
 				grpPtr=mgrPtr->getNextValidGroupChild	(grpPtr);
 			}
 			++it;
-		}		
+		}
 		++instanceIt;
-	}	
+	}
 	return	NULL;
 }
 
@@ -731,7 +734,7 @@ tryWithEntityId:
 CAIEntityPhysical	*CAIS::getEntityPhysical(const TDataSetRow&	row)
 {
 	CHashMap<int,NLMISC::CDbgPtr<CAIEntityPhysical> >::iterator	it(_CAIEntityByDataSetRow.find(row.getIndex()));
-	
+
 	if	(it!=_CAIEntityByDataSetRow.end())
 		return	(*it).second;
 	else
@@ -741,7 +744,7 @@ CAIEntityPhysical	*CAIS::getEntityPhysical(const TDataSetRow&	row)
 
 
 //-------------------------------------------------------------------
-// Interface to bot chat - callbacks called when bots start or 
+// Interface to bot chat - callbacks called when bots start or
 // stop chatting with player(s)
 //-------------------------------------------------------------------
 
@@ -780,7 +783,7 @@ void	CAIS::endBotChat(const TDataSetRow &bot, const TDataSetRow &player)
 	{
 //		nlwarning("CAIS::endBotChat(): Bot chat message identifies an entity that isn't an NPC!!!");
 		return;
-	}		
+	}
 
 	// get a pointer to the player
 	CBotPlayer*	plrPtr	=	dynamic_cast<CBotPlayer*>(CAIS::getEntityPhysical(player));
@@ -817,7 +820,7 @@ void	CAIS::endDynChat(const TDataSetRow &bot)
 	{
 //		nlwarning("CAIS::endBotChat(): Bot chat message identifies an entity that isn't an NPC!!!");
 		return;
-	}		
+	}
 
 	// have the bot register the chat end
 	botNpc->endDynChat();
@@ -880,7 +883,7 @@ void CAIS::updatePersistentVariables()
 
 		Bsi.sendFile( msg );
 		CAIScriptDataManager::getInstance()->clearDirtyFlag();
-	}	
+	}
 }
 
 CAIInstance	*CAIS::getAIInstance(uint32 instanceNumber)

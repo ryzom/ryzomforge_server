@@ -59,7 +59,7 @@ public:
 	sint16	Slow;
 	sint16	Blind;
 	sint16	Madness;
-	
+
 	sint16	Acid;
 	sint16	Cold;
 	sint16	Electricity;
@@ -67,7 +67,7 @@ public:
 	sint16	Poison;
 	sint16	Rot;
 	sint16	Shockwave;
-	
+
 public:
 	// ctor
 	inline CCreatureResistModifiers()
@@ -102,7 +102,7 @@ class CCreatureSheet
 {
 public:
 	CCreatureSheet(IStaticCreaturesCPtr sheet);
-	
+
 public:
 	///@name IStaticCreatures overloads
 	//@{
@@ -110,14 +110,14 @@ public:
 	virtual bool	getFameByKillValid() const { return _FameByKillValid; }
 	virtual sint32	getFameByKill() const { return _FameByKill; }
 	//@}
-	
+
 	///@name Setters
 	//@{
 	virtual void	setFaction(uint32 value) { _Faction = value; }
 	virtual void	setFameByKillValid(bool value) { _FameByKillValid = value; }
 	virtual void	setFameByKill(sint32 value) { _FameByKill = value; }
 	//@}
-	
+
 	/// Proxy reset
 	void reset()
 	{
@@ -134,7 +134,7 @@ public:
 	virtual void	resetFameByKillValid() { if (_Sheet) _FameByKillValid = _Sheet->getFameByKillValid(); }
 	virtual void	resetFameByKill() { if (_Sheet) _FameByKill = _Sheet->getFameByKill(); }
 	//@}
-	
+
 private:
 	uint32	_Faction;
 	bool	_FameByKillValid;
@@ -159,7 +159,7 @@ public:
 	/// Destructor
 	virtual ~CCreature();
 private:
-	
+
 public:
 
 	/// get a copy of this creature
@@ -172,7 +172,7 @@ public:
 
 	/// Load George Sheet, accessing the sheet in the mirror (and initializing _SheetId)
 	virtual void loadSheetCreature( const TDataSetRow& entityIndex );
-	
+
 	/// Load George Sheet; using the param sheetId
 	void loadSheetCreature( NLMISC::CSheetId sheetId);
 
@@ -181,7 +181,7 @@ public:
 	uint32 tickUpdate();
 
 	/**
-	 * set the mode without position or orientation information 
+	 * set the mode without position or orientation information
 	 * \param mode the new mode
 	 * \param forceUpdate if true, set mode without check gameplay rules (for EGS use only)
 	 * \param disengage true to call phrase manager disengage, false otherwise
@@ -253,7 +253,7 @@ public:
 	 */
 	inline const std::vector< uint32 >& getMissionVector() const { return _MissionsProposed; }
 
-	// return Non Null CMerchant ptr 
+	// return Non Null CMerchant ptr
 	NLMISC::CSmartPtr<CMerchant>& getMerchantPtr();
 
 	/**
@@ -265,12 +265,12 @@ public:
 	 * get a reference on shop unit of bot
 	 * \return reference on tradelist vector
 	 */
-	const std::vector< const IShopUnit * >& CCreature::getMerchantTradeList();
+	const std::vector< const IShopUnit * >&getMerchantTradeList();
 
 	/// get bot chat program validation flags reference
 	uint32 getBotChatProgram() const { return _BotChatProgram; }
 
-	/// set bot chat program 
+	/// set bot chat program
 	void setBotChatProgram( uint32 program ) { _BotChatProgram = program; }
 
 	/// return true if bot selling fight action
@@ -371,7 +371,7 @@ public:
 
 	/// get the resist value associated to effect type
 	uint32 getMagicResistance(EFFECT_FAMILIES::TEffectFamily effectFamily);
-	
+
 	/// get the resist value associated to damage type
 	uint32 getMagicResistance(DMGTYPE::EDamageType dmgType);
 
@@ -395,7 +395,7 @@ public:
 	/// get the bot rolemaster type
 	EGSPD::CSPType::TSPType getGuildRoleMasterType() const { return _GuildRoleMasterType; }
 
-	/// return origin shop selector 
+	/// return origin shop selector
 	inline const std::vector< uint32 >& getOriginShopSelector() const { return _OriginShopSelector; }
 
 //#ifdef NL_DEBUG
@@ -449,8 +449,8 @@ public:
 	void moneyHasBeenLooted(bool m) { _MoneyHasBeenLooted = m; }
 
 	/// add a Faction to faction attackable vector
-	inline void addFactionAttackable(uint32 factionIndex, sint32 fame, bool above) 
-	{ 
+	inline void addFactionAttackable(uint32 factionIndex, sint32 fame, bool above)
+	{
 		if (above)
 			_FactionAttackableAbove.push_back( std::make_pair(factionIndex, fame) );
 		else
@@ -459,15 +459,15 @@ public:
 
 	/// check creature can be attacked by given player according to it's faction fames
 	bool checkFactionAttackable(const NLMISC::CEntityId &playerId) const;
-	
+
 	uint32	getFaction() const { return _Faction; }
 	bool	getFameByKillValid() const { return _FameByKillValid; }
 	sint32	getFameByKill() const { return _FameByKill; }
-	
+
 	void	setFaction(uint32 value) { _Faction = value; }
 	void	setFameByKillValid(bool value) { _FameByKillValid = value; }
 	void	setFameByKill(sint32 value) { _FameByKill = value; }
-	
+
 	void reset()
 	{
 		if (_Form)
@@ -481,18 +481,18 @@ public:
 	void	resetFaction() { if (_Form) _Faction = _Form->getFaction(); }
 	void	resetFameByKillValid() { if (_Form) _FameByKillValid = _Form->getFameByKillValid(); }
 	void	resetFameByKill() { if (_Form) _FameByKill = _Form->getFameByKill(); }
-	
+
 	/// get webPage info
 	const std::string &getWebPage() const {return _WebPage;}
 	const std::string &getWebPageName() const {return _WebPageName;}
 
 	const NLMISC::CSheetId &getBotChatOutpost() const {return _BotChatOutpost;}
-	
+
 	const std::vector<NLMISC::CSheetId> &getExplicitActionTradeList() const {return _ExplicitActionTradeList;}
 	bool		getFilterExplicitActionTradeByPlayerRace() const {return _FilterExplicitActionTradeByPlayerRace;}
 	EGSPD::CSPType::TSPType		getExplicitActionSPType() const {return _ExplicitActionSPType;}
 	bool		getFilterExplicitActionTradeByBotRace() const {return _FilterExplicitActionTradeByBotRace;}
-	
+
 	// accessors for altar ticket tp restriction
 	inline PVP_CLAN::TPVPClan getAltarClanRestriction() { return _TicketClanRestriction; }
 	inline bool getAltarForNeutral() { return _TicketForNeutral; }
@@ -503,7 +503,7 @@ public:
 	inline void clearAltarFameRestrictionValue() { _TicketFameRestrictionValue = 250; }
 
 	NLMISC::CSheetId getLootTable(uint i) { if (i<_LootTables.size()) return _LootTables[i]; else return NLMISC::CSheetId::Unknown; };
-	
+
 	float getMaxHitRangeForPC() { return _MaxHitRangeForPC; }
 
 	void setUserModelId(const std::string &id);
@@ -545,7 +545,7 @@ private:
 
 	// Alias of the parent group
 	TAIAlias						_AIGroupAlias;
-	
+
 	// Bot chat parameters part of members
 	TAIAlias						_AIAlias;					// Alias for identitfy creature for mission system
 	std::string						_WebPage;					// Web Page accessible from the NPC
@@ -571,7 +571,7 @@ private:
 	bool							_HarvestAction;				// shop harvest action
 	bool							_CharacteristicsSeller;		// shop characteristics
 	bool							_GuildCreator;				// true if the bot enable player to create guilds
-	
+
 	NLMISC::CSmartPtr<CMerchant> 	_Merchant;					// smart pointer on CMerchant class of creature
 
 	uint32							_BotChatProgram;			// Program enabled for bot chat
@@ -649,7 +649,7 @@ private:
 	std::string						_UserModelId;
 	std::string						_CustomLootTableId;
 	//if the creature has a user model, this is the alias of the primitive where the model is defined
-	uint32							_PrimAlias; 
+	uint32							_PrimAlias;
 };
 
 typedef NLMISC::CSmartPtr<CCreature> CCreaturePtr;

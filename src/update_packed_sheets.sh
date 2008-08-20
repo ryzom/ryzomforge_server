@@ -25,6 +25,6 @@ done
 # if one of the files was missing then call the executable to rebuild the packed sheets
 if [ $REQUIRE_REBUILD == 1 ]
 then
-	PACK_SHEETS_FLAGS=$(grep PACK_SHEETS_FLAGS ../Variables.mk|cut -f2 -d=)
+	PACK_SHEETS_FLAGS=$(grep PACK_SHEETS_FLAGS ../../../Variables.mk|cut -f2 -d=)
 	$EXE_NAME $PACK_SHEETS_FLAGS
 fi

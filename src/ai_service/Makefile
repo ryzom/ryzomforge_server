@@ -5,23 +5,25 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
+        -I$(HOME)/code/nel/include \
+        -I$(RYZOM_PATH)/common/src \
 		-I/usr/include/libxml2 \
-		-I$(HOME)/cvs/code/nel/include \
 		-I.. \
 		-I../ai_share
 
 # The flags for the linker
-LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
-		-L../game_share \
+LDFLAGS      = 	$(LD_FLAGS_CMN) \
+        -L$(NEL_PATH)/lib \
+        -L$(RYZOM_PATH)/common/src/game_share \
+        -L../admin_modules \
+        -L$(RYZOM_PATH)/common/src/r2_share \
+        -L$(RYZOM_PATH)/common/src/r2_modules \
 		-L../admin_modules \
 		-L../ai_share \
-		-L../r2_share \
-		-L../r2_modules \
 		-lai_share \
 		-ladmin_modules \
 		-lr2_modules \
@@ -32,7 +34,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 		-lnelligo \
 		-lnelmisc \
 		-lxml2 \
-		-lstlport \
 		-lrt\
 		-ldl
 
@@ -41,7 +42,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 
 # The list of targets to build
 TARGETS		= ai_service
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 PACKED_SHEETS = \
 	ais.packed_sheets \
 	ais_action.packed_sheets \
@@ -54,9 +55,9 @@ all: exe packed_sheets
 exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
-		../game_share/libgame_share.a \
-		../r2_share/libr2_share.a \
-		../r2_modules/libr2_modules.a
+        ../../../common/src/game_share/libgame_share.a \
+        ../../../common/src/r2_share/libr2_share.a \
+        ../../../common/src/r2_modules/libr2_modules.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)
@@ -68,4 +69,4 @@ packed_sheets: $(TARGETS)
 #############################################################################
 # Rules
 
-include ../Rules.mk
+include ../../../Rules.mk

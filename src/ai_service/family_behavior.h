@@ -66,7 +66,7 @@ private:
 
 /** Bot Family master behavior.
  *	This class contains state and ai profile for a family inside a cellzone.
- *	Also, there is a 
+ *	Also, there is a
  */
 
 class CGroupFamily;
@@ -82,37 +82,37 @@ class CFamilyBehavior
  public:
 	std::string getIndexString() const;
 	std::string getManagerIndexString(const CManager *child) const;
-	
+
 	CFamilyBehavior(CCellZone *owner, const	CGroupFamily	*grpFamily);	//	;const	std::string	&name, const	NLMISC::TStringId	&profileName)
-	
+
 	virtual	~CFamilyBehavior()
 	{
 		_FamilyProfile	=	NULL;
 		_ManagerNpc		=	NULL;
 		_ManagerFauna	=	NULL;
 	}
-	
-	CMgrNpc* CFamilyBehavior::mgrNpc()
+
+	CMgrNpc* mgrNpc()
 	{
 	#ifdef NL_DEBUG
 		nlassert(_ManagerNpc);
 	#endif
 		return _ManagerNpc;
 	}
-	
-	CMgrFauna* CFamilyBehavior::mgrFauna()
+
+	CMgrFauna* mgrFauna()
 	{
 	#ifdef NL_DEBUG
 		nlassert(_ManagerFauna);
 	#endif
 		return _ManagerFauna;
 	}
-	
+
 	bool isFamilyProfileValid()	const
 	{
 		return _FamilyProfile!=NULL;
 	}
-	
+
 	IFamilyProfile* familyProfile()	const
 	{
 		return	_FamilyProfile;
@@ -127,7 +127,7 @@ class CFamilyBehavior
 	static void displayLogLine(CStringWriter& stringWriter, int index, bool detailled, std::vector<size_t> widths);
 	static void displayLogHeaders(CStringWriter& stringWriter, int index, bool detailled, std::vector<size_t> widths);
 	static void checkLogHeadersWidths(std::vector<size_t>& widths, int index, bool detailled);
-		
+
 //	const	AITYPES::TPopulationFamily &getFamily()	const	{	return _Family;	}
 	const	AITYPES::CPropertyId &getFamilyTag() const
 	{
@@ -136,18 +136,18 @@ class CFamilyBehavior
 
 	void	serviceEvent	(const	CServiceEvent	&info);
 
-	uint	getStaticFameIndex()		
-	{ 
-		return _Faction; 
+	uint	getStaticFameIndex()
+	{
+		return _Faction;
 	}
 
 //	NLMISC::CMustConsume<bool>	CFamilyBehavior::getActivities	(AITYPES::CPropertyId &food, AITYPES::CPropertyId &rest, bool &plante, const	CGroupDesc*const	gd)	const;
 	void	getActivities	(AITYPES::CPropertySet &food, AITYPES::CPropertySet &rest/*, *bool &plante,	const	CGroupDesc*const	gd*/)	const;
 	void	getNpcFlags(AITYPES::CPropertySet &flags);
 
-		
+
 //		NLMISC::CMustConsume<bool>	getActivities	(AITYPES::TZoneActivity &food, AITYPES::TZoneActivity &rest, bool &plante, const	CGroupDesc*const	gd)	const;
-		
+
 	const	uint32	&baseLevel	()	const
 	{
 		return	_BaseLevel;
@@ -177,7 +177,7 @@ class CFamilyBehavior
 	{
 		return	_EffectiveLevel;
 	}
-	
+
 	void	setBaseLevel	(const	uint32	&baseLevel)
 	{
 		_BaseLevel=baseLevel;
@@ -210,7 +210,7 @@ class CFamilyBehavior
 	{
 		return	_Modifier[index];
 	}
-	
+
 	bool	needUpdate	()	const
 	{
 		return	getDt()>_UpdatePeriod;
@@ -230,29 +230,29 @@ class CFamilyBehavior
 	{
 		return	_GrpFamily;
 	}
-	
+
 	bool spawn();
 	bool despawn();
-	
+
 	virtual std::string	getOneLineInfoString() const;
 	virtual std::vector<std::string> getMultiLineInfoString() const;
-		
+
 private:
 
  	CAIInstance *getAIInstance() const;
 	virtual	void	addEnergy		(uint32	energy);
 	virtual	void	removeEnergy	(uint32	energy);
-	
+
 	void	groupDead(CGroup *grp);
 
 	 // overloads for IManagerParent virtuals
 	 CAIInstance	&getAiInstance() const;
-	 
+
 	 inline	CCellZone	*getCellZone()
 	 {
 		 return		getOwner();
 	 }
-	 
+
 
 	 // If the family is a tribe, the property describe the name of the family (witch is the tribe name for tribe family)
 	 AITYPES::CPropertyId				_FamilyTag;
@@ -261,9 +261,9 @@ private:
 	 NLMISC::CSmartPtr<IFamilyProfile>	_FamilyProfile;
 
 	 /// A list of group to delete at the next master update.
-	 std::vector<NLMISC::CDbgPtr<CGroup> >	_GroupToDelete;	 
+	 std::vector<NLMISC::CDbgPtr<CGroup> >	_GroupToDelete;
 
-	 
+
 	/// The base level. Come from a random at start of cycle.
 	uint32	_BaseLevel;
 	/// The effective level, computed from base level at start of cycle.
@@ -271,12 +271,12 @@ private:
 	/// The cumulated players actions effect.
 	uint32	_PlayerEffect;
 	/// The current energie level represented by the living population
-	/** The potential energy. 
+	/** The potential energy.
 	 *	This is a very special one. Each time a new group is spawn, the
 	 *	global energy value is added to this var.
 	 *	The value of this var always decay during time.
 	 *	The value is added to CurrentLevel before compare to EffectiveLevel.
-	 *	This avoid spawning lots of unneeded group because the 
+	 *	This avoid spawning lots of unneeded group because the
 	 *	spawn of the bots are delayed so they dont give value
 	 *	in CurrentLevel.
 	 */
@@ -290,7 +290,7 @@ private:
 
 	NLMISC::TGameCycle	_LastUpdateTime;
 	uint32				_UpdatePeriod;
-	
+
 	NLMISC::CDbgPtr<CGroupFamily>	_GrpFamily;
 };
 

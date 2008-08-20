@@ -1,7 +1,7 @@
 /** \file game_item.h
  * This is the class who manage an item
  *
- * 
+ *
  */
 
 
@@ -56,7 +56,7 @@ struct CCraftParameters
 	uint32	nbQuality;
 	float	StatEnergy;
 	uint32  nbStatEnergy;
-	
+
 	// weapons factor
 	float	Dmg;						// melee weapon, range weapon (modifier), ammo
 	uint32	nbDmg;
@@ -90,7 +90,7 @@ struct CCraftParameters
 	uint32	nbDefensiveAfflictionCastingTimeFactor;
 	float	DefensiveAfflictionPowerFactor;
 	uint32	nbDefensiveAfflictionPowerFactor;
-	
+
 	// armor factor
 	float	ProtectionFactor;
 	uint32	nbProtectionFactor;
@@ -101,7 +101,7 @@ struct CCraftParameters
 	float	MaxPiercingProtection;
 	uint32	nbMaxPiercingProtection;
 	std::vector< uint8 > Color;
-	
+
 	// jewel protection
 	float	AcidProtectionFactor;
 	uint32	nbAcidProtectionFactor;
@@ -117,7 +117,7 @@ struct CCraftParameters
 	uint32	nbPoisonProtectionFactor;
 	float	ElectricityProtectionFactor;
 	uint32	nbElectricityProtectionFactor;
-	
+
 	// jewel resistance
 	float	DesertResistanceFactor;
 	uint32	nbDesertResistanceFactor;
@@ -129,13 +129,13 @@ struct CCraftParameters
 	uint32	nbJungleResistanceFactor;
 	float	PrimaryRootResistanceFactor;
 	uint32	nbPrimaryRootResistanceFactor;
-		
+
 	// armor and jewel buff
 	sint32	HpBuff;
 	sint32	SapBuff;
 	sint32	StaBuff;
 	sint32	FocusBuff;
-	
+
 	CCraftParameters();
 };
 
@@ -159,7 +159,7 @@ struct CItemCraftParameters
 	float	Weight;
 	float	SapLoad;
 	float	StatEnergy;					// for price compute rules
-	
+
 	// weapons factor
 	float	Dmg;						// melee weapon, range weapon (modifier), ammo
 	float	Speed;						// ammos (modifier), melee weapon, range weapon
@@ -168,7 +168,7 @@ struct CItemCraftParameters
 	float	ParryModifier;				// not for ammo, but for armor too
 	float	AdversaryDodgeModifier;		// not for ammo
 	float	AdversaryParryModifier;		// not for ammo
-	
+
 	// armor factor
 	float	ProtectionFactor;
 	float	MaxSlashingProtection;
@@ -201,7 +201,7 @@ struct CItemCraftParameters
 	float	HealPowerFactor;
 	float	DefensiveAfflictionCastingTimeFactor;
 	float	DefensiveAfflictionPowerFactor;
-	
+
 	// armor and jewel buff
 	sint32	HpBuff;
 	sint32	SapBuff;
@@ -240,13 +240,13 @@ struct CItemCraftParameters
 private:
 	// copy the three bests protections
 	void keepTheThreeBestProtection( const CCraftParameters& p );
-	
+
 	// copy the three bests resistances
 	void keepTheThreeBestResistance( const CCraftParameters& p );
 };
 
 
-										 
+
 //------------------------------------------------------------------------
 // advance declaration of classes with circular references
 class CGameItem;
@@ -266,17 +266,17 @@ class CGameItem;
 class CGameItemVector
 {
 public:
-	uint32 size() const;				
+	uint32 size() const;
 	CGameItem& operator[](uint32 idx);
-	void extend();						
+	void extend();
 	uint32 getUniqueIndex(const CGameItem& item);
 	virtual ~CGameItemVector();
-	
+
 private:
 	// this is a private class belonging to CGameItem
 	friend class CGameItem;
 	CGameItemVector();
-	
+
 private:
 	std::vector< CGameItem* > _Data;
 };
@@ -285,11 +285,11 @@ private:
 class CGameItemPtrArray
 {
 public:
-	CGameItemPtrArray() 
+	CGameItemPtrArray()
 	{
 	}
 
-	CGameItemPtrArray(const CGameItemPtrArray&) 
+	CGameItemPtrArray(const CGameItemPtrArray&)
 	{
 		// do nothing
 	}
@@ -307,7 +307,7 @@ protected:
  * \author Nevrax France
  * \date 2002
  */
-class CGameItem : 
+class CGameItem :
 	public CGameItemPtrArray
 {
 	NLMISC_COMMAND_FRIEND(testParanoidItemSystem);
@@ -383,10 +383,10 @@ public :
 
 	/// Delete an item in the sub item list
 //	void deleteChildItem(uint index);
-	
-	/// get recommended skill needed for use item		
+
+	/// get recommended skill needed for use item
 	uint32 recommended() const { return _Recommended; }
-	/// set recommended skill needed for use item		
+	/// set recommended skill needed for use item
 	void recommended( uint32 r ) { _Recommended = r; computeRequiredLevel(); }
 	/// get quality (= recommended for item not usable with skill (as raw material, letter...)
 	uint16 quality() const { return (uint16)_Recommended; }
@@ -440,7 +440,7 @@ public :
 	sint32 adversaryDodgeModifier() const;
 	// get adversary parry modifier
 	sint32 adversaryParryModifier() const;
-	
+
 	// get protection factor
 	float protectionFactor() const;
 	// get maximum slashing protection
@@ -454,7 +454,7 @@ public :
 
 	// get one of the three possible protection, legal protection number are 1,2 or 3
 	void magicProtection(uint32 protectionNumber, PROTECTION_TYPE::TProtectionType& protectionType, uint32& protectionValue) const;
-	// return protection gived by item for a protection type 
+	// return protection gived by item for a protection type
 	uint32 magicProtection(PROTECTION_TYPE::TProtectionType protectionType) const;
 
 	// return resistance gived by item for a resistance type
@@ -496,13 +496,13 @@ public :
 
 	// return the enchantment value to be displayed in the client
 	uint16 getClientEnchantValue() const;
-	
+
 	/// get the wear per action (Hp lost for 1 action)
 	float getWearPerAction() const;
 
 	/// Set item stats with craft parameters
 	void setCraftParameters( const CCraftParameters& param );
-	
+
 	/**
 	 * remove HP
 	 * \param hpLost the number of hp to remove
@@ -551,10 +551,10 @@ public :
 
 	// return total game cycle item are left in sell store
 	NLMISC::TGameCycle getTotalSaleCycle() const { return _TotalSaleCycle; }
-	
+
 	// set total game cycle item are left in sell store
 	void setTotalSaleCycle( NLMISC::TGameCycle t ) { _TotalSaleCycle = t; }
-	
+
 	/// \return a pointer on a Copy of this item
 	CGameItemPtr getItemCopy();
 
@@ -575,18 +575,18 @@ public :
 	uint32 fillStack(uint32 addQt);
 
 	uint32 getMaxStackSize() const;
-	
+
 	/**
 	 *	Return true if the item is on the ground, false else
 	 */
 //	bool isOnTheGround() const{ return _IsOnTheGround; }
 
 	/**
-	 *  flag the item as "on" the ground 
+	 *  flag the item as "on" the ground
 	 */
 //	void setAsOnTheGround() { _IsOnTheGround = true; }
 
-	/** 
+	/**
 	 * get the item static form
 	 */
 	const CStaticItem *getStaticForm() const { return _Form; }
@@ -630,7 +630,7 @@ public :
 
 	/// get Vector of CSheetId used for craft item
 //	const std::vector< NLMISC::CSheetId >& getRmUsedForCraft() const { return _RmUsedForCraft; }
-	
+
 	/// add sheet id of RM used for craft item
 	void addRmUsedForCraft( const NLMISC::CSheetId& sheet ) { /* _RmUsedForCraft.push_back( sheet ); */ }
 
@@ -668,22 +668,22 @@ public :
 	inline uint16 getRequiredSkillLevel2() const { return _RequiredSkillLevel2; }
 	/// set required skill level
 	inline void setRequiredSkillLevel2( uint16 l ) { _RequiredSkillLevel2 = l; }
-	
+
 	/// get required stat
 	inline CHARACTERISTICS::TCharacteristics getRequiredCharac() const { return _RequiredCharac; }
 	/// set required stat
 	inline void setRequiredCharac(CHARACTERISTICS::TCharacteristics charac) { _RequiredCharac = charac; }
-	///get min required stat level 
+	///get min required stat level
 	inline uint16 getRequiredCharacLevel() const { return _RequiredCharacLevel; }
-	///set min required stat level 
+	///set min required stat level
 	inline void setRequiredCharacLevel( uint16 l ) { _RequiredCharacLevel = l; }
-	
+
 	// Recompute the Requirement from form
 	void computeRequirementFromForm();
-	
-	
 
-	/// get skill mods 
+
+
+	/// get skill mods
 	inline const std::vector<CTypeSkillMod> &getTypeSkillMods() const { return _TypeSkillMods; }
 	/// set skill mods
 	inline void setTypeSkillMods(const std::vector<CTypeSkillMod> &mods) { _TypeSkillMods = mods; }
@@ -695,7 +695,7 @@ public :
 	ucstring getCustomText() const { return _CustomText; }
 	/// set custom string (for scroll-like items)
 	void setCustomText(ucstring val);
-	
+
 protected:
 	friend class CFaberPhrase;
 	// set Default Color (for craft only)
@@ -723,7 +723,7 @@ private:
 
 	// the container object needs to be a friend in order to setup our private data correctly
 	friend class CGameItemVector;
-	
+
 	//--------------------------------------------------------------------
 	// singleton data
 
@@ -752,7 +752,7 @@ private:
 	// Get hold of the nth item in the singleton's item vector
 	static CGameItem * getItem(uint idx);
 
-	// Allocate an unused item in the singleton's item vector 
+	// Allocate an unused item in the singleton's item vector
 	static CGameItem *newItem();
 
 	// Add an item to the list of 'free' items awaiting re-allocation
@@ -761,7 +761,7 @@ private:
 	// post load treatment
 	void postApply(INVENTORIES::TInventory refInventoryId, CCharacter * owner);
 
-	// return the CWeaponCraftParameters variable corresponding to protection type 
+	// return the CWeaponCraftParameters variable corresponding to protection type
 	float getMagicProtectionCraftParateters( PROTECTION_TYPE::TProtectionType protection ) const;
 
 private:
@@ -773,14 +773,14 @@ private:
 	uint32 _BugTestUpdate;
 
 public:
-	// run through the items looking for bugs 
+	// run through the items looking for bugs
 	static void testItemsForBugs();
 //	static void testPlayerInventoryForBugs(const std::vector<CGameItemPtr>& inventory);
 
 	static std::string showItemsStats();
-	
+
 	// check a single item for bugs...
-	void CGameItem::checkItemForBugs();
+	void checkItemForBugs();
 
 public:	// I've had to make these public for now 'cos I can't work out how to make the vector class a friend :o(
 //private :
@@ -811,8 +811,8 @@ private:
 	/**
 	 * pseudo Constructor
 	 */
-	void ctor(); 
-	
+	void ctor();
+
 	/**
 	 * pseudo Constructor
 	 */
@@ -835,14 +835,14 @@ private:
 
 	// has item prerequisit
 	bool hasPrerequisit() { return _HasPrerequisit; }
-		
+
 	// Recompute the Requirement from Old System (old values for old items)
 	void computeRequirementFromOldSystem();
 
 public:
 	/// owner id (an item or the entity and the inventory id if root item (Parent=NULL))
 //	NLMISC::CEntityId Owner;
-	
+
 //	union TLocation
 //	{
 //		uint32 Slot;
@@ -856,7 +856,7 @@ public:
 //	};
 //	/// time elapsed since the item is on the ground
 //	NLMISC::TGameCycle TimeOnTheGround;
-	
+
 	/// max slot count
 //	sint16 SlotCount;
 
@@ -902,7 +902,7 @@ private:
 	/// all craft parameters
 	CItemCraftParameters * _CraftParameters;
 	/// entityId of the character who has created the Item via faber (if applicable, for item not created by playres, Creator = CEntityId::Unknown)
-	
+
 	NLMISC::CEntityId	_CreatorId;
 	/// number of item locked
 	uint32				_LockCount;
@@ -935,7 +935,7 @@ private:
 	bool				_HasPrerequisit;
 	// skill modifiers against given ennemy types
 	std::vector<CTypeSkillMod>	_TypeSkillMods;
-	
+
 	ucstring			_CustomText;
 };
 
@@ -958,7 +958,7 @@ private:
 //------------------------------------------------------------------------
 // game item vector inline implementation
 
-#ifdef NL_DEBUG		 
+#ifdef NL_DEBUG
 #define LOG_QUANTUM 6
 #else
 #define LOG_QUANTUM 10
@@ -966,42 +966,42 @@ private:
 #define QUANTUM (1<<LOG_QUANTUM)
 #define QUANTUM_MASK (QUANTUM-1)
 
-inline CGameItemVector::CGameItemVector() 
+inline CGameItemVector::CGameItemVector()
 {
 }
 
-inline CGameItemVector::~CGameItemVector()			
+inline CGameItemVector::~CGameItemVector()
 {
-	for (uint32 i=0;i<_Data.size();++i) 
-		delete [] _Data[i]; 
+	for (uint32 i=0;i<_Data.size();++i)
+		delete [] _Data[i];
 }
 
-inline uint32 CGameItemVector::size() const					
+inline uint32 CGameItemVector::size() const
 {
-	return _Data.size()<<LOG_QUANTUM; 
+	return _Data.size()<<LOG_QUANTUM;
 }
 
-inline CGameItem& CGameItemVector::operator[](uint32 idx)	
-{ 
-	return _Data[idx>>LOG_QUANTUM][idx&QUANTUM_MASK]; 
+inline CGameItem& CGameItemVector::operator[](uint32 idx)
+{
+	return _Data[idx>>LOG_QUANTUM][idx&QUANTUM_MASK];
 }
 
-inline void CGameItemVector::extend()						
+inline void CGameItemVector::extend()
 {
 	NL_ALLOC_CONTEXT(GIV_EXT);
-	_Data.push_back(new CGameItem[QUANTUM]); 
+	_Data.push_back(new CGameItem[QUANTUM]);
 	nlassert(_Data.back()!=NULL);
-	for (uint32 i=0;i<QUANTUM;++i) 
-		_Data.back()[i]._AllocatorData=size()-QUANTUM+i+1; 
+	for (uint32 i=0;i<QUANTUM;++i)
+		_Data.back()[i]._AllocatorData=size()-QUANTUM+i+1;
 	egs_giinfo("Increased item vector size to %u items (%u bytes)",size(),size()*sizeof(CGameItem));
 }
 
 inline uint32 CGameItemVector::getUniqueIndex(const CGameItem& item)
 {
-	for (uint32 i=0;i<_Data.size();++i) 
+	for (uint32 i=0;i<_Data.size();++i)
 	{
 		uint32 lowidx= &item-_Data[i];
-		if (lowidx<QUANTUM) 
+		if (lowidx<QUANTUM)
 		{
 			uint32 idx= lowidx+(i<<LOG_QUANTUM);
 			#ifdef ITEM_DEBUG
@@ -1018,7 +1018,7 @@ inline uint32 CGameItemVector::getUniqueIndex(const CGameItem& item)
 #undef LOG_QUANTUM
 #undef QUANTUM
 #undef QUANTUM_MASK
-	
+
 
 //------------------------------------------------------------------------
 // ptr class added by sadge
@@ -1104,8 +1104,8 @@ inline CGameItem *CGameItemPtr::newItem( const NLMISC::CSheetId& sheetId, uint32
 //
 //	// only unlink if the pointer 'this' is not the same as the inventory ptr for the item
 //	// after the unlink this == NULL
-//	if (! ( item->_Parent!=NULL && 
-//			item->Loc.Slot<item->_Parent->getChildren().size() && 
+//	if (! ( item->_Parent!=NULL &&
+//			item->Loc.Slot<item->_Parent->getChildren().size() &&
 //			&(item->_Parent->getChildren()[item->Loc.Slot])==this ) )
 //		unlinkFromItem();
 //
@@ -1131,7 +1131,7 @@ inline void CGameItemPtr::linkToItem()
 	{
 		nlassert(item->_Ptrs[i] != this);
 	}
-	
+
 	item->_Ptrs.push_back(this);
 #endif
 }
@@ -1167,7 +1167,7 @@ inline void CGameItemPtr::unlinkFromItem()
 inline const CGameItemPtr &CGameItemPtr::operator=(const CGameItemPtr &other)
 {
 	unlinkFromItem();
-	
+
 	_idx=other._idx;
 	#ifdef ITEM_DEBUG
 		_debug=other._debug;
@@ -1190,7 +1190,7 @@ inline const CGameItemPtr &CGameItemPtr::operator=(const CGameItem *item)
 	{
 		_idx=CGameItem::_Items.getUniqueIndex(*item);
 
-		// this test would only have value if the implementation of std::vector<> doesn't guarantee a 
+		// this test would only have value if the implementation of std::vector<> doesn't guarantee a
 		// continuous memory address space for the vector's data
 		// It's not in the #IFDEF DEBUG because it may only be triggered in very obscure conditions
 		if (CGameItem::getItem(_idx)!=item)
@@ -1255,7 +1255,7 @@ inline CGameItem *CGameItemPtr::operator->() const
 		if( item )
 			BOMB_IF( _debug!=CGameItem::getItem(_idx)->_AllocatorData, "Attempting to access an item that has been re-allocated", return 0 );
 	#endif
-	
+
 	BOMB_IF(item==0, "Attempting to access an item an item that is not allocated or has been freed", return 0);
 
 	item->_BugTestUpdate=CGameItem::_BugTestCounter;
@@ -1300,7 +1300,7 @@ inline bool CGameItemPtr::operator!=(const CGameItem *item) const
 {
 	if (item==NULL)
 		return operator*()!=NULL;
-	
+
 	return !(*this==item);
 }
 

@@ -46,7 +46,7 @@ void	CDataSetMS::init( const NLMISC::CSheetId& sheetId, const TDataSetSheet& pro
 
 
 /*
- * Add the specified property 
+ * Add the specified property
  */
 CChangeTrackerMS&	CDataSetMS::addPropTracker( TPropertyIndex propIndex, TServiceId destId, bool local, bool readOnly, bool allocate, bool writeOnly )
 {
@@ -144,9 +144,9 @@ void				CDataSetMS::readdTracker( TServiceId serviceId, TPropertyIndex propIndex
 void				CDataSetMS::clearValuesOfRow( TDataSetIndex entityIndex )
 {
 	//nldebug( "Clearing values of E%u", entityIndex );
-	uint propIndex; 
-	for ( propIndex=0; propIndex!=_PropertyContainer.PropertyValueArrays.size(); ++propIndex )  
-	{ 
+	uint propIndex;
+	for ( propIndex=0; propIndex!=_PropertyContainer.PropertyValueArrays.size(); ++propIndex )
+	{
 		if ( _PropertyContainer.PropertyValueArrays[propIndex].Values == NULL )
 			continue;
 
@@ -173,14 +173,14 @@ void				CDataSetMS::clearValuesOfRow( TDataSetIndex entityIndex )
 		else
 		{
 			// Reset values
-			uint32 datasize = getDataSizeOfProp( (TPropertyIndex)propIndex );  
-			uint8 *ptValue = ((uint8*)(_PropertyContainer.PropertyValueArrays[propIndex].Values)) + (uint)(entityIndex*datasize); 
+			uint32 datasize = getDataSizeOfProp( (TPropertyIndex)propIndex );
+			uint8 *ptValue = ((uint8*)(_PropertyContainer.PropertyValueArrays[propIndex].Values)) + (uint)(entityIndex*datasize);
 			memset( ptValue, 0, datasize );
 		}
-		
+
 		// Reset timestamps
 		_PropertyContainer.PropertyValueArrays[propIndex].ChangeTimestamps[entityIndex] = 0;
-		
+
 #ifdef STORE_CHANGE_SERVICEIDS
 		// Reset serviceids
 		_PropertyContainer.PropertyValueArrays[propIndex].ChangeServiceIds[entityIndex].set(0);
@@ -371,7 +371,7 @@ void				CDataSetMS::receiveAllBindingCounters( NLNET::CMessage& msgin )
 	for ( uint i=0; i!=nbToRemove; ++i )
 	{
 		msgin.serial( entityIndex );
-		bc.EntitiesToRemove.push_back( entityIndex );	
+		bc.EntitiesToRemove.push_back( entityIndex );
 	}
 
 	_ReceivedBindingCounters.push_back( bc );
@@ -563,7 +563,7 @@ void				CDataSetMS::applyAllBindingCounters( const TBindingCountersToApply& bc )
 bool	CChangeTrackerMS::allocate( sint32 shmid, sint32 nbRowsToAllocate )
 {
 	_SMId = shmid;
-	
+
 	uint32 segmentSize = sizeof(TChangeTrackerHeader) + (nbRowsToAllocate*sizeof(TChangeTrackerItem));
 	_Header = (TChangeTrackerHeader*)CSharedMemory::createSharedMemory( toSharedMemId(_SMId), segmentSize );
 	if ( (_Header == NULL) && DestroyGhostSharedMemSegments )
@@ -972,12 +972,12 @@ void	CDataSetMS::killList( TDataSetRow entityIndex, TPropertyIndex propIndex )
 		default:
 			break;
 	}
-/*	
+/*
 	TSharedListRow *ptFront;
 	TSharedListCell *container;
 	dataSet.getPropPointerForList( &ptFront, propIndex, entityIndex );
 	container = (TSharedListCell*)(dataSet.getListCellContainer( propIndex ));
-	
+
 	TSharedListRow row = *ptFront;
 	while ( row != INVALID_SHAREDLIST_ROW )
 	{
@@ -997,7 +997,7 @@ void	CDataSetMS::killList( TDataSetRow entityIndex, TPropertyIndex propIndex )
 /*
  * Constructor
  */
-CMirrorPropValueListMS<NLMISC::CEntityId>::CMirrorPropValueListMS<NLMISC::CEntityId>( CDataSetMS& dataSet, const TDataSetRow& entityIndex, TPropertyIndex propIndex )
+CMirrorPropValueListMS<NLMISC::CEntityId>::CMirrorPropValueListMS( CDataSetMS& dataSet, const TDataSetRow& entityIndex, TPropertyIndex propIndex )
 {
 	dataSet.getPropPointerForList( &_PtFront, propIndex, entityIndex, (NLMISC::CEntityId*)NULL );
 	_Container = (TSharedListCell*)(dataSet.getListCellContainer( propIndex ));
@@ -1054,7 +1054,7 @@ CMirrorPropValueListMS<NLMISC::CEntityId>::iterator					CMirrorPropValueListMS<N
 	it._Index = *_PtFront;
 	return it;
 }
-	
+
 CMirrorPropValueListMS<NLMISC::CEntityId>::iterator					CMirrorPropValueListMS<NLMISC::CEntityId>::end()
 {
 	iterator it;

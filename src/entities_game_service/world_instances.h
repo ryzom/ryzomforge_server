@@ -34,7 +34,7 @@ class CReportAIInstanceDespawnMsgImp : public CReportAIInstanceDespawnMsg
 };
 
 
-/* This class store instance informations as well as 
+/* This class store instance informations as well as
  * AIS list with available collision information.
  * The AIS collision information is used to select the
  * AIS for spawning a new dynamic instance.
@@ -59,8 +59,8 @@ public:
 	/// Send the mirror transport class to the AIS that contains the AI instance (makes a warning if not found)
 	void msgToAIInstance(uint32 instanceNumber, CMirrorTransportClass &msg);
 	/// Send the message to the AIS that contains the AI instance (makes a warning if not found)
-	void CWorldInstances::msgToAIInstance2(uint32 instanceNumber, NLNET::CMessage &msg);
-	
+	void msgToAIInstance2(uint32 instanceNumber, NLNET::CMessage &msg);
+
 	/// Return the AIS Id or 0 if no AIS is currently online (no warning if not found)
 	NLNET::TServiceId getAISId(uint32 instanceNumber ) const;
 
@@ -112,9 +112,9 @@ private:
 	friend class CReportStaticAIInstanceMsgImp;
 	friend class CReportAIInstanceDespawnMsgImp;
 
-	void reportAICollisionAvailable (const std::string &name, NLNET::TServiceId id, CReportAICollisionAvailableMsgImp &msg); 
-	void reportStaticAIInstance (const std::string &name, NLNET::TServiceId id, CReportStaticAIInstanceMsgImp &msg); 
-	void reportAIInstanceDespawn (const std::string &name, NLNET::TServiceId id, CReportAIInstanceDespawnMsgImp &msg); 
+	void reportAICollisionAvailable (const std::string &name, NLNET::TServiceId id, CReportAICollisionAvailableMsgImp &msg);
+	void reportStaticAIInstance (const std::string &name, NLNET::TServiceId id, CReportStaticAIInstanceMsgImp &msg);
+	void reportAIInstanceDespawn (const std::string &name, NLNET::TServiceId id, CReportAIInstanceDespawnMsgImp &msg);
 
 };
 
