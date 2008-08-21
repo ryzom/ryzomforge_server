@@ -1,7 +1,4 @@
 #############################################################################
-# Simple make file for compiling AI SERVICE
-
-#############################################################################
 # Setting up the compiler settings...
 
 # Global variables
@@ -9,14 +6,15 @@ include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
 		-I/usr/include/libxml2 \
-		-I$(HOME)/cvs/code/nel/include \
+		-I$(NEL_INCLUDE) \
+		-I$(RYZOM_COMMON_SRC) \
 		-I..
 
 # The flags for the linker
-LDFLAGS      = $(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
-		-L../game_share \
+LDFLAGS      = $(LD_FLAGS_CMN) \
+		-L$(NEL_PATH)/lib \
+		-L$(RYZOM_COMMON_SRC)/game_share \
 		-lgame_share \
 		-lnelnet \
 		-lnelgeorges \

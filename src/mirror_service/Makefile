@@ -7,12 +7,12 @@ include ../../../Variables.mk
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 		-I/usr/include/libxml2 \
-        -I$(HOME)/code/nel/include \
-		-I$(RYZOM_PATH)/common/src
+		-I$(NEL_INCLUDE) \
+		-I$(RYZOM_COMMON_SRC)
 
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
-		-L$(RYZOM_PATH)/common/src/game_share \
+		-L$(RYZOM_COMMON_SRC)/game_share \
 		-L../admin_modules \
 		-lgame_share \
 		-ladmin_modules \

@@ -1,7 +1,4 @@
 #############################################################################
-# Simple make file for compiling admin modules
-
-#############################################################################
 # Setting up the compiler settings...
 
 # Global variables
@@ -10,12 +7,13 @@ include ../../../Variables.mk
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 		-I/usr/include/libxml2 \
-        -I$(HOME)/code/nel/include \
-        -I$(HOME)/code/ryzom/common/src \
+		-I$(NEL_INCLUDE) \
+		-I$(RYZOM_COMMON_SRC) \
 		-I..
 
 # The flags for the linker
-LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
+LDFLAGS      = 	$(LD_FLAGS_CMN) \
+		-L$(NEL_PATH)/lib \
 		-lnelnet \
 		-lnelmisc \
 		-lstlport \

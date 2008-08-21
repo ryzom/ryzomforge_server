@@ -1,7 +1,4 @@
 #############################################################################
-# Simple make file for compiling ENTITIES GAME SERVICE service
-
-#############################################################################
 # Setting up the compiler settings...
 
 # Global variables
@@ -10,17 +7,17 @@ include ../../../Variables.mk
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 		-I/usr/include/libxml2 \
-        -I$(HOME)/code/nel/include \
-        -I$(RYZOM_PATH)/common/src \
+		-I$(NEL_INCLUDE) \
+		-I$(RYZOM_COMMON_SRC) \
 		-I.. \
 		-I.
 
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
-        -L$(NEL_PATH)/lib \
-        -L$(RYZOM_PATH)/common/src/game_share \
+		-L$(NEL_PATH)/lib \
 		-L../admin_modules \
-		-L$(RYZOM_PATH)/common/src/r2_share \
-		-L$(RYZOM_PATH)/common/src/r2_modules \
+		-L$(RYZOM_COMMON_SRC)/game_share \
+		-L$(RYZOM_COMMON_SRC)/r2_share \
+		-L$(RYZOM_COMMON_SRC)/r2_modules \
 		-L../pd_lib \
 		-L../gameplay_module_lib \
 		-ladmin_modules \

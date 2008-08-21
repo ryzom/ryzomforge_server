@@ -1,7 +1,4 @@
 #############################################################################
-# Simple make file for compiling GAMEPLAY MODULE LIB
-
-#############################################################################
 # Setting up the compiler settings...
 
 # Global variables
@@ -10,15 +7,15 @@ include ../../../Variables.mk
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 		-I/usr/include/libxml2 \
-        -I$(HOME)/code/nel/include \
-        -I$(RYZOM_PATH)/common/src \
+		-I$(NEL_INCLUDE) \
+		-I$(RYZOM_COMMON_SRC) \
 		-I./ \
 
 # The flags for the linker
 LDFLAGS      = $(LD_FLAGS_CMN) \
-        -L$(NEL_PATH)/lib \
-        -L$(RYZOM_PATH)/common/src/game_share \
-        -L../admin_modules \
+		-L$(NEL_PATH)/lib \
+		-L$(RYZOM_COMMON_SRC)/game_share \
+		-L../admin_modules \
 		-lnelnet \
 		-L/usr/lib \
 		-L/usr/X11R6/lib \

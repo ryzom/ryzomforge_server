@@ -1,7 +1,4 @@
 #############################################################################
-# Simple make file for compiling SHARD UNIFIER SERVICE service
-
-#############################################################################
 # Setting up the compiler settings...
 
 # Global variables
@@ -9,17 +6,17 @@ include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-		-I/usr/include/stlport \
 		-I/usr/include/libxml2 \
 		-I/usr/include/mysql \
-		-I$(HOME)/cvs/code/nel/include \
-		-I$(HOME)/cvs/code/ryzom/src_v2 \
+		-I$(NEL_INCLUDE) \
+		-I$(RYZOM_COMMON_SRC) \
 		-I./ 
 
-LDFLAGS      = $(LD_FLAGS_CMN) 	-L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
-		-L$(HOME)/cvs/code/ryzom/src_v2/game_share \
-		-L$(HOME)/cvs/code/ryzom/src_v2/admin_modules \
-		-L$(HOME)/cvs/code/ryzom/src_v2/r2_share \
+LDFLAGS      = $(LD_FLAGS_CMN) \
+		-L$(NEL_PATH)/lib \
+		-L$(RYZOM_COMMON_SRC)/game_share \
+		-L../admin_modules \
+		-L$(RYZOM_COMMON_SRC)/r2_share \
 		-lmysqlclient \
 		-lgame_share \
 		-lr2_share \
