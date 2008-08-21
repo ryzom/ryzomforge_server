@@ -33,7 +33,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 
 # The list of targets to build
 TARGETS		= input_output_service
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 PACKED_SHEETS = \
 	ios_sheets.packed_sheets \
 

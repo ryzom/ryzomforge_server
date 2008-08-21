@@ -28,7 +28,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 
 # The list of targets to build
 TARGETS		= mail_forum_service
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 
 # The default build rule
 all: exe packed_sheets

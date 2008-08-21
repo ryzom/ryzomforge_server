@@ -34,7 +34,7 @@ LDFLAGS      = $(LD_FLAGS_CMN) \
 
 # The list of targets to build
 TARGETS		= session_browser_server
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 
 # The default build rule
 all: exe packed_sheets

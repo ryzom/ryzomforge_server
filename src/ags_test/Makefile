@@ -29,7 +29,7 @@ LDFLAGS      = $(LD_FLAGS_CMN) \
 
 # The list of targets to build
 TARGETS		= ags_test
-DSP_TARGET  = $(TARGETS).dsp
+DSP_TARGET  = $(TARGETS).vcproj
 
 # The default build rule
 all:			check-deps $(TARGETS)

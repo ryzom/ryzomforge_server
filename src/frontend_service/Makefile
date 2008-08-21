@@ -48,7 +48,7 @@ LDFLAGS2      = 	-L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 
 # The list of targets to build
 TARGETS		= frontend_service
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 
 # The default build rule
 all: exe packed_sheets

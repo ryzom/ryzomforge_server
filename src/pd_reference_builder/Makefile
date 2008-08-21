@@ -29,7 +29,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 
 # The list of targets to build
 TARGETS		= reference_builder_service
-DSP_TARGET	= pd_reference_builder.dsp
+DSP_TARGET	= pd_reference_builder.vcproj
 
 # The default build rule
 all:			check-deps $(TARGETS)
