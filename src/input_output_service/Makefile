@@ -5,7 +5,7 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
@@ -47,7 +47,7 @@ exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
 		../pd_lib/libpd_lib.a \
-		../game_share/libgame_share.a	
+		../game_share/libgame_share.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)
@@ -59,4 +59,4 @@ packed_sheets: $(TARGETS)
 #############################################################################
 # Rules
 
-include ../Rules.mk
+include ../../../Rules.mk

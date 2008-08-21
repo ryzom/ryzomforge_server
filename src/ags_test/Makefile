@@ -5,7 +5,7 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
@@ -42,5 +42,5 @@ ags_test: $(OBJS)
 #############################################################################
 # Rules
 
-include ../Rules.mk
+include ../../../Rules.mk
 

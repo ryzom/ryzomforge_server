@@ -5,7 +5,7 @@
 # Setting up the compiler settings...
 
 # Global variables
-include ../Variables.mk
+include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = -DFAST_MIRROR $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
@@ -73,5 +73,5 @@ packed_sheets:
 #############################################################################
 # Rules
 
-include ../Rules.mk
+include ../../../Rules.mk
 
