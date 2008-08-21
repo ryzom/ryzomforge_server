@@ -35,7 +35,8 @@ all: exe packed_sheets
 
 exe: check-deps $(TARGETS)
 
-$(TARGETS): $(OBJS) ../game_share/libgame_share.a
+$(TARGETS): $(OBJS) \
+		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)

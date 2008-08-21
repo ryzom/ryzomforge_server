@@ -47,10 +47,10 @@ all: exe packed_sheets
 exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
-		../game_share/libgame_share.a \
+		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a \
 		../ai_share/libai_share.a \
-		../r2_share/libr2_share.a \
-		../r2_modules/libr2_modules.a
+		$(RYZOM_COMMON_SRC)/r2_share/libr2_share.a \
+		$(RYZOM_COMMON_SRC)/r2_modules/libr2_modules.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)
