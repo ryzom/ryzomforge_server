@@ -170,7 +170,6 @@ protected:
 	///\init the factories
 	inline static void init()
 	{	
-		NL_ALLOC_CONTEXT(AEF_INIT);
 		if( !Factories )
 			Factories = new std::vector< std::pair< POWERS::TPowerType , IAuraEffectFactory* > >;
 	}
@@ -215,7 +214,6 @@ public:
 	/// buildEffect method
 	CAuraBaseEffect * buildEffect( const CAuraRootEffect &rootEffect, TDataSetRow targetRowId )
 	{
-		NL_ALLOC_CONTEXT(AEF_BE);
 		T *instance = new T(rootEffect, targetRowId);
 		if (!instance)
 		{

@@ -45,7 +45,6 @@ CGmTpPendingCommand::~CGmTpPendingCommand()
 //-----------------------------------------------------------------------------
 CGmTpPendingCommand * CGmTpPendingCommand::getInstance()
 { 
-	NL_ALLOC_CONTEXT(GTPCGI);
 	if( _Instance == 0 )
 	{
 		_Instance = new CGmTpPendingCommand();

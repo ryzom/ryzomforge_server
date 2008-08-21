@@ -19,7 +19,6 @@ CWorldInstances	*CWorldInstances::_Instance = NULL;
 
 CWorldInstances &CWorldInstances::instance()
 {
-	NL_ALLOC_CONTEXT(WLDINST);
 	if (_Instance == NULL)
 		_Instance = new CWorldInstances;
 

@@ -29,7 +29,6 @@ public:\
 protected:\
 	CSPhrasePtr buildPhrase( const TDataSetRow & actorRowId, const std::vector< const CStaticBrick* >& bricks, bool execution )\
 	{\
-		NL_ALLOC_CONTEXT(DSF_BP);\
 		_class_ *inst = new _class_;\
 		if ( !inst->build( actorRowId, bricks, execution ) ){delete inst;return NULL;} \
 		return inst;\
@@ -77,7 +76,6 @@ public:
 	/// init the factory
 	static void init()
 	{
-		NL_ALLOC_CONTEXT(SPF_INIT);
 		if ( Factories == NULL )
 			Factories = new std::vector< std::pair< BRICK_TYPE::EBrickType, ISPhraseFactory* > >;
 	}

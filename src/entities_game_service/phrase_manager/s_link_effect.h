@@ -53,7 +53,6 @@ public:
 	/// method called when the link is broken
 	inline void breakLink(float factorOnSurvivalTime = 1.0f) 
 	{ 
-		NL_ALLOC_CONTEXT(SLE_BL);
 		if (factorOnSurvivalTime < 0.0f)
 			factorOnSurvivalTime = 0.0f;
 		

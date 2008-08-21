@@ -286,7 +286,6 @@ bool CDeposit::build( const NLLIGO::CPrimZone* zone )
 	if ( IsRingShard )
 		return false;
 	
-	NL_ALLOC_CONTEXT(DEP_BLD);
 	//_Id  =id;
 	*( (NLLIGO::CPrimZone*)this ) = *zone;
 

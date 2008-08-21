@@ -88,7 +88,6 @@ public:
 	CSEffect()
 		:_IsRemoved(false),_Value(0),_Power(0)
 	{
-		NL_ALLOC_CONTEXT(SE_CTR);
 		_UpdateTimer.setRemaining(1, new CUpdateEffectTimerEvent(this, true));
 		_Skill = SKILLS::unknown;
 		_IsStackable = false;
@@ -99,7 +98,6 @@ public:
 	inline CSEffect( const TDataSetRow & creatorRowId, const TDataSetRow & targetRowId, EFFECT_FAMILIES::TEffectFamily family, bool stackable, sint32 effectValue, uint32 power)
 		:_CreatorRowId(creatorRowId),_TargetRowId(targetRowId),_Family(family),_Value(effectValue),_Power(power),_IsStackable(stackable),_IsRemoved(false)
 	{
-		NL_ALLOC_CONTEXT(SE_CTR2);
 		++NbAllocatedEffects;
 		_EffectChatName = EFFECT_FAMILIES::getAssociatedChatId(family); // txt msg
 		_UpdateTimer.setRemaining(1, new CUpdateEffectTimerEvent(this, true));
@@ -126,7 +124,6 @@ public:
 	 */
 	void stopEffect()
 	{
-		NL_ALLOC_CONTEXT(SE_SE);
 		_EndTimer.setRemaining(1, new CEndEffectTimerEvent(this));
 		_UpdateTimer.reset();
 	}
@@ -136,7 +133,6 @@ public:
 	 */
 	void forceUpdate(bool forceApply = true)
 	{
-		NL_ALLOC_CONTEXT(SE_FU);
 		_UpdateTimer.reset();
 		NLMISC::CSmartPtr<CTimerEvent> eventPtr = new CUpdateEffectTimerEvent(this);
 		update( eventPtr, forceApply );
@@ -253,21 +249,18 @@ public:
 
 	CSTimedEffect() : CSEffect()
 	{
-		NL_ALLOC_CONTEXT(STECTR1);
 		_EndTimer.setRemaining(1, new CEndEffectTimerEvent(this));
 	}
 
 	CSTimedEffect( const TDataSetRow & creatorRowId, const TDataSetRow & targetRowId, EFFECT_FAMILIES::TEffectFamily family,bool stackable, sint32 effectValue, uint32 power, uint32 endDate)
 		:CSEffect(creatorRowId,targetRowId,family,stackable,effectValue,power), _EndDate(endDate)
 	{
-		NL_ALLOC_CONTEXT(CTECTR2);
 		_EndTimer.set(_EndDate, new CEndEffectTimerEvent(this));
 	}
 
 	/// set endDate
 	inline void setEndDate(NLMISC::TGameCycle date) 
 	{ 
-		NL_ALLOC_CONTEXT(CTE_SED);
 		_EndDate = date; 
 		if (_EndTimer.getEvent() != NULL)
 			_EndTimer.set(date, _EndTimer.getEvent()); 

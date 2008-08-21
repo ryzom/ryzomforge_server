@@ -236,7 +236,6 @@ IMissionStepTemplate* IMissionStepTemplateFactory::buildStep( uint32 line, const
 
 void IMissionStepTemplateFactory::init()
 {
-	NL_ALLOC_CONTEXT(MST_INIT);
 	if ( ! Entries )
 		Entries = new std::vector< std::pair< std::string, IMissionStepTemplateFactory* > >;
 }// IMissionStepTemplate init

@@ -662,7 +662,6 @@ DEFINE_ACTION(ContextNpcGrp,PARAMETR)
 
 DEFINE_ACTION(ContextNpcGrp,BOTCOUNT)
 {
-	NL_ALLOC_CONTEXT(AINGBOT);
 	// this is for the counter of automatically generated bots
 	// if the counter is '0' then only real bots should be here
 

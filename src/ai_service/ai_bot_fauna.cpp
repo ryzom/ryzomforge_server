@@ -157,7 +157,6 @@ static const char *cyclesStateName(CFaunaActivity::TCycleState s);
 CSpawnBotFauna::CSpawnBotFauna(TDataSetRow const& row, CBot& owner, NLMISC::CEntityId const& id, float radius, uint32 level, RYAI_MAP_CRUNCH::TAStarFlag denyFlags)
 : CSpawnBot(row, owner, id, radius, level, denyFlags)
 {
-	NL_ALLOC_CONTEXT(AISBF);
 	setCycleState(CFaunaActivity::CycleStateUndefined);
 	
 	//	we start with a wander activity.
@@ -198,7 +197,6 @@ void CSpawnBotFauna::update(TProfiles activity, uint32 ticksSinceLastUpdate)
 {
 	H_AUTO(CSpawnBotFauna_update);
 	
-	NL_ALLOC_CONTEXT(AISBFU);
 	nlassert(!getAISpawnProfile().isNull());
 	//	this piece of code change the current comportment of the fauna in regards of the group comportment.
 	
@@ -875,7 +873,6 @@ CMovementMagnet::CMovementMagnet(CSpawnBotFauna& botFauna, RYAI_MAP_CRUNCH::TASt
 , _PathCont(flag)
 , _denyFlags(flag)
 {
-	NL_ALLOC_CONTEXT(AIMVMAG);
 	//	start by moving during a variable time, just to disperse bot in their place.(must be initialised by constructor)
 	_StateTimer.set(0);	//	do not wait a long time .. :)
 	_State = Movement_Wait_Anim;
@@ -1152,7 +1149,6 @@ CBotFauna::~CBotFauna()
 
 CSpawnBot* CBotFauna::getSpawnBot(TDataSetRow const& row, NLMISC::CEntityId const& id, float radius)
 {
-	NL_ALLOC_CONTEXT(AIBFSB);
 	return new CSpawnBotFauna(row, *this, id, radius, getSheet()->Level(), getGroup().getAStarFlag());
 }
 

@@ -331,7 +331,6 @@ CCharacter::CCharacter():	CEntityBase(false),
 							_AggroableSave(true),
 							_GodModeSave(false)
 {
-	NL_ALLOC_CONTEXT(CHAR)
 
 	// todo : uncomment that when sadge item api is plugged
 	_AggroCount = 0;
@@ -1393,7 +1392,6 @@ uint32 CCharacter::tickUpdate()
 //----------------------------------------------------------------------------
 void CCharacter::setEnterFlag( bool b ) 
 {
-	NL_ALLOC_CONTEXT(CHAR_SEF);
 	if ( b )
 	{
 		// setup timer for tickUpdate() calling
@@ -8512,7 +8510,6 @@ CEvalNumExpr::TReturnState CCharacter::evalValue (const char *value, double &res
 //-----------------------------------------------------------------------------
 void CCharacter::startTradeItemSession( uint16 session )
 {
-	NL_ALLOC_CONTEXT(CHAR_STIS);
 
 	// Start a new trade sesssion
 	_CurrentTradeSession = session;
@@ -11458,7 +11455,6 @@ bool CCharacter::processMissionUserEvent(std::list< CMissionEvent* > & eventList
 //-----------------------------------------------
 bool CCharacter::processMissionStepUserEvent(std::list< CMissionEvent* > & eventList,uint missionAlias,uint32 stepIndex)
 {
-	NL_ALLOC_CONTEXT(CHARPMSUE);
 	H_AUTO(CCharacter_processMissionStepUserEvent);
 
 	CMission * mission = _Missions->getMissions( missionAlias );
@@ -11532,7 +11528,6 @@ bool CCharacter::processMissionStepUserEvent(std::list< CMissionEvent* > & event
 //-----------------------------------------------
 void CCharacter::botChatMissionAdvance( uint8 index )
 {
-	NL_ALLOC_CONTEXT(CHARBCMA);
 	CCreature * bot = CreatureManager.getCreature( _CurrentInterlocutor );
 	// no mission found : check in the special contexts of the bot
 	if ( !bot )
@@ -13561,7 +13556,6 @@ void CCharacter::updatePowerAndAuraFlags()
  */
 void CCharacter::beginOrResumeForageSession( const NLMISC::CSheetId& materialSheetId, const TDataSetRow& sourceRowId, SKILLS::ESkills usedSkill, bool isTheExtractor /*, CGameItemPtr forageToolUsed*/ )
 {
-	NL_ALLOC_CONTEXT(CHARBORFS);
 	bool resetProgress = false;
 	if ( ! _ForageProgress )
 	{
@@ -19238,7 +19232,6 @@ void CCharacter::setCurrentSessionId( TSessionId sessionId )
 
 //void CCharacter::ensureDbReminderReady()
 //{
-//	NL_ALLOC_CONTEXT(CHAREDRR);
 //	if ( ! _DataIndexReminder )
 //		_DataIndexReminder = new CCharacterDbReminder();
 //}

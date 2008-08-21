@@ -137,7 +137,6 @@ bool CToxicCloud::update()
 
 NLMISC_COMMAND( spawnToxicCloud, "Spawn a toxic cloud", "<posXm> <posYm> <iRadius{0,1,2}=0> <dmgPerHit=0> <updateFrequency=ToxicCloudUpdateFrequency> <lifetimeInTicks=ToxicCloudDefaultLifetime>" )
 {
-	NL_ALLOC_CONTEXT(CMD_STC);
 	if ( args.size() < 2 )
 		return false;
 	CVector cloudPos( (float)atof( args[0].c_str() ), (float)atof( args[1].c_str() ), 0.0f );

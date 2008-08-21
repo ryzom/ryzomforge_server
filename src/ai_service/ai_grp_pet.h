@@ -129,7 +129,6 @@ void CGrpPet::setEvent(uint eventId)
 inline
 NLMISC::CSmartPtr<CSpawnGroup> CGrpPet::createSpawnGroup()
 {
-	NL_ALLOC_CONTEXT(AIGPGSG);
 	return new CSpawnGroupPet(*this);
 }
 

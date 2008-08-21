@@ -112,7 +112,6 @@ void CCombatActionDoT::applyOnTarget(uint8 targetIndex, CCombatPhrase *phrase)
 //--------------------------------------------------------------
 void CCombatActionDoT::applyOnEntity( CEntityBase *entity, float successFactor )
 {
-	NL_ALLOC_CONTEXT(CAD_AOE);
 	if (!entity || !_EffectDuration) return;
 	
 	// if entity is already dead, return

@@ -621,7 +621,6 @@ void CBuildingTest::checkIntegrity()
 NLMISC_COMMAND (testBuildingManager, "(debug) Unit test for building manager",
 				"[<nb_test_characters> <nb_ops> <nb_simultaneous> <delay_in_ticks> <verbose=0/1>]")
 {
-	NL_ALLOC_CONTEXT(CMD_TBM);
 	uint nbChars, nbOps, nbSimultaneous, opDelay;
 	if (args.empty())
 	{
@@ -692,7 +691,6 @@ NLMISC_COMMAND (testBuildingManager, "(debug) Unit test for building manager",
 //----------------------------------------------------------------------------
 static CEntityId createFakeCharacter(uint32 playerId, const string & name, EGSPD::CPeople::TPeople people, GSGENDER::EGender gender)
 {
-	NL_ALLOC_CONTEXT(CRTFKCH);
 	if (people >= EGSPD::CPeople::EndPlayable)
 		return CEntityId::Unknown;
 

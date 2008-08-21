@@ -61,7 +61,6 @@ CTimedActionPhrase::~CTimedActionPhrase()
 //-----------------------------------------------
 bool CTimedActionPhrase::build( const TDataSetRow & actorRowId, const std::vector< const CStaticBrick* >& bricks, bool buildToExecute )
 {
-	NL_ALLOC_CONTEXT(TAPBLD);
 	_ActorRowId = actorRowId;
 
 	for (uint i = 0 ; i < bricks.size() ; ++i)

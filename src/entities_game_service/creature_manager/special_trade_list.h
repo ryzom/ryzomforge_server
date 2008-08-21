@@ -118,7 +118,6 @@ private:
 	/// allocate the list
 	void allocate()
 	{
-		NL_ALLOC_CONTEXT(SPEC_TL);
 		if ( !_Content )
 			_Content = new CContent;
 	}

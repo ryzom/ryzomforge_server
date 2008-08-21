@@ -104,7 +104,6 @@ void CMagicAiActionDamageAura::apply( CMagicPhrase * phrase, sint deltaLevel, si
 									  const NLMISC::CBitSet & invulnerabilityAll, bool isMad, NLMISC::CBitSet & resists, const TReportAction & actionReport,
 									  sint32 vamp, float vampRatio, bool reportXp )
 {
-	NL_ALLOC_CONTEXT(MADAAPY);
 	H_AUTO(CMagicAiActionDamageAura_apply);
 
 	const TGameCycle endDate = CTickEventHandler::getGameCycle() + _EffectDuration;

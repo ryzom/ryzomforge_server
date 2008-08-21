@@ -31,7 +31,6 @@ public:
 	///	Build the structure of the database from a XML file, and create the singleton instance
 	static void				init( const std::string& filename ) 
 	{ 
-		NL_ALLOC_CONTEXT(CDB_INI);
 		nlassert( !_Instance ); 
 		_Instance = new CCDBStructBanks(); 
 		_Instance->doInit( filename ); 

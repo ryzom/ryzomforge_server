@@ -194,7 +194,6 @@ void cleanOrphanTargetLists( NLNET::TServiceId serviceId )
  */
 void cbMirrorReadyForAddEntity( CMirror *mirror )
 {
-	NL_ALLOC_CONTEXT(CB_MIRR);
 	CFameManager::getInstance().mirrorReadyToAdd();
 
 	// Clean orphan target lists that could remain if the EGS crashed (or was stopped with remaining player) in a previous session

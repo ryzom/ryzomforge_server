@@ -156,7 +156,6 @@ public:
 	{
 		if	(!find(listener))
 		{
-			NL_ALLOC_CONTEXT(AIALNR);
 			CListenerEmitterLink<T>*	link=new	CListenerEmitterLink<T>(listener,this);
 			_listenerList.attachAfter			(link,CListenerEmitterLink::LISTENER);
 			listener->_emitterList.attachAfter	(link,CListenerEmitterLink::EMITTER);

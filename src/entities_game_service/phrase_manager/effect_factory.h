@@ -50,7 +50,6 @@ protected:
 	///\init the factories
 	inline static void init()
 	{	
-		NL_ALLOC_CONTEXT(EF_INIT);
 		if( !Factories )
 			Factories = new std::vector< std::pair< EFFECT_FAMILIES::TEffectFamily , IEffectFactory* > >;
 	}
@@ -95,7 +94,6 @@ public:
 	/// buildEffect method
 	CSTimedEffect * buildEffect()
 	{
-		NL_ALLOC_CONTEXT(EF_BLD);
 		T *instance = new T;
 		if (!instance)
 		{

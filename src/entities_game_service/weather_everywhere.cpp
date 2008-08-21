@@ -45,7 +45,6 @@ const CRyzomTime::EWeather WeatherSetupsToValue [NB_WEATHER_SETUPS] =
  */
 void CWeatherEverywhere::init()
 {
-	NL_ALLOC_CONTEXT(WTHINIT);
 	// Init weather manager (with weather setup sheets)
 	std::vector<CSheetId> sheetVec;
 	CSheetId::buildIdVector( sheetVec, "weather_setup" ); // list weather_setup sheets

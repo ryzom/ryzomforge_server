@@ -105,7 +105,6 @@ void CCDBSynchronised::init( TCDBBank bank, bool usePermanentTracker )
 //-----------------------------------------------
 void CCDBSynchronised::read( const string& fileName )
 {
-	NL_ALLOC_CONTEXT(DBS_R);
 #ifdef NL_DEBUG
 	int linecount=1;
 #endif

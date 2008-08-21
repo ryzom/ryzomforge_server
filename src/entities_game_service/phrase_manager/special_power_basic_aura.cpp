@@ -33,7 +33,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 void CSpecialPowerBasicAura::apply()
 {
-	NL_ALLOC_CONTEXT(SPBAAPY);
 	if (!_Phrase)
 		return;
 

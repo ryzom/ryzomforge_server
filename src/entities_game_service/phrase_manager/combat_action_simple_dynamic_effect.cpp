@@ -69,7 +69,6 @@ void CCombatActionDynamicEffect::apply(CCombatPhrase *phrase)
 //--------------------------------------------------------------
 void CCombatActionDynamicEffect::applyOnEntity( CEntityBase *entity, float successFactor )
 {
-	NL_ALLOC_CONTEXT(CADE_AOE);
 	if (!entity || !_CombatPhrase) return;
 
 	// if entity is already dead, return

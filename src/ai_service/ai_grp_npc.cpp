@@ -462,7 +462,6 @@ IAliasCont* CGroupNpc::getAliasCont(TAIType type)
 
 CAliasTreeOwner* CGroupNpc::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(AIGNCC);
 	CAliasTreeOwner* child = NULL;
 	
 	switch (aliasTree->getType())
@@ -484,7 +483,6 @@ CAliasTreeOwner* CGroupNpc::createChild(IAliasCont* cont, CAIAliasDescriptionNod
 
 CSmartPtr<CSpawnGroup> CGroupNpc::createSpawnGroup()
 {
-	NL_ALLOC_CONTEXT(AIGBGSG);
 	return new CSpawnGroupNpc(*this);
 }
 

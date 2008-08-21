@@ -25,7 +25,6 @@ using namespace NLNET;
 //--------------------------------------------------------------
 bool CRegenModifierEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(RME_UPD);
 	if (_AffectedScore >= SCORES::NUM_SCORES)
 	{
 		_EndTimer.setRemaining(1, new CEndEffectTimerEvent(this));

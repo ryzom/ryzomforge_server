@@ -82,7 +82,6 @@ CStaticBrick::~CStaticBrick()
 //--------------------------------------------------------------
 void CStaticBrick::serial(class NLMISC::IStream &f)
 {
-	NL_ALLOC_CONTEXT(BRK_SER);
 	f.serial( Name );
 	f.serial( SheetId );
 	f.serialEnum(Nature);
@@ -625,7 +624,6 @@ bool	CPlayerSkill::initFromString( const string& skillAndValue )
 //--------------------------------------------------------------
 void addParam(const std::string &paramStr, std::vector<TBrickParam::IIdPtr> &Params)
 {
-	NL_ALLOC_CONTEXT(SB_AP);
 	std::string keyword;
 	std::string tail;
 	stringToKeywordAndTail(paramStr,keyword,tail);
@@ -1654,7 +1652,6 @@ void addParam(const std::string &paramStr, std::vector<TBrickParam::IIdPtr> &Par
 //--------------------------------------------------------------
 void CStaticBrick::loadFaber( const UFormElm &root, const CSheetId &sheetId )
 {
-	NL_ALLOC_CONTEXT(SB_LF);
 	if ( Faber == NULL) Faber = new CFaber();
 	
 	const UFormElm *faber = NULL;

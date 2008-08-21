@@ -875,7 +875,6 @@ sint CGroupDesc<FamilyT>::getNbUse() const
 template <class FamilyT>
 CAliasTreeOwner	*CGroupDesc<FamilyT>::createChild(IAliasCont	*cont, CAIAliasDescriptionNode *aliasTree)
 {
-	NL_ALLOC_CONTEXT(GRPDCC);
 	if (!cont)
 		return	NULL;
 	
@@ -1128,7 +1127,6 @@ DEFINE_ACTION_TEMPLATE1(ContextGroupDesc,GT_GNRJ,FamilyT)
 /// make a modification.
 DEFINE_ACTION_TEMPLATE1(ContextGroupDesc,POPVER,FamilyT)
 {
-	NL_ALLOC_CONTEXT(AIFGPOP);
 	// add a population version for a group
 	// args: uint32 alias, string spawn_type, uint weight, (string sheet, uint32 count)+
 

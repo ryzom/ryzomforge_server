@@ -33,7 +33,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 bool CDamageAuraEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(DAE_UPD);
 	const TGameCycle time = CTickEventHandler::getGameCycle();
 
 	if (!_AffectedEntity)

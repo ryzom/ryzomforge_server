@@ -38,7 +38,6 @@ void CGuildInvitationModule::refuse()
 //----------------------------------------------------------------------------
 void CGuildInvitationModule::accept()
 {
-	NL_ALLOC_CONTEXT(GIM_ACC);
 	MODULE_AST(_Invitation);
 	nlassert( _Invitation->getGuild() );
 	CGuild * guild = EGS_PD_CAST< CGuild* > ( _Invitation->getGuild() );

@@ -180,7 +180,6 @@ void CSpawnBotFauna::doFight(CAIEntityPhysical* ennemy)
 
 void CSpawnBotFauna::setDefaultComportment()
 {	
-	NL_ALLOC_CONTEXT(AISBFEF);
 	
 	if (getPersistent().getRyzomType()==RYZOMID::flora)
 		setAIProfile(this, &PlanteIdleFaunaProfileFactory, false);
@@ -298,7 +297,6 @@ void CWanderFaunaProfile::updateProfile(uint ticksSinceLastUpdate)
 {
 	H_AUTO(WanderFaunaProfileUpdate)
 	CFollowPathContext fpcWanderFaunaProfileUpdate("WanderFaunaProfileUpdate");
-	NL_ALLOC_CONTEXT(AIP_WDR);
 	
 	// calculate distance from bot position to magnet point (used in all the different processes)
 	_magnetDist=_Bot->pos().distTo(_Bot->spawnGrp().magnetPos());
@@ -379,7 +377,6 @@ CGrazeFaunaProfile::CGrazeFaunaProfile(CProfileOwner* owner)
 
 void CGrazeFaunaProfile::beginProfile()
 {
-	NL_ALLOC_CONTEXT(AIP_GRZ);
 	_ArrivedInZone=false;
 	_OutOfMagnet=false;
 	_Bot->setCycleState(CFaunaActivity::CycleStateHungry);
@@ -539,7 +536,6 @@ CRestFaunaProfile::CRestFaunaProfile(CProfileOwner* owner)
 void CRestFaunaProfile::beginProfile()
 {
 	_ArrivedInZone=false;
-	NL_ALLOC_CONTEXT(AIP_RST);
 	_Bot->setCycleState(CFaunaActivity::CycleStateTired);
 	_CycleTimerBaseTime=_Bot->spawnGrp().getCurrentCycleTime()>>2;	//	4 steps. (sorry, its hard coded)
 	_CycleTimer.set(_CycleTimerBaseTime+CAIS::rand16(_CycleTimerBaseTime/4));

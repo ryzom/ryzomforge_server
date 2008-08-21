@@ -30,7 +30,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 bool CNoLinkDOTEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(NLDEUPD);
 	// if needed check if caster is dead
 	if (_EndsAtCasterDeath)
 	{

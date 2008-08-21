@@ -123,7 +123,6 @@ void CMemorizationSet::clear()
 //-----------------------------------------------
 void CMemorizationSet::memorize(uint8 i, const vector<CSheetId> &bricks, uint16 id, const TDataSetRow &rowId)
 {
-	NL_ALLOC_CONTEXT(MS_MEM);
 	if (i >= Phrases.size() )
 	{
 		nlwarning("<CMemorizationSet::setPhrase> Error, tried to memorized in slot %u while there is %u slots", i, Phrases.size());
@@ -152,7 +151,6 @@ void CMemorizationSet::memorize(uint8 i, const vector<CSheetId> &bricks, uint16 
 //-----------------------------------------------
 bool CMemorizationSet::memorizeStarterPhrase(const std::vector<NLMISC::CSheetId> &bricks, uint16 id)
 {
-	NL_ALLOC_CONTEXT(MS_MSP);
 	const CStaticBrick * brick = CSheets::getSBrickForm( bricks[0] );
 	if( brick )
 	{
@@ -214,7 +212,6 @@ bool CMemorizationSet::memorizeStarterPhrase(const std::vector<NLMISC::CSheetId>
 //-----------------------------------------------
 bool CMemorizationSet::memorizeInFirstEmptySlot(const vector<CSheetId> &bricks, uint16 id)
 {
-	NL_ALLOC_CONTEXT(MS_MIFES);
 	for (uint i = 0 ; i < Phrases.size() ; ++i)
 	{
 		if (Phrases[i] == NULL)
@@ -233,7 +230,6 @@ bool CMemorizationSet::memorizeInFirstEmptySlot(const vector<CSheetId> &bricks, 
 //-----------------------------------------------
 void CMemorizationSet::memorizeWithoutCheck(uint8 i, const vector<CSheetId> &bricks, uint16 id)
 {
-	NL_ALLOC_CONTEXT(MS_MWC);
 	if (i >= Phrases.size() )
 	{
 		nlwarning("<CMemorizationSet::memorizeWithoutCheck> Error, tried to memorized in slot %u while there is %u slots", i, Phrases.size());
@@ -383,7 +379,6 @@ void CPlayerPhraseMemory::clear()
 //-----------------------------------------------
 CMemorizationSet* CPlayerPhraseMemory::getMemSet(uint32 idx)
 {
-	NL_ALLOC_CONTEXT(PPM_GMS);
 	nlassert(idx<_MemSets.size());
 	if (_MemSets[idx]==NULL)
 		_MemSets[idx]= new CMemorizationSet;

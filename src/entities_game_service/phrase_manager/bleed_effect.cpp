@@ -29,7 +29,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 bool CBleedEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(BE_UPD);
 
 	const TGameCycle date = CTickEventHandler::getGameCycle();
 	float totalDamage = 0.0f;

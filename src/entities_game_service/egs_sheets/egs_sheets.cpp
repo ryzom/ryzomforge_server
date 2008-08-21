@@ -214,7 +214,6 @@ void loadSheetSetForHashMap(const vector<string> &fileTypes,const char *sheetFil
 //---------------------------------------------------
 void CSheets::init()
 {
-	NL_ALLOC_CONTEXT(SHE_INI);
 	CMP::loadGroups( "item_mp_group.typ" );
 	vector<string> fileTypes;
 

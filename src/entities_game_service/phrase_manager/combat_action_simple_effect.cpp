@@ -67,7 +67,6 @@ void CCombatActionSimpleEffect::apply(CCombatPhrase *phrase)
 //--------------------------------------------------------------
 void CCombatActionSimpleEffect::applyOnEntity( CEntityBase *entity, float successFactor )
 {
-	NL_ALLOC_CONTEXT(CASE_AOE);
 	H_AUTO(CCombatActionSimpleEffect_applyOnEntity);
 
 	if (!entity || !_CombatPhrase) return;

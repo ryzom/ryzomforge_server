@@ -55,7 +55,6 @@ static uint32 EntityMatrixDiscTblUpTo250[] = {11, 15, 19, 23, 25, 27, 27, 29, 29
 
 void CEntityMatrixPatternSymetrical::initMatrixPatterns()
 {
-	NL_ALLOC_CONTEXT(EMTRIX);
 	// initialise the vectors with the first tables
 	_DiscPatterns.push_back(new CEntityMatrixPatternSymetrical(&(EntityMatrixDiscTbl0[0]),3));
 

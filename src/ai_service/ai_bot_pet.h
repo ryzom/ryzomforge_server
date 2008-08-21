@@ -95,7 +95,6 @@ protected:
 	
 	CSpawnBot* getSpawnBot(TDataSetRow const& row, NLMISC::CEntityId const& id, float radius)
 	{
-		NL_ALLOC_CONTEXT(AIBPGSB);
 		return new CSpawnBotPet(row, *this, id, radius, getSheet()->Level(), getGroup().getAStarFlag());
 	}
 	

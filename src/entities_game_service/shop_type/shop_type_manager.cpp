@@ -811,7 +811,6 @@ void CShopTypeManager::mountItemShopBase( const std::string& type )
 //----------------------------------------------------------------------------
 void CShopTypeManager::mountRmShopBase( const std::string& family )
 {
-	NL_ALLOC_CONTEXT(STM_MMS);
 	CRMShopType * shop = new CRMShopType();
 	_ShopTypes.push_back( shop );
 
@@ -875,7 +874,6 @@ void CShopTypeManager::mountRmShopBase( const std::string& family )
 //----------------------------------------------------------------------------
 void CShopTypeManager::mountTpShopBase( const std::string& type )
 {
-	NL_ALLOC_CONTEXT(STM_MTS);
 	CTPShopType * shop = new CTPShopType();
 	_ShopTypes.push_back( shop );
 	

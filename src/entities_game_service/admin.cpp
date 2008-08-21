@@ -407,7 +407,6 @@ void initCommandsPrivileges(const std::string & fileName)
 static void loadCommandsPrivileges(const string & fileName, bool init)
 {
 	H_AUTO(loadCommandsPrivileges);
-	NL_ALLOC_CONTEXT(CMDPRI);
 
 	CIFile ifile;
 	if (!ifile.open(fileName))
@@ -4343,7 +4342,6 @@ NLMISC_COMMAND(listGuildMembers, "display guild members list", "<csr eid> <guild
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(guildInvite, "send a guild invite to a player character", "<eid> <member name>")
 {
-	NL_ALLOC_CONTEXT(CMD_GI);
 	if(args.size() != 2 )
 		return false;
 	
@@ -4397,7 +4395,6 @@ NLMISC_COMMAND(guildInvite, "send a guild invite to a player character", "<eid> 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(addGuildMember, "add a new member to a guild", "<csr eid> <guild_name>|<shardId:guildId> <member name>")
 {
-	NL_ALLOC_CONTEXT(CMD_AGM);
 	if (args.size() != 3)
 		return false;
 

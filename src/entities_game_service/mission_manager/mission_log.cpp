@@ -21,7 +21,6 @@ CMissionLog MissionLog;
 //-----------------------------------------------
 void CMissionLog::init(const std::string & logFile)
 {
-	NL_ALLOC_CONTEXT(ML_INIT);
 	_LogFile = logFile;
 	if ( logFile.empty() )
 		Log = NLMISC::WarningLog;

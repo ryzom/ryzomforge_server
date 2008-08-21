@@ -17,7 +17,6 @@ CActionDistanceChecker* CActionDistanceChecker::_Instance = NULL;
 //---------------------------------------------------
 void CActionDistanceChecker::init()
 {
-	NL_ALLOC_CONTEXT(ADC_INIT);
 	nlassert(_Instance == NULL);
 	_Instance = new CActionDistanceChecker;
 }// init

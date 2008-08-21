@@ -81,7 +81,6 @@ NL_INSTANCE_COUNTER_IMPL(CCreature);
 //-----------------------------------------------
 CCreature::CCreature() : CEntityBase(true)
 {
-	NL_ALLOC_CONTEXT(ENT_BSE);
 	_TickUpdateTimer.setRemaining( 1, new CCreatureTickUpdateTimerEvent(this),63 );
 
 	_AIGroupAlias = CAIAliasTranslator::Invalid;
@@ -204,7 +203,6 @@ CCreature::~CCreature()
 //-----------------------------------------------
 CCreature * CCreature::getCreatureCopy( const NLMISC::CEntityId & entityId, sint32 cellId  )
 {
-	NL_ALLOC_CONTEXT(CREATUR);
 	// allocate a new creature
 	CCreature * creature = new CCreature();
 	//set its id
@@ -873,7 +871,6 @@ static bool isShopStaticItemFamily(ITEMFAMILY::EItemFamily fam)
 //---------------------------------------------------
 void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 {
-	NL_ALLOC_CONTEXT(CRE_SBD);
 	_BotChatProgram = 0;
 	_LastCycleUpdateSelectors = CTickEventHandler::getGameCycle();
 
@@ -1450,7 +1447,6 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 //-----------------------------------------------------------------------------
 CSmartPtr<CMerchant>& CCreature::getMerchantPtr()
 {
-	NL_ALLOC_CONTEXT(CRE_GMP);
 	if( _Merchant == 0 )
 	{
 		_Merchant = new CMerchant( *this );
@@ -2103,7 +2099,6 @@ void CCreature::setMode( MBEHAV::EMode mode, bool, bool)
 //---------------------------------------------------
 void CCreature::requestDespawn(NLMISC::TGameCycle waitCycles)
 {
-	NL_ALLOC_CONTEXT(CRE_RD);
 	WARN_IF(!isDead(), "<CCreature::requestDespawn> trying to despawn a living creature.");
 
 	if (_DespawnSentToAI)

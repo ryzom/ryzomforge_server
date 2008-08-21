@@ -166,7 +166,6 @@ public:
 
 //void	CPersistentPlayerLoader::cbBSconnect(bool connecting)
 //{
-//	NL_ALLOC_CONTEXT(PPL_CBC);
 //	// load all character files if BS up
 //	if (!connecting)
 //		return;
@@ -237,7 +236,6 @@ public:
 //
 //void	CPersistentPlayerLoader::startCharLoading(CPersistentPlayer* player, uint charId)
 //{
-//	NL_ALLOC_CONTEXT(PPL_SCL);
 //	// no file to load, assumes no character can be loaded
 //	if (player->Chars[charId].FileList.empty())
 //	{
@@ -621,7 +619,6 @@ void CPlayerManager::loadPlayer( CPlayer * player )
  */
 void	CPlayerManager::asyncLoadPlayer( CPlayer* player, uint32 userId, const std::string& languageId, const NLNET::CLoginCookie& cookie, bool allAuthorized )
 {
-	NL_ALLOC_CONTEXT(PM_ALP);
 	TAsyncLoadMap::iterator	it = _LoadingPlayers.find(userId);
 
 	if (it != _LoadingPlayers.end())

@@ -67,7 +67,6 @@ void CCombatActionSlowMove::apply(CCombatPhrase *phrase)
 //--------------------------------------------------------------
 void CCombatActionSlowMove::applyOnEntity( CEntityBase *entity, float successFactor )
 {
-	NL_ALLOC_CONTEXT(CASM_AOE);
 	H_AUTO(CCombatActionSlowMove_applyOnEntity);
 
 	if (!entity || !_CombatPhrase) return;

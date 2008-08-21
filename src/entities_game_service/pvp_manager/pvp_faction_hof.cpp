@@ -36,7 +36,6 @@ NL_INSTANCE_COUNTER_IMPL(CPVPFactionHOF);
 void CPVPFactionHOF::init()
 {
 	BOMB_IF( _Instance != 0, "CPVPFactionHOF already allocated", return );
-	NL_ALLOC_CONTEXT(PVF_INIT);
 	_Instance = new CPVPFactionHOF();
 	BOMB_IF( _Instance == 0, "Can't allocate CPVPFactionHOF singleton", nlstop );
 

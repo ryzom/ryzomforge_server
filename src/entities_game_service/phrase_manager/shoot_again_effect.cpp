@@ -31,7 +31,6 @@ extern CPlayerManager PlayerManager;
 
 bool CShootAgainEffect::update(CTimerEvent* event, bool applyEffect)
 {
-//	NL_ALLOC_CONTEXT(EWEUPD);
 	
 	// if needed check if caster is dead
 	const CEntityBase *caster = CEntityBaseManager::getEntityBasePtr(_CreatorRowId);

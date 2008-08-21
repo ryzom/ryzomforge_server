@@ -29,7 +29,6 @@ public:
 	/// getInstance
 	static inline CCharacterVersionAdapter *getInstance()
 	{
-		NL_ALLOC_CONTEXT(CVAGI);
 		if (_Instance == NULL)
 			_Instance = new CCharacterVersionAdapter();
 		

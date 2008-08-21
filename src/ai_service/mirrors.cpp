@@ -58,7 +58,6 @@ void	cbMirrorIsReady( CMirror *mirror )
 
 void cbMirrorReadyForAddEntity( CMirror *mirror )
 {
-	NL_ALLOC_CONTEXT(CB_MIRR);
 
 	// Init fx manager
 	const TDeclaredEntityRangeOfType& declERT = TheDataset.getDeclaredEntityRanges();
@@ -71,7 +70,6 @@ void cbMirrorReadyForAddEntity( CMirror *mirror )
 
 
 #define initIsolatedPropTable( name, thetype, defaultvalue ) \
-	NL_ALLOC_CONTEXT(AIIPT); \
 	name = new thetype [MAX_NB_ENTITIES_ISOLATED]; \
 	for ( i=0; i!=MAX_NB_ENTITIES_ISOLATED; ++i ) \
 		name[i] = defaultvalue

@@ -47,7 +47,6 @@ void CPlayerRoomInterface::store(CPersistentDataRecord & pdr) const
 //----------------------------------------------------------------------------
 void CPlayerRoomInterface::apply(CPersistentDataRecord & pdr, CCharacter * owner)
 {
-	NL_ALLOC_CONTEXT(PRI_APY);
 	if (_Data == NULL)
 	{
 		_Data = new CPlayerRoomData(owner, NULL);
@@ -74,7 +73,6 @@ void CPlayerRoomInterface::init(CCharacter * owner, CBuildingPhysicalPlayer * bu
 {
 	nlassert(owner != NULL);
 
-	NL_ALLOC_CONTEXT(PRI_INIT);
 	if (_Data != NULL)
 	{
 		CBuildingManager::getInstance()->removePlayerBuilding(owner->getId());
@@ -91,7 +89,6 @@ void CPlayerRoomInterface::init(CCharacter * owner, CBuildingPhysicalPlayer * bu
 //----------------------------------------------------------------------------
 //void CPlayerRoomInterface::serial(NLMISC::IStream & f, CCharacter * owner, uint16 playerVersion)
 //{
-//	NL_ALLOC_CONTEXT(PRI_SER);
 //	f.xmlPush("room");
 //	if ( f.isReading() )
 //	{

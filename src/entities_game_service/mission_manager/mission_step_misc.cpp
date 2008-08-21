@@ -799,7 +799,6 @@ class CMissionStepSkill : public IMissionStepTemplate
 
 	void onActivation(CMission* instance,uint32 stepIndex,std::list< CMissionEvent * > & eventList)
 	{		
-		NL_ALLOC_CONTEXT(MSS_OA);
 
 		IMissionStepTemplate::onActivation( instance, stepIndex, eventList );
 		// check if user meets success condition when step is activated

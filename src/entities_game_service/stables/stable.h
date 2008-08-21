@@ -40,7 +40,6 @@ public:
 	// initialize 
 	static CStable* getInstance() 
 	{
-		NL_ALLOC_CONTEXT(ST_GI);
 		if(_Instance == NULL)
 		{
 			_Instance = new CStable();

@@ -28,7 +28,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 bool CModRangeSuccessEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(RAE_UPD);
 	if (!TheDataset.isAccessible(_TargetRowId))
 	{
 		_EndTimer.setRemaining(1, new CEndEffectTimerEvent(this));

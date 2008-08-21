@@ -158,7 +158,6 @@ NLMISC_COMMAND(dumpGuild, "dump a guild", "<guildName|<shardId>:<guildId>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(guildAddMember, "add a new member to a guild", "<guildName|<shardId>:<guildId> <member eid>")
 {
-	NL_ALLOC_CONTEXT(CMD_GAM);
 	if (args.size() != 2)
 		return false;
 

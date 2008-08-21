@@ -536,7 +536,6 @@ void loadAmmo( UFormElm &root, CStaticItem *item, const CSheetId &sheetId )
 //--------------------------------------------------------------
 void loadArmor( UFormElm &root, CStaticItem *item, const CSheetId &sheetId )
 {
-	NL_ALLOC_CONTEXT(LD_ARM)
 	if ( ! item)
 		return;
 
@@ -1190,7 +1189,6 @@ void loadCommandTicket( NLGEORGES::UFormElm &root, CStaticItem *item, const NLMI
 //--------------------------------------------------------------
 void CStaticItem::serial(class NLMISC::IStream &f)
 {
-	NL_ALLOC_CONTEXT(SI_SER);
 	f.serial( SheetId );
 	f.serialEnum( Origin );
 	f.serialEnum( Family );
@@ -1432,7 +1430,6 @@ void CStaticItem::serial(class NLMISC::IStream &f)
 //--------------------------------------------------------------
 void CStaticItem::readGeorges (const NLMISC::CSmartPtr<NLGEORGES::UForm> &form, const CSheetId &sheetId)
 {
-	NL_ALLOC_CONTEXT(SI_RDG);
 	if (form == NULL)
 		return;
 

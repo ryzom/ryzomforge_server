@@ -1143,7 +1143,6 @@ void CBotNpc::getSpawnPos(CAIVector& triedPos, RYAI_MAP_CRUNCH::CWorldPosition& 
 
 CSpawnBot* CBotNpc::getSpawnBot(TDataSetRow const& row, NLMISC::CEntityId const& id, float radius)
 {
-	NL_ALLOC_CONTEXT(AISBGSB);
 	return new CSpawnBotNpc(row, *this, id, radius, getSheet()->Level(), getGroup().getAStarFlag());
 }
 

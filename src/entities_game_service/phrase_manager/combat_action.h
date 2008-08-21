@@ -113,7 +113,6 @@ protected:
 	///\init the factories
 	inline static void init()
 	{
-		NL_ALLOC_CONTEXT(CAF_INIT);
 		if( !Factories )
 			Factories = new std::vector< std::pair< AI_ACTION::TAiEffectType, CCombatAIActionFactory* > >;
 	}
@@ -159,7 +158,6 @@ public:
 	/// build method
 	CCombatAction *build(const CStaticAiAction *aiAction, CCombatPhrase * phrase)
 	{
-		NL_ALLOC_CONTEXT(CA_BLD);
 		T *instance = new T;
 		if (!instance)
 		{

@@ -21,7 +21,6 @@ public:
 	/// getInstance
 	static inline CGuildVersionAdapter *getInstance()
 	{
-		NL_ALLOC_CONTEXT(GVA_GI);
 		if (_Instance == NULL)
 			_Instance = new CGuildVersionAdapter();
 		

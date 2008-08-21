@@ -156,7 +156,6 @@ bool CDamageFactor::entityMatchRequirements(CEntityBase *entity)
 //--------------------------------------------------------------
 bool CCombatPhrase::build( const TDataSetRow & actorRowId, const std::vector< const CStaticBrick* >& bricks, bool buildToExecute )
 {
-	NL_ALLOC_CONTEXT(CP_BLD);
 	H_AUTO(CCombatPhrase_build);
 	
 	if (TheDataset.isAccessible(actorRowId) )
@@ -202,7 +201,6 @@ bool CCombatPhrase::build( const TDataSetRow & actorRowId, const std::vector< co
 //--------------------------------------------------------------
 bool CCombatPhrase::initPhraseFromAiAction( const TDataSetRow & actorRowId, const CStaticAiAction *aiAction, float damageCoeff, float speedCoeff )
 {
-	NL_ALLOC_CONTEXT(CP_INIT);
 	H_AUTO(CCombatPhrase_initPhraseFromAiAction);
 	
 	if ( !TheDataset.isAccessible(actorRowId) )
@@ -422,7 +420,6 @@ void CCombatPhrase::init()
 //--------------------------------------------------------------
 void CCombatPhrase::addBrick( const CStaticBrick &brick )
 {
-	NL_ALLOC_CONTEXT(CP_AB);
 	H_AUTO(CCombatPhrase_addBrick);
 	
 	// check attacker is still valid
@@ -4017,7 +4014,6 @@ bool CCombatPhrase::checkPhraseCost( string &errorCode )
 //--------------------------------------------------------------
 CCombatDefenderPtr CCombatPhrase::createDefender( const TDataSetRow &targetRowId )
 {
-	NL_ALLOC_CONTEXT(CP_CD);
 	H_AUTO(CCombatPhrase_createDefender);
 	
 	if ( !TheDataset.isAccessible(targetRowId) )

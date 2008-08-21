@@ -67,17 +67,14 @@ RY_PDS::IPDBaseData* CMissionManager::missionFactoryPD()
 
 RY_PDS::IPDBaseData* CMissionManager::missionFactoryPDSolo()
 {
-	NL_ALLOC_CONTEXT(MM_NMS);
 	return new CMissionSolo;
 }
 RY_PDS::IPDBaseData* CMissionManager::missionFactoryPDTeam()
 {
-	NL_ALLOC_CONTEXT(MM_NMT);
 	return new CMissionTeam;
 }
 RY_PDS::IPDBaseData* CMissionManager::missionFactoryPDGuild()
 {
-	NL_ALLOC_CONTEXT(MM_NMG);
 	return new CMissionGuild;
 }
 
@@ -220,7 +217,6 @@ void CHandledAIGroupDespawnedMsgImp::callback (const std::string &name, NLNET::T
 
 void CMissionManager::init()
 {
-	NL_ALLOC_CONTEXT(MM_INIT);
 	nlassert(_Instance == NULL);
 	_Instance = new CMissionManager();
 }// CMissionManager init
@@ -393,7 +389,6 @@ CMissionManager::~CMissionManager()
 
 bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const std::string &filename, CMissionGlobalParsingData & globalData, uint &badMissionCount, TAIAlias npcGiverAlias)
 {
-	NL_ALLOC_CONTEXT(MM_PTM);
 	string value;
 	// index of the mission bring parsed
 	static uint missionIndex = 0;

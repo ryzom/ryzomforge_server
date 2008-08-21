@@ -81,7 +81,6 @@ void CCombatActionBleed::applyOnTarget(uint8 targetIndex, CCombatPhrase *phrase)
 //--------------------------------------------------------------
 void CCombatActionBleed::applyOnEntity( CEntityBase *entity, float )
 {
-	NL_ALLOC_CONTEXT(CAB_AOE);
 	if (!entity) return;
 
 	// if entity is already dead, return

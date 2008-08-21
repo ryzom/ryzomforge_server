@@ -23,7 +23,6 @@ extern CRandom RandomGenerator;
 //--------------------------------------------------------------
 bool CSLinkEffectDebuffStat::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(SLEDS);
 	if ( CSLinkEffectOffensive::update(event, applyEffect) )
 		return true;
 	

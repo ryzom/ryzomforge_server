@@ -1731,7 +1731,6 @@ float CEntityBase::getScore2()
 //---------------------------------------------------
 void CEntityBase::stun()
 {
-	NL_ALLOC_CONTEXT(EB_STUN);
 	_Stunned = true;
 	_Behaviour = MBEHAV::CBehaviour( MBEHAV::STUNNED );
 
@@ -1759,7 +1758,6 @@ void CEntityBase::stun()
 //---------------------------------------------------
 void CEntityBase::wake()
 {
-	NL_ALLOC_CONTEXT(EB_WAKE);
 	if (! _Stunned.getValue() ) return;
 
 	_Stunned = false;

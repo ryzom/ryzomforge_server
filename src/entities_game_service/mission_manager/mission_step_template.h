@@ -182,7 +182,6 @@ public:\
 	}\
 	IMissionStepTemplate * instanciate()\
 	{ \
-		NL_ALLOC_CONTEXT(MRS_INST);\
 		return new _class_; \
 	} \
 };\
@@ -191,7 +190,6 @@ _class_##StepTemplateFactory* _class_##StepTemplateFactoryInstance = new _class_
 #define MISSION_STEP_GETNEWPTR(_class_) \
 IMissionStepTemplate* getNewPtr()\
 { \
-	NL_ALLOC_CONTEXT(MSGNP);\
 	_class_ * ptr = new _class_;\
 	*ptr = *this;\
 	return ptr;\

@@ -42,7 +42,6 @@ CRedirectAttacksEffect::CRedirectAttacksEffect( const TDataSetRow & creatorRowId
 					   :	CSTimedEffect(creatorRowId, targetRowId, family, false, effectValue,(uint8)0, endDate),
 					   _Range(range)
 {
-	NL_ALLOC_CONTEXT(RAE_CTR);
 	// init affected creature
 	_AffectedCreature = CreatureManager.getCreature(_TargetRowId);
 	if (!_AffectedCreature)

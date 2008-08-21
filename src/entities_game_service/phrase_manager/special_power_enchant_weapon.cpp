@@ -33,7 +33,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 void CSpecialPowerEnchantWeapon::apply()
 {
-	NL_ALLOC_CONTEXT(SPEWAPY);
 	if (!_Phrase)
 		return;
 	

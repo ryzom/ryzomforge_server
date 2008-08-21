@@ -22,7 +22,6 @@ NL_INSTANCE_COUNTER_IMPL(CMissionEvent);
 
 bool CMissionEvent::simMissionEvent(const std::vector< std::string > & script, CLog & log)
 {
-	NL_ALLOC_CONTEXT(ME_SME);
 
 	if ( script.size() < 2 )
 	{

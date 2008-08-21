@@ -298,7 +298,6 @@ NLMISC_COMMAND( spawnFakePlayers, "Temp", "<nb>" )
  */
 void processMirrorUpdates()
 {
-	NL_ALLOC_CONTEXT(MIR_UPD);
 	TDataSetRow entityIndex;
 
 	// Additions
@@ -1581,27 +1580,26 @@ nlassert(nodeLeaf->getType() == ICDBStructNode::TEXT);
 
 
 //-----------------------------------------------------------------------------
-NLMISC_COMMAND (reportMemoryLeak, "report memory leak", "")
-{
-	NLMEMORY::ReportMemoryLeak ();
-	return true;
-}
+// NLMISC_COMMAND (reportMemoryLeak, "report memory leak", "")
+// {
+// 	NLMEMORY::ReportMemoryLeak ();
+// 	return true;
+// }
 
 
 //-----------------------------------------------------------------------------
-NLMISC_COMMAND (statisticsReport, "Report static usage of memory", "<filanme.csv> <dump>")
-{
-	if( args.size() == 0 )
-		return false;
-
-	NLMEMORY::StatisticsReport( args[0].c_str(), args.size() > 1 );
-	return true;
-}
+// NLMISC_COMMAND (statisticsReport, "Report static usage of memory", "<filanme.csv> <dump>")
+// {
+// 	if( args.size() == 0 )
+// 		return false;
+// 
+// 	NLMEMORY::StatisticsReport( args[0].c_str(), args.size() > 1 );
+// 	return true;
+//}
 
 
 NLMISC_COMMAND(loadAndReSaveCharacters,"load and resave the complete set of player characters","")
 {
-	NL_ALLOC_CONTEXT(CMD_LRC);
 	H_AUTO(LoadAndReSaveCharacters);
 	nlinfo ("Loading and re-saving player character save game files");
 	set<uint32> playerIds;
@@ -1720,7 +1718,6 @@ NLMISC_COMMAND(loadCharacterNames,"load all character save games and extract nam
 //---------------------------------------------------
 //NLMISC_COMMAND(loadAndReSaveAll,"load and resave all .bin in the save_shard","")
 //{
-//	NL_ALLOC_CONTEXT(CMD_LRC);
 //	H_AUTO(LoadAndReSaveAll);
 //	nlinfo ("Loading and re-saving all .bin, .offline_commands and .ticks files");
 //
@@ -1770,7 +1767,6 @@ NLMISC_COMMAND(loadCharacterNames,"load all character save games and extract nam
 //---------------------------------------------------
 //NLMISC_COMMAND(dumpAllCharToTxt,"load and resave all .bin in the save_shard","")
 //{
-//	NL_ALLOC_CONTEXT(CMD_LRC);
 //	H_AUTO(dumpAllCharToTxt);
 //
 //	for(uint t=0;t<2;t++)
@@ -2912,7 +2908,6 @@ NLMISC_COMMAND(displayModifiedEntity, "displayModifiedEntity", "<creature id(id:
 //-----------------------------------------------
 NLMISC_COMMAND(createPlayer," create a player","<playerId, characterName, race, sex>")
 {
-	NL_ALLOC_CONTEXT(CMD_CP);
 	if( args.size() == 4 )
 	{
 		uint32 playerId = atoi( args[0].c_str() );
@@ -3091,7 +3086,6 @@ NLMISC_COMMAND(reloadPlayer," reload a connected player character, a previous sa
 //-----------------------------------------------
 NLMISC_COMMAND(loadPlayer," load a player","uid")
 {
-	NL_ALLOC_CONTEXT(CMD_LP);
 	if( args.size() == 1 )
 	{
 		uint32 userId = atoi( args[0].c_str() );
@@ -4799,15 +4793,15 @@ NLMISC_COMMAND(dumpEntityPhrases,"dump all infos about given entity phrases","<e
 //-----------------------------------------------
 // dumpMemoryStats
 //-----------------------------------------------
-NLMISC_COMMAND(dumpMemoryStats,"dump the memory stats","dump file")
-{
-	if( args.size() == 1 )
-	{
-		NLMEMORY::StatisticsReport(args[0].c_str(),true);
-		return true;
-	}
-	return false;
-} // dumpMemoryStats //
+// NLMISC_COMMAND(dumpMemoryStats,"dump the memory stats","dump file")
+// {
+// 	if( args.size() == 1 )
+// 	{
+// 		NLMEMORY::StatisticsReport(args[0].c_str(),true);
+// 		return true;
+// 	}
+// 	return false;
+// } // dumpMemoryStats //
 
 
 //-----------------------------------------------

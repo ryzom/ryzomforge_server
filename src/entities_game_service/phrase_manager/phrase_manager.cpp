@@ -1053,7 +1053,6 @@ CSPhrasePtr CPhraseManager::executePhrase( const TDataSetRow &actorRowId, const 
 //-----------------------------------------------
 void CPhraseManager::executeAiAction( const TDataSetRow &actorRowId, const TDataSetRow &targetRowId,  const NLMISC::CSheetId &actionId, float damageCoeff, float speedCoeff )
 {
-	NL_ALLOC_CONTEXT(PM_EAA);
 	H_AUTO(CPhraseManager_executeAiAction);
 	
 	{

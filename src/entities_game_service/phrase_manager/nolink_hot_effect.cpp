@@ -29,7 +29,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 bool CNoLinkHoTEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(NLHEUPD);
 	const TGameCycle time = CTickEventHandler::getGameCycle();
 
 	if(_TargetEntity == NULL)

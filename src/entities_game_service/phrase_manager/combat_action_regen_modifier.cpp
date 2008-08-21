@@ -67,7 +67,6 @@ void CCombatActionRegenModifier::apply(CCombatPhrase *phrase)
 //--------------------------------------------------------------
 void CCombatActionRegenModifier::applyOnEntity( CEntityBase *entity, float successFactor )
 {
-	NL_ALLOC_CONTEXT(CAR_AOE);
 	if (!entity || !_CombatPhrase) return;
 
 	// if entity is already dead, return

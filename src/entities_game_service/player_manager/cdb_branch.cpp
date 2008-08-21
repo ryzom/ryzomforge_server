@@ -56,7 +56,6 @@ NL_INSTANCE_COUNTER_IMPL(CCDBStructNodeBranch);
  */
 void	ICDBStructNode::labelBranch( TCDBBank bank )
 {
-	NL_ALLOC_CONTEXT(DBSNLB);
 	if ( _BankLabels && (_BankLabels->size() == 1) && (*(_BankLabels->begin()) == bank) )
 	{
 		// Propagate label to ancestors, until root
@@ -94,7 +93,6 @@ void	ICDBStructNode::labelBranch( TCDBBank bank )
  */
 void	CCDBStructNodeBranch::moveBranchesToBank( CCDBStructNodeBranch *destRoot, TCDBBank bank )
 {
-	NL_ALLOC_CONTEXT(DBSNBMB);
 	if ( (!_BankLabels) || _BankLabels->empty() )
 	{
 		nlwarning( "CDB: Found a branch (%s) with no bank label", getParent()?getName()->c_str():"root" );
@@ -158,7 +156,6 @@ void	CCDBStructNodeBranch::moveBranchesToBank( CCDBStructNodeBranch *destRoot, T
  */
 void	ICDBStructNode::setLabel( const std::string& bankName )
 {
-	NL_ALLOC_CONTEXT(DBSNSL);
 	if ( ! bankName.empty() )
 	{
 		nlassert( _BankLabels == NULL );
@@ -250,7 +247,6 @@ static inline void addNode( ICDBStructNode *newNode,
  */
 void CCDBStructNodeBranch::init( xmlNodePtr node, NLMISC::IProgressCallback &progressCallBack ) 
 {
-	NL_ALLOC_CONTEXT(DBSNINIT);
 	xmlNodePtr child;
 
 	// look for other branches within this branch
@@ -457,7 +453,6 @@ ICDBStructNode * CCDBStructNodeBranch::getNode( std::vector<uint16>& ids, uint i
 //-----------------------------------------------
 ICDBStructNode * CCDBStructNodeBranch::getNode (const CTextId& id , bool bCreate) 
 {
-	NL_ALLOC_CONTEXT(DBSNBGN);
 	// lookup next element from textid in my index => idx
 	string str = id.readNext();
 	map<string,uint32>::iterator itIdx = _Index.find( str );

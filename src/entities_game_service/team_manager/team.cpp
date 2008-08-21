@@ -889,7 +889,6 @@ bool CTeam::processTeamMissionEvent(std::list< CMissionEvent * > & eventList, TA
 
 bool CTeam::processTeamMissionStepEvent(std::list< CMissionEvent* > & eventList, TAIAlias missionAlias, uint32 stepIndex )
 {
-	NL_ALLOC_CONTEXT(TEA_PTMS);
 	CMissionTeam * mission = getMissionByAlias( missionAlias );
 	if (!mission )
 	{

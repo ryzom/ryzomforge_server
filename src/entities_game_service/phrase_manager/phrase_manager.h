@@ -267,7 +267,6 @@ public:
 /*	/// getInstance
 	static inline CPhraseManager *getInstance()
 	{
-		NL_ALLOC_CONTEXT(PM_GI);
 		if (_Instance == NULL)
 			_Instance = new CPhraseManager();
 	

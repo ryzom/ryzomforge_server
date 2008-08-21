@@ -44,7 +44,6 @@ Factories->push_back(std::make_pair( std::string(_type_) ,this));
 	};\
 	IMagicAction * build( const TDataSetRow & actorRowId, const std::vector< const CStaticBrick* >& bricks, uint & brickIndex, CBuildParameters &buildParams, CMagicPhrase * phrase )\
 	{\
-		NL_ALLOC_CONTEXT(EMAD_BLD);\
 		_class_ *inst = new _class_;\
 		if ( !inst->build( actorRowId, bricks, brickIndex, buildParams, phrase ) ){delete inst;return NULL;} \
 		return inst;\
@@ -238,7 +237,6 @@ protected:
 	///\init the factories
 	inline static void init()
 	{	
-		NL_ALLOC_CONTEXT(MAF_INIT);
 		if( !Factories )
 			Factories = new std::vector< std::pair< std::string , IMagicActionFactory* > >;
 	}
@@ -327,7 +325,6 @@ protected:
 	///\init the factories
 	inline static void init()
 	{	
-		NL_ALLOC_CONTEXT(MAAF_INIT);
 		if( !Factories )
 			Factories = new std::vector< std::pair< AI_ACTION::TAiActionType , IMagicAiActionFactory* > >;
 		if( !SpecializedActionFactories )
@@ -377,7 +374,6 @@ public:
 	/// buildFromAiAction method
 	IMagicAction * buildFromAiAction(const CStaticAiAction *aiAction, CMagicPhrase *phrase)
 	{
-		NL_ALLOC_CONTEXT(MAAFBFAA);
 		T *instance = new T;
 		if (!instance)
 		{
@@ -424,7 +420,6 @@ public:
 	/// buildFromAiAction method
 	IMagicAction * buildFromAiAction(const CStaticAiAction *aiAction, CMagicPhrase *phrase)
 	{
-		NL_ALLOC_CONTEXT(MASAFBFAA);
 		T *instance = new T;
 		if (!instance)
 		{

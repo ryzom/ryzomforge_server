@@ -340,7 +340,6 @@ static const CAIAliasDescriptionNode *nextTreeNode(const CAIAliasDescriptionNode
 // to represent ai type tree entries
 static	void	buildAliasTree(CAIAliasDescriptionNode *treeNode,CAIAliasDescriptionNode *rootNode,const IPrimitive *prim,std::vector<SFolderRef> &folders)
 {
-	NL_ALLOC_CONTEXT(AIS_buildAliasTree);
 	// run through the node children looking for nodes with types that we recognize
 	for	(uint i=0;i<prim->getNumChildren();++i)
 	{

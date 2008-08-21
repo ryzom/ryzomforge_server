@@ -569,7 +569,6 @@ double CCharacterProgressionPVE::getXpGain( CEntityBase * actor, sint32 deltaLvl
 //----------------------------------------------------------------------------
 void CCharacterProgressionPVE::offensiveActionReported( const TReportAction& reportAction, CEntityBase * actor, CEntityBase * target, bool incActionCounter )
 {
-	NL_ALLOC_CONTEXT(CP_OAR);
 	if( actor->getId().getType() == RYZOMID::player )
 	{
 //		if( reportAction.Skill != SKILLS::unknown )
@@ -636,7 +635,6 @@ void CCharacterProgressionPVE::offensiveActionReported( const TReportAction& rep
 //----------------------------------------------------------------------------
 void CCharacterProgressionPVE::curativeActionReported( const TReportAction& reportAction, CEntityBase * actor, CEntityBase * target, bool incActionCounter )
 {
-	NL_ALLOC_CONTEXT(CP_CAR);
 	BOMB_IF(actor == NULL || target == NULL, "", return);
 
 	// do nothing if target or actor aren't both players
@@ -1806,7 +1804,6 @@ CCharacterActions::~CCharacterActions()
 //----------------------------------------------------------------------------
 void CCharacterActions::addAction( const TDataSetRow& target, SKILLS::ESkills skill, bool incActionCounter)
 {
-	NL_ALLOC_CONTEXT(CA_AA);
 	TSkillProgressPerOpponentContainer::iterator it = _SkillProgressPerOpponent.find( target );
 	if( it == _SkillProgressPerOpponent.end() )
 	{

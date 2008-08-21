@@ -396,7 +396,6 @@ public:
 	// initialize 
 	static CCharacterProgressionPVE* getInstance() 
 	{
-		NL_ALLOC_CONTEXT(CP_GI);
 		if(_Instance == NULL)
 		{
 			_Instance = new CCharacterProgressionPVE();

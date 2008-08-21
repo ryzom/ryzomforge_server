@@ -27,7 +27,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 bool CModMagicProtectionEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(MMP_UPD);
 	if (!TheDataset.isAccessible(_TargetRowId))
 	{
 		_EndTimer.setRemaining(1, new CEndEffectTimerEvent(this));

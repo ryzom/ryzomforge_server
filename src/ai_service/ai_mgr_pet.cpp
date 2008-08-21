@@ -55,7 +55,6 @@ void CMgrPet::update()
 
 void CMgrPet::createPetGroup(CEntityId const& petOwnerId)
 {
-	NL_ALLOC_CONTEXT(AIPETOW);
 	nlassert(_EntityIdToIndex.find(petOwnerId)==_EntityIdToIndex.end());
 	
 	CSmartPtr<CGrpPet> const petGroup = new CGrpPet(this, petOwnerId);
@@ -153,7 +152,6 @@ CPetOwner::~CPetOwner()
 void CPetSpawnMsgImp::callback(std::string const& name, NLNET::TServiceId id)
 {
 	CAIInstance* aiInstance = NULL;
-	NL_ALLOC_CONTEXT(AIPSCB);
 	CPetSpawnConfirmationMsg confirmMsg;
 	
 	confirmMsg.CharacterMirrorRow = CharacterMirrorRow;

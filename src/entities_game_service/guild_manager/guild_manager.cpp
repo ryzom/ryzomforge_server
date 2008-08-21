@@ -97,14 +97,12 @@ uint32 parseGuildId(const std::string &str)
 // PDLIB factory for guild members
 RY_PDS::IPDBaseData* CGuildManager::guildMemberFactoryPD()
 {
-	NL_ALLOC_CONTEXT(GM_GMFP);
 	return new CGuildMember();
 }
 
 // PDLIB factory for guilds
 RY_PDS::IPDBaseData* CGuildManager::guildFactoryPD()
 {
-	NL_ALLOC_CONTEXT(GM_GFP);
 	return new CGuild();
 }
 
@@ -123,7 +121,6 @@ const std::string &CGuildManager::getCommandHandlerName() const
 //----------------------------------------------------------------------------
 void CGuildManager::init()
 {
-	NL_ALLOC_CONTEXT(GM_INIT);
 	nlassert(_Instance == NULL );
 	// allocate the instance
 	_Instance = new CGuildManager;
@@ -679,7 +676,6 @@ bool CGuildManager::isGMGuild( const EGSPD::TGuildId & guildId )
 //----------------------------------------------------------------------------
 void CGuildManager::createGuild(CGuildCharProxy & proxy,const ucstring & guildName,const uint64 &icon,const ucstring & description)
 {
-	NL_ALLOC_CONTEXT(GM_CG);
 	if ( !_Container )
 	{
 		nlwarning("<GUILD> container not initialized (8)");

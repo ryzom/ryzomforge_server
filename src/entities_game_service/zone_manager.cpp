@@ -735,7 +735,6 @@ bool CZoneManager::parseContinents( const NLLIGO::IPrimitive* prim )
 //-----------------------------------------------
 bool CZoneManager::parseRegions( const NLLIGO::IPrimitive* prim )
 {
-	NL_ALLOC_CONTEXT(ZM_PR);
 	std::string value;
 	const CPrimZone* zone = dynamic_cast<const CPrimZone*>(prim);
 	// if the primitive is a continent, parse it, build it and add it to this manager if it is correct
@@ -782,7 +781,6 @@ bool CZoneManager::parseRegions( const NLLIGO::IPrimitive* prim )
 //-----------------------------------------------
 bool CZoneManager::parseZones( const NLLIGO::IPrimitive* prim )
 {
-	NL_ALLOC_CONTEXT(ZM_PZ);
 	std::string value;
 	const CPrimZone* zone = dynamic_cast<const CPrimZone*>(prim);
 	// if the primitive is a zone, parse it
@@ -834,7 +832,6 @@ bool CZoneManager::parseZones( const NLLIGO::IPrimitive* prim )
 //-----------------------------------------------
 bool CZoneManager::parseEcotypes( const NLLIGO::IPrimitive* prim )
 {
-	NL_ALLOC_CONTEXT(ZM_PE);
 	std::string value;
 	if (prim->getPropertyByName("class",value) )
 	{
@@ -893,7 +890,6 @@ bool CZoneManager::parseEcotypes( const NLLIGO::IPrimitive* prim )
 //-----------------------------------------------
 bool CZoneManager::parseDeposits( const NLLIGO::IPrimitive* prim )
 {
-	NL_ALLOC_CONTEXT(ZM_PD);
 	std::string value;
 	if (prim->getPropertyByName("class",value) )
 	{
@@ -980,7 +976,6 @@ bool CZoneManager::parseDeposits( const NLLIGO::IPrimitive* prim )
 //-----------------------------------------------
 bool CZoneManager::parseStables( const NLLIGO::IPrimitive* prim )
 {
-	NL_ALLOC_CONTEXT(ZM_PS);
 // Primitives format:	
 // <!-- stables -->
 // <PRIMITIVE CLASS_NAME="stables" TYPE="node" AUTO_INIT="true" DELETABLE="true">
@@ -1188,7 +1183,6 @@ bool CZoneManager::parseTpSpawnZones( const NLLIGO::IPrimitive* prim )
 //-----------------------------------------------
 bool CZoneManager::parseGooBorder( const NLLIGO::IPrimitive* prim )
 {
-	NL_ALLOC_CONTEXT(ZM_PGB);
 	std::string value;
 	if (prim->getPropertyByName("class",value) )
 	{

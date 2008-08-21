@@ -254,7 +254,6 @@ void CFameManager::mirrorIsReady()
 
 void CFameManager::mirrorReadyToAdd()
 {
-	NL_ALLOC_CONTEXT(FM_MRTA);
 	// create the civilisation record in the dataset
 	for (uint i=EGSPD::CPeople::Playable; i<EGSPD::CPeople::EndPlayable; ++i)
 	{
@@ -282,7 +281,6 @@ void CFameManager::mirrorReadyToAdd()
 
 void CFameManager::addPlayer(const CEntityId &playerId, const EGSPD::CFameContainerPD &fameContainer, EGSPD::CPeople::TPeople civilisation)
 {
-	NL_ALLOC_CONTEXT(FM_AP);
 	TDataSetRow entityIndex = TheFameDataset.getDataSetRow(playerId);
 	if (TheFameDataset.isAccessible(entityIndex))
 	{
@@ -488,7 +486,6 @@ void CFameManager::removePlayer(const CEntityId &playerId)
 void CFameManager::addGuild(const CEntityId &guildId, const EGSPD::CFameContainerPD &fameContainer, EGSPD::CPeople::TPeople civilisation)
 {
 	H_AUTO(FMaddGuild);
-	NL_ALLOC_CONTEXT(FM_AG);
 	Mirror.createAndDeclareEntity(guildId);
 	TDataSetRow	entityIndex = TheFameDataset.getDataSetRow(guildId);
 
@@ -514,7 +511,6 @@ void CFameManager::addGuild(const CEntityId &guildId, const EGSPD::CFameContaine
 
 void CFameManager::updateGuildFame(const CEntityId &guildId, const EGSPD::CFameContainerPD &fameContainer)
 {
-	NL_ALLOC_CONTEXT(FM_AG);
 	TDataSetRow	entityIndex = TheFameDataset.getDataSetRow(guildId);
 
 	TFameContainer::iterator it(_FamesOwners.find(entityIndex));

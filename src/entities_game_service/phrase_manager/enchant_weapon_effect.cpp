@@ -31,7 +31,6 @@ extern CPlayerManager PlayerManager;
 
 bool CEnchantWeaponEffect::update(CTimerEvent* event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(EWEUPD);
 	// if needed check if caster is dead
 	if (_EndsAtCasterDeath)
 	{

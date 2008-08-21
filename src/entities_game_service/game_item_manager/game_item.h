@@ -988,7 +988,6 @@ inline CGameItem& CGameItemVector::operator[](uint32 idx)
 
 inline void CGameItemVector::extend()
 {
-	NL_ALLOC_CONTEXT(GIV_EXT);
 	_Data.push_back(new CGameItem[QUANTUM]);
 	nlassert(_Data.back()!=NULL);
 	for (uint32 i=0;i<QUANTUM;++i)

@@ -25,7 +25,6 @@ NL_INSTANCE_COUNTER_IMPL(CItemsForSale);
 //-----------------------------------------------------------------------------
 bool CItemsForSale::addItemForSale( uint32 price, uint32 retirePrice, CGameItemPtr item, uint32 quantity )
 {
-	NL_ALLOC_CONTEXT(IFS_AIFS);
 #ifdef NL_DEBUG
 	nlassert( _Character != 0 );
 	nlassert( item != NULL );
@@ -335,7 +334,6 @@ NLMISC_COMMAND(deleteItemsForSale, "delete items for sale of a player on the giv
 		VECT_LOGIC(_ItemsForSale),\
 		((CItemForSale*)&*(_ItemsForSale[ i ]))->store(pdr),\
 		{\
-			NL_ALLOC_CONTEXT(IFS_PD);\
 			_ItemsForSale.push_back(new CItemForSale); \
 			((CItemForSale*)&*_ItemsForSale.back())->apply(pdr);\
 		}\

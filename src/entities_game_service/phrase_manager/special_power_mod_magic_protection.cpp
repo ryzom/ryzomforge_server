@@ -36,7 +36,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 void CSpecialPowerModMagicProtection::apply()
 {
-	NL_ALLOC_CONTEXT(SPMMPAPY);
 	if (!_Phrase)
 		return;
 

@@ -86,7 +86,6 @@ IAliasCont* CMgrFauna::getAliasCont(TAIType type)
 
 CAliasTreeOwner* CMgrFauna::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(AIMFCC);
 	CAliasTreeOwner* child = NULL;
 	
 	switch (aliasTree->getType())

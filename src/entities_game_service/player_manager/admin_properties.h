@@ -36,7 +36,6 @@ public:
 
 	void init()
 	{
-		NL_ALLOC_CONTEXT(AP_INIT);
 		_Data = new CData;
 	}
 

@@ -3205,7 +3205,6 @@ IAILogicAction	*CAIEventReaction::newAILogicAction(const char *name,
 													const CAIAliasDescriptionNode *eventNode, 
 													CStateMachine	*container)
 {
-	NL_ALLOC_CONTEXT(AIERNEW);
 #define BUILD(theName,theClass) if (NLMISC::nlstricmp(theName,name)==0) return new theClass(args,subActions,eventNode,container);
 	BUILD(	"begin_state",			CAILogicActionBeginState		)
 	BUILD(	"random_select_state",	CAILogicActionRandomSelectState	)

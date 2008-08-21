@@ -50,7 +50,6 @@ extern CVariable<bool> EGSLight;
 					VECT_LOGIC(_DynamicItems[index]), \
 					((CItemForSale*)&*(_DynamicItems[index][ i ]))->store(pdr), \
 					{\
-						NL_ALLOC_CONTEXT(DI_PD);\
 						CItemForSale *item = new CItemForSale; \
 						item->apply(pdr); \
 						/* Determine the correct slot */ \
@@ -87,7 +86,6 @@ CDynamicItems::CDynamicItems()
 //-----------------------------------------------------------------------------
 CDynamicItems * CDynamicItems::getInstance()
 {
-	NL_ALLOC_CONTEXT(DI_GI);
 	if( _Instance == 0 )
 	{
 		_Instance = new CDynamicItems();

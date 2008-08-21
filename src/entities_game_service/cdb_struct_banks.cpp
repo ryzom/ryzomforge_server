@@ -62,7 +62,6 @@ void cbSetNodeForIndex( ICDBStructNode *node, void *bank )
  */
 void					CCDBStructBanks::doInit( const std::string& filename )
 {
-	NL_ALLOC_CONTEXT(CDB_DI);
 	try
 	{
 		CIFile file;
@@ -111,7 +110,6 @@ void					CCDBStructBanks::doInit( const std::string& filename )
  */
 void					CCDBStructBanks::initBank( TCDBBank bank )
 {
-	NL_ALLOC_CONTEXT(CDB_IBK);
 	// Calculate the number of indices
 	TCDBDataIndex index = 0;
 	_StructTreeRootBanks[bank]->initDataIndex( index );

@@ -36,7 +36,6 @@ NL_INSTANCE_COUNTER_IMPL(CGuildMemberModule);
 //----------------------------------------------------------------------------
 CGuildMemberModule * CGuildMemberModule::createModule( CGuildCharProxy& proxy, CGuildMember* guildMember )
 {
-	NL_ALLOC_CONTEXT(GMM_CM);
 	nlassert( guildMember );
 	switch( guildMember->getGrade() ) 
 	{
@@ -193,7 +192,6 @@ void CGuildMemberModule::sendMessageToGuildMembers( const std::string &  msg, co
 //----------------------------------------------------------------------------
 void CGuildMemberModule::inviteCharacterInGuild(CCharacter * invitedCharacter)const
 {
-	NL_ALLOC_CONTEXT(GMM_ITG);
 	MODULE_AST( _GuildMemberCore );
 	MODULE_AST( _GuildMemberCore->getGuild() );
 
@@ -214,7 +212,6 @@ void CGuildMemberModule::inviteCharacterInGuild(CCharacter * invitedCharacter)co
 //----------------------------------------------------------------------------
 void CGuildMemberModule::inviteTargetInGuild()const
 {
-	NL_ALLOC_CONTEXT(GMM_ITG);
 	MODULE_AST( _GuildMemberCore );
 	MODULE_AST( _GuildMemberCore->getGuild() );
 

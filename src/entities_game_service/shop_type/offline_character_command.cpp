@@ -41,7 +41,6 @@ string DummyOfflineCommand = string("Dummy");
 //-----------------------------------------------------------------------------
 COfflineCharacterCommand * COfflineCharacterCommand::getInstance()
 {
-	NL_ALLOC_CONTEXT(OCC_GI);
 	if( _Instance == 0 )
 	{
 		_Instance = new COfflineCharacterCommand();
@@ -59,7 +58,6 @@ COfflineCharacterCommand::COfflineCharacterCommand()
 //-----------------------------------------------------------------------------
 IOfflineCommand * COfflineCharacterCommand::factory( const std::string& command )
 {
-	NL_ALLOC_CONTEXT(OCC_FAC);
 	if( command == DummyOfflineCommand )
 	{
 		return 0;
@@ -137,7 +135,6 @@ bool COfflineCharacterCommand::addOfflineCommandWithoutApply( const std::string&
 //-----------------------------------------------------------------------------
 void COfflineCharacterCommand::characterOnline( const NLMISC::CEntityId& entity )
 {
-	NL_ALLOC_CONTEXT(OCC_CO);
 	std::string	filename = getOfflineCommandsFilename(entity);
 
 //	nlinfo("BSIF: requesting file...");

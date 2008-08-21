@@ -700,7 +700,6 @@ bool CPathCont::getPathForSource(CPathPosition& pathPos, RYAI_MAP_CRUNCH::CWorld
 bool CPathCont::calcPathForSource(CPathPosition& pathPos, RYAI_MAP_CRUNCH::CWorldPosition const& startPos)
 {
 	H_AUTO(calcPathForSource);
-	NL_ALLOC_CONTEXT(AIPCPFS);
 	
 	RYAI_MAP_CRUNCH::CWorldMap const& worldMap = CWorldContainer::getWorldMap();
 	

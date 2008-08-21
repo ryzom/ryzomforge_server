@@ -115,7 +115,6 @@ bool CSpecialPowerShielding::validate(std::string &errorCode)
 //--------------------------------------------------------------
 void CSpecialPowerShielding::apply()
 {
-	NL_ALLOC_CONTEXT(SPSAPY);
 	if (!_Phrase)
 		return;
 

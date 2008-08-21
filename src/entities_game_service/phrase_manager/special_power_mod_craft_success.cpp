@@ -36,7 +36,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 void CSpecialPowerModCraftSuccess::apply()
 {
-	NL_ALLOC_CONTEXT(SPSUAPY);
 	if (!_Phrase)
 		return;
 

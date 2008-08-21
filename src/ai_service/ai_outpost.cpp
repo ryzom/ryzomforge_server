@@ -158,7 +158,6 @@ IAliasCont* COutpost::getAliasCont(TAIType type)
 
 CAliasTreeOwner* COutpost::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(OUTPOST);
 	if (!cont)
 		return	NULL;
 	
@@ -352,7 +351,6 @@ IAliasCont* COutpostSquadFamily::getAliasCont(TAIType type)
 
 CAliasTreeOwner* COutpostSquadFamily::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(OUTPOST);
 	if (!cont)
 		return	NULL;
 	

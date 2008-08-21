@@ -866,7 +866,6 @@ IAliasCont* CRegion::getAliasCont(TAIType type)
 
 CAliasTreeOwner* CRegion::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(REGINCC);
 	if (!cont)
 		return NULL;
 	
@@ -1149,7 +1148,6 @@ IAliasCont		*CGroupFamily::getAliasCont(TAIType type)
 
 CAliasTreeOwner	*CGroupFamily::createChild(IAliasCont	*cont, CAIAliasDescriptionNode *aliasTree)
 {
-	NL_ALLOC_CONTEXT(GRPFCC);
 	if	(!cont)
 		return	NULL;
 	
@@ -1306,7 +1304,6 @@ IAliasCont		*CRoad::getAliasCont(TAIType type)
 }
 CAliasTreeOwner	*CRoad::createChild(IAliasCont	*cont, CAIAliasDescriptionNode *aliasTree)
 {
-	NL_ALLOC_CONTEXT(ROADCC);
 	if (!cont)
 		return	NULL;
 	
@@ -1489,7 +1486,6 @@ IAliasCont* CCellZone::getAliasCont(TAIType type)
 
 CAliasTreeOwner	*CCellZone::createChild(IAliasCont	*cont, CAIAliasDescriptionNode *aliasTree)
 {
-	NL_ALLOC_CONTEXT(CELLZCC);
 	if	(!cont)
 		return	NULL;
 	
@@ -2196,7 +2192,6 @@ CNpcZone	*CCell::findNpcZone(const CAIVector &posInside)
 
 CAliasTreeOwner	*CCell::createChild(IAliasCont	*cont, CAIAliasDescriptionNode *aliasTree)
 {
-	NL_ALLOC_CONTEXT(CELLCC);
 	if (!cont)
 		return	NULL;
 	

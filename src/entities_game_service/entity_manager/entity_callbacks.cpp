@@ -175,7 +175,6 @@ NLMISC_COMMAND(verboseCallbackLogAll,"turn on verbose entity callback logging fo
 //---------------------------------------------------
 void cbClientConnection(CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
-	NL_ALLOC_CONTEXT(CB_CLRD);
 	H_AUTO(cbClientConnection);
 
 	uint32 userId;
@@ -930,7 +929,6 @@ void cbCheckName( CMessage& msgin, const std::string &serviceName, NLNET::TServi
 //---------------------------------------------------
 void cbCreateChar( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
-	NL_ALLOC_CONTEXT(CB_CRCH);
 	H_AUTO(cbCreateChar);
 	
 	// read the player id

@@ -1622,7 +1622,6 @@ CTopology::CTopology()
 inline
 void CTopology::serial(NLMISC::IStream& f)
 {
-	NL_ALLOC_CONTEXT(AITPS);
 	
 	uint version = 0;
 	
@@ -2617,7 +2616,6 @@ sint CMultiLayerCell::getHeight(CWorldPosition const& wpos) const
 inline
 void CMultiLayerCell::setLinks(CWorldPosition const& wpos, CCellLinkage links)
 {
-	NL_ALLOC_CONTEXT(AILINKS);
 #ifdef NL_DEBUG
 	nlassert(wpos.isValid());
 #endif
@@ -2773,7 +2771,6 @@ void CSuperCell::setRootCell(CMapPosition const& pos, CRootCell* cell)
 inline
 CComputeCell* CSuperCell::getComputeCell(CMapPosition const& pos)
 {
-	NL_ALLOC_CONTEXT(AICMPCL);
 	CRootCell*& rootCell = _Grid[pos.rootCellFastIndex()];
 	if (!rootCell)
 		rootCell = new CComputeCell(_WorldMap);
@@ -3695,7 +3692,6 @@ CWorldPosition CWorldMap::getSafeWorldPosition(CMapPosition const& mapPos, CSlot
 inline
 CSuperCell* CWorldMap::getSuperCell(CMapPosition const& pos)
 {
-	NL_ALLOC_CONTEXT(AISCEL);
 	CSuperCell*	superCellPtr = _GridFastAccess[pos.superCellFastIndex()];
 	
 	if (!superCellPtr)

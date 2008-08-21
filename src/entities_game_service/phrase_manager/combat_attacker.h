@@ -46,7 +46,6 @@ public:
 	/// operator = (because of the Area pointer)
 	inline CCombatWeapon &operator=(const CCombatWeapon &weapon)
 	{
-		NL_ALLOC_CONTEXT(CW_EQ);
 		LatencyInTicks = weapon.LatencyInTicks;
 		Damage = weapon.Damage;
 		Quality = weapon.Quality;

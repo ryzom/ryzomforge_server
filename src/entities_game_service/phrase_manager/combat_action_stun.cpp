@@ -98,7 +98,6 @@ void CCombatActionStun::apply(CCombatPhrase *phrase)
 //--------------------------------------------------------------
 void CCombatActionStun::applyOnEntity( CEntityBase *entity, float successFactor )
 {
-	NL_ALLOC_CONTEXT(CAS_AOE);
 	H_AUTO(CCombatActionStun_applyOnEntity);
 
 	if (!entity || !_CombatPhrase) return;

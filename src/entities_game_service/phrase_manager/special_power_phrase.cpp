@@ -73,7 +73,6 @@ CSpecialPowerPhrase::~CSpecialPowerPhrase()
 //-----------------------------------------------
 bool CSpecialPowerPhrase::build( const TDataSetRow & actorRowId, const std::vector< const CStaticBrick* >& bricks, bool buildToExecute )
 {
-	NL_ALLOC_CONTEXT(SPP_BLD);
 
 	_ActorRowId = actorRowId;
 
@@ -90,7 +89,6 @@ bool CSpecialPowerPhrase::build( const TDataSetRow & actorRowId, const std::vect
 //-----------------------------------------------
 bool CSpecialPowerPhrase::buildFromConsumable(const TDataSetRow & actorRowId, const CStaticItem *itemForm, uint16 quality)
 {
-	NL_ALLOC_CONTEXT(SPP_BLDCONS);
 	_ActorRowId = actorRowId;
 
 	nlassert(itemForm);

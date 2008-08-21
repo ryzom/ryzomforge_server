@@ -70,7 +70,6 @@ void CMagicAiActionToxicCloud::apply( CMagicPhrase * phrase, sint deltaLevel, si
 									  const NLMISC::CBitSet & invulnerabilityAll, bool isMad, NLMISC::CBitSet & resists, const TReportAction & actionReport,
 									  sint32 vamp, float vampRatio, bool reportXp )
 {
-	NL_ALLOC_CONTEXT(MAATCAPY);
 	H_AUTO(CMagicAiActionToxicCloud_apply);
 
 	if (!phrase || !_EffectDuration)

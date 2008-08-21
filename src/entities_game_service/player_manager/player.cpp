@@ -200,7 +200,6 @@ void	CAsyncPlayerLoad::initChars()
 // Ask BS to transfer character data
 void	CAsyncPlayerLoad::startLoading()
 {
-	NL_ALLOC_CONTEXT(APL_SL);
 	if (Player == NULL)
 		return;
 
@@ -269,7 +268,6 @@ void	CAsyncPlayerLoad::receivedCharacterFileList(const CFileDescriptionContainer
 // Start Char loading
 void	CAsyncPlayerLoad::startCharLoading(uint charId)
 {
-	NL_ALLOC_CONTEXT(APL_SCL);
 	if (Player == NULL || charId >= Chars.size())
 		return;
 
@@ -290,7 +288,6 @@ void	CAsyncPlayerLoad::startCharLoading(uint charId)
 // Received character file
 void	CAsyncPlayerLoad::receivedCharacterFile(const CFileDescription& fileDescription, NLMISC::IStream& dataStream, uint charId)
 {
-	NL_ALLOC_CONTEXT(APL_RCF);
 	if (Player == NULL)
 		return;
 
@@ -470,7 +467,6 @@ CPlayer::CPlayer()
 //---------------------------------------------------
 CEntityId CPlayer::createCharacter( const std::string& characterName, EGSPD::CPeople::TPeople people, GSGENDER::EGender gender ) 
 { 
-	NL_ALLOC_CONTEXT(P_CC);
 	CCharacter * ch = new CCharacter();
 	sint32 index = PlayerManager.getFirstFreeCharacterIndex( _UserId );
 	if( index == - 1 )
@@ -947,7 +943,6 @@ void CPlayer::loadAllCharacters()
 //---------------------------------------------------
 void CPlayer::loadAllCharactersPdr()
 {
-	NL_ALLOC_CONTEXT(P_LACP);
 	H_AUTO(loadAllCharactersPdr);
 
 	// load all character files
@@ -1204,7 +1199,6 @@ void CPlayer::isWindermeerCommunity(bool windermeerCommunityPlayer)
 
 void CPlayer::loadOldFormat(class NLMISC::IStream &f)
 {
-	NL_ALLOC_CONTEXT(P_LOF);
 	H_AUTO(PlyerLoadOldFormat);
 
 	if(f.isReading())
@@ -1283,7 +1277,6 @@ void CPlayer::loadOldFormat(class NLMISC::IStream &f)
 
 NLMISC_CATEGORISED_COMMAND(egs, convertToPdr, "Load all possible characters from xml/bin save format and save to pds format","[-recurse <1|0> (default true)] [-xml <1|0> (default false)] [-overwrite <1|0> (default false)] [-wcbin <binary filewildcard>]* [-wcxml <xml filewildcard>]* [-wcexcl <exclude filewildcard>]* <source directory> [destination directory]")
 {
-	NL_ALLOC_CONTEXT(CMD_CTP);
 	bool						recurse = true;
 	bool						xml = false;
 	bool						overwrite = false;

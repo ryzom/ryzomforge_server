@@ -962,7 +962,6 @@ public:
  */
 void CHarvestSource::spawnToxicCloud()
 {
-	NL_ALLOC_CONTEXT(HRV_TC);
 	H_AUTO(CHarvestSource_spawnToxicCloud);
 	
 	sendMessageToExtractors( "SOURCE_TOXIC_CLOUD" );
@@ -1188,7 +1187,6 @@ TDataSetRow TestSourceRow;
 
 void forageTestDoBegin()
 {
-	NL_ALLOC_CONTEXT(FRG_TST);
 	CHarvestSource templateSource, *testSource;
 	templateSource.setLifetime( 1140 );
 	templateSource.setProspectionExtraExtractionTime( 1140 );

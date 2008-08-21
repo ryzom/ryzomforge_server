@@ -346,7 +346,6 @@ DEFINE_ACTION(ContextFaunaGrp, SPAWTIME)
 
 DEFINE_ACTION(ContextFaunaGrp,POPVER)
 {
-	NL_ALLOC_CONTEXT(AIFGPOP);
 	// add a population version for a group
 	// args: uint32 alias, string spawn_type, uint weight, (string sheet, uint32 count)+
 

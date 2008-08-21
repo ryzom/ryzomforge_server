@@ -24,7 +24,6 @@ public:
 	/// get singleton instance
 	static inline COutpostVersionAdapter * getInstance()
 	{
-		NL_ALLOC_CONTEXT(OVAGI);
 		if (_Instance == NULL)
 			_Instance = new COutpostVersionAdapter();
 

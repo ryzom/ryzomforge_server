@@ -37,7 +37,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 void CSpecialPowerDoT::apply()
 {
-	NL_ALLOC_CONTEXT(SPDAPY);
 	if (!_Phrase)
 		return;
 

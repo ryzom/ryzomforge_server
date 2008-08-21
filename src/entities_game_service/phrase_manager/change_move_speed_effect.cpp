@@ -25,7 +25,6 @@ using namespace NLNET;
 //--------------------------------------------------------------
 bool CChangeMoveSpeedEffect::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(CMSE_UPD);
 	if (!_AffectedEntity)
 	{
 		_AffectedEntity = CEntityBaseManager::getEntityBasePtr(_TargetRowId);

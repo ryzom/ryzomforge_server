@@ -33,7 +33,6 @@ NL_INSTANCE_COUNTER_IMPL(CBuildingPhysicalPlayer);
 //----------------------------------------------------------------------------
 bool IBuildingPhysical::build( const NLLIGO::IPrimitive* prim, CBuildingParseData & parseData )
 {
-	NL_ALLOC_CONTEXT(BP_B);
 	bool ret = true;
 	std::string value;
 	

@@ -31,7 +31,6 @@ public:\
 protected:\
 	IFaberAction * build( const TDataSetRow & actorRowId, CFaberPhrase * phrase )\
 	{\
-		NL_ALLOC_CONTEXT(FAF_BLD);\
 		_class_ *inst = new _class_;\
 		if ( !inst->build( actorRowId, phrase  ) ){delete inst;return NULL;} \
 		return inst;\

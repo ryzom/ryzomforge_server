@@ -35,7 +35,6 @@ extern CPlayerManager PlayerManager;
 //--------------------------------------------------------------
 void CSpecialPowerSpeedingUp::apply()
 {
-	NL_ALLOC_CONTEXT(SPSUAPY);
 	if (!_Phrase)
 		return;
 

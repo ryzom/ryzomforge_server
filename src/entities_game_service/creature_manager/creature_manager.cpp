@@ -56,7 +56,6 @@ TUnifiedCallbackItem	GenNpcDescCbTable[] =
 //void CNpcBotDescriptionImp::callback(const string &serviceName, uint8 sid)
 void CGenNpcDescMsgImp::callback (const std::string &serviceName, NLNET::TServiceId sid)
 {
-	NL_ALLOC_CONTEXT(NBD_CB);
 	H_AUTO(CGenNpcDescMsgImp_callback );
 	
 	if ( ! Mirror.mirrorIsReady() )

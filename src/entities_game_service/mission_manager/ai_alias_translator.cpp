@@ -27,7 +27,6 @@ const TAIAlias CAIAliasTranslator::Invalid = 0;
 //-----------------------------------------------
 void CAIAliasTranslator::init()
 {
-	NL_ALLOC_CONTEXT(AAT_INIT);
 	nlassert(_Instance == NULL);
 	_Instance = new CAIAliasTranslator();
 }// CAIAliasTranslator init

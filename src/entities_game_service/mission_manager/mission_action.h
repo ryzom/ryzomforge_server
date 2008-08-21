@@ -75,7 +75,6 @@ protected:
 		}\
 		IMissionAction * instanciate()\
 		{ \
-			NL_ALLOC_CONTEXT(MRA_INS);\
 			return new _class_;\
 		} \
 	};\
@@ -96,7 +95,6 @@ protected:
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList);
 	IMissionAction* getNewPtr()
 	{ 
-		NL_ALLOC_CONTEXT(MAF_GNP);
 		CMissionActionSetFailureIndex * ptr = new CMissionActionSetFailureIndex;
 		*ptr = *this; 
 		return ptr; 
@@ -118,7 +116,6 @@ protected:
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList);
 	IMissionAction* getNewPtr()
 	{ 
-		NL_ALLOC_CONTEXT(MACH_GNP);
 		CMissionActionSetPlayerReconnectHandlerIndex * ptr = new CMissionActionSetPlayerReconnectHandlerIndex;
 		*ptr = *this;
 		return ptr; 
@@ -140,7 +137,6 @@ protected:
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList);
 	IMissionAction* getNewPtr()
 	{ 
-		NL_ALLOC_CONTEXT(MACH_GNP);
 		CMissionActionSetCrashHandlerIndex * ptr = new CMissionActionSetCrashHandlerIndex;
 		*ptr = *this;
 		return ptr; 
@@ -166,7 +162,6 @@ private:
 	void launch(CMission* instance,std::list< CMissionEvent * > & eventList);
 	IMissionAction* getNewPtr()
 	{ 
-		NL_ALLOC_CONTEXT(MAST_GNP);
 		CMissionActionSetTeleport * ptr = new CMissionActionSetTeleport;
 		*ptr = *this;
 		return ptr; 

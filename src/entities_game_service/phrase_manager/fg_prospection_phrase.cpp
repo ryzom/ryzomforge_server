@@ -619,7 +619,6 @@ private:
  */
 bool CSEffectLocateDeposit::update(CTimerEvent * event, bool )
 {
-	NL_ALLOC_CONTEXT(ELD_UPD);
 	H_AUTO(CSEffectLocateDeposit_update);
 
 	CCharacter *player = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr( _CreatorRowId ));
@@ -723,7 +722,6 @@ void CFgProspectionPhrase::apply()
  */
 uint CFgProspectionPhrase::generateSources( CCharacter *player )
 {
-	NL_ALLOC_CONTEXT(FPP_GS);
 	H_AUTO(CFgProspectionPhrase_generateSources);
 	
 	CVector playerPos( float(player->getState().X)/1000.0f, float(player->getState().Y)/1000.0f, float(player->getState().Z)/1000.0f ), pos;
@@ -958,7 +956,6 @@ struct TDepositLoc
  */
 void CFgProspectionPhrase::startLocateDeposit( CCharacter *player )
 {
-	NL_ALLOC_CONTEXT(FPP_SLD);
 	H_AUTO(CFgProspectionPhrase_startLocateDeposit);
 	
 	// Get deposits in region
@@ -1120,7 +1117,6 @@ struct CContextMatchPred : public std::unary_function< CDeposit*, bool >
  */
 bool CFgProspectionPhrase::autoSpawnSource( const NLMISC::CVector& pos, CDeposit *deposit )
 {
-	NL_ALLOC_CONTEXT(FPP_ASS);
 	H_AUTO(CFgProspectionPhrase_autoSpawnSource);
 	
 	// Get weather
@@ -1594,7 +1590,6 @@ private:
  */
 NLMISC_COMMAND( makeDepositMap, "Write a map of the raw materials at a position", "<_playerRowId | posX,posY | depositName> <outputFilename.tga> [<resolution=0.5> [<width=200> [<neighboorhoodMode=0> [<displayColorFrequencies=0> [<onlySpecifiedDeposit>]]]]" )
 {
-	NL_ALLOC_CONTEXT(CMD_MDM);
 	H_AUTO(makeDepositMap);
 	
 	// Default arguments

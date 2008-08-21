@@ -810,7 +810,6 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 		 Phrases[i]->store(pdr),\
 		if (key<Phrases.size()) \
 		{ \
-			NL_ALLOC_CONTEXT(MS_PD);\
 			if (Phrases[key]==NULL) \
 				Phrases[key]=new CMemorizedPhrase; \
 			Phrases[key]->apply(pdr);\

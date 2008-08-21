@@ -241,7 +241,6 @@ void CDirectionLayer::serial(NLMISC::IStream& f)
 
 void CDirectionMap::serial(NLMISC::IStream& f)
 {
-	NL_ALLOC_CONTEXT(AIDMAPS);
 	uint i;
 	for (i=0; i<3; ++i)
 	{
@@ -269,7 +268,6 @@ void CDirectionMap::serial(NLMISC::IStream& f)
 
 CRootCell* CRootCell::load(NLMISC::IStream& f, CWorldMap const& worldMap)
 {
-	NL_ALLOC_CONTEXT(AIRCELD);
 	TCellType	type = Compute;
 	CRootCell	*result = NULL;
 
@@ -397,7 +395,6 @@ void CSingleLayerCell::serial(NLMISC::IStream& f)
 
 void CMultiLayerCell::serial(NLMISC::IStream& f)
 {
-	NL_ALLOC_CONTEXT(AIMLCS);
 	f.serialCheck((uint16)'ML');
 
 	uint slot;
@@ -548,7 +545,6 @@ void	CWorldMap::clear()
 
 void	CWorldMap::serial(NLMISC::IStream &f)
 {
-	NL_ALLOC_CONTEXT(AIWMS);
 	f.serialCheck((uint32)'WMAP');
 
 	// Version

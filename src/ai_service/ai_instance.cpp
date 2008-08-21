@@ -487,7 +487,6 @@ tryWithEntityId:
 // asserts if the id is already in use
 CManager* CAIInstance::newMgr(AITYPES::TMgrType type, uint32 alias, std::string const& name, std::string const& mapName, std::string const& filename)
 {
-	NL_ALLOC_CONTEXT(AIIMGR);
 	
 	CManager* mgr = CManager::createManager(type, this, alias, name, "", filename);
 	// add the manager into the singleton's managers vector

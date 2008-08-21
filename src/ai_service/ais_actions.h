@@ -139,7 +139,6 @@ public:
 	
 	static void init() 
 	{
-		NL_ALLOC_CONTEXT(AIACTI);
 		if (CAISActions::Instance==NULL)
 			CAISActions::Instance=new CAISActions;
 		CAIActions::init(Instance); 
@@ -178,7 +177,6 @@ public:
 	public:
 		IActionHandler(CAISActionEnums::TContext context, const char *name)
 		{
-			NL_ALLOC_CONTEXT(AIAH);
 			if (CAISActions::Instance==NULL)
 				CAISActions::Instance=new CAISActions;
 

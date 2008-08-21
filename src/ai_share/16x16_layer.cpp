@@ -17,7 +17,6 @@ using namespace NLMISC;
  */
 I16x16Layer		*I16x16Layer::load(NLMISC::IStream &f)
 {
-	NL_ALLOC_CONTEXT(AII16LL);
 	uint8	type = 0;
 	f.serial(type);
 
@@ -67,7 +66,6 @@ void			I16x16Layer::save(NLMISC::IStream &f, I16x16Layer *layer)
  */
 I16x16Layer		*I16x16Layer::compress(I16x16Layer *layer, sint32 blank)
 {
-	NL_ALLOC_CONTEXT(AII16C);
 	CFull16x16Layer	*flayer = dynamic_cast<CFull16x16Layer*>(layer);
 	if (flayer == NULL)
 	{

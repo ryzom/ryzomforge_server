@@ -129,7 +129,6 @@ Implementation of all mission instructions
 #define MISSION_ACTION_GETNEWPTR(_class_)\
 IMissionAction* getNewPtr()\
 {\
-	NL_ALLOC_CONTEXT(MA_GNP);\
 	_class_ * ptr = new _class_;\
 	*ptr = *this;\
 	return ptr;\
@@ -190,7 +189,6 @@ IMissionAction* IMissionActionFactory::buildAction( uint32 line, const std::vect
 
 void IMissionActionFactory::init()
 {
-	NL_ALLOC_CONTEXT(MAF_INIT);
 	if ( ! Entries )
 		Entries = new std::vector< std::pair< std::string, IMissionActionFactory* > >;
 }// IMissionActionFactory init
@@ -1844,7 +1842,6 @@ void CMissionActionJump::launch(CMission* instance, std::list< CMissionEvent * >
 
 IMissionAction* CMissionActionJump::getNewPtr()
 {
-	NL_ALLOC_CONTEXT(MAJ_GNP);
 	CMissionActionJump * ptr = new CMissionActionJump;
 	*ptr = *this;
 	return ptr; 
@@ -2655,7 +2652,6 @@ public:
 	
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
-		NL_ALLOC_CONTEXT(MAR_LCH);;
 		LOGMISSIONACTION("reward");
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
@@ -3584,7 +3580,6 @@ protected:
 
 	void launchExt(CMission* instance, std::list< CMissionEvent * > & eventList, TAIAlias mainMission)
 	{
-		NL_ALLOC_CONTEXT(MAS_LCH);
 		string sDebugBotName;
 		if (NPCOwner == CAIAliasTranslator::Invalid)
 		{

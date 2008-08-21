@@ -728,7 +728,6 @@ DEFINE_ACTION_TEMPLATE1(ContextOutpostGroupDesc,GT_GNRJ,FamilyT)
 /// make a modification.
 DEFINE_ACTION_TEMPLATE1(ContextOutpostGroupDesc,POPVER,FamilyT)
 {
-	NL_ALLOC_CONTEXT(AIFGPOP);
 	// add a population version for a group
 	// args: uint32 alias, string spawn_type, uint weight, (string sheet, uint32 count)+
 

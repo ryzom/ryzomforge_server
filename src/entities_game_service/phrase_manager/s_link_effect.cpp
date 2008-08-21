@@ -96,7 +96,6 @@ TGameCycle CSLinkEffect::getUpdatePeriod( EFFECT_FAMILIES::TEffectFamily family)
 //-----------------------------------------------
 bool CSLinkEffect::update(CTimerEvent * event, bool)
 {
-	NL_ALLOC_CONTEXT(SLE_UPD);
 	CEntityBase * target = CEntityBaseManager::getEntityBasePtr( _TargetRowId );
 	if ( !target )
 	{
@@ -222,7 +221,6 @@ void CSLinkEffect::removed()
 //-----------------------------------------------
 bool CSLinkEffectOffensive::updateOffensive(CTimerEvent * event, bool sendReportForXP)
 {
-	NL_ALLOC_CONTEXT(SLEOUO);
 	if ( CSLinkEffect::update(event,true) )
 		return true;
 

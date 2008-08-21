@@ -70,7 +70,6 @@ void cbLiftOut( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::T
 //----------------------------------------------------------------------------
 void CBuildingManager::init()
 {
-	NL_ALLOC_CONTEXT(BM_INIT);
 	nlassert( _Instance == NULL );
 
 	_Instance = new CBuildingManager;
@@ -188,7 +187,6 @@ void CBuildingManager::gpmsConnection()
 //----------------------------------------------------------------------------
 bool CBuildingManager::parseBuildingTemplates( const NLLIGO::IPrimitive* prim, CBuildingParseData & parseData )
 {
-	NL_ALLOC_CONTEXT(BM_PBT);
 	nlassert(prim);
 	std::string value;
 	if (prim->getPropertyByName("class",value) )
@@ -218,7 +216,6 @@ bool CBuildingManager::parseBuildingTemplates( const NLLIGO::IPrimitive* prim, C
 //----------------------------------------------------------------------------
 bool CBuildingManager::parsePhysicalBuildings( const NLLIGO::IPrimitive* prim, CBuildingParseData & parseData )
 {
-	NL_ALLOC_CONTEXT(BM_PPB);
 	nlassert(prim);
 	std::string value;
 	bool ret = true;
@@ -277,7 +274,6 @@ bool CBuildingManager::parsePhysicalBuildings( const NLLIGO::IPrimitive* prim, C
 //----------------------------------------------------------------------------
 bool CBuildingManager::parseTriggers( const NLLIGO::IPrimitive* prim, CBuildingParseData & parseData )
 {
-	NL_ALLOC_CONTEXT(BM_PT);
 	nlassert(prim);
 	std::string value;
 	bool ret = true;
@@ -354,7 +350,6 @@ bool CBuildingManager::parseTriggers( const NLLIGO::IPrimitive* prim, CBuildingP
 //----------------------------------------------------------------------------
 void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 triggerId )
 {
-	NL_ALLOC_CONTEXT(BM_ATR);
 	//GPMS can send a trigger msg more than one. So check if we already received it	
 	TTriggerRequestCont::iterator itReq = _TriggerRequests.find( rowId );
 	if ( itReq != _TriggerRequests.end() )
@@ -643,7 +638,6 @@ void CBuildingManager::removePlayerFromRoom( CCharacter * user )
 //----------------------------------------------------------------------------
 IRoomInstance *  CBuildingManager::allocateRoom( sint32 & cellRet, BUILDING_TYPES::TBuildingType type)
 {
-	NL_ALLOC_CONTEXT(BM_AR);
 	// update room vector
 	if ( _FirstFreeRoomId >= _RoomInstances.size() )
 		reallocRooms();

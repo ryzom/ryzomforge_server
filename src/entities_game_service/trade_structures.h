@@ -72,7 +72,6 @@ public:
 
 	CTradeBase( TTradeType type )
 	{	
-		NL_ALLOC_CONTEXT(TRDBSE);
 		Type = type; 
 		if ( Type == item || Type == plan )
 		{
@@ -94,7 +93,6 @@ public:
 	// Copy constructor
 	CTradeBase( const CTradeBase& t )
 	{
-		NL_ALLOC_CONTEXT(TRDBSE2);
 		Price = t.Price;
 		Type = t.Type;
 		Sheet = t.Sheet;
@@ -110,7 +108,6 @@ public:
 	// = operator
 	const CTradeBase &operator = (const CTradeBase &a)
 	{
-		NL_ALLOC_CONTEXT(TRDBSE3);
 		Price = a.Price;
 		Type = a.Type;
 		Sheet = a.Sheet;
@@ -135,7 +132,6 @@ private:
 
 	void init( CTradeUnserial& s )
 	{
-		NL_ALLOC_CONTEXT(TRDBSE4);
 		Price = s.Price;
 		Type = s.Type;
 		Sheet = s.Sheet;

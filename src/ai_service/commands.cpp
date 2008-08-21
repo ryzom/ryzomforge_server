@@ -23,7 +23,6 @@
 #include "ai_grp_pet.h"
 #include "ai_bot_npc.h"
 #include "mirrors.h"
-#include "nel/memory/memory_manager.h"
 #include "game_share/mission_messages.h"
 #include "game_share/fame.h"
 #include "game_share/used_continent.h"
@@ -1005,30 +1004,30 @@ NLMISC_COMMAND(globalEnergy, "set or get the effective energy for a family.","[<
 	
 //-------------------------------------------------------------------------
 // memory report
-NLMISC_COMMAND(statMemory, "generate a memory usage statistic file","<begin|end>")
-{
-	if (args.size() != 1)
-		return false;
-	
-	CLogStringWriter	stringWriter(&log);
-	
-	if (args[0] == "begin")
-	{
-		stringWriter.append("Writing begin memory state in 'memory_report_begin.csv'...");
-		NLMEMORY::StatisticsReport("memory_report_begin.csv", false);
-		stringWriter.append("Memory stat Done.");
-	}
-	else if (args[0] == "end")
-	{
-		stringWriter.append("Writing end memory state report in 'memory_report_end.csv'...");
-		NLMEMORY::StatisticsReport("memory_report_end.csv", false);
-		stringWriter.append("Memory stat Done.");
-	}
-	else
-		return false;
-	
-	return true;
-}
+// NLMISC_COMMAND(statMemory, "generate a memory usage statistic file","<begin|end>")
+// {
+// 	if (args.size() != 1)
+// 		return false;
+// 	
+// 	CLogStringWriter	stringWriter(&log);
+// 	
+// 	if (args[0] == "begin")
+// 	{
+// 		stringWriter.append("Writing begin memory state in 'memory_report_begin.csv'...");
+// 		NLMEMORY::StatisticsReport("memory_report_begin.csv", false);
+// 		stringWriter.append("Memory stat Done.");
+// 	}
+// 	else if (args[0] == "end")
+// 	{
+// 		stringWriter.append("Writing end memory state report in 'memory_report_end.csv'...");
+// 		NLMEMORY::StatisticsReport("memory_report_end.csv", false);
+// 		stringWriter.append("Memory stat Done.");
+// 	}
+// 	else
+// 		return false;
+// 	
+// 	return true;
+// }
 
 //-------------------------------------------------------------------------
 // set a group variable

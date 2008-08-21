@@ -114,7 +114,6 @@ protected:
 
 	static CAreaEffect * buildBomb( const TBrickParam::IId * param )
 	{
-		NL_ALLOC_CONTEXT(AE_BB);
 		CAreaEffect * effect = new CAreaEffect;
 		effect->Type = MAGICFX::Bomb;
 		effect->Bomb.Radius = ((CSBrickParamAreaBomb *)param)->Radius;
@@ -125,7 +124,6 @@ protected:
 	
 	static CAreaEffect * buildSpray( const TBrickParam::IId * param )
 	{
-		NL_ALLOC_CONTEXT(AE_BS);
 		CAreaEffect * effect = new CAreaEffect;
 		effect->Type = MAGICFX::Spray;
 		effect->Spray.MinBase = ((CSBrickParamAreaSpray *)param)->Base;
@@ -146,7 +144,6 @@ protected:
 	
 	static CAreaEffect * buildChain( const TBrickParam::IId * param )
 	{
-		NL_ALLOC_CONTEXT(AE_BC);
 		CAreaEffect * effect = new CAreaEffect;
 		effect->Type = MAGICFX::Chain;
 		effect->Chain.MaxTargets = ((CSBrickParamAreaChain *)param)->MaxTargets;

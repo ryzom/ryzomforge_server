@@ -38,7 +38,6 @@ CVariable<bool> DisablePVPChallenge("egs", "DisablePVPChallenge", "If true PVP c
 //----------------------------------------------------------------------------
 void CPVPManager::init()
 {
-	NL_ALLOC_CONTEXT(PM_INIT);
 	nlassert( _Instance == NULL );
 	_Instance = new CPVPManager;
 	_Instance->_FirstFreeIslandIdx = 0;
@@ -899,7 +898,6 @@ void CPVPManager::acceptPVPChallenge( const NLMISC::CEntityId & userId )
 {	
 	BOMB_IF(IsRingShard,"acceptPVPChallenge() - not allowed on Ring shards because PVP Challenge requires non-ring GPMS",return);
 
-	NL_ALLOC_CONTEXT(PVM_APC);
 	SM_STATIC_PARAMS_1(params, STRING_MANAGER::player);
 	CCharacter * invited = PlayerManager.getChar(userId ); 
 	if ( !invited )

@@ -322,7 +322,6 @@ IAliasCont* CSpire::getAliasCont(TAIType type)
 
 CAliasTreeOwner* CSpire::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(SPIRE);
 	if (!cont)
 		return	NULL;
 	
@@ -516,7 +515,6 @@ IAliasCont* CSpireSquadFamily::getAliasCont(TAIType type)
 
 CAliasTreeOwner* CSpireSquadFamily::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(SPIRE);
 	if (!cont)
 		return	NULL;
 	

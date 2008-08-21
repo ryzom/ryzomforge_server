@@ -156,7 +156,6 @@ static uint32 EntityMatrixTblUpTo250[] = {11, 15, 19, 23, 25, 27, 27, 29, 29, 31
 static void initLinearMatrixIteratorTables(std::vector<CAIEntityMatrixIteratorTblLinear *> &vect)
 {
 	// initialise the vector with the first table
-	NL_ALLOC_CONTEXT(AIILMIT);
 	vect.push_back(new CAIEntityMatrixIteratorTblLinear(&(EntityMatrixTbl0[0]),3));
 
 	// local macro undefined at end of function
@@ -241,7 +240,6 @@ void	CAIS::initAI()
 	_random.srand( (sint32)NLMISC::CTime::getLocalTime() );
 
 	// allocate RAM for the players
-	NL_ALLOC_CONTEXT(AIS_init);
 
 	// setup the standard iterator tables for scanning the entity matrices
 	_matrixIterator2x2.push_back(-1,-1); _matrixIterator2x2.push_back(1,0);

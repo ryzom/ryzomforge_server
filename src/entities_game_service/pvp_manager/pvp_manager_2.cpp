@@ -49,7 +49,6 @@ NL_INSTANCE_COUNTER_IMPL(CPVPManager2);
 void CPVPManager2::init()
 {
 	BOMB_IF( _Instance != 0, "CPVPManager2 already allocated", return );
-	NL_ALLOC_CONTEXT(PM_INIT);
 	_Instance = new CPVPManager2();
 	BOMB_IF(_Instance == 0, "Can't allocate CPVPManager2 singleton", nlstop );
 
@@ -85,7 +84,6 @@ void CPVPManager2::release()
 {
 	if( _Instance != 0 )
 	{
-		NL_ALLOC_CONTEXT(PM2_INIT);
 		
 		for( uint32 i = 0; i < _Instance->_PVPInterface.size(); ++i )
 		{
@@ -1124,7 +1122,6 @@ void CPVPManager2::abandonDuel( const NLMISC::CEntityId & userId )
 //-----------------------------------------------
 void CPVPManager2::acceptDuel( const NLMISC::CEntityId & userId )
 {
-	NL_ALLOC_CONTEXT(PVM_AD);
 	SM_STATIC_PARAMS_1(params, STRING_MANAGER::player);
 	
 	CCharacter * invited = PlayerManager.getChar(userId ); 

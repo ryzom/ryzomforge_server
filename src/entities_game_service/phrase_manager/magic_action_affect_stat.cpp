@@ -302,7 +302,6 @@ protected:
 						const NLMISC::CBitSet & invulnerabilityAll, bool isMad, NLMISC::CBitSet & resists, const TReportAction & actionReport,
 						sint32 vamp, float vampRatio, bool reportXp )
 	{
-		NL_ALLOC_CONTEXT(MAAS_APY);
 		if (!phrase)
 			return;
 

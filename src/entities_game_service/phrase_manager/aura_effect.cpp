@@ -41,7 +41,6 @@ vector< pair< POWERS::TPowerType , IAuraEffectFactory* > >* IAuraEffectFactory::
 //--------------------------------------------------------------
 bool CAuraRootEffect::update(CTimerEvent * event, bool )
 {
-	NL_ALLOC_CONTEXT(ARE_UPD);
 	// get creator
 	CEntityBase *creator = CEntityBaseManager::getEntityBasePtr(_CreatorRowId);
 	if (!creator)

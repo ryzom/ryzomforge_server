@@ -86,7 +86,6 @@ IPVPZone::IPVPZone()
 //----------------------------------------------------------------------------
 NLMISC::CSmartPtr<IPVPZone> IPVPZone::build(const NLLIGO::CPrimZone * zone)
 {
-	NL_ALLOC_CONTEXT(PVZ_BLD);
 	nlassert(zone);
 
 	string value;

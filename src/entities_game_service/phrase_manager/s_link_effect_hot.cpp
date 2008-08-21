@@ -27,7 +27,6 @@ extern CRandom RandomGenerator;
 
 bool CSLinkEffectHot::update(CTimerEvent * event, bool applyEffect)
 {
-	NL_ALLOC_CONTEXT(SLEHUPD);
 	if ( CSLinkEffect::update(event,applyEffect) )
 		return true;
 

@@ -66,7 +66,6 @@ IShopUnit * CItemShopType::getShopUnit( uint32 selector1, uint32 selector2, uint
 //-----------------------------------------------------------------------------
 IShopUnit * CItemShopType::createShopUnit( uint32 selector1, uint32 selector2, uint32 selector3, IShopUnit::TShopUnitType shopUnitType )
 {
-	NL_ALLOC_CONTEXT(IST_CSU);
 	IShopUnit * shopUnit = getShopUnit( selector1, selector2, selector3, shopUnitType );
 	if( shopUnit == 0 )
 	{
@@ -141,7 +140,6 @@ IShopUnit * CRMShopType::getShopUnit( uint32 selector1, uint32 selector2, uint32
 //-----------------------------------------------------------------------------
 IShopUnit * CRMShopType::createShopUnit( uint32 selector1, uint32 selector2, uint32 selector3, IShopUnit::TShopUnitType shopUnitType )
 {
-	NL_ALLOC_CONTEXT(RST_CSU);
 	IShopUnit * shopUnit = getShopUnit( selector1, selector2, selector3, shopUnitType );
 	if( shopUnit == 0 )
 	{
@@ -202,7 +200,6 @@ IShopUnit * CTPShopType::getShopUnit( uint32 selector1, uint32 selector2, uint32
 //-----------------------------------------------------------------------------
 IShopUnit * CTPShopType::createShopUnit( uint32 selector1, uint32 selector2, uint32 selector3, IShopUnit::TShopUnitType shopUnitType )
 {
-	NL_ALLOC_CONTEXT(TST_CSU);
 	IShopUnit * shopUnit = getShopUnit( selector1, selector2, selector3, shopUnitType );
 	if( shopUnit == 0 )
 	{

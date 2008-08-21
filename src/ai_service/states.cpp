@@ -66,7 +66,6 @@ IAliasCont*		CAIState::getAliasCont(TAIType	type)
 
 CAliasTreeOwner*	CAIState::createChild(IAliasCont *cont, CAIAliasDescriptionNode *aliasTree)
 {
-	NL_ALLOC_CONTEXT(AISCC);
 	CAliasTreeOwner*	child	=	NULL;
 	
 	switch(aliasTree->getType())

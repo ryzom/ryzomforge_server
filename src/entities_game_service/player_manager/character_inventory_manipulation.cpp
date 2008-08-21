@@ -2147,7 +2147,6 @@ void CCharacter::incSlotVersion(INVENTORIES::TInventory invId, uint32 slot)
 void CCharacter::sendItemInfos( uint16 slotId )
 {
 	TLogNoContext_Item	noContext;
-	NL_ALLOC_CONTEXT(CHARSII);
 	try
 	{
 		CSmartPtr< CItemPtr > itemPtrSmart = new CItemPtr();

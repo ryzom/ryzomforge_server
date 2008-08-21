@@ -592,7 +592,6 @@ CGrpFauna::CGrpFauna(CMgrFauna* mgr, CAIAliasDescriptionNode* aliasTree, RYAI_MA
 , CDynGrpBase()
 , CPersistentStateInstance(*mgr->getStateMachine())
 {
-	NL_ALLOC_CONTEXT(AIGF);		
 	
 	// state
 	
@@ -672,7 +671,6 @@ IAliasCont* CGrpFauna::getAliasCont(TAIType type)
 
 CAliasTreeOwner* CGrpFauna::createChild(IAliasCont* cont, CAIAliasDescriptionNode* aliasTree)
 {
-	NL_ALLOC_CONTEXT(AIGFCC);
 	if (!cont)
 		return	NULL;
 	
@@ -751,7 +749,6 @@ void CGrpFauna::serviceEvent (const CServiceEvent &info)
 
 NLMISC::CSmartPtr<CSpawnGroup> CGrpFauna::createSpawnGroup()
 {
-	NL_ALLOC_CONTEXT(AIGFSG);
 	return new CSpawnGroupFauna(*this, getAStarFlag());
 }
 
@@ -788,7 +785,6 @@ bool CGrpFauna::timeAllowSpawn(uint32 popVersion) const
 
 bool CGrpFauna::spawnPop(uint popVersion)
 {
-	NL_ALLOC_CONTEXT(AIGFSP);
 	if (places().isEmpty()) return false;
 	for (uint k = 0; k < places().size(); ++k)
 	{
@@ -1049,7 +1045,6 @@ void CGrpFauna::setPopulation(CPopulation* pop)
 
 void CGrpFauna::allocateBots()
 {
-	NL_ALLOC_CONTEXT(AIGFAB);
 	uint maxPopulation = 0;
 	
 	// work out how much space we need

@@ -43,7 +43,6 @@ public:
 	/// get singleton instance
 	static CNamedItems &getInstance()
 	{
-		NL_ALLOC_CONTEXT(NI_GI);
 		if(!_Instance)
 		{
 			_Instance = new CNamedItems;

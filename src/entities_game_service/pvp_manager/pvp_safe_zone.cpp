@@ -33,7 +33,6 @@ CPVPSafeZone::CPVPSafeZone()
 //----------------------------------------------------------------------------
 NLMISC::CSmartPtr<CPVPSafeZone> CPVPSafeZone::build(const NLLIGO::CPrimPoint * point)
 {
-	NL_ALLOC_CONTEXT(PSZ_BLD);
 	nlassert(point);
 
 	string value;
