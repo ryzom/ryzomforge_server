@@ -16,7 +16,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-lnelnet \
 		-lnelmisc \
-		-lstlport \
 		-lrt\
 		-ldl
 

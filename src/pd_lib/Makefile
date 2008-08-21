@@ -19,7 +19,6 @@ LDFLAGS      = $(LD_FLAGS_CMN) \
 		-L/usr/X11R6/lib \
 		-lnelmisc \
 		-lxml2 \
-		-lstlport \
 		-lpthread \
 		-lgame_share
 

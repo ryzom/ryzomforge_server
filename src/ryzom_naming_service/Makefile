@@ -17,7 +17,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lnelmisc \
 		-ladmin_modules \
 		-lxml2 \
-		-lstlport \
 		-lrt\
 		-ldl
 

@@ -38,7 +38,6 @@ LDFLAGS2      = 	-L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 		-lxml2 \
 		-lz \
 		-lm \
-		-lstlport \
 		-lpthread \
 		-lcrypt
 

@@ -21,8 +21,7 @@ LDFLAGS      = $(LD_FLAGS_CMN) \
 		-lnelligo \
 		-lnelpacs \
 		-lnelmisc \
-		-lxml2 \
-		-lstlport
+		-lxml2
 
 #############################################################################
 # The bit that changes each time we cut paste and hack this file :o)

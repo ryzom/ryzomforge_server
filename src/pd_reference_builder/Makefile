@@ -20,7 +20,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lnelnet \
 		-lnelmisc \
 		-lxml2 \
-		-lstlport \
 		-lrt\
 		-ldl
 

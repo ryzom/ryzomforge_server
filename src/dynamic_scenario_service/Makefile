@@ -30,7 +30,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lnelligo \
 		-lnelmisc \
 		-lxml2 \
-		-lstlport \
 		-lrt\
 		-ldl\
 		-lz

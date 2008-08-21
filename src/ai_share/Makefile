@@ -17,8 +17,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lgame_share \
 		-lnelnet \
 		-lnelmisc \
-		-lxml2 \
-		-lstlport
+		-lxml2
 
 # The flags for the linker
 LDFLAGS2      = 	-L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \

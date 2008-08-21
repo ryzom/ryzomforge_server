@@ -18,7 +18,6 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lgame_share \
 		-lnelnet \
 		-lnelmisc \
-		-lstlport \
 		-lrt\
 		-ldl
 

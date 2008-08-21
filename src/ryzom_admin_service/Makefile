@@ -13,12 +13,11 @@ CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-L../admin_modules \
+		-ladmin_modules \
 		-lnelnet \
 		-lnelmisc \
 		-lxml2 \
-		-lstlport \
 		-lrt\
-		-ladmin_modules \
 		-ldl
 
 #############################################################################
