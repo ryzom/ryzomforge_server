@@ -40,8 +40,8 @@ $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a ../game_share/libgame_sh
 	strip $(TARGETS)
 
 packed_sheets:
-	# this service has no packed_sheets to pack
-	# ./$(TARGETS) $(PACK_SHEETS_FLAGS)
+# this service has no packed_sheets to pack
+# ./$(TARGETS) $(PACK_SHEETS_FLAGS)
 
 
 #############################################################################

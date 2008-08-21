@@ -39,8 +39,8 @@ $(TARGETS): $(OBJS) ../game_share/libgame_share.a
 	strip $(TARGETS)
 
 packed_sheets:
-	# this service has no packed_sheets to pack
-	# ./$(TARGETS) $(PACK_SHEETS_FLAGS)
+# this service has no packed_sheets to pack
+# ./$(TARGETS) $(PACK_SHEETS_FLAGS)
 
 
 #############################################################################
