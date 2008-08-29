@@ -8,7 +8,7 @@
 #ifndef RYAI_NPC_DESCRIPTION_MSG_H
 #define RYAI_NPC_DESCRIPTION_MSG_H
 
-#include "game_share/npc_description_messages.h"
+#include "server_share/npc_description_messages.h"
 
 //----------------------------------------------------------------
 // class used to describe a bot's chat possibilities

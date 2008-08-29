@@ -13,8 +13,8 @@
 #include "nel/misc/path.h"
 #include "nel/misc/file.h"
 #include "nel/ligo/primitive_utils.h"
-#include "game_share/primitive_cfg.h"
-#include "game_share/used_continent.h"
+#include "server_share/primitive_cfg.h"
+#include "server_share/used_continent.h"
 
 using namespace std;
 using namespace NLMISC;

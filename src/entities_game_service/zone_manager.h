@@ -15,8 +15,8 @@
 
 #include "game_share/base_types.h"
 #include "game_share/continent.h"
-#include "game_share/respawn_point_type.h"
-#include "game_share/place_type.h"
+#include "server_share/respawn_point_type.h"
+#include "server_share/place_type.h"
 #include "entity_manager/entity_base.h"
 #include "game_share/string_manager_sender.h"
 #include "mission_manager/ai_alias_translator.h"

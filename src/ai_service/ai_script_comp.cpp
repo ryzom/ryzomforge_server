@@ -2,7 +2,7 @@
 #include "stdpch.h"
 #include "ai_generic_fight.h"
 #include "ai_script_comp.h"
-#include "game_share/msg_brick_service.h"
+#include "server_share/msg_brick_service.h"
 
 using	namespace	std;
 using	namespace	NLMISC;

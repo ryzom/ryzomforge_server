@@ -40,7 +40,7 @@
 
 // GameShare
 #include "game_share/generic_xml_msg_mngr.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "game_share/people.h"
 #include "game_share/persistent_data.h"
 #include "game_share/skills.h"

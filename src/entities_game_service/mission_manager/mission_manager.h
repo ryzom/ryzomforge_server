@@ -11,8 +11,8 @@
 
 #include "nel/ligo/primitive.h"
 
-#include "game_share/mission_messages.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/mission_messages.h"
+#include "server_share/msg_ai_service.h"
 
 #include "mission_manager/mission_template.h"
 

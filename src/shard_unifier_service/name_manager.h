@@ -14,7 +14,7 @@
 
 #include "game_share/character_sync_itf.h"
 
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 
 namespace CHARSYNC
 {

@@ -16,7 +16,7 @@
 #include "modules/character_control.h"
 #include "player_manager/player_manager.h"
 #include "player_manager/character.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 
 using namespace std;
 using namespace NLMISC;

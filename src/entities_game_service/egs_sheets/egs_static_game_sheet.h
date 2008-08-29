@@ -21,13 +21,13 @@
 #include "game_share/ecosystem.h"
 #include "game_share/rm_family.h"
 #include "game_share/mp_category.h"
-#include "game_share/mirror_equipment.h"
+#include "server_share/mirror_equipment.h"
 #include "game_share/damage_types.h"
 #include "game_share/constants.h"
 #include "game_share/memorization_set_types.h"
-#include "game_share/respawn_point_type.h"
+#include "server_share/respawn_point_type.h"
 #include "game_share/continent.h"
-#include "game_share/npc_description_messages.h"
+#include "server_share/npc_description_messages.h"
 
 // georges
 #include "nel/georges/load_form.h"

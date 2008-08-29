@@ -22,7 +22,7 @@
 #include "game_share/item_family.h"
 #include "game_share/rm_family.h"
 #include "game_share/crafting_tool_type.h"
-#include "game_share/target.h"
+#include "server_share/target.h"
 #include "game_share/characteristics.h"
 
 //

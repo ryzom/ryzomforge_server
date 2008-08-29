@@ -20,7 +20,6 @@
 #include "player_manager/character.h"
 #include "egs_globals.h"
 #include "egs_sheets/egs_sheets.h"
-#include "game_share/stl_allocator_checker.h"
 //
 
 
@@ -220,7 +219,6 @@ bool  CTimedActionPhrase::update()
 //-----------------------------------------------
 void  CTimedActionPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	_ExecutionEndDate = CTickEventHandler::getGameCycle() + _ExecutionDuration;
 
 	CCharacter* player = PlayerManager.getChar(_ActorRowId);
@@ -268,7 +266,6 @@ bool CTimedActionPhrase::launch()
 //-----------------------------------------------
 void CTimedActionPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	// keep a ptr on this to prevent it to be deleted when timed action is deconnection
 	CSPhrasePtr selfPtr = this;
 

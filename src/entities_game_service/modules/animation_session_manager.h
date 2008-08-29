@@ -14,7 +14,7 @@
 // includes
 
 #include "nel/misc/singleton.h"
-#include "r2_share/r2_share_itf.h"
+#include "game_share/r2_share_itf.h"
 
 
 //-----------------------------------------------------------------------------

@@ -13,10 +13,10 @@
 #include "ai_pos_mirror.h"
 #include "persistent_spawnable.h"
 #include "ai_share/world_map.h"
-#include "game_share/combat_state.h"
+#include "server_share/combat_state.h"
 #include "world_container.h"
 #include "ai_entity_matrix.h"
-#include "game_share/action_flags.h"
+#include "server_share/action_flags.h"
 #include "combat_interface.h"
 
 #include "world_map_link.h"

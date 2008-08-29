@@ -12,8 +12,8 @@
 // misc
 #include "nel/misc/eid_translator.h"
 //game share
-#include "game_share/pet_interface_msg.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/pet_interface_msg.h"
+#include "server_share/msg_ai_service.h"
 #include "game_share/ryzom_entity_id.h"
 #include "game_share/starting_point.h"
 #include "game_share/generic_xml_msg_mngr.h"

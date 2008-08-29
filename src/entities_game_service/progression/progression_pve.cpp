@@ -60,11 +60,11 @@
 #include "team_manager/team_manager.h"
 #include "pvp_manager/pvp.h"
 #include "pvp_manager/pvp_faction_reward_manager/pvp_faction_reward_manager.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 #include "egs_globals.h"
-#include "game_share/log_item_gen.h"
-#include "game_share/log_character_gen.h"
+#include "server_share/log_item_gen.h"
+#include "server_share/log_character_gen.h"
 
 using namespace std;
 using namespace NLMISC;

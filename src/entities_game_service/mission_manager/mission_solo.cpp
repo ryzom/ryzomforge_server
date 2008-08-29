@@ -6,7 +6,7 @@
 
 #include "stdpch.h"
 #include "mission_manager/mission_solo.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"
 #include "player_manager/character.h"

@@ -17,8 +17,8 @@
 #include "nel/misc/singleton.h"
 #include "nel/misc/entity_id.h"
 
-#include "game_share/msg_ai_service.h"
-#include "r2_share/scenario.h"
+#include "server_share/msg_ai_service.h"
+#include "game_share/scenario.h"
 
 class CCharacter;
 

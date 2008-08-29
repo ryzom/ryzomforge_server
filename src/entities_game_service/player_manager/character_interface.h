@@ -1,6 +1,6 @@
 
 #include "nel/misc/entity_id.h"
-#include "r2_share/r2_types.h"
+#include "game_share/r2_types.h"
 
 class CCharacter;
 class CEntityState;

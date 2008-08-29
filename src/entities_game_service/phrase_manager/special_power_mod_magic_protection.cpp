@@ -13,7 +13,7 @@
 // misc
 #include "nel/misc/bit_mem_stream.h"
 //
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 //
 #include "special_power_mod_magic_protection.h"
 #include "phrase_manager/phrase_utilities_functions.h"

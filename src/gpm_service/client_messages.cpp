@@ -20,7 +20,7 @@
 //#include "game_share/ryzom_version.h"
 //#include "game_share/ryzom_mirror_properties.h"
 
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 #include "world_position_manager.h"
 #include "gpm_service.h"

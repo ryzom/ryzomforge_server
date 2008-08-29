@@ -26,7 +26,7 @@
 #include "game_share/utils.h"
 #include "game_share/shard_names.h"
 #include "game_share/ryzom_entity_id.h"
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 
 #include "database_mapping.h"
 #include "character_sync.h"

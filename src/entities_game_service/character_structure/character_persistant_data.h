@@ -12,7 +12,7 @@
 #include "game_share/mirror_prop_value.h"
 #include "game_share/player_visual_properties.h"
 #include "game_share/character_title.h"
-#include "game_share/entity_state.h"
+#include "server_share/entity_state.h"
 
 #include "character_structure/pact_class.h"
 #include "character_structure/character_sentence.h"

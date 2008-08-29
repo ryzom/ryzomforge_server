@@ -13,7 +13,7 @@
 #include "nel/net/module.h"
 #include "nel/net/module_builder_parts.h"
 
-#include "game_share/command_executor_itf.h"
+#include "server_share/command_executor_itf.h"
 
 #include "client_command_forwarder.h"
 

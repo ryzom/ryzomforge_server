@@ -3,7 +3,7 @@
 
 
 #include "egs_sheets/egs_static_game_sheet.h"
-#include "game_share/npc_description_messages.h"
+#include "server_share/npc_description_messages.h"
 
 
 

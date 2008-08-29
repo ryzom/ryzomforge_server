@@ -1,5 +1,5 @@
 #include "stdpch.h"
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 #include "ai_instance.h"
 
 #include "ai_player.h"

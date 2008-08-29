@@ -14,7 +14,7 @@
 #include "phrase_manager/phrase_manager.h"
 #include "phrase_manager/phrase_utilities_functions.h"
 #include "game_share/magic_fx.h"
-#include "game_share/ai_event_report.h"
+#include "server_share/ai_event_report.h"
 #include "phrase_manager/s_link_effect.h"
 #include "progression/progression_pvp.h"
 

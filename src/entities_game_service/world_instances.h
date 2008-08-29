@@ -9,7 +9,7 @@
 #ifndef WORLD_INSTANCES
 #define WORLD_INSTANCES
 
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "game_share/misc_const.h"
 
 /// Message from AIS to EGS to report available collision data

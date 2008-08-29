@@ -12,7 +12,7 @@
 #include "state_instance.h"
 #include "ai_grp.h"
 #include "child_container.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "ai_share/ai_share.h"
 #include "ai_grp_npc.h"
 #include "ai_bot_npc.h"

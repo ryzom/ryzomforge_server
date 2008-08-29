@@ -17,9 +17,9 @@
 // game_share
 #include "game_share/shield_types.h"
 #include "game_share/brick_types.h"
-#include "game_share/event_report.h"
-#include "game_share/ai_event.h"
-#include "game_share/msg_brick_service.h"
+#include "server_share/event_report.h"
+#include "server_share/ai_event.h"
+#include "server_share/msg_brick_service.h"
 //
 #include "phrase_manager/s_phrase.h"
 #include "entity_manager/entity_base.h"

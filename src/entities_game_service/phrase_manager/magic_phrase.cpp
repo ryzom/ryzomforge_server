@@ -14,7 +14,6 @@
 #include "game_share/brick_families.h"
 #include "game_share/magic_fx.h"
 #include "game_share/combat_flying_text.h"
-#include "game_share/stl_allocator_checker.h"
 //
 #include "entity_structure/statistic.h"
 #include "phrase_manager/magic_phrase.h"
@@ -812,7 +811,6 @@ bool  CMagicPhrase::update()
 //-----------------------------------------------
 void  CMagicPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CMagicPhrase_execute);
 	
 	CEntityBase * caster = CEntityBaseManager::getEntityBasePtr( _ActorRowId );
@@ -1643,7 +1641,6 @@ bool CMagicPhrase::launch()
 //-----------------------------------------------
 void CMagicPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CMagicPhrase_apply);
 	
 	bool autoSuccess = EntitiesNoActionFailure || _IsProc;

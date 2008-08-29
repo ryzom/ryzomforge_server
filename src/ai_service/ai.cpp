@@ -37,7 +37,7 @@
 #include "game_share/backup_service_interface.h"
 
 #include "ai_variables.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 using namespace NLMISC;
 using namespace NLNET;

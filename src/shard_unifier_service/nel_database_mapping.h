@@ -18,7 +18,7 @@
 #include "nel/net/module_gateway.h"
 
 #include "nel/misc/string_common.h"
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 
 #include "ring_session_manager.h"
 	

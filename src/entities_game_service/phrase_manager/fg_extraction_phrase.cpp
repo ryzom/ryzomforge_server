@@ -21,7 +21,6 @@
 #include "deposit.h"
 #include "progression/progression_pve.h"
 #include "entities_game_service.h"
-#include "game_share/stl_allocator_checker.h"
 
 DEFAULT_SPHRASE_FACTORY( CFgExtractionPhrase, BRICK_TYPE::FORAGE_EXTRACTION );
 
@@ -623,7 +622,6 @@ bool CFgExtractionPhrase::update()
  */
 void CFgExtractionPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CFgExtractionPhrase_execute);
 	
 	// Get character
@@ -733,7 +731,6 @@ bool CFgExtractionPhrase::launch()
  */
 void CFgExtractionPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CFgExtractionPhrase_apply);
 	
 	CCharacter* player = PlayerManager.getChar( _ActorRowId );

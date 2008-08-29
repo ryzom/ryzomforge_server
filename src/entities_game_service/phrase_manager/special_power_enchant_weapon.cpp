@@ -9,7 +9,7 @@
 // misc
 #include "nel/misc/bit_mem_stream.h"
 //
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 //
 #include "special_power_enchant_weapon.h"
 

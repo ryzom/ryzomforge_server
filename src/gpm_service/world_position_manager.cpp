@@ -36,13 +36,13 @@
 #include "nel/misc/hierarchical_timer.h"
 
 // Game share
-#include "game_share/combat_vision_delta.h"
-#include "game_share/animal_hunger.h"
+#include "server_share/combat_vision_delta.h"
+#include "server_share/animal_hunger.h"
 #include "game_share/generic_xml_msg_mngr.h"
 #include "game_share/utils.h"
 
 // R2 share
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 // local
 #include "gpm_service.h"

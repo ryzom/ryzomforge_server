@@ -17,8 +17,7 @@
 #include "player_manager/player.h"
 #include "team_manager/team_manager.h"
 
-#include "game_share/msg_ai_service.h"
-#include "game_share/stl_allocator_checker.h"
+#include "server_share/msg_ai_service.h"
 
 #include "nel/misc/algo.h"
 
@@ -56,7 +55,6 @@ bool CMissionStepEscort::buildStep( uint32 line, const std::vector< std::string 
 //----------------------------------------------------------------------------
 uint CMissionStepEscort::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	// not check here : they are done before. If a talk event comes here, the step is complete
 	if( event.Type == CMissionEvent::Escort )
 	{
@@ -173,7 +171,6 @@ bool CMissionStepAIMsg::buildStep( uint32 line, const std::vector< std::string >
 //----------------------------------------------------------------------------
 uint CMissionStepAIMsg::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	// not check here : they are done befor. If a talk event comes here, the step is complete
 	if( event.Type == CMissionEvent::AIMsg )
 	{

@@ -9,8 +9,8 @@
 #include "stdpch.h"
 #include "nel/misc/algo.h"
 #include "nel/net/service.h"
-#include "game_share/log_item_gen.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/log_item_gen.h"
+#include "server_share/r2_variables.h"
 
 #include "building_manager/building_manager.h"
 #include "player_manager/character.h"

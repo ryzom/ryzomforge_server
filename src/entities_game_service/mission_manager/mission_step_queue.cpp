@@ -17,8 +17,7 @@
 #include "player_manager/player.h"
 #include "team_manager/team_manager.h"
 
-#include "game_share/msg_ai_service.h"
-#include "game_share/stl_allocator_checker.h"
+#include "server_share/msg_ai_service.h"
 
 #include "nel/misc/algo.h"
 
@@ -67,7 +66,6 @@ bool CMissionStepQueueStart::buildStep( uint32 line, const vector< string > & sc
 //----------------------------------------------------------------------------
 uint CMissionStepQueueStart::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	if( event.Type == CMissionEvent::QueueEntryOk )
 	{
 		return 1;
@@ -208,7 +206,6 @@ bool CMissionStepQueueEnd::buildStep( uint32 line, const vector< string > & scri
 //----------------------------------------------------------------------------
 uint CMissionStepQueueEnd::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	if( event.Type == CMissionEvent::QueueExit )
 	{
 		// remove player from queue

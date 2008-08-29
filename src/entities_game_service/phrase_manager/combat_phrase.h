@@ -11,13 +11,13 @@
 #define RY_COMBAT_PHRASE_H
 
 // game share
-#include "game_share/ai_event_report.h"
+#include "server_share/ai_event_report.h"
 #include "game_share/body.h"
 #include "game_share/ecosystem.h"
 #include "game_share/season.h"
 #include "game_share/people.h"
 #include "game_share/brick_flags.h"
-#include "game_share/ai_aiming_type.h"
+#include "server_share/ai_aiming_type.h"
 //
 #include "phrase_manager/s_phrase.h"
 #include "phrase_manager/phrase_utilities_functions.h"

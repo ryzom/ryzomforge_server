@@ -8,9 +8,9 @@
 #include "../../nelns/welcome_service/welcome_service_itf.h"
 
 #include "game_share/utils.h"
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 
-#include "game_share/login_service_itf.h"
+#include "server_share/login_service_itf.h"
 #include "database_mapping.h"
 #include "nel_database_mapping.h"
 #include "entity_locator.h"
@@ -22,6 +22,8 @@ using namespace NLNET;
 using namespace MSW;
 using namespace RSMGR;
 using namespace ENTITYLOC;
+
+#include "../../../../nelns/welcome_service/welcome_service_itf.cpp"
 
 namespace LS
 {

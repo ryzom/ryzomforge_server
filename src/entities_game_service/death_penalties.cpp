@@ -15,7 +15,7 @@
 #include "player_manager/character.h"
 #include "phrase_manager/phrase_utilities_functions.h"
 #include "player_manager/item_service_manager.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 NL_INSTANCE_COUNTER_IMPL(CDeathPenalties);
 

@@ -17,7 +17,7 @@
 
 #include "egs_sheets/egs_static_game_sheet.h"
 #include "egs_sheets/egs_static_success_table.h"
-#include "game_share/creature_size.h"
+#include "server_share/creature_size.h"
 #include "game_share/roles.h"
 #include "game_share/fame.h"
 

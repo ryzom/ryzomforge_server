@@ -9,7 +9,7 @@
 #ifndef NL_CDB_DATA_INSTANCE_CONTAINER_H
 #define NL_CDB_DATA_INSTANCE_CONTAINER_H
 
-#include "game_share/fixed_size_int_vector.h"
+#include "server_share/fixed_size_int_vector.h"
 #include "cdb_struct_banks.h"
 
 

@@ -10,7 +10,7 @@
 
 
 #include "child_container.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "nel/misc/random.h"
 #include "nel/misc/variable.h"
 #include "ai_entity_matrix.h"

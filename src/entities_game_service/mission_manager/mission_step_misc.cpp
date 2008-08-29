@@ -20,7 +20,6 @@
 #include "mission_manager/mission_parser.h"
 #include "mission_manager/mission_manager.h"
 #include "nel/misc/algo.h"
-#include "game_share/stl_allocator_checker.h"
 
 
 using namespace std;
@@ -135,7 +134,6 @@ public:
 	// Process the step events with place check if needed
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex, const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		uint32 ret = 0;
 		if ( event.Type == CMissionEvent::Target )
 		{
@@ -753,7 +751,6 @@ class CMissionStepSkill : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::SkillProgress )
 		{
 			CMissionEventSkillProgress & eventSpe = (CMissionEventSkillProgress&)event;
@@ -912,7 +909,6 @@ void	CMissionStepVisit::onDeleteStepPrematurely(CMission *inst, uint32 stepIndex
  */
 uint CMissionStepVisit::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	if ( event.Type == CMissionEvent::EnterZone )
 	{
 		CMissionEventVisitPlace & eventSpe = (CMissionEventVisitPlace&)event;
@@ -1050,7 +1046,6 @@ class CMissionStepCast : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Cast )
 		{
 			CMissionEventCast & eventSpe = (CMissionEventCast&)event;
@@ -1147,7 +1142,6 @@ class CMissionStepDoMissions : public IMissionStepTemplate
 	
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::MissionDone )
 		{
 			CMissionEventMissionDone & eventSpe = (CMissionEventMissionDone&)event;
@@ -1206,7 +1200,6 @@ class CMissionStepRingScenario : public IMissionStepTemplate
 	
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::TaggedRingScenario )
 		{
 			const CMissionEventTaggedRingScenarioDone & eventSpe = static_cast<const CMissionEventTaggedRingScenarioDone&>(event);
@@ -1296,7 +1289,6 @@ void CMissionStepHandleCreate::onActivation(CMission* instance,uint32 stepIndex,
 // ----------------------------------------------------------------------------
 uint CMissionStepHandleCreate::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	if ( event.Type == CMissionEvent::GroupSpawned )
 	{
 		CMissionEventGroupSpawned & eventSpe = (CMissionEventGroupSpawned&)event;
@@ -1370,7 +1362,6 @@ void CMissionStepHandleRelease::onActivation(CMission* instance,uint32 stepIndex
 // ----------------------------------------------------------------------------
 uint CMissionStepHandleRelease::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	if ( event.Type == CMissionEvent::GroupDespawned )
 	{
 		CMissionEventGroupDespawned & eventSpe = (CMissionEventGroupDespawned&)event;

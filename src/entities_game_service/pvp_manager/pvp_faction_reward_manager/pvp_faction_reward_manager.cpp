@@ -15,7 +15,7 @@
 #include "pvp_manager/pvp_manager_2.h"
 #include "nel/misc/path.h"
 #include "game_share/fame.h"
-#include "game_share/used_continent.h"
+#include "server_share/used_continent.h"
 #include "world_instances.h"
 #include "phrase_manager/phrase_utilities_functions.h"
 //#include "creature_manager/creature_manager.h"

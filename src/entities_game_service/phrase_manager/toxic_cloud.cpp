@@ -16,7 +16,7 @@
 #include "game_share/mode_and_behaviour.h"
 #include "egs_variables.h"
 
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 
 using namespace NLMISC;
 using namespace NLNET;

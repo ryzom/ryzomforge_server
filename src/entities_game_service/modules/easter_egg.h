@@ -18,7 +18,7 @@
 
 #include "game_share/far_position.h"
 
-#include "r2_share/scenario.h"
+#include "game_share/scenario.h"
 
 #include "game_item_manager/game_item_ptr.h"
 

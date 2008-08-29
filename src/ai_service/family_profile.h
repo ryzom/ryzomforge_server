@@ -11,7 +11,7 @@
 #include "nel/misc/smart_ptr.h"
 
 #include "ai_share/ai_types.h"
-#include "game_share/mission_messages.h"
+#include "server_share/mission_messages.h"
 #include "game_share/zc_shard_common.h"
 #include "ai_factory.h"
 

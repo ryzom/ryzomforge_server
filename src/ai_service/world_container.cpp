@@ -12,7 +12,7 @@
 #include "nel/misc/path.h"
 #include "nel/misc/file.h"
 //	#include "nel/misc/hierarchical_timer.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 
 
 using namespace std;

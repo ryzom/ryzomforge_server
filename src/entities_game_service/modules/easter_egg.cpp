@@ -17,7 +17,7 @@
 #include "player_manager/player_manager.h"
 #include "player_manager/character.h"
 #include "creature_manager/creature_manager.h"
-#include "r2_share/scenario.h"
+#include "game_share/scenario.h"
 #include "modules/character_control.h"
 
 using namespace std;

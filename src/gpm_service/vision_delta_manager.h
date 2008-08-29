@@ -7,7 +7,7 @@
 #define VISION_DELTA_MANAGER_H
 
 #include "nel/net/message.h"
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 
 
 class CVisionDeltaManager: public R2_VISION::IVisionDeltaManager

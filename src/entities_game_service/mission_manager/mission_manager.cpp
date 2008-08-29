@@ -16,7 +16,6 @@
 
 #include "game_share/emote_list_parser.h"
 #include "game_share/generic_xml_msg_mngr.h"
-#include "game_share/stl_allocator_checker.h"
 
 #include "egs_sheets/egs_sheets.h"
 #include "egs_sheets/egs_static_encyclo.h"
@@ -41,6 +40,7 @@
 #include "world_instances.h"
 #include "mission_step_ai.h"
 #include "mission_step_misc.h"
+#include "server_share/stl_allocator_checker.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -85,7 +85,6 @@ RY_PDS::IPDBaseData* CMissionManager::missionFactoryPDGuild()
 */
 void CCAisActionMsgImp::callback(const std::string &name, NLNET::TServiceId id)
 {
-	STL_ALLOC_CONTEXT
 	if ( Content.size() == 2 )
 	{
 		MISDBG("CCAisActionMsg received. params = '%s' , '%s'", Content[0].c_str(),Content[1].c_str());
@@ -707,7 +706,6 @@ void CMissionManager::instanciateChargeMission(TAIAlias  alias, TAIAlias giver, 
 
 void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAlias giver, std::list< CMissionEvent * > & eventList, TAIAlias mainMission)
 {
-	STL_ALLOC_CONTEXT
 	nlassert(user);
 	
 	string sDebugPrefix = "user:" + user->getId().toString() + " miss:" + CPrimitivesParser::aliasToString(alias);

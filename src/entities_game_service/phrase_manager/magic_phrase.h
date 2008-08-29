@@ -10,7 +10,7 @@
 #define RY_MAGIC_PHRASE_H
 
 //
-#include "game_share/target.h"
+#include "server_share/target.h"
 #include "game_share/magic_fx.h"
 //
 #include "s_phrase.h"

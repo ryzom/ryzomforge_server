@@ -5,7 +5,7 @@
 #include "ai_grp_npc.h"
 #include "group_profile.h"
 #include "ai_generic_fight.h"
-#include "game_share/msg_brick_service.h"
+#include "server_share/msg_brick_service.h"
 
 #include "continent_inline.h"
 #include "dyn_grp_inline.h"

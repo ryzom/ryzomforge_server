@@ -21,7 +21,7 @@
 //#include "game_share/chat_dynamic_database.h"
 #include "game_share/string_manager_sender.h"
 #include "game_share/gender.h"
-#include "r2_share/r2_share_itf.h"
+#include "game_share/r2_share_itf.h"
 
 #include <map>
 #include <string>

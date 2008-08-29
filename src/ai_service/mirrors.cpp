@@ -14,8 +14,8 @@
 #include "game_share/fame.h"
 #include "ai_bot_npc.h"
 #include "ai_grp_npc.h"
-#include "r2_share/r2_variables.h"
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_variables.h"
+#include "server_share/r2_vision.h"
 
 
 #include "ai.h"

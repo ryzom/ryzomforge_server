@@ -28,9 +28,9 @@
 #include "nel/net/callback_server.h"
 
 #include "game_share/ryzom_entity_id.h"
-#include "game_share/mail_forum_itf.h"
+#include "server_share/mail_forum_itf.h"
 #include "game_share/utils.h"
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 
 #include "database_mapping.h"
 #include "entity_locator.h"

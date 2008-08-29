@@ -12,9 +12,9 @@
 #include "game_share/bot_chat_types.h"
 #include "game_share/backup_service_interface.h"
 #include "game_share/ryzom_mirror_properties.h"
-#include "game_share/mail_forum_validator.h"
+#include "server_share/mail_forum_validator.h"
 #include "game_share/persistent_data_tree.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"

@@ -18,12 +18,11 @@
 #include "nel/misc/common.h"
 // game share
 #include "game_share/mode_and_behaviour.h"
-#include "game_share/combat_state.h"
+#include "server_share/combat_state.h"
 #include "game_share/hit_type.h"
 #include "game_share/time_weather_season/time_date_season_manager.h"
 #include "game_share/magic_fx.h"
 #include "game_share/intensity_types.h"
-#include "game_share/stl_allocator_checker.h"
 //
 #include "entity_structure/statistic.h"
 #include "egs_sheets/egs_sheets.h"
@@ -1602,7 +1601,6 @@ bool  CCombatPhrase::update()
 //--------------------------------------------------------------
 void  CCombatPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CCombatPhrase_execute);
 	
 	// check attacker is still valid
@@ -2760,7 +2758,6 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 //--------------------------------------------------------------
 void CCombatPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CCombatPhrase_apply);
 	
 	if (!_Attacker)

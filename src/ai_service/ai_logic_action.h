@@ -9,7 +9,7 @@
 #define RYAI_LOGIC_ACTION_H
 
 #include "alias_tree_owner.h"
-#include "r2_share/r2_basic_types.h"
+#include "game_share/r2_basic_types.h"
 
 class IAIEvent;
 

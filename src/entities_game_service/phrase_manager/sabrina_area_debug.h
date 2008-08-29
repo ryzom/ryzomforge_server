@@ -13,7 +13,7 @@
 
 #include "egs_mirror.h"
 #include "area_geometry.h"
-#include "game_share/bmp4image.h"
+#include "server_share/bmp4image.h"
 
 
 

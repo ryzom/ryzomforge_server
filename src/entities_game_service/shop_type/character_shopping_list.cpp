@@ -25,7 +25,7 @@
 #include "shop_type/shop_type_manager.h"
 #include "mission_manager/mission_event.h"
 #include "player_manager/item_service_manager.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 
 
 using namespace std;

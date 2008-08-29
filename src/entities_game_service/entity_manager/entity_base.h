@@ -14,18 +14,18 @@
 // INCLUDE //
 /////////////
 // game share
-#include "game_share/action_flags.h"
+#include "server_share/action_flags.h"
 #include "game_share/client_action_type.h"
 #include "game_share/constants.h"
-#include "game_share/creature_size.h"
+#include "server_share/creature_size.h"
 #include "game_share/mode_and_behaviour.h"
-#include "game_share/mirror_equipment.h"
+#include "server_share/mirror_equipment.h"
 #include "game_share/properties.h"
 #include "game_share/effect_families.h"
 #include "game_share/mount_people.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 //
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 //
 #include "entity_structure/entity_persistant_data.h"
 #include "gameplay_module_lib/module_core.h"

@@ -8,7 +8,7 @@
 #ifndef RY_GPMS_MESSAGES_H
 #define RY_GPMS_MESSAGES_H
 
-#include "game_share/msg_gpm_service.h"
+#include "server_share/msg_gpm_service.h"
 
 class CGPMPlayerPrivilegeInst : public CGPMPlayerPrivilege
 {

@@ -8,7 +8,7 @@
 
 #include "ai_bot_pet.h"			// for CSpawnBotPet
 #include "ai_grp_pet.h"			// for CSpawnGroupPet
-#include "game_share/animal_hunger.h"	// for CSpeedLimit
+#include "server_share/animal_hunger.h"	// for CSpeedLimit
 
 using namespace NLMISC;
 using namespace NLNET;

@@ -12,7 +12,7 @@
 #include "nel/ligo/primitive.h"
 #include "game_share/base_types.h"
 #include "game_share/pvp_clan.h"
-#include "game_share/pvp_relation.h"
+#include "server_share/pvp_relation.h"
 
 #include "mission_manager/ai_alias_translator.h"
 

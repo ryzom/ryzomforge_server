@@ -21,7 +21,7 @@
 
 #include "game_share/ryzom_entity_id.h"
 #include "game_share/player_vision_delta.h"
-#include "game_share/continent_container.h"
+#include "server_share/continent_container.h"
 #include "game_share/tick_event_handler.h"
 #include "game_share/mirror_prop_value.h"
 #include "game_share/ryzom_mirror_properties.h"

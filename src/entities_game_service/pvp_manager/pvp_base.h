@@ -10,7 +10,7 @@
 #define RY_PVP_BASE_H
 
 #include "game_share/pvp_mode.h"
-#include "game_share/pvp_relation.h"
+#include "server_share/pvp_relation.h"
 
 //#ifdef NL_DEBUG
 // uncomment this if you want PVP stuff to be verbose

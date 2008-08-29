@@ -20,7 +20,6 @@
 // game share
 #include "game_share/brick_families.h"
 #include "game_share/string_manager_sender.h"
-#include "game_share/stl_allocator_checker.h"
 
 #include "egs_sheets/egs_sheets.h"
 #include "egs_sheets/egs_static_brick.h"
@@ -281,7 +280,6 @@ bool  CHarvestPhrase::update()
 //-----------------------------------------------
 void  CHarvestPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CHarvestPhrase_execute);
 	
 	const NLMISC::TGameCycle time = CTickEventHandler::getGameCycle();
@@ -320,7 +318,6 @@ bool CHarvestPhrase::launch()
 //-----------------------------------------------
 void CHarvestPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CHarvestPhrase_apply);
 	
 	// spend energies

@@ -6,8 +6,8 @@
 #include "stdpch.h"
 #include "ai_bot.h"
 #include "visual_properties_interface.h"
-#include "game_share/msg_brick_service.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/msg_brick_service.h"
+#include "server_share/r2_variables.h"
 
 using namespace MULTI_LINE_FORMATER;
 

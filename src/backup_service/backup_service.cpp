@@ -13,8 +13,8 @@
 #include "nel/misc/sheet_id.h"
 
 #include "game_share/backup_service_messages.h"
-#include "game_share/backup_service_itf.h"
-#include "game_share/handy_commands.h"
+#include "server_share/backup_service_itf.h"
+#include "server_share/handy_commands.h"
 
 #include "backup_service.h"
 #include "web_connection.h"

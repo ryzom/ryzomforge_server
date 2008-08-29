@@ -10,8 +10,6 @@
 #include "nel/net/module.h"
 #include "nel/net/module_builder_parts.h"
 
-#include "game_share/stl_allocator_checker.h"
-
 #include "guild_unifier.h"
 #include "guild_manager/guild_unifier_itf.h"
 #include "guild_manager/guild.h"
@@ -636,7 +634,6 @@ public:
 	// The guild has been saved, the guild host send an update of the guild status (with fames, but no members)
 	virtual void updateGuild(NLNET::IModuleProxy *sender, const CGuildDesc &guildInfo)
 	{
-		STL_ALLOC_CONTEXT
 		// 1st, retrieve the guild
 		CGuild *guild = CGuildManager::getInstance()->getGuildFromId(guildInfo.getGuildId());
 		BOMB_IF(guild == NULL, "Failed to retrieve foreign guild "<<guildIdToString(guildInfo.getGuildId())<<" to update", return);

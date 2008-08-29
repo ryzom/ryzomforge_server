@@ -26,7 +26,7 @@
 #include "game_share/tick_event_handler.h"
 #include "game_share/mirror.h"
 
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 
 #include "move_checker.h"
 #include "world_position_manager.h"

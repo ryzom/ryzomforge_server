@@ -10,7 +10,7 @@
 #include "ai_player.h"
 #include "ai_mgr_npc.h"
 #include "ai_bot_npc.h"
-#include "game_share/animal_hunger.h"
+#include "server_share/animal_hunger.h"
 #include "ai_profile_pet.h"
 
 using namespace NLMISC;

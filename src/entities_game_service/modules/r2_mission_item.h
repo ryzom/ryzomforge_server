@@ -15,7 +15,7 @@
 #include "nel/misc/types_nl.h"
 #include "nel/misc/singleton.h"
 #include "nel/misc/entity_id.h"
-#include "r2_share/scenario.h"
+#include "game_share/scenario.h"
 
 #include "game_item_manager/game_item.h"
 

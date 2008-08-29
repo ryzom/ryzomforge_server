@@ -10,7 +10,7 @@
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"
 #include "player_manager/character.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "world_instances.h"
 #include "primitives_parser.h"
 #include "mission_manager/mission_manager.h"

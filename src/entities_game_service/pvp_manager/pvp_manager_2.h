@@ -11,7 +11,7 @@
 #include "dyn_chat_egs.h"
 
 #include "game_share/pvp_clan.h"
-#include "game_share/pvp_relation.h"
+#include "server_share/pvp_relation.h"
 #include "pvp_manager/pvp_safe_zone.h"
 
 class CCharacter;

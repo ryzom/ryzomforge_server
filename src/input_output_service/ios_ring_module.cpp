@@ -2,8 +2,8 @@
 #include "stdpch.h"
 #include "nel/net/module_builder_parts.h"
 
-#include "r2_share/r2_variables.h"
-#include "r2_share/r2_share_itf.h"
+#include "server_share/r2_variables.h"
+#include "game_share/r2_share_itf.h"
 
 #include "string_manager.h"
 #include "input_output_service.h"

@@ -19,7 +19,6 @@
 #include "mission_manager/mission_parser.h"
 #include "nel/misc/algo.h"
 #include "game_share/fame.h"
-#include "game_share/stl_allocator_checker.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -93,7 +92,6 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Kill )
 		{
 			CMissionEventKill & eventSpe = (CMissionEventKill&)event;
@@ -258,7 +256,6 @@ class CMissionStepKillRace : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Kill )
 		{
 			CMissionEventKill & eventSpe = (CMissionEventKill&)event;
@@ -401,7 +398,6 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Kill )
 		{
 			CMissionEventKill & eventSpe = (CMissionEventKill&)event;
@@ -519,7 +515,6 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::KillGroup )
 		{
 			CMissionEventKillGroup & eventSpe = (CMissionEventKillGroup&)event;
@@ -617,7 +612,6 @@ class CMissionStepKillFaction : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Kill )
 		{
 			CMissionEventKill & eventSpe = (CMissionEventKill&)event;
@@ -784,7 +778,6 @@ class CMissionStepKillByName : public IMissionStepTemplate
 	}
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Kill )
 		{
 			CMissionStepKillByName & eventSpe = (CMissionStepKillByName&)event;

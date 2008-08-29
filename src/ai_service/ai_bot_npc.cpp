@@ -6,7 +6,7 @@
 #include "stdpch.h"
 
 #include "game_share/visual_slot_manager.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 #include "ai_bot_npc.h"
 #include "ai_grp_npc.h"

@@ -18,26 +18,25 @@
 #include "nel/misc/sstring.h"
 
 //game share
-#include "game_share/msg_object_player_manager.h"
-#include "game_share/msg_brick_service.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_object_player_manager.h"
+#include "server_share/msg_brick_service.h"
+#include "server_share/msg_ai_service.h"
 #include "game_share/mode_and_behaviour.h"
-#include "game_share/effect_message.h"
-#include "game_share/pet_interface_msg.h"
+#include "server_share/effect_message.h"
+#include "server_share/pet_interface_msg.h"
 //#include "game_share/chat_static_database.h"
 #include "game_share/ryzom_version.h"
 #include "game_share/mirror.h"
-#include "game_share/effect_manager.h"
+#include "server_share/effect_manager.h"
 #include "game_share/time_weather_season/time_date_season_manager.h"
 #include "game_share/time_weather_season/time_and_season.h"
 #include "game_share/singleton_registry.h"
 #include "game_share/file_description_container.h"
 #include "game_share/dyn_chat.h"
-#include "game_share/mail_forum_validator.h"
+#include "server_share/mail_forum_validator.h"
 #include "game_share/mainland_summary.h"
 #include "game_share/shard_names.h"
-#include "game_share/handy_commands.h"
-#include "game_share/stl_allocator_checker.h"
+#include "server_share/handy_commands.h"
 
 // egs
 #include "game_item_manager/game_item_manager.h"
@@ -114,7 +113,8 @@
 #include "player_manager/player_manager.h"
 #include "modules/r2_give_item.h"
 
-#include "game_share/logger_service_client.h"
+#include "server_share/logger_service_client.h"
+#include "server_share/stl_allocator_checker.h"
 
 ///////////
 // USING //
@@ -651,8 +651,6 @@ void updateConvertFile()
 //---------------------------------------------------
 void CPlayerService::egsUpdate()
 {
-	STL_ALLOC_CONTEXT
-
 	// reset the load/save char/tick counter
 	CharacterSavePerTick = CharacterSaveCounter;
 	CharacterSaveCounter = 0;

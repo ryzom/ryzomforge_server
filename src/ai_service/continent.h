@@ -15,7 +15,7 @@
 #include "manager_parent.h"
 #include "family_profile.h"
 #include "ai_place_xyr.h"
-#include "game_share/mission_messages.h"
+#include "server_share/mission_messages.h"
 #include <set>
 #include "family_behavior.h"
 #include "ai_outpost.h"

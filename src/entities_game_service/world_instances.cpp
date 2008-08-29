@@ -7,7 +7,7 @@
 
 
 #include "stdpch.h"
-#include "game_share/used_continent.h"
+#include "server_share/used_continent.h"
 #include "world_instances.h"
 #include "egs_variables.h"
 

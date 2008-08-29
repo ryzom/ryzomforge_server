@@ -24,12 +24,12 @@
 #include "game_share/ryzom_mirror_properties.h"
 #include "game_share/mode_and_behaviour.h"
 #include "game_share/synchronised_message.h"
-#include "game_share/used_continent.h"
-#include "game_share/pet_interface_msg.h"
+#include "server_share/used_continent.h"
+#include "server_share/pet_interface_msg.h"
 #include "game_share/utils.h"
 //
 // r2 share
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 //
 // local
 #include "gpm_service.h"

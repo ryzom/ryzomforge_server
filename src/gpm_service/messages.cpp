@@ -9,8 +9,8 @@
 
 #include "game_share/utils.h"
 
-#include "r2_share/r2_variables.h"
-#include "r2_share/r2_messages.h"
+#include "server_share/r2_variables.h"
+#include "game_share/r2_messages.h"
 
 #include "gpm_service.h"
 #include "messages.h"

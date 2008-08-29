@@ -14,7 +14,7 @@
 #include "player_manager/player.h"
 #include "player_manager/player_manager.h"
 #include "egs_sheets/egs_sheets.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 
 using namespace NLMISC;
 using namespace std;

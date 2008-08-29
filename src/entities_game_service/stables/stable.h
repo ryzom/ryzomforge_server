@@ -10,8 +10,8 @@
 #define RYZOM_STABLE_H
 
 #include "game_share/continent.h"
-#include "game_share/respawn_point_type.h"
-#include "game_share/entity_state.h"
+#include "server_share/respawn_point_type.h"
+#include "server_share/entity_state.h"
 
 /**
  * CStable

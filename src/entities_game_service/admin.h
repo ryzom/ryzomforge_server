@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "game_share/log_character_gen.h"
+#include "server_share/log_character_gen.h"
 
 struct CAdminCommand
 {

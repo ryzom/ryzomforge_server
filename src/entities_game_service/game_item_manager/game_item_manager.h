@@ -17,7 +17,7 @@
 #include <queue>
 
 // game_share
-#include "game_share/msg_gpm_service.h"
+#include "server_share/msg_gpm_service.h"
 #include "game_share/inventories.h"
 
 #include "game_item_manager/game_item.h"

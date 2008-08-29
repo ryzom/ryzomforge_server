@@ -2,7 +2,7 @@
 #define AIS_USER_MODELS
 
 
-#include "game_share/npc_description_messages.h"
+#include "server_share/npc_description_messages.h"
 
 class CAIUserModelManager
 {

@@ -13,7 +13,7 @@
 #include "pvp_interface.h"
 
 #include "game_share/pvp_clan.h"
-#include "game_share/pvp_relation.h"
+#include "server_share/pvp_relation.h"
 
 /**
  * A Duel between 2 players

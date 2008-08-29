@@ -22,7 +22,6 @@
 #include "player_manager/character_encyclopedia.h"
 #include "primitives_parser.h"
 #include "game_share/time_weather_season/time_date_season_manager.h"
-#include "game_share/stl_allocator_checker.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -35,7 +34,6 @@ CVariable<float> MissionForcedTime( "egs", "MissionForcedTime", "-1=Use real ryz
 //----------------------------------------------------------------------------
 void CMissionBaseBehaviour::onCreation( TAIAlias giver)
 {
-	STL_ALLOC_CONTEXT
 	_ClientIndex = 0xFF; // Must be initialized with setClientIndex later (for instance in looking in the DB)
 	_Mission->setFailureIndex(0xFFFFFFFF);
 	_Mission->setDescIndex(0xFFFFFFFF);
@@ -416,7 +414,6 @@ void CMissionBaseBehaviour::removeCompassPlace( uint16 placeId )
 //----------------------------------------------------------------------------
 CMissionEvent::TResult CMissionBaseBehaviour::processEventForStep( const TDataSetRow & userRow, EGSPD::CActiveStepPD & step, CMissionEvent & event )
 {
-	STL_ALLOC_CONTEXT
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	nlassert(templ);
 	nlassert( uint(step.getIndexInTemplate() - 1) < templ->Steps.size() );
@@ -501,7 +498,6 @@ bool CMissionBaseBehaviour::checkConstraints( bool logForProcessingEvent, const 
 //----------------------------------------------------------------------------
 CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & userRow, std::list< CMissionEvent* > & eventList,uint32 stepIndex )
 {
-	STL_ALLOC_CONTEXT
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	nlassert(templ);
 

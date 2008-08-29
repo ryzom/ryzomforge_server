@@ -20,7 +20,7 @@
 #include "egs_sheets/egs_sheets.h"
 #include "nel/misc/variable.h"
 #include "phrase_manager/s_effect.h"
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 
 
 using namespace NLMISC;

@@ -22,7 +22,7 @@
 
 #include "game_share/mirror_prop_value.h"
 #include "game_share/ryzom_mirror_properties.h"
-#include "game_share/msg_gpm_service.h"
+#include "server_share/msg_gpm_service.h"
 
 #include <deque>
 

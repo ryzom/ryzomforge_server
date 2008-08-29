@@ -18,8 +18,7 @@
 #include "phrase_manager/phrase_manager.h"
 #include "pvp_manager/pvp_manager_2.h"
 #include "phrase_manager/phrase_utilities_functions.h"
-#include "r2_share/r2_vision.h"
-#include "game_share/stl_allocator_checker.h"
+#include "server_share/r2_vision.h"
 
 #include "egs_sheets/egs_sheets.h"
 //
@@ -194,7 +193,6 @@ bool CDisconnectTimedAction::validate(CTimedActionPhrase *phrase, CEntityBase *a
 //-----------------------------------------------
 void CDisconnectTimedAction::applyAction(CTimedActionPhrase *phrase, CEntityBase *actor)
 {
-	STL_ALLOC_CONTEXT
 	// must be used by a player
 	CCharacter *character = dynamic_cast<CCharacter *> (actor);
 	if (!character)

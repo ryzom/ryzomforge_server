@@ -25,16 +25,16 @@
 #include "limits.h"
 
 
-#include "game_share/used_continent.h"
-#include "game_share/msg_brick_service.h"
+#include "server_share/used_continent.h"
+#include "server_share/msg_brick_service.h"
 #include "game_share/msg_client_server.h"
 #include "game_share/slot_equipment.h"
 //#include "game_share/chat_static_database.h"
 #include "game_share/inventories.h"
-#include "game_share/stats_status.h"
+#include "server_share/stats_status.h"
 #include "game_share/gender.h"
 #include "game_share/chat_group.h"
-#include "game_share/npc_description_messages.h"
+#include "server_share/npc_description_messages.h"
 #include "game_share/roles.h"
 #include "game_share/guild_grade.h"
 #include "game_share/fame.h"
@@ -54,11 +54,10 @@
 #include "game_share/shard_names.h"
 #include "game_share/character_sync_itf.h"
 #include "game_share/mainland_summary.h"
-#include "game_share/stl_allocator_checker.h"
 
-#include "r2_share/r2_share_itf.h"
+#include "game_share/r2_share_itf.h"
 
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 
 #include "egs_sheets/egs_sheets.h"
 #include "player_manager/character.h"
@@ -133,8 +132,8 @@
 #include "modules/char_name_mapper_client.h"
 #include "inter_shard_exchange_validator.h"
 #include "modules/client_command_forwarder.h"
-#include "game_share/log_character_gen.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_character_gen.h"
+#include "server_share/log_item_gen.h"
 
 ///////////
 // USING //
@@ -11294,7 +11293,6 @@ void CCharacter::updateMissionHistories(TAIAlias missionAlias, /*TMissionResult*
 
 bool CCharacter::processMissionEventList( std::list< CMissionEvent* > & eventList,bool deleteEvent, TAIAlias alias)
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CCharacter_processMissionEventList);
 	
 	if ( eventList.empty() )

@@ -10,7 +10,6 @@
 // game share
 #include "game_share/brick_families.h"
 #include "game_share/string_manager_sender.h"
-#include "game_share/stl_allocator_checker.h"
 //
 #include "special_power_phrase.h"
 #include "s_phrase_factory.h"
@@ -664,7 +663,6 @@ bool  CSpecialPowerPhrase::update()
 //-----------------------------------------------
 void  CSpecialPowerPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	_ExecutionEndDate = 0;
 	// nothing to do
 }// CSpecialPowerPhrase execute
@@ -686,7 +684,6 @@ bool CSpecialPowerPhrase::launch()
 //-----------------------------------------------
 void CSpecialPowerPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	_LatencyEndDate = 0;
 
 	// TODO

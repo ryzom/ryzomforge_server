@@ -14,7 +14,7 @@
 #include "nel/georges/u_form_elm.h"
 #include "nel/georges/u_form_loader.h"
 
-//#include "game_share/creature_size.h"
+//#include "server_share/creature_size.h"
 #include "game_share/skills.h"
 
 #include "egs_sheets/egs_static_raw_material.h"

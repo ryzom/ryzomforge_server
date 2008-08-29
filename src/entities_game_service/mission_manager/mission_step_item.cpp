@@ -16,7 +16,6 @@
 #include "egs_mirror.h"
 #include "primitives_parser.h"
 #include "egs_sheets/egs_sheets.h"
-#include "game_share/stl_allocator_checker.h"
 
 
 using namespace std;
@@ -135,7 +134,6 @@ class CMissionStepForage : public IMissionStepItem
 
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Forage )
 		{
 			CMissionEventForage & eventSpe = (CMissionEventForage&)event;
@@ -165,7 +163,6 @@ class CMissionStepLootItem : public IMissionStepItem
 {
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::LootItem )
 		{
 			CMissionEventLootItem & eventSpe = (CMissionEventLootItem&)event;
@@ -193,7 +190,6 @@ MISSION_REGISTER_STEP(CMissionStepLootItem,"loot_item")
 // ----------------------------------------------------------------------------
 uint CMissionStepLootRm::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
-	STL_ALLOC_CONTEXT
 	if ( event.Type == CMissionEvent::LootRm )
 	{
 		CMissionEventLootRm & eventSpe = (CMissionEventLootRm&)event;
@@ -220,7 +216,6 @@ class CMissionStepCraft : public IMissionStepItem
 {
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-		STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::Craft )
 		{
 			CMissionEventCraft & eventSpe = (CMissionEventCraft&)event;
@@ -267,7 +262,6 @@ class CMissionStepBuyItem : public IMissionStepItem
 	
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::BuyItem )
 		{
 			CMissionEventBuyItem & eventSpe = (CMissionEventBuyItem&)event;
@@ -349,7 +343,6 @@ class CMissionStepSellItem : public IMissionStepItem
 	
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if ( event.Type == CMissionEvent::SellItem )
 		{
 			CMissionEventSellItem & eventSpe = (CMissionEventSellItem&)event;

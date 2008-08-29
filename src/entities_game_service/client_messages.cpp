@@ -17,7 +17,7 @@
 #include "game_share/generic_xml_msg_mngr.h"
 #include "game_share/sphrase_com.h"
 #include "game_share/security_check.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 //egs
 #include "client_messages.h"
 #include "player_manager/player_manager.h"
@@ -44,8 +44,8 @@
 #include "guild_manager/guild_manager.h"
 #include "modules/r2_mission_item.h"
 #include "modules/r2_give_item.h"
-#include "r2_share/scenario.h"
-#include "r2_share/r2_vision.h"
+#include "game_share/scenario.h"
+#include "server_share/r2_vision.h"
 
 using namespace NLMISC;
 using namespace NLNET;

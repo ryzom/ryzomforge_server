@@ -19,7 +19,6 @@
 #include "player_manager/player.h"
 #include "phrase_manager/phrase_utilities_functions.h"
 #include "entity_structure/statistic.h"
-#include "game_share/stl_allocator_checker.h"
 
 
 DEFAULT_SPHRASE_FACTORY( CFaberPhrase, BRICK_TYPE::FABER );
@@ -308,7 +307,6 @@ bool  CFaberPhrase::update()
 //-----------------------------------------------
 void  CFaberPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CFaberPhrase_execute);
 	
 	CCharacter* player = PlayerManager.getChar(_ActorRowId);
@@ -357,7 +355,6 @@ bool CFaberPhrase::launch()
 //-----------------------------------------------
 void CFaberPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CFaberPhrase_apply);
 	
 	CCharacter * c = dynamic_cast< CCharacter * > ( CEntityBaseManager::getEntityBasePtr( _ActorRowId ) );

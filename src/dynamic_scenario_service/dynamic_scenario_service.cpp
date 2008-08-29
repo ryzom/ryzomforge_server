@@ -8,13 +8,13 @@
 #include "dynamic_scenario_service.h"
 
 #include <sstream>
-#include "r2_modules/dms.h"
-#include "r2_modules/ai_wrapper.h"
-#include "r2_modules/server_animation_module.h"
-#include "r2_modules/server_edition_module.h"
+#include "game_share/dms.h"
+#include "game_share/ai_wrapper.h"
+#include "game_share/server_animation_module.h"
+#include "game_share/server_edition_module.h"
 
-#include "r2_share/r2_ligo_config.h"
-#include "r2_share/ring_access.h"
+#include "game_share/r2_ligo_config.h"
+#include "game_share/ring_access.h"
 
 #include "nel/net/unified_network.h"
 #include "nel/net/module_manager.h"

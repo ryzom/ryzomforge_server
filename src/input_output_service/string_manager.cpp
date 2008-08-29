@@ -13,7 +13,7 @@
 #include "game_share/backup_service_interface.h"
 #include "nel/georges/u_form_elm.h"
 #include "nel/georges/load_form.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 #include <time.h>
 
 //---------------------------------------------------------------------------------------

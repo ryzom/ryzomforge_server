@@ -9,7 +9,7 @@
 #include "news_manager.h"
 #include "input_output_service.h"
 
-#include "game_share/generic_msg_mngr.h"
+//#include "game_share/generic_msg_mngr.h"
 #include "game_share/msg_client_server.h"
 #include "game_share/news_types.h"
 

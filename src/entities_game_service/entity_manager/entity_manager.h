@@ -12,7 +12,7 @@
 //game share
 #include "game_share/ryzom_entity_id.h"
 #include "game_share/sentence_appraisal.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 //
 #include "egs_mirror.h"
 

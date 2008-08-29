@@ -9,7 +9,7 @@
 #include "nel/net/service.h"
 #include "nel/misc/hierarchical_timer.h"
 #include "nel/misc/log.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 #include "pvp_manager/pvp_manager.h"
 #include "player_manager/player_manager.h"

@@ -16,14 +16,14 @@
 // game share
 #include "game_share/mode_and_behaviour.h"
 #include "game_share/characteristics.h"
-#include "game_share/creature_size.h"
+#include "server_share/creature_size.h"
 #include "game_share/combat_flying_text.h"
 // georges
 #include "nel/georges/u_form.h"
 #include "nel/georges/u_form_elm.h"
 #include "nel/georges/u_form_loader.h"
 
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 
 //
 #include "player_manager/character.h"

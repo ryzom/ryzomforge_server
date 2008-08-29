@@ -10,10 +10,10 @@
 #define RY_STAT_DB_H
 
 #include "nel/misc/static_map.h"
-#include "game_share/stat_db_msg.h"
-#include "game_share/stat_db_tree.h"
-#include "game_share/stat_db_tree_pd.h"
-#include "game_share/stat_db_tree_visitor.h"
+#include "server_share/stat_db_msg.h"
+#include "server_share/stat_db_tree.h"
+#include "server_share/stat_db_tree_pd.h"
+#include "server_share/stat_db_tree_visitor.h"
 
 class CFileDescription;
 

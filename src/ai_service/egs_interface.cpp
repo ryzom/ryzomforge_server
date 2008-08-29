@@ -9,7 +9,7 @@
 #include "egs_interface.h"
 #include "ai.h"
 #include "ai_mgr.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "ai_bot_fauna.h"
 #include "ai_grp_fauna.h"
 #include "ai_bot_npc.h"

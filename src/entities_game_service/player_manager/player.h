@@ -17,7 +17,7 @@
 #include "game_share/character_summary.h"
 #include "game_share/gender.h"
 #include "game_share/backup_service_interface.h"
-#include "game_share/entity_state.h"
+#include "server_share/entity_state.h"
 
 //
 // different level of priviliges for players

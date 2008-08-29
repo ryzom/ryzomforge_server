@@ -31,9 +31,9 @@
 #include "nel/net/module_socket.h"
 #include "nel/net/module_builder_parts.h"
 
-#include "game_share/entity_locator_itf.h"
+#include "server_share/entity_locator_itf.h"
 #include "game_share/utils.h"
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 #include "game_share/shard_names.h"
 #include "game_share/ryzom_entity_id.h"
 

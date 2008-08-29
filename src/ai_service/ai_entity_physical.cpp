@@ -6,7 +6,7 @@
 
 
 #include "stdpch.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 #include "ai_mgr.h"
 #include "ai_entity_physical.h"
 #include "ai_entity_physical_inline.h"

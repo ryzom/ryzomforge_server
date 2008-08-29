@@ -11,7 +11,7 @@
 
 #include "ai_mgr.h"
 #include "ai_bot_pet.h"
-#include "game_share/pet_interface_msg.h"
+#include "server_share/pet_interface_msg.h"
 
 class	CPetOwner;
 

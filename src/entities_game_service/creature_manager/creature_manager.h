@@ -11,11 +11,11 @@
 
 //game share
 #include "game_share/ryzom_entity_id.h"
-#include "game_share/npc_description_messages.h"
+#include "server_share/npc_description_messages.h"
 
 #include "entity_manager/entity_manager.h"
 #include "creature_manager/creature.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 
 extern NLNET::TUnifiedCallbackItem	GenNpcDescCbTable[];
 

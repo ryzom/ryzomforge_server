@@ -8,7 +8,7 @@
 #include "stdpch.h"
 #include "ai_generic_fight.h"
 #include "ai_player.h"
-#include "game_share/msg_brick_service.h"
+#include "server_share/msg_brick_service.h"
 #include "ai_profile_npc.h"
 
 extern bool simulateBug(int bugId);

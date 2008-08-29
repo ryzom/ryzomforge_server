@@ -15,7 +15,7 @@
 // misc
 #include "nel/misc/bit_mem_stream.h"
 //
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 //
 #include "special_power_taunt.h"
 #include "phrase_manager/phrase_utilities_functions.h"

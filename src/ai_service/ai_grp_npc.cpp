@@ -4,7 +4,7 @@
  */
 
 #include "stdpch.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 #include "ai_grp_npc.h"
 #include "ai_mgr_npc.h"
 #include "ai_bot_npc.h"
@@ -12,7 +12,7 @@
 #include "npc_description_msg.h"
 #include "ai_player.h"
 #include "ai_profile_npc.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 extern bool simulateBug(int bugId);
 

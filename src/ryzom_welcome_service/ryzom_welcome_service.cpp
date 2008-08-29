@@ -8,5 +8,5 @@ void foo()
 }
 
 
-#include "../../nelns/welcome_service/welcome_service.cpp"
-#include "../../nelns/welcome_service/welcome_service_itf.cpp"
+#include "../../../../nelns/welcome_service/welcome_service.cpp"
+#include "../../../../nelns/welcome_service/welcome_service_itf.cpp"

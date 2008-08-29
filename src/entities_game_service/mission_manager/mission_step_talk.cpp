@@ -15,7 +15,6 @@
 #include "creature_manager/creature_manager.h"
 #include "mission_manager/mission_manager.h"
 #include "game_item_manager/player_inv_xchg.h"
-#include "game_share/stl_allocator_checker.h"
 #include "egs_pd.h"
 
 #include "nel/misc/algo.h"
@@ -77,7 +76,6 @@ class CMissionStepTalk : public IMissionStepTemplate
 
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		// not check here : they are done befor. If a talk event comes here, the step is complete
 		if( event.Type == CMissionEvent::Talk )		
 		{
@@ -187,7 +185,6 @@ class CMissionGiveMoney : public IMissionStepTemplate
 	
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		// not check here : they are done before. If a give event comes here, the step advances
 		if( event.Type == CMissionEvent::GiveMoney )
 		{
@@ -381,7 +378,6 @@ class CMissionStepGiveItem : public IMissionStepTemplate
 	
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
-	STL_ALLOC_CONTEXT
 		if( event.Type == CMissionEvent::GiveItem )
 		{
 			const CMissionEventGiveItem& eventSpe = (const CMissionEventGiveItem&)event;
@@ -713,7 +709,6 @@ bool CMissionStepDynChat::solveTextsParams( CMissionSpecificParsingData & missio
 
 uint CMissionStepDynChat::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {	
-	STL_ALLOC_CONTEXT
 	// 1 active dyn chat per mission, so if the event is triggered, it is for this step
 	if ( event.Type == CMissionEvent::EndDynChat )
 	{

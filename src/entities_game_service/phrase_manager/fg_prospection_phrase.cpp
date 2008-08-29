@@ -24,9 +24,9 @@
 #include "weather_everywhere.h"
 #include "world_instances.h"
 #include "progression/progression_pve.h"
-#include "game_share/used_continent.h"
+#include "server_share/used_continent.h"
 #include "game_share/time_weather_season/time_date_season_manager.h"
-#include "game_share/stl_allocator_checker.h"
+#include "server_share/stl_allocator_checker.h"
 //#include "dss_session_manager.h"
 
 DEFAULT_SPHRASE_FACTORY( CFgProspectionPhrase, BRICK_TYPE::FORAGE_PROSPECTION );
@@ -437,7 +437,6 @@ bool CFgSearchPhrase::update()
  */
 void CFgSearchPhrase::execute()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CFgSearchPhrase_execute);
 	
 	// Init phrase execution
@@ -683,7 +682,6 @@ bool CFgProspectionPhrase::launch()
  */
 void CFgProspectionPhrase::apply()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CFgProspectionPhrase_apply);
 	
 	CCharacter* player = PlayerManager.getChar( _ActorRowId );
@@ -1501,7 +1499,7 @@ NLMISC_DYNVARIABLE( uint32, RyzomSeason, "Get season number (0=Spring)" )
 
 #ifdef DEPOSIT_MAP_GENERATION
 
-#include "game_share/bmp4image.h"
+#include "server_share/bmp4image.h"
 #include <nel/misc/words_dictionary.h>
 
 typedef std::map< std::string, pair< pair< float, float >, uint > > CSUMap;

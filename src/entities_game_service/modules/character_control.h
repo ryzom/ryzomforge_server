@@ -11,7 +11,7 @@
 #include "nel/misc/singleton.h"
 
 #include "game_share/far_position.h"
-#include "r2_share/scenario.h"
+#include "game_share/scenario.h"
 
 #include "modules/character_control.h"
 #include "modules/r2_mission_item.h"

@@ -8,7 +8,7 @@
 #ifndef RYAI_GRP_FAUNA_H
 #define RYAI_GRP_FAUNA_H
 
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 #include "ai_vision.h"
 #include "timer.h"
 #include "ai_place_xyr.h"

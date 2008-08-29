@@ -23,7 +23,7 @@
 #include "egs_globals.h"
 #include "egs_sheets/egs_sheets.h"
 #include "egs_sheets/egs_static_outpost.h"
-#include "game_share/used_continent.h"
+#include "server_share/used_continent.h"
 #include "primitives_parser.h"
 #include "world_instances.h"
 #include "entity_manager/entity_manager.h"

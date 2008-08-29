@@ -24,7 +24,7 @@
 #include "egs_sheets/egs_sheets.h"
 #include "egs_sheets/egs_static_outpost.h"
 #include "egs_variables.h"
-#include "game_share/used_continent.h"
+#include "server_share/used_continent.h"
 #include "primitives_parser.h"
 #include "world_instances.h"
 #include "entity_manager/entity_manager.h"
@@ -32,7 +32,7 @@
 #include "player_manager/player.h"
 #include "player_manager/player_manager.h"
 #include "phrase_manager/phrase_utilities_functions.h"
-#include "game_share/log_outpost_gen.h"
+#include "server_share/log_outpost_gen.h"
 
 /**
 

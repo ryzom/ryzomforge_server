@@ -22,13 +22,13 @@
 
 //Game share
 #include "game_share/slot_equipment.h"
-#include "game_share/ai_event.h"
+#include "server_share/ai_event.h"
 #include "game_share/ryzom_mirror_properties.h"
 #include "game_share/chat_group.h"
-#include "game_share/effect_manager.h"
+#include "server_share/effect_manager.h"
 #include "game_share/visual_fx.h"
 
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_vision.h"
 
 #include "entity_manager/entity_base.h"
 #include "entity_manager/entity_manager.h"

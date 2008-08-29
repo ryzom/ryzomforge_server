@@ -12,7 +12,7 @@
 #include "game_item_manager/weapon_craft_parameters.h"
 #include "game_share/string_manager_sender.h"
 
-#include "r2_share/scenario.h"
+#include "game_share/scenario.h"
 
 #include "modules/character_control.h"
 #include "modules/r2_mission_item.h"
@@ -24,7 +24,7 @@
 #include "player_manager/player.h"
 #include "phrase_manager/phrase_utilities_functions.h"
 #include "egs_sheets/egs_sheets.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 
 using namespace NLMISC;
 using namespace std;

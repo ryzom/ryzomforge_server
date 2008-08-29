@@ -10,7 +10,7 @@
 #include "stdpch.h"
 #include "nel/net/module_builder_parts.h"
 #include "game_share/ring_session_manager_itf.h"
-#include "game_share/log_ring_gen.h"
+#include "server_share/log_ring_gen.h"
 #include "animation_session_manager.h"
 #include "player_manager/character_interface.h"
 #include "player_manager/ring_reward_points.h"

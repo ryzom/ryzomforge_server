@@ -7,8 +7,8 @@
 #include "nel/misc/types_nl.h"
 #include "nel/net/module.h"
 #include "nel/net/module_builder_parts.h"
-#include "game_share/chat_unifier_itf.h"
-#include "r2_share/r2_variables.h"
+#include "server_share/chat_unifier_itf.h"
+#include "server_share/r2_variables.h"
 
 #include "input_output_service.h"
 #include "chat_manager.h"

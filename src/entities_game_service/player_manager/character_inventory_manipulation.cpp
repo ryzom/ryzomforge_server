@@ -19,7 +19,7 @@
 #include "game_share/temp_inventory_mode.h"
 #include "game_share/bot_chat_types.h"
 
-#include "r2_share/scenario.h"
+#include "game_share/scenario.h"
 
 #include "egs_sheets/egs_sheets.h"
 
@@ -59,7 +59,7 @@
 #include "game_item_manager/player_inv_xchg.h"
 
 #include "modules/r2_mission_item.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 #include "egs_dynamic_sheet_manager.h"
 
 ///////////

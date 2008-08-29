@@ -16,22 +16,22 @@
 // game share
 #include "game_share/ryzom_entity_id.h"
 #include "game_share/mode_and_behaviour.h"
-#include "game_share/msg_brick_service.h"
-#include "game_share/event_report.h"
+#include "server_share/msg_brick_service.h"
+#include "server_share/event_report.h"
 #include "game_share/loot_harvest_state.h"
 #include "game_share/msg_client_server.h"
-#include "game_share/combat_state.h"
+#include "server_share/combat_state.h"
 #include "game_share/seeds.h"
 #include "game_share/client_action_type.h"
-#include "game_share/mail_forum_validator.h"
-#include "game_share/used_continent.h"
+#include "server_share/mail_forum_validator.h"
+#include "server_share/used_continent.h"
 #include "game_share/entity_types.h"
 #include "game_share/mainland_summary.h"
 #include "game_share/shard_names.h"
-#include "game_share/testing_tool_structures.h"
+#include "server_share/testing_tool_structures.h"
 
-#include "r2_share/r2_vision.h"
-#include "r2_share/r2_share_itf.h"
+#include "server_share/r2_vision.h"
+#include "game_share/r2_share_itf.h"
 
 #include "phrase_manager/phrase_utilities_functions.h"
 #include "entities_game_service.h"
@@ -68,9 +68,9 @@
 #include "modules/character_control.h"
 
 #include "egs_sheets/egs_sheets.h"
-#include "game_share/log_player_gen.h"
-#include "game_share/log_character_gen.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_player_gen.h"
+#include "server_share/log_character_gen.h"
+#include "server_share/log_item_gen.h"
 
 
 

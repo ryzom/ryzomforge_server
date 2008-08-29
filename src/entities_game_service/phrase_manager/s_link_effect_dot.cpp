@@ -18,7 +18,7 @@
 #include "entity_structure/statistic.h"
 #include "progression/progression_pvp.h"
 
-#include "game_share/ai_event_report.h"
+#include "server_share/ai_event_report.h"
 
 
 using namespace std;

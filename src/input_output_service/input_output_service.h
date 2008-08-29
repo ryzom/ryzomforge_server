@@ -13,7 +13,7 @@
 #include "nel/net/service.h"
 #include "nel/misc/sstring.h"
 
-#include "game_share/generic_msg_mngr.h"
+//#include "game_share/generic_msg_mngr.h"
 #include "game_share/generic_xml_msg_mngr.h"
 
 #include "chat_manager.h"
@@ -25,7 +25,7 @@
 #include "game_share/player_visual_properties.h"
 #include "game_share/shard_names.h"
 
-#include "r2_share/r2_basic_types.h"
+#include "game_share/r2_basic_types.h"
 
 
 extern bool							ShowChat;

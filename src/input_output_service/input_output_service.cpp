@@ -17,7 +17,7 @@
 #include "game_share/ryzom_version.h"
 #include "game_share/ryzom_mirror_properties.h"
 #include "game_share/singleton_registry.h"
-#include "game_share/logger_service_client.h"
+#include "server_share/logger_service_client.h"
 
 #include "nel/misc/bit_mem_stream.h"
 #include "nel/misc/path.h"

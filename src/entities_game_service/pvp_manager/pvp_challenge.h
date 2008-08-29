@@ -12,7 +12,7 @@
 #include "pvp_base.h"
 #include "game_share/base_types.h"
 #include "game_share/string_manager_sender.h"
-#include "game_share/entity_state.h"
+#include "server_share/entity_state.h"
 
 class CCharacter;
 

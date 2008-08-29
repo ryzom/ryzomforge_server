@@ -2,7 +2,7 @@
 #include "stdpch.h"
 #include "nel/net/module_builder_parts.h"
 
-#include "game_share/char_name_mapper_itf.h"
+#include "server_share/char_name_mapper_itf.h"
 
 #include "string_manager.h"
 

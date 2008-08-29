@@ -10,8 +10,8 @@
 #include "nel/net/module.h"
 #include "nel/net/module_builder_parts.h"
 
-#include "r2_modules/r2_modules_itf.h"
-#include "r2_share/r2_variables.h"
+#include "game_share/r2_modules_itf.h"
+#include "server_share/r2_variables.h"
 
 #include "ais_control.h"
 

@@ -14,8 +14,8 @@
 
 
 #include "game_share/utils.h"
-#include "game_share/mail_forum_itf.h"
-#include "game_share/entity_locator_itf.h"
+#include "server_share/mail_forum_itf.h"
+#include "server_share/entity_locator_itf.h"
 #include "game_share/character_sync_itf.h"
 #include "game_share/msg_client_server.h"
 

@@ -24,7 +24,7 @@
 #include "entities_game_service.h"
 #include "phrase_manager/s_effect.h"
 #include "mission_manager/mission_event.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 
 
 extern NLMISC::CRandom RandomGenerator;

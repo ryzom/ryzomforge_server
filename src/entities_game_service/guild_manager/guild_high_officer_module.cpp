@@ -7,7 +7,7 @@
 #include "stdpch.h"
 
 #include "game_share/fame.h"
-#include "game_share/log_outpost_gen.h"
+#include "server_share/log_outpost_gen.h"
 
 #include "guild_manager/guild_member.h"
 #include "building_manager/building_physical.h"

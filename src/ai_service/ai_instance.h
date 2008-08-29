@@ -11,7 +11,7 @@
 #define RYAI_AI_INSTANCE_H
 
 #include "child_container.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 #include "ai_entity_matrix.h"
 #include "ai_entity.h"
 #include "continent.h"

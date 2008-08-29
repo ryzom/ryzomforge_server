@@ -12,7 +12,7 @@
 #include "player_manager/character_respawn_points.h"
 
 #include "game_share/pvp_clan.h"
-#include "game_share/pvp_relation.h"
+#include "server_share/pvp_relation.h"
 
 class CEntityBase;
 class CCharacter;

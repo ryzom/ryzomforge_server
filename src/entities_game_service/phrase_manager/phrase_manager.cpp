@@ -28,8 +28,7 @@
 #include "egs_sheets/egs_static_ai_action.h"
 //
 #include "nel/misc/algo.h"
-#include "game_share/stl_allocator_checker.h"
-
+#include "server_share/stl_allocator_checker.h"
 
 
 /////////////
@@ -343,7 +342,6 @@ void CPhraseManager::removeEntities()
 //--------------------------------------------------------------
 void CPhraseManager::updatePhrases()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(PhraseManagerUpdate);
 	
 	/************************************************************************/
@@ -465,7 +463,6 @@ void CPhraseManager::updatePhrases()
 //--------------------------------------------------------------
 void CPhraseManager::updateEntityCurrentAction(const TDataSetRow &entityId, CEntityPhrases &entityPhrases)
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(PhraseManager_updatePhrase);
 	
 	CSPhrasePtr phrase = entityPhrases.getCurrentAction();
@@ -510,7 +507,6 @@ void CPhraseManager::updateEntityCurrentAction(const TDataSetRow &entityId, CEnt
 		
 		if (!deletePhrase)
 		{
-			STL_ALLOC_CONTEXT
 			// update has been successful, now do things according to sentence state
 			switch(phrase->state())
 			{
@@ -540,7 +536,6 @@ void CPhraseManager::updateEntityCurrentAction(const TDataSetRow &entityId, CEnt
 				
 				if ( phrase->latencyEndDate() <= time )
 				{
-					STL_ALLOC_CONTEXT
 					CEntityBase *entity = CEntityBaseManager::getEntityBasePtr(entityId);
 					if (entity && entity->getId().getType() == RYZOMID::player)
 					{
@@ -574,7 +569,6 @@ void CPhraseManager::updateEntityCurrentAction(const TDataSetRow &entityId, CEnt
 	// the phrase is updated for the first time (or gets out from idle state), validate and execute it
 	else
 	{
-		STL_ALLOC_CONTEXT
 		if ( phrase->idle() )
 		{
 			H_AUTO(CEntityPhrases_updateEntityCurrentAction_processIdlePhrase);
@@ -590,7 +584,6 @@ void CPhraseManager::updateEntityCurrentAction(const TDataSetRow &entityId, CEnt
 		}
 
 		{
-			STL_ALLOC_CONTEXT
 			H_AUTO(CEntityPhrases_updateEntityCurrentAction_firstValidateAndExecute);
 			// if phrase has never been evaluated, evaluate it
 			if ( phrase->state() == CSPhrase::New )

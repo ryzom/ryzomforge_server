@@ -44,8 +44,8 @@
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
 #include "shop_type/named_items.h"
-#include "game_share/log_item_gen.h"
-#include "game_share/log_character_gen.h"
+#include "server_share/log_item_gen.h"
+#include "server_share/log_character_gen.h"
 
 using namespace std;
 using namespace NLMISC;

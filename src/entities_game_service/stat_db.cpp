@@ -10,7 +10,7 @@
 
 #include "nel/net/service.h"
 
-#include "game_share/mail_forum_validator.h"
+#include "server_share/mail_forum_validator.h"
 
 #include "player_manager/character.h"
 #include "player_manager/player_manager.h"

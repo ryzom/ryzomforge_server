@@ -4,8 +4,8 @@
 #include "ai_instance.h"
 #include "game_share/ryzom_entity_id.h"
 #include "ai_grp_npc.h"
-#include "r2_share/r2_variables.h"
-#include "r2_share/r2_vision.h"
+#include "server_share/r2_variables.h"
+#include "server_share/r2_vision.h"
 
 using namespace MULTI_LINE_FORMATER;
 

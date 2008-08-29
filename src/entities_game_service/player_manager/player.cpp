@@ -14,8 +14,7 @@
 #include "nel/net/service.h"
 
 #include "game_share/msg_client_server.h"
-#include "game_share/mail_forum_validator.h"
-#include "game_share/stl_allocator_checker.h"
+#include "server_share/mail_forum_validator.h"
 
 #include "player_manager/player.h"
 #include "player_manager/player_manager.h"
@@ -1084,7 +1083,6 @@ void CPlayer::getValue( std::string var, std::string& value )
 //---------------------------------------------------
 void CPlayer::removeAllCharacters()
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(RemoveAllCharacters);
 
 	for( uint32 i = 0; i < _Characters.size(); ++i )

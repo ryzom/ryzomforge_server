@@ -9,9 +9,9 @@
 #include "game_share/ring_session_manager_itf.h"
 #include "game_share/character_sync_itf.h"
 #include "game_share/utils.h"
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 #include "game_share/shard_names.h"
-#include "r2_share/r2_share_itf.h"
+#include "game_share/r2_share_itf.h"
 
 using namespace std;
 using namespace NLMISC;

@@ -10,7 +10,7 @@
 #define RYZOM_PROGRESSION_PVE_H
 
 #include "progression_common.h"
-#include "game_share/msg_ai_service.h"
+#include "server_share/msg_ai_service.h"
 //
 #include "egs_sheets/egs_static_success_table.h"
 #include "egs_mirror.h"

@@ -10,7 +10,7 @@
 #include "nel/misc/types_nl.h"
 #include "nel/net/service.h"
 #include "game_share/dyn_chat.h"
-#include "r2_modules/r2_session_backup_module.h"
+#include "../server_share/r2_session_backup_module.h"
 
 namespace NLNET
 {

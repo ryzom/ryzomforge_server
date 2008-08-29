@@ -7,7 +7,7 @@
 #ifndef GM_TP_PENDING_COMMAND_H
 #define GM_TP_PENDING_COMMAND_H
 
-#include "game_share/entity_state.h"
+#include "server_share/entity_state.h"
 
 #include <map>
 #include <string>

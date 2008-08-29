@@ -5,9 +5,9 @@
 
 #include "stdpch.h"
 // Game share
-#include "game_share/msg_brick_service.h"
+#include "server_share/msg_brick_service.h"
 #include "game_share/tick_event_handler.h"
-#include "game_share/effect_message.h"
+#include "server_share/effect_message.h"
 
 #include "combat_interface.h"
 #include "ai.h"

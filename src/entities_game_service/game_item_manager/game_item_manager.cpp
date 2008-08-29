@@ -23,7 +23,7 @@
 #include "egs_sheets/egs_sheets.h"
 #include "game_item_manager/game_item_manager.h"
 #include "shop_type/static_items.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 
 
 using namespace std;

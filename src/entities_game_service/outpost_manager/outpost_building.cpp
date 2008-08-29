@@ -5,7 +5,7 @@
  */
 
 #include "stdpch.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 #include "outpost.h"
 #include "outpost_building.h"
 #include "outpost_manager.h"

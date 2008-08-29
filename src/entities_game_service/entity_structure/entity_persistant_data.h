@@ -19,7 +19,7 @@
 #include "game_share/skills.h"
 #include "game_share/slot_equipment.h"
 #include "game_share/ryzom_mirror_properties.h"
-#include "game_share/entity_state.h"
+#include "server_share/entity_state.h"
 
 #include "statistic.h"
 #include "special_modifier.h"

@@ -52,11 +52,11 @@
 
 
 // Ring
-#include "r2_share/r2_variables.h"
+#include "server_share/r2_variables.h"
 
 #include "game_item_manager/game_item_manager.h"
 #include "entity_matrix.h"
-#include "game_share/log_item_gen.h"
+#include "server_share/log_item_gen.h"
 #include "egs_dynamic_sheet_manager.h"
 
 #include <string>

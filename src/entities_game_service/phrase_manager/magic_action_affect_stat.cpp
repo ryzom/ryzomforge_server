@@ -4,11 +4,6 @@
  * $Id: magic_action_affect_stat.cpp,v 1.70 2007/05/29 16:09:38 coutelas Exp $
  */
 
-
-
-
-
-
 #include "stdpch.h"
 #include "magic_action.h"
 #include "phrase_manager/magic_phrase.h"
@@ -20,7 +15,7 @@
 #include "entity_structure/statistic.h"
 #include "entity_manager/entity_manager.h"
 #include "game_share/magic_fx.h"
-#include "game_share/ai_event_report.h"
+#include "server_share/ai_event_report.h"
 #include "progression/progression_pvp.h"
 
 

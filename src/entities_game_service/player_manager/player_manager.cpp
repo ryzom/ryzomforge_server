@@ -16,9 +16,8 @@
 #include "nel/net/service.h"
 #include "nel/net/message.h"
 
-#include "game_share/mail_forum_validator.h"
+#include "server_share/mail_forum_validator.h"
 #include "game_share/send_chat.h"
-#include "game_share/stl_allocator_checker.h"
 
 //#include "../../pd_lib/pd_string_manager.h"
 
@@ -1235,7 +1234,6 @@ void CPlayerManager::setActiveCharForPlayer( uint32 userId, uint32 index, CEntit
 //---------------------------------------------------
 void CPlayerManager::disconnectPlayer( uint32 userId )
 {
-	STL_ALLOC_CONTEXT
 	H_AUTO(CPlayerManagerDisconnectPlayer);
 	
 	// save and remove active character

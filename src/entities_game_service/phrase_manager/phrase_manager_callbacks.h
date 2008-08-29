@@ -10,7 +10,7 @@
 #define EGS_PHRASE_MANAGER_CALLBACKS_H
 
 //
-#include "game_share/msg_brick_service.h"
+#include "server_share/msg_brick_service.h"
 
 /**
  * Implementation of the phrase execution description Transport class

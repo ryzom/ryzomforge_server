@@ -28,9 +28,9 @@
 
 #include "game_share/tick_event_handler.h"
 #include "messages.h"
-#include "game_share/msg_brick_service.h"
-#include "game_share/msg_ai_service.h"
-#include "game_share/effect_message.h"
+#include "server_share/msg_brick_service.h"
+#include "server_share/msg_ai_service.h"
+#include "server_share/effect_message.h"
 // ai_share
 #include "ai_share/ai_actions_dr.h"
 

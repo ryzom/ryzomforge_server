@@ -5,14 +5,14 @@
 #include "nel/net/callback_server.h"
 
 #include "../../nelns/welcome_service/welcome_service_itf.h"
-#include "r2_share/r2_types.h"
+#include "game_share/r2_types.h"
 
 
 #include "game_share/ryzom_entity_id.h"
 #include "game_share/ring_session_manager_itf.h"
 #include "game_share/misc_const.h"
 #include "game_share/utils.h"
-#include "game_share/mysql_wrapper.h"
+#include "server_share/mysql_wrapper.h"
 #include "game_share/shard_names.h"
 #include "game_share/security_check.h"
 
