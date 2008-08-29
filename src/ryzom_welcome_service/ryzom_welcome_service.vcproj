@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../../../common/src;.;.."
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -115,6 +116,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="../../../common/src;.;.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;NL_RELEASE_DEBUG"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
