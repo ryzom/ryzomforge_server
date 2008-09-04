@@ -8,7 +8,8 @@ include ../../../Variables.mk
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 		-I/usr/include/libxml2 \
 		-I$(NEL_INCLUDE) \
-		-I$(RYZOM_COMMON_SRC)
+		-I$(RYZOM_COMMON_SRC) \
+		-I..
 
 LDFLAGS      = $(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
