@@ -15,7 +15,6 @@
 #include "processing_spreader.h"
 #include "client_entity_id_translator.h"
 #include "vision_receiver.h"
-#include <hash_set>
 
 
 /*
@@ -34,7 +33,7 @@ class CClientIdLookup;
 /*struct TPairClientEntity
 {
 	TPairClientEntity() : ClientId(INVALID_CLIENT), SeenEntity() {}
-	
+
 	TPairClientEntity( TClientId clientid, TEntityIndex entityindex )
 	{
 		ClientId = clientid;
@@ -45,7 +44,7 @@ class CClientIdLookup;
 	{
 		return (e1.ClientId == e2.ClientId) && (e1.SeenEntity == e2.SeenEntity );
 	}
-	
+
 	TClientId		ClientId;
 	TEntityIndex	SeenEntity;
 };*/
@@ -59,7 +58,7 @@ class CClientIdLookup;
 {
 	// Default constructor
 	TPairClientSlot() : ClientId(INVALID_CLIENT), Slot(0) {}
-	
+
 	TPairClientSlot( TClientId clientid, CLFECOMMON::TCLEntityId slot )
 	{
 		ClientId = clientid;
@@ -71,7 +70,7 @@ class CClientIdLookup;
 	{
 		return (e1.ClientId == e2.ClientId) && (e1.Slot == e2.Slot );
 	}
-	
+
 	// Hash function: ClientId * 256 + CeId
 	struct CHash
 	{
@@ -156,7 +155,7 @@ public:
 	NLMISC::TTime			AssocStartTime;
 
 	CProcessingSpreader		DistanceSpreader;
-	
+
 protected:
 
 	/// Remove a pair. The client id cannot be INVALID_CLIENT
