@@ -3,9 +3,6 @@ BUILD_DIRS = \
 admin_modules \
 ryzom_admin_service \
 ryzom_naming_service \
-game_share \
-r2_share \
-r2_modules \
 mirror_service \
 ryzom_welcome_service \
 tick_service \
@@ -17,13 +14,12 @@ gameplay_module_lib \
 entities_game_service \
 ai_share \
 ai_service \
-monitor_service \
+#monitor_service \
 backup_service \
 pd_reference_builder \
-log_analyser_service \
+#log_analyser_service \
 mail_forum_service \
 dynamic_scenario_service \
-pdr_util \
 shard_unifier_service \
 session_browser_server \
 pd_support_service \

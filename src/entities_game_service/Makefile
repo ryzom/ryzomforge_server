@@ -16,15 +16,13 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-L../admin_modules \
 		-L$(RYZOM_COMMON_SRC)/game_share \
-		-L$(RYZOM_COMMON_SRC)/r2_share \
-		-L$(RYZOM_COMMON_SRC)/r2_modules \
+        -L../server_share \
 		-L../pd_lib \
 		-L../gameplay_module_lib \
 		-ladmin_modules \
 		-lpd_lib \
+        -lserver_share \
 		-lgame_share \
-		-lr2_share \
-		-lr2_modules \
 		-lnelligo \
 		-lnelgeorges \
 		-lgameplay_module_lib \
@@ -75,8 +73,7 @@ exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
 		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a \
-		$(RYZOM_COMMON_SRC)/r2_share/libr2_share.a \
-		$(RYZOM_COMMON_SRC)/r2_modules/libr2_modules.a \
+		../server_share/libserver_share.a \
 		../pd_lib/libpd_lib.a \
 		../gameplay_module_lib/libgameplay_module_lib.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)

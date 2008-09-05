@@ -24,13 +24,6 @@ using namespace NLNET;
 
 CRangeMirrorManager *RMMInstance = NULL;
 
-#if !FINAL_VERSION 
-#ifndef NL_OS_WINDOWS  //Its allowed to not be in FINAL_VERSION for dev (windows server)
-	#error("FINAL_VERSION must be true")
-#endif
-#endif
-
-
 // Pause state of the Tick Service (can be removed if the Range Manager is not hosted by the Tick Service)
 extern bool Pause;
 

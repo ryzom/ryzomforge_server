@@ -14,12 +14,12 @@ CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-L$(RYZOM_COMMON_SRC)/game_share \
+        -L../server_share \
 		-L../pd_lib \
-		-L$(RYZOM_COMMON_SRC)/r2_share \
 		-L../admin_modules \
 		-lpd_lib \
+        -lserver_share \
 		-lgame_share \
-		-lr2_share \
 		-ladmin_modules \
 		-lnelgeorges \
 		-lnelnet \
