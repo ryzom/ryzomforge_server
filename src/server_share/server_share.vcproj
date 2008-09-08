@@ -157,42 +157,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\ai_aiming_type.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_aiming_type.h"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_event.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_event.h"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_event_report.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_event_report.h"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_primitive_parser.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_primitive_parser.h"
-			>
-		</File>
-		<File
-			RelativePath=".\ai_wrapper_sever.cpp"
-			>
-		</File>
-		<File
 			RelativePath=".\animal_hunger.cpp"
 			>
 		</File>
