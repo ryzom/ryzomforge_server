@@ -18,7 +18,7 @@
 #include "game_share/ryzom_entity_id.h"
 
 #include "game_share/base_types.h"
-#include "ai_event_report.h"
+#include "ai_share/ai_event_report.h"
 
 
 /**

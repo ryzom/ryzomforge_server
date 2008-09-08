@@ -12,7 +12,7 @@
 #include "phrase_manager/effect_factory.h"
 #include "phrase_manager/phrase_manager.h"
 #include "entity_structure/statistic.h"
-#include "server_share/ai_event_report.h"
+#include "ai_share/ai_event_report.h"
 #include "player_manager/character.h"
 #include "entity_manager/entity_manager.h"
 

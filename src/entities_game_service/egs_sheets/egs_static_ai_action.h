@@ -12,7 +12,7 @@
 //Nel georges
 #include "nel/georges/u_form.h"
 //
-#include "server_share/ai_aiming_type.h"
+#include "ai_share/ai_aiming_type.h"
 #include "game_share/damage_types.h"
 #include "game_share/skills.h"
 #include "game_share/scores.h"

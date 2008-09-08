@@ -17,7 +17,7 @@
 #include "phrase_manager/phrase_manager.h"
 #include "progression/progression_pvp.h"
 
-#include "server_share/ai_event_report.h"
+#include "ai_share/ai_event_report.h"
 #include "entity_structure/statistic.h"
 #include "egs_sheets/egs_sheets.h"
 

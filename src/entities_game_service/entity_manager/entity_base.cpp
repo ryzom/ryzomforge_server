@@ -22,7 +22,7 @@
 
 //Game share
 #include "game_share/slot_equipment.h"
-#include "server_share/ai_event.h"
+#include "ai_share/ai_event.h"
 #include "game_share/ryzom_mirror_properties.h"
 #include "game_share/chat_group.h"
 #include "server_share/effect_manager.h"

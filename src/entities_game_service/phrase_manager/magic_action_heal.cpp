@@ -20,7 +20,7 @@
 #include "progression/progression_pvp.h"
 //
 #include "game_share/magic_fx.h"
-#include "server_share/ai_event_report.h"
+#include "ai_share/ai_event_report.h"
 
 using namespace NLNET;
 using namespace NLMISC;

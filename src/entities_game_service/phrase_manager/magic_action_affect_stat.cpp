@@ -15,7 +15,7 @@
 #include "entity_structure/statistic.h"
 #include "entity_manager/entity_manager.h"
 #include "game_share/magic_fx.h"
-#include "server_share/ai_event_report.h"
+#include "ai_share/ai_event_report.h"
 #include "progression/progression_pvp.h"
 
 

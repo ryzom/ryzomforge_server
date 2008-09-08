@@ -14,7 +14,7 @@
 #include "player_manager/character.h"
 #include "entity_structure/statistic.h"
 #include "entity_manager/entity_manager.h"
-#include "server_share/ai_event_report.h"
+#include "ai_share/ai_event_report.h"
 
 using namespace NLMISC;
 using namespace std;

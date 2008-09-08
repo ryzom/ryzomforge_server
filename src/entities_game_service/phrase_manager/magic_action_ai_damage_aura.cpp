@@ -14,7 +14,7 @@
 #include "creature_manager/creature_manager.h"
 #include "damage_aura_effect.h"
 #include "entity_structure/statistic.h"
-#include "server_share/ai_event_report.h"
+#include "ai_share/ai_event_report.h"
 
 using namespace NLMISC;
 using namespace std;

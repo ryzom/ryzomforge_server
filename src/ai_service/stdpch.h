@@ -165,7 +165,7 @@ namespace MULTI_LINE_FORMATER {
 #include "game_share/ryzom_entity_id.h"
 #include "game_share/mode_and_behaviour.h"
 #include "game_share/player_visual_properties.h"
-#include "../server_share/ai_event.h"
+#include "../ai_share/ai_event.h"
 #include "../server_share/msg_ai_service.h"
 
 //----------------------------------------------------------------
