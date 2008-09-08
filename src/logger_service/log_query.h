@@ -6,7 +6,7 @@
 #include "nel/misc/types_nl.h"
 #include "nel/misc/common.h"
 
-#include "game_share/logger_service_itf.h"
+#include "server_share/logger_service_itf.h"
 #include "game_share/shard_names.h"
 
 #include "logger_service.h"

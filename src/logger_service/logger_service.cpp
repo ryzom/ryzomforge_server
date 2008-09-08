@@ -9,7 +9,7 @@
 #include "nel/net/module.h"
 #include "nel/net/module_builder_parts.h"
 
-#include "game_share/logger_service_itf.h"
+#include "server_share/logger_service_itf.h"
 #include "game_share/inventories.h"
 #include "game_share/backup_service_interface.h"
 #include "game_share/singleton_registry.h"

@@ -9,7 +9,7 @@
 #include "nel/misc/path.h"
 #include "nel/misc/file.h"
 
-#include "game_share/mail_forum_validator.h"
+#include "server_share/mail_forum_validator.h"
 
 #include "shard_stat_db_manager.h"
 #include "hof_generator.h"

@@ -10,7 +10,7 @@
 
 #include "ai_share/aids_messages.h"
 #include "ai_share/ais_messages.h"
-#include "game_share/pet_interface_msg.h"
+#include "server_share/pet_interface_msg.h"
 
 class CMessages
 {

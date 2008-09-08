@@ -3,7 +3,7 @@
 #ifndef LOGGER_SERVICE_H
 #define LOGGER_SERVICE_H
 
-#include "game_share/logger_service_itf.h"
+#include "server_share/logger_service_itf.h"
 #include "nel/misc/sstring.h"
 #include "nel/misc/file.h"
 #include "nel/net/service.h"

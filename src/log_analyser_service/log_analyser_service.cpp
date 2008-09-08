@@ -478,7 +478,7 @@ void	cbResult(CMemStream &msgin, TSockId host)
 	{
 		// old compatibility mode
 		vector<string>	res;
-		explode(idStr, ":", res);
+		explode(idStr, string(":"), res);
 
 		if (res.size() >= 1)
 		{
