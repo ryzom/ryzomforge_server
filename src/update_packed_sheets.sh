@@ -26,5 +26,6 @@ done
 if [ $REQUIRE_REBUILD == 1 ]
 then
 	PACK_SHEETS_FLAGS=$(grep PACK_SHEETS_FLAGS ../../../Variables.mk|cut -f2 -d=)
+	echo "$EXE_NAME $PACK_SHEETS_FLAGS"
 	$EXE_NAME $PACK_SHEETS_FLAGS
 fi

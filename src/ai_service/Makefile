@@ -56,7 +56,7 @@ $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
 	strip $(TARGETS)
 
 packed_sheets: $(TARGETS)
-#todo	/bin/sh ../update_packed_sheets.sh ./$(TARGETS) $(PACKED_SHEETS)
+	/bin/sh ../update_packed_sheets.sh ./$(TARGETS) $(PACKED_SHEETS)
 
 
 #############################################################################
