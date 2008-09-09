@@ -17,10 +17,10 @@ LDFLAGS      = $(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-L$(RYZOM_COMMON_SRC)/game_share \
 		-L../admin_modules \
-		-L$(RYZOM_COMMON_SRC)/r2_share \
+        -L../server_share \
 		-lmysqlclient \
+        -lserver_share \
 		-lgame_share \
-		-lr2_share \
 		-ladmin_modules \
 		-lnelgeorges \
 		-lnelnet \
@@ -43,8 +43,7 @@ exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) \
 		../admin_modules/libadmin_modules.a \
-		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a \
-		$(RYZOM_COMMON_SRC)/r2_share/libr2_share.a
+        ../server_share/libserver_share.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)

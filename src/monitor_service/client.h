@@ -21,7 +21,7 @@ protected:
 
 	// The listening bounding box
 	NLMISC::CVector _WindowTopLeft, _WindowBottomRight;
-private:
+
 public:
 
 	class CEntityEntry
@@ -33,7 +33,7 @@ public:
 		}
 		enum
 		{
-			Present = 1,			
+			Present = 1,
 			Pending = 2,
 			PosDirty = 4,
 			MiscPropDirty = 8,
@@ -75,7 +75,7 @@ public:
 	}
 
 	// returns the TSockID
-	NLNET::TSockId CMonitorClient::getSock() const {return _Sock;}
+	NLNET::TSockId getSock() const {return _Sock;}
 
 	// Entities
 	std::vector<CEntityEntry>	Entites;
@@ -149,7 +149,7 @@ public:
 	bool						BadLogin; // The client has given a bad login
 	                                      // As long as this flag is set, no login should be accepted
 	                                      // for that client. The flag will be cleared in the main loop
-	                                      // when enough time has ellapsed	                       
+	                                      // when enough time has ellapsed
 };
 
 

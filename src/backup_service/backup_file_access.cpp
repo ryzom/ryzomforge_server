@@ -31,7 +31,7 @@ bool	bsstrincmp(const char* s1, const char* s2, int n)
 	return nn == 0 || (*s1 == *s2);
 }
 
-inline std::string	getBackupFileName(const std::string& filename)
+std::string	getBackupFileName(const std::string& filename)
 {
 	return SaveShardRoot.get() + filename;
 	/* // BSFilePrefix and BSFileSubst are deprecated

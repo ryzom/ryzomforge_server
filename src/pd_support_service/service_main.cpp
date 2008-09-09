@@ -17,7 +17,7 @@
 #include "game_share/ryzom_version.h"
 #include "game_share/tick_event_handler.h"
 #include "game_share/singleton_registry.h"
-#include "game_share/handy_commands.h"
+#include "server_share/handy_commands.h"
 
 // local
 #include "service_main.h"
@@ -44,7 +44,7 @@ using namespace NLNET;
 
 
 //-----------------------------------------------------------------------------
-// methods CServiceClass 
+// methods CServiceClass
 //-----------------------------------------------------------------------------
 
 void CServiceClass::init()
@@ -116,7 +116,7 @@ static const char* getShortServiceName(const IService* theService)
 	{
 		s= theService->getLongArg("shortname");
 	}
-	
+
 	return s.c_str();
 }
 

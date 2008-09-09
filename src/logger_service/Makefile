@@ -13,8 +13,10 @@ CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
+		-L../server_share \
 		-L$(RYZOM_COMMON_SRC)/game_share \
 		-L../admin_modules \
+        -lserver_share \
 		-lgame_share \
 		-lnelnet \
 		-lnelmisc \
@@ -36,6 +38,7 @@ all: exe packed_sheets
 exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
+        ../server_share/libserver_share.a \
 		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug

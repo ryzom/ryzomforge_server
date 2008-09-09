@@ -23,9 +23,9 @@ class CFdcCache: public NLMISC::CSingleton<CFdcCache>
 {
 public:
 	const CFileDescriptionContainer& getFdc() const;
-	void CFdcCache::addFileSpec(const NLMISC::CSString& fspec,bool recurse);
-	void CFdcCache::addFile(const NLMISC::CSString& fileName);
-	void CFdcCache::clear();
+	void addFileSpec(const NLMISC::CSString& fspec,bool recurse);
+	void addFile(const NLMISC::CSString& fileName);
+	void clear();
 
 private:
 	CFileDescriptionContainer _Fdc;

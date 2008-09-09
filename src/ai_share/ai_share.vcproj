@@ -251,7 +251,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\ai_wrapper_sever.cpp"
+			RelativePath=".\ai_wrapper_server.cpp"
 			>
 		</File>
 		<File

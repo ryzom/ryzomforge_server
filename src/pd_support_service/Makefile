@@ -14,8 +14,10 @@ CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-L$(RYZOM_COMMON_SRC)/game_share \
+		-L../server_share \
 		-L../admin_modules \
 		-lgame_share \
+        -lserver_share \
 		-lnelnet \
 		-lnelmisc \
 		-ladmin_modules \
@@ -28,15 +30,16 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 
 # The list of targets to build
 TARGETS		= pd_support_service
-DSP_TARGET	= $(TARGETS).dsp
+DSP_TARGET	= $(TARGETS).vcproj
 
 # The default build rule
 all: exe packed_sheets
 
 exe: check-deps $(TARGETS)
 
-$(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a
-		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a
+$(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
+		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a \
+        ../server_share/libserver_share.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)
