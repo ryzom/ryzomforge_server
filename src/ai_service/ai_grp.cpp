@@ -279,9 +279,10 @@ void CSpawnGroup::checkDespawn()
 	if (_BotsToDespawn.empty())
 		return;
 	
-	FOREACH_NOINC(it, std::vector<CBotToSpawn>, _BotsToDespawn)
-	{			
-		CBotToSpawn& botToDespawn = *it;
+	//FOREACH_NOINC(it, std::vector<CBotToSpawn>, _BotsToDespawn)
+	for(uint32 i = 0; i < _BotsToDespawn.size();)
+	{
+		CBotToSpawn& botToDespawn = _BotsToDespawn[i];
 		if (botToDespawn.waitingDespawnTimeOver())
 		{
 			if (botToDespawn.getBotIndex()>=getPersistent().bots().size())
@@ -299,13 +300,13 @@ void CSpawnGroup::checkDespawn()
 					_BotsToRespawn.push_back(botToDespawn);
 			}
 
-			// pop this entry out of the bots to despawn vector 
-			*it = _BotsToDespawn.back();
+			// pop this entry out of the bots to despawn vector
+			// ace: we don't use iterator because when pop_back(), all iterators are invalidated
+			_BotsToDespawn[i] = _BotsToDespawn.back();
 			_BotsToDespawn.pop_back();
-			itend = _BotsToDespawn.end();
 			continue;
 		}
-		it++;
+		i++;
 	}
 
 	if (_NbSpawnedBot==0 && _BotsToRespawn.size()==0)
