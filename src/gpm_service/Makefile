@@ -44,7 +44,7 @@ exe: check-deps $(TARGETS)
 
 $(TARGETS): $(OBJS) ../admin_modules/libadmin_modules.a \
 		$(RYZOM_COMMON_SRC)/game_share/libgame_share.a \
-		..//server_share/libserver_share.a
+		../server_share/libserver_share.a
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
 	cp -a $(TARGETS) $(TARGETS)_debug
 	strip $(TARGETS)

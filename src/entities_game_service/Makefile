@@ -16,11 +16,13 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-L../admin_modules \
 		-L$(RYZOM_COMMON_SRC)/game_share \
+        -L../ai_share \
         -L../server_share \
 		-L../pd_lib \
 		-L../gameplay_module_lib \
 		-ladmin_modules \
 		-lpd_lib \
+		-lai_share \
         -lserver_share \
 		-lgame_share \
 		-lnelligo \

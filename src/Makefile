@@ -1,5 +1,7 @@
 
 BUILD_DIRS = \
+server_share \
+ai_share \
 admin_modules \
 ryzom_admin_service \
 ryzom_naming_service \
@@ -12,7 +14,6 @@ pd_lib \
 input_output_service \
 gameplay_module_lib \
 entities_game_service \
-ai_share \
 ai_service \
 backup_service \
 dynamic_scenario_service \
@@ -38,6 +39,11 @@ clean: $(foreach dir,$(BUILD_DIRS),$(dir)-clean)
 
 %-clean:
 	+make -C $* clean
+
+distclean: $(foreach dir,$(BUILD_DIRS),$(dir)-distclean)
+
+%-distclean:
+	+make -C $* distclean
 
 cleansheets: $(foreach dir,$(BUILD_DIRS),$(dir)-cleansheets)
 
