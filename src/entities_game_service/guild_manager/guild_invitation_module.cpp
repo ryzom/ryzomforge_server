@@ -52,19 +52,22 @@ void CGuildInvitationModule::accept()
 	if ( oldModule )
 	{
 		nlwarning("<GUILD> user %s is already member of a guild",proxy.getId().toString().c_str() );
+		CGuildManager::getInstance()->removeInvitation(_Invitation);
 		return;
 	}
 
 	/// check if there is room in the guild
 	if (  guild->getMemberCount() >= GuildMaxMemberCount )
 	{
+		nlwarning("<GUILD> guild max number member reached");
 		SM_STATIC_PARAMS_1(params,STRING_MANAGER::integer);
 		params[0].Int = GuildMaxMemberCount;
 		proxy.sendSystemMessage("GUILD_MAX_MEMBER_COUNT_INVITE",params);
-		return;		
+		CGuildManager::getInstance()->removeInvitation(_Invitation);
+		return;
 	}
 	// send message to the guild
-	SM_STATIC_PARAMS_1(params2,STRING_MANAGER::player);	
+	SM_STATIC_PARAMS_1(params2,STRING_MANAGER::player);
 	params2[0].setEIdAIAlias( proxy.getId(), CAIAliasTranslator::getInstance()->getAIAlias( proxy.getId()) );
 	_Invitation->getGuild()->sendMessageToGuildMembers("GUILD_JOIN", params2);
 
