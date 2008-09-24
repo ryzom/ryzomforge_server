@@ -366,35 +366,34 @@ void CSpawnGroup::checkRespawn()
 	if (_BotsToRespawn.size()<=0)
 		return;
 	
-	FOREACH_NOINC(it, std::vector<CBotToSpawn>, _BotsToRespawn)
+	//FOREACH_NOINC(it, std::vector<CBotToSpawn>, _BotsToRespawn)
+	for(uint32 i = 0; i < _BotsToRespawn.size();)
 	{
-		CBotToSpawn const& botToSpawn = *it;
+		CBotToSpawn const& botToSpawn = _BotsToRespawn[i];
 		if (botToSpawn.waitingRespawnTimeOver())
 		{
 			CBot* botPt = getPersistent().bots()[botToSpawn.getBotIndex()];
-			
+
 			CBotToSpawn const botToSpawn = _BotsToRespawn.back();
-			
+
 			//	remove the entry
-			*it = _BotsToRespawn.back();
+			_BotsToRespawn[i] = _BotsToRespawn.back();
 			_BotsToRespawn.pop_back();
-			
+
 			if (botPt->isSpawned())
 			{
 				nlwarning("CSpawnGroup::checkRespawn : trying to respawn a spawned bot");
 			}
 			if (botPt->isSpawned() || botPt->reSpawn(false))
 			{
-				itend = _BotsToRespawn.end();	//	reactualise the end pointer.
 				continue;					//	directly test the same it (the next in fact).
 			}
 			else
 			{
-				_BotsToRespawn.insert(_BotsToRespawn.begin(), botToSpawn);	//	push_front so  the end doesn't change.
-				itend = _BotsToRespawn.end();
+				_BotsToRespawn.insert(_BotsToRespawn.begin(), botToSpawn);	//	push_front so the end doesn't change.
 			}
 		}
-		++it;
+		++i;
 	}
 	
 }

@@ -861,6 +861,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\script_parser.lex"
+			>
+		</File>
+		<File
+			RelativePath=".\script_parser.yacc"
+			>
+		</File>
+		<File
 			RelativePath=".\script_parser_lex.cpp"
 			>
 			<FileConfiguration

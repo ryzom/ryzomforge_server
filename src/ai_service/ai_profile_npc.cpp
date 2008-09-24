@@ -524,18 +524,16 @@ void CGrpProfileFight::updateProfile(uint ticksSinceLastUpdate)
 
 	// check if some bots died or are despawned.
 
-	vector<CBot*>::iterator it=_NpcList.begin(), itEnd=_NpcList.end();
-	while (it!=itEnd)
+	for(uint i = 0; i < _NpcList.size();)
 	{
-		CSpawnBot	*spawnBot=(*it)->getSpawnObj();
+		CSpawnBot	*spawnBot=_NpcList[i]->getSpawnObj();
 		if (	!spawnBot
 			||	!spawnBot->isAlive())
 		{
-			_NpcList.erase	(it);
-			itEnd=_NpcList.end();
+			_NpcList.erase(_NpcList.begin()+i);
 			continue;
 		}
-		++it;
+		i++;
 	}
 	reorganize(_NpcList.begin(), _NpcList.end());
 	
