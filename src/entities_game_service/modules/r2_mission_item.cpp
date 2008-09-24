@@ -1,5 +1,5 @@
 /** \file r2_mission_item.cpp
- * Keep definition of R2 item per scenario (instance of) and manage 
+ * Keep definition of R2 item per scenario (instance of) and manage
  * instanciated item of that type with specifics rules of persistance.
  *
  * $Id: r2_mission_item.cpp,v 1.4 2007/05/09 15:33:37 boucher Exp $
@@ -128,7 +128,7 @@ void CR2MissionItem::_removeAllR2ItemsOfInventory(CInventoryPtr inv, std::vector
 
 //-----------------------------------------------------------------------------
 void CR2MissionItem::giveMissionItem(const NLMISC::CEntityId &eid, TSessionId sessionId, const std::vector< R2::TItemAndQuantity > &items)
-{	
+{
 	TLogContext_Item_Mission	logContext(eid);
 
 	TSessionId scenarioId = ICharacterControl::getInstance()->getSessionId( sessionId); // Just to be sure
@@ -138,7 +138,7 @@ void CR2MissionItem::giveMissionItem(const NLMISC::CEntityId &eid, TSessionId se
 		nlwarning("Error Linked Session %u and %u are not correctly handled", sessionId.asInt(), scenarioId.asInt());
 	}
 
-	// give an mission item o a scenario to a player character, 
+	// give an mission item o a scenario to a player character,
 	//and give a reference of where the item is with a reference inventory on this player character
 	CCharacter *c = PlayerManager.getChar(eid);
 	if( c != 0 )
@@ -167,7 +167,7 @@ void CR2MissionItem::giveMissionItem(const NLMISC::CEntityId &eid, TSessionId se
 						bool found = false;
 						for( uint32 i = 0; i < (*it).second.size(); ++ i )
 						{
-							if( (*it).second[i] == eid )								
+							if( (*it).second[i] == eid )
 							{
 								found = true;
 								break;
@@ -278,12 +278,12 @@ void CR2MissionItem::destroyMissionItem(const NLMISC::CEntityId &eid, const std:
 						break;
 				}
 			}
-			// TODO: if we can't found enough quantity of item to destroy, we need decide if we must manage that as an error 
+			// TODO: if we can't found enough quantity of item to destroy, we need decide if we must manage that as an error
 //			if(quantity > 0)
 //			{
 //			}
 		}
-	}	
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -467,7 +467,7 @@ void CR2MissionItem::keepR2ItemAssociation(const NLMISC::CEntityId& eid, TScenar
 		bool found = false;
 		for( uint32 i = 0; i < (*it).second.size(); ++ i )
 		{
-			if( (*it).second[i] == eid )								
+			if( (*it).second[i] == eid )
 			{
 				found = true;
 				break;
@@ -483,7 +483,7 @@ NLMISC_COMMAND(itemR2Description, "set definition of a R2 item", "<ScenarioId> <
 {
 	if( args.size() != 5 )
 		return false;
-	
+
 	TSessionId scenarioId( (uint32)atoi(args[0].c_str()) );
 
 	R2::TMissionItem itemDesc;
@@ -534,7 +534,7 @@ NLMISC_COMMAND(endScenario, "Simulate the end of a R2 scenario", "<ScenarioId>")
 {
 	if( args.size() != 1)
 		return false;
-	
+
 	TSessionId scenarioId( (uint32)atoi(args[0].c_str()) );
 	CR2MissionItem::getInstance().endScenario( scenarioId );
 	return true;
@@ -559,7 +559,7 @@ NLMISC_COMMAND(destroyMissionR2Item, "Destroy an R2 itme mission owned by a play
 
 NLMISC_COMMAND(getNumberMissionItem, "return number of R2 mission item of asked type a player character have","<Character Eid> <SheetId>")
 {
-	if( args.size() != 2 ) 
+	if( args.size() != 2 )
 		return false;
 
 	NLMISC::CEntityId eid;

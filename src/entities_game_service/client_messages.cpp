@@ -3117,7 +3117,7 @@ void cbDMGiftBegin( NLNET::CMessage& msgin, const std::string & serviceName, NLN
 	if(!IsRingShard)
 	{
 		string name = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
-		nlwarning("HACK: %s %s try to start a GM gift on a non ring shard", eid.toString().c_str(), name.c_str());
+		nlwarning("HACK: %s %s tries to start a GM gift on a non ring shard", eid.toString().c_str(), name.c_str());
 		return;
 	}
 
@@ -3132,7 +3132,7 @@ void cbDMGiftValidate( NLNET::CMessage& msgin, const std::string & serviceName, 
 	if(!IsRingShard)
 	{
 		string name = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
-		nlwarning("HACK: %s %s try to validate a GM gift on a non ring shard", eid.toString().c_str(), name.c_str());
+		nlwarning("HACK: %s %s tries to validate a GM gift on a non ring shard", eid.toString().c_str(), name.c_str());
 		return;
 	}
 
@@ -3149,6 +3149,20 @@ void cbDMGiftValidate( NLNET::CMessage& msgin, const std::string & serviceName, 
 			R2::TItemAndQuantity item;
 			item.SheetId = sheet;
 			item.Quantity = quantity;
+
+			const CStaticItem * form = CSheets::getForm(sheet);
+			if (form == NULL)
+			{
+				string name = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
+				nlwarning("HACK: %s %s tries to create an item that has a null form", eid.toString().c_str(), name.c_str());
+				return;
+			}
+			if(form->Family != ITEMFAMILY::SCROLL_R2)
+			{
+				string name = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
+				nlwarning("HACK: %s %s tries to create an item that is not a plot item", eid.toString().c_str(), name.c_str());
+				return;
+			}
 			items.push_back( item );
 		}
 	}
