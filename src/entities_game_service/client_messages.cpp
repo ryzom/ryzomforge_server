@@ -97,7 +97,7 @@ void cbClientItemHarvestClose( NLNET::CMessage& msgin, const std::string &servic
 void cbClientItemEquip( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientItemEquip);
-	
+
 	uint16 equipedInventory, equipedSlot, bagSlot;
 	CEntityId id;
 
@@ -123,20 +123,20 @@ void cbClientItemEquip( NLNET::CMessage& msgin, const std::string &serviceName, 
 void cbClientItemUnequip( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientItemUnequip);
-	
+
 	uint16 equipedInventory, equipedSlot;
 	CEntityId id;
-	
+
 	msgin.serial( id );
 	msgin.serial( equipedInventory );
 	msgin.serial( equipedSlot );
-	
+
 	CCharacter *c = (CCharacter * ) CEntityBaseManager::getEntityBasePtr( id );
 	if( c )
 	{
 		c->setAfkState(false);
 		c->incInterfaceCounter();
-		
+
 		// if player is stunned or dead cancel action
 		if (c->isDead() || c->isStunned())
 			return;
@@ -152,7 +152,7 @@ void cbClientItemUnequip( NLNET::CMessage& msgin, const std::string &serviceName
 void cbClientItemDestroy( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientItemDestroy);
-	
+
 	CEntityId user;
 	uint16 inventory,slot,quantity;
 
@@ -183,7 +183,7 @@ void cbClientItemDestroy( CMessage& msgin, const std::string &serviceName, NLNET
 void cbClientItemTempToBag( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientItemTempToBag);
-	
+
 	CEntityId user;
 	uint16 slot;
 
@@ -212,10 +212,10 @@ void cbClientItemTempToBag( CMessage& msgin, const std::string &serviceName, NLN
 void cbClientItemAllTemp( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientItemAllTemp);
-	
+
 	CEntityId user;
 	msgin.serial(user);
-	
+
 	CCharacter *character = PlayerManager.getChar( user );
 	if (character == NULL)
 	{
@@ -237,7 +237,7 @@ void cbClientItemAllTemp( CMessage& msgin, const std::string &serviceName, NLNET
 void cbClientItemNoTemp( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientItemNoTemp);
-	
+
 	CEntityId user;
 	msgin.serial(user);
 
@@ -253,7 +253,7 @@ void cbClientItemNoTemp( CMessage& msgin, const std::string &serviceName, NLNET:
 		nlwarning("<cbClientItemAllTemp> player Id %s not yet ready", user.toString().c_str() );
 		return;
 	}
-	
+
 	TLogContext_Item_DropTempInventory dropTemp(user);
 
 	character->setAfkState(false);
@@ -264,7 +264,7 @@ void cbClientItemNoTemp( CMessage& msgin, const std::string &serviceName, NLNET:
 void cbClientItemEnchant( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientItemEnchant);
-	
+
 	CEntityId user;
 	msgin.serial(user);
 
@@ -292,13 +292,13 @@ void cbClientItemEnchant( CMessage& msgin, const std::string &serviceName, NLNET
 void cbClientItemUseItem( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientItemUseItem);
-	
+
 	CEntityId user;
 	msgin.serial(user);
-	
+
 	uint16 slot;
 	msgin.serial(slot);
-	
+
 	CCharacter *character = PlayerManager.getChar( user );
 	if (character == NULL)
 	{
@@ -318,7 +318,7 @@ void cbClientItemUseItem( CMessage& msgin, const std::string &serviceName, NLNET
 void cbClientItemStopUseXpCat( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientItemStopUseXpCat);
-	
+
 	CEntityId user;
 	msgin.serial(user);
 
@@ -337,11 +337,11 @@ void cbClientItemStopUseXpCat( CMessage& msgin, const std::string &serviceName, 
 		nlwarning("<cbClientItemStopUseXpCat> player Id %s not yet ready", user.toString().c_str() );
 		return;
 	}
-	
+
 	character->stopUseItem( isRingCatalyser );
 }
 
-	
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //		CLIENT:HARVEST
@@ -364,8 +364,8 @@ void cbClientHarvestDeposit( NLNET::CMessage& msgin, const std::string &serviceN
 void cbClientPhraseExecute( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseExecute);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint8 set,slot;
@@ -389,12 +389,12 @@ void cbClientPhraseExecute( NLNET::CMessage& msgin, const std::string &serviceNa
 }
 
 
-// 
+//
 void cbClientPhraseExecuteCyclic( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseExecuteCyclic);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint8 set,slot;
@@ -418,17 +418,17 @@ void cbClientPhraseExecuteCyclic( NLNET::CMessage& msgin, const std::string &ser
 }
 
 
-// 
+//
 void cbClientPhraseExecuteFaber( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseExecuteFaber);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
-	
+
 	NLMISC::CSheetId craftPlan;
 	msgin.serial( craftPlan );
-		
+
 	uint8 set,slot;
 	msgin.serial(set,slot);
 
@@ -444,7 +444,7 @@ void cbClientPhraseExecuteFaber( NLNET::CMessage& msgin, const std::string &serv
 		nlwarning("<cbClientPhraseExecuteFaber> player Id %s not yet ready", Id.toString().c_str() );
 		return;
 	}
-		
+
 	ch->setCraftPlan( craftPlan );
 
 	ch->clearFaberRms();
@@ -460,8 +460,8 @@ void cbClientPhraseExecuteFaber( NLNET::CMessage& msgin, const std::string &serv
 void cbClientPhraseMemorize( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseMemorize);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint8 set,slot;
@@ -495,8 +495,8 @@ void cbClientPhraseMemorize( NLNET::CMessage& msgin, const std::string &serviceN
 void cbClientPhraseForget( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseForget);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint8 set,slot;
@@ -523,8 +523,8 @@ void cbClientPhraseForget( NLNET::CMessage& msgin, const std::string &serviceNam
 void cbClientPhraseDelete( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseDelete);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint16 phraseId;
@@ -551,8 +551,8 @@ void cbClientPhraseDelete( NLNET::CMessage& msgin, const std::string &serviceNam
 void cbClientPhraseLearn( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseLearn);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint16 phraseId;
@@ -582,8 +582,8 @@ void cbClientPhraseLearn( NLNET::CMessage& msgin, const std::string &serviceName
 void cbClientPhraseBuyByIndex( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseBuyByIndex);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint8 botChatIndex;
@@ -613,10 +613,10 @@ void cbClientPhraseBuyByIndex( NLNET::CMessage& msgin, const std::string &servic
 void cbClientPhraseBuyBySheet( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientPhraseBuyBySheet);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
-	
+
 	CSheetId	phraseSheetId;
 	uint32		val;
 	msgin.serial( val );
@@ -624,7 +624,7 @@ void cbClientPhraseBuyBySheet( NLNET::CMessage& msgin, const std::string &servic
 
 	uint16		index;
 	msgin.serial( index );
-	
+
 	CCharacter *ch = PlayerManager.getChar( Id );
 	if ( !ch )
 	{
@@ -637,7 +637,7 @@ void cbClientPhraseBuyBySheet( NLNET::CMessage& msgin, const std::string &servic
 		nlwarning("<cbClientPhraseBuyBySheet> player Id %s not yet ready", Id.toString().c_str() );
 		return;
 	}
-	
+
 	ch->incInterfaceCounter();
 	ch->buyPhraseBySheet(phraseSheetId,index);
 	ch->setAfkState(false);
@@ -646,44 +646,44 @@ void cbClientPhraseBuyBySheet( NLNET::CMessage& msgin, const std::string &servic
 void cbClientPhraseCancelTop( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientPhraseCancelTop);
-	
+
 	if ( ! Mirror.mirrorIsReady() )
 	{
 		nlwarning("<cbClientPhraseCancelTop> Received from %s service but mirror not yet ready", serviceName.c_str() );
 		return;
 	}
-	
+
 	NLMISC::CEntityId entityId;
 	msgin.serial( entityId );
 
 	TDataSetRow	entityRowId = TheDataset.getDataSetRow(entityId);
-	
+
 	CPhraseManager::getInstance().cancelTopPhrase(entityRowId);
 } // cbClientPhraseCancelTop //
 
 void cbClientPhraseCancelAll( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientPhraseCancelAll);
-	
+
 	if ( ! Mirror.mirrorIsReady() )
 	{
 		nlwarning("<cbClientPhraseCancelAll> Received from %s service but mirror not yet ready", serviceName.c_str() );
 		return;
 	}
-	
+
 	NLMISC::CEntityId entityId;
 	msgin.serial( entityId );
-	
+
 	TDataSetRow	entityRowId = TheDataset.getDataSetRow(entityId);
-	
+
 	CPhraseManager::getInstance().cancelAllPhrases(entityRowId);
 } // cbClientPhraseCancelAll //
 
 void cbClientPhraseCristalize( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientPhraseCristalize);
-	
-	CEntityId	Id;	
+
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	uint8 set,slot;
@@ -734,7 +734,7 @@ void cbClientCombatDefaultAttack( NLNET::CMessage& msgin, const std::string &ser
 void cbClientValidateMeleeCombat( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientValidateMeleeCombat);
-	
+
 	CEntityId idPlayer;
 	msgin.serial( idPlayer );
 
@@ -752,10 +752,10 @@ void cbClientValidateMeleeCombat( NLNET::CMessage& msgin, const std::string &ser
 void cbClientCombatProtectedSlot( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientCombatProtectedSlot);
-	
+
 	CEntityId idPlayer;
 	msgin.serial( idPlayer );
-	
+
 	uint8 slot;
 	msgin.serial( slot );
 
@@ -770,10 +770,10 @@ void cbClientCombatProtectedSlot( NLNET::CMessage& msgin, const std::string &ser
 void cbClientCombatParry( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientCombatParry);
-	
+
 	CEntityId idPlayer;
 	msgin.serial( idPlayer );
-	
+
 	CCharacter *ch = PlayerManager.getChar( idPlayer );
 	if ( ch && ch->getEnterFlag() )
 	{
@@ -785,10 +785,10 @@ void cbClientCombatParry( NLNET::CMessage& msgin, const std::string &serviceName
 void cbClientCombatDodge( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientCombatDodge);
-	
+
 	CEntityId idPlayer;
 	msgin.serial( idPlayer );
-	
+
 	CCharacter *ch = PlayerManager.getChar( idPlayer );
 	if ( ch && ch->getEnterFlag() )
 	{
@@ -836,12 +836,12 @@ void cbClientTeamJoinProposalDecline( NLNET::CMessage& msgin, const std::string 
 void cbClientTeamSetSuccessor( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientTeamSetSuccessor);
-	
+
 	CEntityId id;
 	uint8 idx;
 	msgin.serial( id,idx );
 	CCharacter* user = PlayerManager.getChar( id );
-	if ( !user ) 
+	if ( !user )
 	{
 		nlwarning("<TEAM> Invalid user %s",id.toString().c_str() );
 		return;
@@ -864,7 +864,7 @@ void cbClientTeamSetSuccessor( NLNET::CMessage& msgin, const std::string &servic
 void cbClientTeamShareValidItem( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientTeamShareValidItem);
-	
+
 	CEntityId id;
 	msgin.serial(id);
 	CCharacter * user = PlayerManager.getChar(id);
@@ -892,7 +892,7 @@ void cbClientTeamShareValidItem( NLNET::CMessage& msgin, const std::string &serv
 		nlwarning("<cbClientTeamShareValidItem>char %s: his team has no reward",id.toString().c_str());
 		return;
 	}
-	
+
 	uint8 pos,state;
 	msgin.serial(pos);
 	msgin.serial(state);
@@ -902,7 +902,7 @@ void cbClientTeamShareValidItem( NLNET::CMessage& msgin, const std::string &serv
 void cbClientTeamShareInvalidItem( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientTeamShareInvalidItem);
-	
+
 	CEntityId id;
 	msgin.serial(id);
 	CCharacter * user = PlayerManager.getChar(id);
@@ -929,7 +929,7 @@ void cbClientTeamShareInvalidItem( NLNET::CMessage& msgin, const std::string &se
 		nlwarning("<cbClientTeamShareInvalidItem>char %s: his team has no reward",id.toString().c_str());
 		return;
 	}
-	
+
 	uint8 pos,state;
 	msgin.serial(pos);
 	msgin.serial(state);
@@ -939,7 +939,7 @@ void cbClientTeamShareInvalidItem( NLNET::CMessage& msgin, const std::string &se
 void cbClientTeamShareValid( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientTeamShareValid);
-	
+
 	CEntityId id;
 	msgin.serial(id);
 	CCharacter * user = PlayerManager.getChar(id);
@@ -966,7 +966,7 @@ void cbClientTeamShareValid( NLNET::CMessage& msgin, const std::string &serviceN
 		nlwarning("<cbClientTeamShareValid>char %s: his team has no reward",id.toString().c_str());
 		return;
 	}
-	
+
 	uint8 state;
 	msgin.serial(state);
 	if ( team->getReward()->userValidSelect(user->getEntityRowId(),state) )
@@ -979,15 +979,15 @@ void cbClientTeamShareValid( NLNET::CMessage& msgin, const std::string &serviceN
 void cbClientAddToContactList( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientAddToContactList);
-	
+
 	CEntityId	charId;
 	ucstring	playerName;
 	uint8		list;
-	
+
 	msgin.serial(charId);
 	msgin.serial(playerName);
 	msgin.serial(list);
-	
+
 	CCharacter * c = PlayerManager.getChar( charId );
 	if( c && c->getEnterFlag() )
 	{
@@ -1011,15 +1011,15 @@ void cbClientAddToContactList( NLNET::CMessage& msgin, const std::string &servic
 void cbClientRemoveFromContactList( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientRemoveFromContactList);
-	
+
 	CEntityId	charId;
 	uint32		contactId;
 	uint8		list;
-	
+
 	msgin.serial(charId);
 	msgin.serial(contactId);
 	msgin.serial(list);
-	
+
 	CCharacter * c = PlayerManager.getChar( charId );
 	if( c && c->getEnterFlag() )
 	{
@@ -1043,15 +1043,15 @@ void cbClientRemoveFromContactList( NLNET::CMessage& msgin, const std::string &s
 void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientMoveInContactLists);
-	
+
 	CEntityId	charId;
 	uint32		contactIdOrigin;
 	uint8		listOrigin;
-	
+
 	msgin.serial(charId);
 	msgin.serial(contactIdOrigin);
 	msgin.serial(listOrigin);
-	
+
 	CCharacter * c = PlayerManager.getChar( charId );
 	if( c && c->getEnterFlag() )
 	{
@@ -1113,7 +1113,7 @@ void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serv
 	{
 		CEntityBase* entity = PlayerManager.getCharacterByName( name );
 		if( ! entity )
-		{		
+		{
 			TAIAlias alias = CAIAliasTranslator::getInstance()->getNPCAliasFromName(name);
 			if ( ! CAIAliasTranslator::getInstance()->getEntityId(alias,botId) )
 			{
@@ -1145,12 +1145,12 @@ void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serv
 {
 	CEntityId Id;
 	sint32 x, y, z;
-	
+
 	msgin.serial( Id );
 	msgin.serial( x );
 	msgin.serial( y );
 	msgin.serial( z );
-	
+
 	CCharacter *ch = PlayerManager.getChar( Id );
 	if ( ch && ch->havePriv(PriviliegeGameMaster))
 	{
@@ -1161,7 +1161,7 @@ void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serv
 	{
 		nlwarning("<cbClientTpWanted> Unknown character %s or don't have priv", Id.toString().c_str() );
 	}
-	
+
 }*/
 
 
@@ -1170,7 +1170,7 @@ void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serv
 {
 	CEntityId characterId;
 	msgin.serial( characterId );
-	
+
 	CCharacter *ch = PlayerManager.getChar( characterId );
 	if ( ch )
 	{
@@ -1208,7 +1208,7 @@ void cbClientAnimalsBeast( NLNET::CMessage& msgin, const std::string &serviceNam
 	else
 	{
 		nlwarning("<cbClientAnimalsDisbandConvoy> received message from unknown client %s", id.toString().c_str() );
-	}	
+	}
 }
 */
 
@@ -1346,7 +1346,7 @@ void cbClientExchangeValidate( NLNET::CMessage& msgin, const std::string &servic
 void cbClientExchangeInvalidate( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientExchangeInvalidate);
-	
+
 	CEntityId id;
 	msgin.serial(id);
 	CCharacter * c = PlayerManager.getChar( id );
@@ -1362,7 +1362,7 @@ void cbClientExchangeInvalidate( NLNET::CMessage& msgin, const std::string &serv
 void cbClientExchangeAdd( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientExchangeAdd);
-	
+
 	CEntityId id;
 	msgin.serial(id);
 
@@ -1387,13 +1387,13 @@ void cbClientExchangeAdd( NLNET::CMessage& msgin, const std::string &serviceName
 void cbClientExchangeRemove( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientExchangeRemove);
-	
+
 	CEntityId id;
 	msgin.serial(id);
 
 	uint16 slotSrc;
 	msgin.serial(slotSrc);
-	
+
 	CCharacter * c = PlayerManager.getChar( id );
 	if (c && c->getEnterFlag() )
 	{
@@ -1478,12 +1478,12 @@ void cbClientGroupAbandonMission( NLNET::CMessage& msgin, const std::string &ser
 void cbClientBotChatStartTradeItem( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatStartTradeItem);
-	
+
 	uint16 session;
 	CEntityId userId;
 	msgin.serial(userId,session);
 	CCharacter * user = PlayerManager.getChar(userId);
-	
+
 	if ( !user )
 	{
 		nlwarning("<cbClientBotChatStartTradeItem> Invalid char %s",userId.toString().c_str());
@@ -1501,7 +1501,7 @@ void cbClientBotChatStartTradeItem( NLNET::CMessage& msgin, const std::string &s
 	{
 		return;
 	}
-	
+
 	user->resetRawMaterialItemPartFilter();
 	user->resetItemTypeFilter();
 	user->startTradeItemSession(session);
@@ -1512,12 +1512,12 @@ void cbClientBotChatStartTradeItem( NLNET::CMessage& msgin, const std::string &s
 void cbClientBotChatStartTradeTp( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatStartTradeTp);
-	
+
 	uint16 session;
 	CEntityId userId;
 	msgin.serial(userId,session);
 	CCharacter * user = PlayerManager.getChar(userId);
-	
+
 	if ( !user )
 	{
 		nlwarning("<cbClientBotChatStartTradeTp> Invalid char %s",userId.toString().c_str());
@@ -1529,7 +1529,7 @@ void cbClientBotChatStartTradeTp( NLNET::CMessage& msgin, const std::string &ser
 		nlwarning("<cbClientBotChatStartTradeTp> player Id %s not yet ready", userId.toString().c_str() );
 		return;
 	}
-	
+
 	// start a bot chat
 	if ( !user->startBotChat( BOTCHATTYPE::TradeTeleportFlag ) )
 	{
@@ -1543,12 +1543,12 @@ void cbClientBotChatStartTradeTp( NLNET::CMessage& msgin, const std::string &ser
 void cbClientBotChatStartTradeFaction( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatStartTradeFaction);
-	
+
 	uint16 session;
 	CEntityId userId;
 	msgin.serial(userId,session);
 	CCharacter * user = PlayerManager.getChar(userId);
-	
+
 	if ( !user )
 	{
 		nlwarning("<cbClientBotChatStartTradeFaction> Invalid char %s",userId.toString().c_str());
@@ -1560,7 +1560,7 @@ void cbClientBotChatStartTradeFaction( NLNET::CMessage& msgin, const std::string
 		nlwarning("<cbClientBotChatStartTradeFaction> player Id %s not yet ready", userId.toString().c_str() );
 		return;
 	}
-	
+
 	// start a bot chat
 	if ( !user->startBotChat( BOTCHATTYPE::TradeFactionFlag ) )
 	{
@@ -1594,7 +1594,7 @@ void cbClientBotChatBuyGuildOptions( NLNET::CMessage& msgin, const std::string &
 void cbClientBotChatStartGuildResearch( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatStartGuildResearch);
-	
+
 	uint16 session;
 	CEntityId userId;
 	msgin.serial(userId,session);
@@ -1602,18 +1602,18 @@ void cbClientBotChatStartGuildResearch( NLNET::CMessage& msgin, const std::strin
 	/// todo appart
 //	CGuildManager::getInstance()->buildGuildResearchList(userId,session);
 }
-	
+
 
 /// trade next page
 void cbClientBotChatTradeNextPage( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatTradeNextPage);
-	
+
 	uint16 session;
 	CEntityId userId;
 	msgin.serial(userId,session);
 	CCharacter * user = PlayerManager.getChar(userId);
-	
+
 	if ( !user )
 	{
 		nlwarning("<cbClientBotChatTradeNextPage> Invalid char %s",userId.toString().c_str());
@@ -1633,13 +1633,13 @@ void cbClientBotChatTradeNextPage( NLNET::CMessage& msgin, const std::string &se
 void cbClientBotChatTradeBuy( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatTradeBuy);
-	
+
 	uint16 idx;
 	uint16 quantity;
 	CEntityId userId;
 	msgin.serial(userId,idx,quantity);
 	CCharacter * user = PlayerManager.getChar(userId);
-	
+
 	if ( !user )
 	{
 		nlwarning("<cbClientBotChatTradeBuy> Invalid char %s",userId.toString().c_str());
@@ -1664,7 +1664,7 @@ void cbClientBotChatTradeDestroy( NLNET::CMessage& msgin, const std::string &ser
 	CEntityId userId;
 	msgin.serial(userId,idx,quantity);
 	CCharacter * user = PlayerManager.getChar(userId);
-	
+
 	if ( !user )
 	{
 		nlwarning("<cbClientBotChatTradeDestroy> Invalid char %s",userId.toString().c_str());
@@ -1684,7 +1684,7 @@ void cbClientBotChatTradeDestroy( NLNET::CMessage& msgin, const std::string &ser
 void cbClientBotChatTradeSell( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatTradeSell);
-	
+
 	uint8 inv;
 	uint8 idx;
 	uint16 quantity;
@@ -1711,7 +1711,7 @@ void cbClientBotChatTradeSell( NLNET::CMessage& msgin, const std::string &servic
 void cbClientBotChatStartGuildCreation( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatStartGuildCreation);
-	
+
 	CEntityId id;
 	msgin.serial(id);
 	CCharacter * user = PlayerManager.getChar(id);
@@ -1743,7 +1743,7 @@ void cbClientBotChatStartTradeAction( NLNET::CMessage& msgin, const std::string 
 	CEntityId userId;
 
 	msgin.serial(userId, sessionId);
-	
+
 	CCharacter * user = PlayerManager.getChar(userId);
 	if ( !user )
 	{
@@ -1772,7 +1772,7 @@ void cbClientBotChatSetFilters( NLNET::CMessage& msgin, const std::string &servi
 {
 	H_AUTO(cbClientBotChatSetFilters);
 	CEntityId userId;
-	
+
 	uint32 minQuality, maxQuality, minPrice, maxPrice;
 	uint8 minClass, maxClass;
 	uint8  itemPartFilter;
@@ -1780,7 +1780,7 @@ void cbClientBotChatSetFilters( NLNET::CMessage& msgin, const std::string &servi
 
 	msgin.serial(userId, minQuality, maxQuality, minPrice, maxPrice);
 	msgin.serial(minClass, maxClass, itemPartFilter, itemTypeFilter);
-	
+
 	CCharacter * user = PlayerManager.getChar(userId);
 	if ( !user )
 	{
@@ -1796,7 +1796,7 @@ void cbRefreshTradeList( NLNET::CMessage& msgin, const std::string &serviceName,
 {
 	H_AUTO(cbRefreshTradeList);
 	CEntityId userId;
-	
+
 	msgin.serial( userId );
 	CCharacter * user = PlayerManager.getChar(userId);
 	if ( !user )
@@ -1817,7 +1817,7 @@ void cbRefreshTradeList( NLNET::CMessage& msgin, const std::string &serviceName,
 void cbClientBotChatEnd( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientBotChatEnd);
-	
+
 	CEntityId userId;
 	msgin.serial(userId);
 	CCharacter* user = PlayerManager.getChar( userId );
@@ -1841,7 +1841,7 @@ void cbClientBotChatEnd( NLNET::CMessage& msgin, const std::string &serviceName,
 void cbClientSendEmote( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientSendEmote);
-	
+
 	CEntityId id;
 	MBEHAV::EBehaviour behaviour = MBEHAV::IDLE;
 	uint16 emoteTextId;
@@ -1850,7 +1850,7 @@ void cbClientSendEmote( NLNET::CMessage& msgin, const std::string &serviceName, 
 		msgin.serial( id );
 		msgin.serialEnum( behaviour );
 		msgin.serial( emoteTextId );
-		
+
 	}
 	catch(Exception &e)
 	{
@@ -1886,7 +1886,7 @@ void cbClientSendEmote( NLNET::CMessage& msgin, const std::string &serviceName, 
 void cbClientSendCustomEmote( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientSendCustomEmote);
-	
+
 	CEntityId id;
 	MBEHAV::EBehaviour behaviour = MBEHAV::IDLE;
 	ucstring emoteCustomText;
@@ -1895,7 +1895,7 @@ void cbClientSendCustomEmote( NLNET::CMessage& msgin, const std::string &service
 		msgin.serial( id );
 		msgin.serialEnum( behaviour );
 		msgin.serial( emoteCustomText );
-		
+
 	}
 	catch(Exception &e)
 	{
@@ -1918,7 +1918,7 @@ void cbClientSendCustomEmote( NLNET::CMessage& msgin, const std::string &service
 void cbClientSendWhere( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientSendWhere);
-	
+
 	CEntityId id;
 	msgin.serial( id );
 	CZoneManager::getInstance().answerWhere(id);
@@ -1928,7 +1928,7 @@ void cbClientSendWhere( NLNET::CMessage& msgin, const std::string &serviceName, 
 void cbClientSendAfk( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientSendAfk);
-	
+
 	CEntityId id;
 	bool afk;
 	msgin.serial( id );
@@ -1946,7 +1946,7 @@ void cbClientSendAfk( NLNET::CMessage& msgin, const std::string &serviceName, NL
 void cbClientRollDice( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientRollDice);
-	
+
 	CEntityId entityId;
 	sint16 min;
 	sint16 max;
@@ -1954,26 +1954,26 @@ void cbClientRollDice( NLNET::CMessage& msgin, const std::string &serviceName, N
 	msgin.serial( entityId );
 	msgin.serial( min );
 	msgin.serial( max );
-	
+
 	static NLMISC::CRandom* dice = (NLMISC::CRandom*)NULL;
 	if (!dice)
 	{
 		dice = new NLMISC::CRandom;
 		dice->srand(CTickEventHandler::getGameCycle());
 	}
-	
+
 	roll = min + (sint16)dice->rand(max-min);
-	
+
 	SM_STATIC_PARAMS_4(params, STRING_MANAGER::player, STRING_MANAGER::integer, STRING_MANAGER::integer, STRING_MANAGER::integer);
 	params[0].setEIdAIAlias(entityId, CAIAliasTranslator::getInstance()->getAIAlias(entityId));
 	params[1].Int = min;
 	params[2].Int = max;
 	params[3].Int = roll;
-	
+
 	TDataSetRow playerRowId = TheDataset.getDataSetRow( entityId );
 	if ( !TheDataset.isAccessible(playerRowId) )
 		return;
-	
+
 	PHRASE_UTILITIES::sendDynamicSystemMessage(playerRowId, "ROLL_DICE", params);
 	STRING_MANAGER::sendSystemStringToClientAudience(playerRowId, std::vector<NLMISC::CEntityId>(), CChatGroup::shout, "ROLL_DICE", params);
 }
@@ -1982,7 +1982,7 @@ void cbClientRollDice( NLNET::CMessage& msgin, const std::string &serviceName, N
 void cbClientSit( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientSit);
-	
+
 	CEntityId id;
 	bool sit;
 	msgin.serial( id );
@@ -1997,7 +1997,7 @@ void cbClientSit( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 			if( !c->isInWater() && c->getMode()!=MBEHAV::MOUNT_NORMAL && c->getMode()!=MBEHAV::DEATH )
 			{
 				c->setMode( MBEHAV::SIT );
-				// only if player is'nt equipping an item 
+				// only if player is'nt equipping an item
 				//( to prevent exploit "sit to reduce equip latency time")
 				if( !c->getGearLatency().isLatent() )
 				{
@@ -2022,12 +2022,12 @@ void cbClientSit( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 void cbClientGuildMotd( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientGuildMotd);
-	
+
 	CEntityId entityId;
 	string motd;
 	msgin.serial( entityId );
 	msgin.serial( motd );
-	
+
 	CCharacter * user = PlayerManager.getChar( entityId );
 	if (!user)
 	{
@@ -2065,7 +2065,7 @@ void cbClientGuildMotd( NLNET::CMessage& msgin, const std::string &serviceName, 
 {
 	CEntityId id;
 	msgin.serial( id );
-	
+
 	CCharacter * c = PlayerManager.getChar( id );
 	if( c && c->havePriv(PriviliegeGameMaster))
 	{
@@ -2080,16 +2080,16 @@ void cbClientCreateItemInBag( NLNET::CMessage& msgin, const std::string &service
 {
 	CEntityId charId;
 	msgin.serial( charId );
-	
+
 	CSheetId itemSheetId;
 	msgin.serial( itemSheetId );
-	
+
 	uint16 quantity;
 	msgin.serial( quantity );
-	
+
 	uint16 quality;
 	msgin.serial( quality );
-	
+
 	// get character
 	CCharacter *c = PlayerManager.getChar( charId );
 	if (c&& c->havePriv(PriviliegeGameMaster))
@@ -2097,7 +2097,7 @@ void cbClientCreateItemInBag( NLNET::CMessage& msgin, const std::string &service
 		nlwarning("<cbClientCreateItemInBag> Invalid player Id %s", charId.toString().c_str() );
 		return;
 	}
-	
+
 	c->createItemInBag( quality, quantity, itemSheetId );
 }*/
 
@@ -2106,7 +2106,7 @@ void cbClientLearnAllBricks( NLNET::CMessage& msgin, const std::string &serviceN
 {
 	CEntityId id;
 	msgin.serial( id );
-	
+
 	CCharacter * c = PlayerManager.getChar( id );
 	if( c && c->havePriv(PriviliegeGameMaster))
 		GameItemManager.learnAllBricks( c );
@@ -2157,10 +2157,10 @@ void cbClientRyzomDay( NLNET::CMessage& msgin, const std::string &serviceName, u
 {
 	CEntityId	Id;
 	msgin.serial( Id );
-	
+
 	if (!PlayerManager.havePriv(Id, PriviliegeGameMaster))
 		return;
-	
+
 	uint32		Day;
 	msgin.serial( Day );
 
@@ -2179,7 +2179,7 @@ void cbClientRyzomDay( NLNET::CMessage& msgin, const std::string &serviceName, u
 	msgin.serial( Id );
 	msgin.serial( Xp );
 	msgin.serial( Skill );
-	
+
 	CCharacter * c = PlayerManager.getChar( Id );
 	if( c && c->havePriv(PriviliegeGameMaster))
 	{
@@ -2570,7 +2570,7 @@ void cbClientSetCharacterTitle( NLNET::CMessage& msgin, const std::string & serv
 	uint8 title;
 	msgin.serial( eId );
 	msgin.serial( title );
-	
+
 	CCharacter * c = PlayerManager.getChar(eId);
 	if ( !c )
 	{
@@ -2590,12 +2590,12 @@ void cbClientSetCharacterTitle( NLNET::CMessage& msgin, const std::string & serv
 	if ( title == uint8(CHARACTER_TITLE::FBT) )
 	{
 		if ( !p->isBetaTester() )
-			return;	
+			return;
 	}
 	else if ( title == uint8(CHARACTER_TITLE::WIND) )
 	{
 		if ( !p->isWindermeerCommunity() )
-			return;	
+			return;
 	}
 	else if ( title >= uint8(CHARACTER_TITLE::BeginGmTitle) && title <= uint8(CHARACTER_TITLE::EndGmTitle) )
 	{
@@ -2655,7 +2655,7 @@ void cbClientAskRespawn( NLNET::CMessage& msgin, const std::string & serviceName
 	{
 		user->respawn( index );
 		user->setAfkState(false);
-	}	
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2678,7 +2678,7 @@ void cbClientCompassEnableDynamic( NLNET::CMessage& msgin, const std::string & s
 		nlwarning("<cbClientCompassEnableDynamic>: compressed index results in an invalid datasetrow");
 		return;
 	}
-			
+
 	CCharacter * user = PlayerManager.getChar(userId);
 	if ( user && user->getEnterFlag() )
 	{
@@ -2692,7 +2692,7 @@ void cbClientCompassDisableDynamic( NLNET::CMessage& msgin, const std::string & 
 
 	CEntityId	userId;
 	msgin.serial(userId);
-	
+
 	CCharacter * user = PlayerManager.getChar(userId);
 	if ( user && user->getEnterFlag() )
 	{
@@ -2739,8 +2739,8 @@ void cbClientMissionEnterCritical( NLNET::CMessage& msgin, const std::string & s
 	CCharacter *player = PlayerManager.getChar(userId);
 	if (player)
 		CMissionQueueManager::getInstance()->playerEntersCriticalArea(userId, player->getEnterCriticalZoneProposalQueueId(), accept);
-	
-	
+
+
 }
 
 void cbClientMissionWake( NLNET::CMessage& msgin, const std::string & serviceName, NLNET::TServiceId serviceId );
@@ -3023,12 +3023,12 @@ sint32 clientEventSetItemCustomText(CCharacter* character, INVENTORIES::TInvento
 	{
 		return -3;
 	}
-	
+
 	CGameItemPtr item = invent->getItem(slot);
 	item->setCustomText(text);
 	// Following line was commented out by trap, reason unknown
 	character->incSlotVersion(inventory, slot);
-	
+
 	return 0;
 }
 
@@ -3044,7 +3044,7 @@ void cbClientEventSetItemCustomText( NLNET::CMessage& msgin, const std::string &
 	inventory = (INVENTORIES::TInventory)uiInventory;
 	msgin.serial(slot);
 	msgin.serial(text);
-	
+
 	// Verify that sender is valid and has the rights to send this message.
 	CCharacter* character = PlayerManager.getChar(eid);
 	if (character && character->havePriv(":DEV:SGM:GM:EM:"))
@@ -3062,7 +3062,7 @@ void cbTotemBuild( NLNET::CMessage& msgin, const std::string & serviceName, NLNE
 {
 	if( BuildSpireActive == false )
 		return;
-	CEntityId	Id;	
+	CEntityId	Id;
 	msgin.serial( Id );
 
 	CCharacter *ch = PlayerManager.getChar( Id );
@@ -3086,7 +3086,7 @@ void cbTotemBuild( NLNET::CMessage& msgin, const std::string & serviceName, NLNE
 	}
 	NLMISC::CVector pos( (float)ch->getX() / 1000.0f,  (float)ch->getY() / 1000.0f, 0 );
 	CRegion* region = CZoneManager::getInstance().getRegion( pos );
-	
+
 	if ( !region )
 	{
 		nlwarning("Totem build aborted: no region where character is");
@@ -3112,7 +3112,14 @@ void cbTotemBuild( NLNET::CMessage& msgin, const std::string & serviceName, NLNE
 void cbDMGiftBegin( NLNET::CMessage& msgin, const std::string & serviceName, NLNET::TServiceId serviceId )
 {
 	CEntityId eid;
-	eid.serial( msgin );
+	msgin.serial( eid );
+
+	if(!IsRingShard)
+	{
+		string name = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
+		nlwarning("HACK: %s %s try to start a GM gift on a non ring shard", eid.toString().c_str(), name.c_str());
+		return;
+	}
 
 	CR2MissionItem::getInstance().dmGiftBegin( eid );
 }
@@ -3121,6 +3128,13 @@ void cbDMGiftValidate( NLNET::CMessage& msgin, const std::string & serviceName, 
 {
 	CEntityId eid;
 	msgin.serial( eid );
+
+	if(!IsRingShard)
+	{
+		string name = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
+		nlwarning("HACK: %s %s try to validate a GM gift on a non ring shard", eid.toString().c_str(), name.c_str());
+		return;
+	}
 
 	std::vector< R2::TItemAndQuantity > items;
 	CSheetId sheet;
@@ -3184,11 +3198,11 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:ITEM:ENCHANT",				cbClientItemEnchant },
 	{ "CLIENT:ITEM:USE_ITEM",				cbClientItemUseItem },
 	{ "CLIENT:ITEM:STOP_USE_XP_CAT",		cbClientItemStopUseXpCat },
-	
-	
+
+
 	{ "CLIENT:ITEM_INFO:GET",				cbClientItemInfos },
 	{ "CLIENT:MISSION_PREREQ:GET",			cbClientMissionPrereq },
-		
+
 	{ "CLIENT:HARVEST:DEPOSIT",				cbClientHarvestDeposit },
 
 	{ "CLIENT:PHRASE:MEMORIZE",				cbClientPhraseMemorize },
@@ -3200,12 +3214,12 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:PHRASE:EXECUTE_FABER",		cbClientPhraseExecuteFaber },
 	{ "CLIENT:PHRASE:BUY",					cbClientPhraseBuyByIndex },
 	{ "CLIENT:PHRASE:BUY_SHEET",			cbClientPhraseBuyBySheet },
-		
+
 	{ "CLIENT:PHRASE:CANCEL_TOP",			cbClientPhraseCancelTop },
 	{ "CLIENT:PHRASE:CANCEL_ALL",			cbClientPhraseCancelAll },
-	{ "CLIENT:PHRASE:CRISTALIZE",			cbClientPhraseCristalize },	
+	{ "CLIENT:PHRASE:CRISTALIZE",			cbClientPhraseCristalize },
 
-	
+
 	{ "CLIENT:COMBAT:ENGAGE",				cbClientCombatEngage },
 	{ "CLIENT:COMBAT:DISENGAGE",			cbClientCombatDisengage },
 	{ "CLIENT:COMBAT:DEFAULT_ATTACK",		cbClientCombatDefaultAttack },
@@ -3273,8 +3287,8 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:COMMAND:AFK",					cbClientSendAfk },
 	{ "CLIENT:COMMAND:RANDOM",				cbClientRollDice },
 	{ "CLIENT:COMMAND:GUILDMOTD",			cbClientGuildMotd },
-	
-	
+
+
 // For all these commented commands, now you have to use the CLIENT:COMMAND:ADMIN message using /a client command
 
 //	{ "CLIENT:CHEAT:GOD",					cbClientCheatGod },
@@ -3288,7 +3302,7 @@ TUnifiedCallbackItem CbClientArray[]=
 //	{ "CLIENT:CHEAT:ADD_ROLE",				cbClientAddRole },
 //	{ "CLIENT:CHEAT:LEARN_BRICK",			cbClientLearnBrick },
 //	{ "CLIENT:CHEAT:LEARN_ALL_FABER_PLANS",	cbClientLearnAllFaberPlans },
-	
+
 	{ "CLIENT:DEBUG:WHERE",					cbClientWhere },
 	{ "CLIENT:DEBUG:WHO",					cbClientWho },
 	{ "CLIENT:DEBUG:PING",					cbClientPing },
@@ -3298,7 +3312,7 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:BOTCHAT:PICK_MISSION",			cbClientBotChatPickStaticMission },
 	{ "CLIENT:BOTCHAT:CONTINUE_MISSION",		cbClientContinueMission },
 	{ "CLIENT:BOTCHAT:VALIDATE_PLAYER_GIFT",	cbClientValidateMissionGift },
-	
+
 
 	{ "CLIENT:BOTCHAT:START_TRADE_ITEM",		cbClientBotChatStartTradeItem },
 	{ "CLIENT:BOTCHAT:START_TRADE_TELEPORT",	cbClientBotChatStartTradeTp },
@@ -3307,14 +3321,14 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:BOTCHAT:START_TRADE_GUILD_OPTIONS",	cbClientBotChatStartTradeGuildOptions },
 	{ "CLIENT:BOTCHAT:BUY_GUILD_OPTION",			cbClientBotChatBuyGuildOptions },
 	{ "CLIENT:BOTCHAT:START_GUILD_RESEARCH",		cbClientBotChatStartGuildResearch },
-	 
-	
+
+
 /*	{ "CLIENT:BOTCHAT:START_TRADE_SKILL",		cbClientBotChatStartTradeSkill },
 	{ "CLIENT:BOTCHAT:START_TRADE_PACT",		cbClientBotChatStartTradePact },*/
 	{ "CLIENT:BOTCHAT:START_TRADE_ACTION",		cbClientBotChatStartTradeAction },
 
 	{ "CLIENT:BOTCHAT:SET_FILTERS",				cbClientBotChatSetFilters },
-	
+
 
 	{ "CLIENT:BOTCHAT:NEXT_PAGE_ITEM",			cbClientBotChatTradeNextPage },
 	{ "CLIENT:BOTCHAT:BUY",						cbClientBotChatTradeBuy },
@@ -3371,7 +3385,7 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:OUTPOST:BANISH_PLAYER",			cbClientOutpostBanishPlayer },
 	{ "CLIENT:OUTPOST:BANISH_GUILD",			cbClientOutpostBanishGuild },
 	{ "CLIENT:OUTPOST:SET_DEF_PERIOD",			cbClientOutpostSetDefensePeriod },
-	
+
 	// death management messages
 	{ "CLIENT:DEATH:ASK_RESPAWN",				cbClientAskRespawn },
 
@@ -3397,7 +3411,7 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:MISSION:ENTER_CRITICAL",			cbClientMissionEnterCritical },
 	{ "CLIENT:MISSION:WAKE",					cbClientMissionWake },
 	{ "CLIENT:MISSION:GROUP_WAKE",				cbClientMissionGroupWake },
-	
+
 	{ "CLIENT:EVENT:SET_ITEM_CUSTOM_TEXT",		cbClientEventSetItemCustomText },
 
 	{ "CLIENT:TOTEM:BUILD",						cbTotemBuild },
@@ -3406,7 +3420,7 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:DM_GIFT:VALIDATE",				cbDMGiftValidate },
 
 	{ "CLIENT:RING_MISSION:MISSION_RING_SELECT",cbRingMissionSelectAction },
-}; 
+};
 
 
 
