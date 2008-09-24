@@ -1903,6 +1903,13 @@ void cbClientSendCustomEmote( NLNET::CMessage& msgin, const std::string &service
 		return;
 	}
 
+	if(behaviour >= 140 && behaviour <= 169)
+	{
+		string name = CEntityIdTranslator::getInstance()->getByEntity(id).toString();
+		nlwarning("HACK: %s %s tries to launch a firework %d", id.toString().c_str(), name.c_str(), behaviour);
+		return;
+	}
+
 	CCharacter * c = PlayerManager.getChar( id );
 	if( c && c->getEnterFlag() )
 	{
