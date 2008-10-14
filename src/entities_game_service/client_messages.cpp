@@ -435,13 +435,21 @@ void cbClientPhraseExecuteFaber( NLNET::CMessage& msgin, const std::string &serv
 	CCharacter *ch = PlayerManager.getChar( Id );
 	if ( !ch )
 	{
-		nlwarning("<cbClientPhraseExecuteFaber> Unknown character %s", Id.toString().c_str() );
+		nlwarning("Unknown character %s", Id.toString().c_str() );
 		return;
 	}
 	// check character is ready
 	if (!ch->getEnterFlag())
 	{
-		nlwarning("<cbClientPhraseExecuteFaber> player Id %s not yet ready", Id.toString().c_str() );
+		nlwarning("player Id %s not yet ready", Id.toString().c_str() );
+		return;
+	}
+
+
+	if ( ch->getKnownBricks().find( craftPlan ) == ch->getKnownBricks().end())
+	{
+		string name = CEntityIdTranslator::getInstance()->getByEntity(Id).toString();
+		nlwarning("HACK: %s %s tries to craft a brick he doesn't know %s", Id.toString().c_str(), name.c_str(), craftPlan.toString().c_str());
 		return;
 	}
 
