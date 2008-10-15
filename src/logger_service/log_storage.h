@@ -142,7 +142,7 @@ public:
 	}
 
 	/// Save the last minute of logs on disk
-	void saveMinutly(const TLogInfos &logInfos)
+	void saveMinutely(const TLogInfos &logInfos)
 	{
 		uint32 now = NLMISC::CTime::getSecondsSince1970();
 
@@ -174,7 +174,7 @@ public:
 		}
 
 		// write the container on disk
-		saveLogfile("minutly_");
+		saveLogfile("minutely_");
 	}
 
 	// Save all logs in memory on disk

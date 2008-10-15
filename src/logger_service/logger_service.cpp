@@ -250,9 +250,9 @@ class CLoggerServiceMod
 	/// date of last 'minute' log output
 	uint32						_LastMinuteOutput;
 	/// date of last 'hourly' consolidation
-	uint32						_LastOurlyProcess;
+	uint32						_LastHourlyProcess;
 
-	/// Line counter of current request beeing writen to backup service
+	/// Line counter of current request being written to backup service
 	uint32						_WriteLineCounter;
 	/// Query number, used to number each query sent to the worker thread.
 	uint32						_LastQueryNumber;
@@ -261,7 +261,7 @@ class CLoggerServiceMod
 	enum
 	{
 		MinuteDelay = 60,
-		OurlyDelay = 60*60,
+		HourlyDelay = 60*60,
 	};
 
 	enum TQueryCommand
@@ -378,7 +378,7 @@ public:
 		:	_LogInfosSize(0),
 			_LogId(0),
 			_LastMinuteOutput(0),
-			_LastOurlyProcess(0),
+			_LastHourlyProcess(0),
 			_LastQueryNumber(0),
 			_WriteLineCounter(0),
 			_QueryThread(NULL)
@@ -405,7 +405,7 @@ public:
 	bool initModule(const TParsedCommandLine &initInfo)
 	{
 		CModuleBase::initModule(initInfo);
-		// Check and eventually process the ourly output of the preceding minute run
+		// Check and eventually process the hourly output of the preceding minute run
 		consolidatePreviousFiles();
 
 		// start the query thread
@@ -432,25 +432,25 @@ public:
 	{
 		uint32 now = CTime::getSecondsSince1970();
 
-		if (now > _LastOurlyProcess+OurlyDelay)
+		if (now > _LastHourlyProcess+HourlyDelay)
 		{
-			// do the ourly process
+			// do the hourly process
 
 			_LogMutex.enter();
 			doHourlyProcess();
 			_LogMutex.leave();
 			
 			// update working time
-			_LastOurlyProcess = now;
+			_LastHourlyProcess = now;
 			_LastMinuteOutput = now;
 		}
 		if (now > _LastMinuteOutput+MinuteDelay)
 		{
-			_LogMutex.enter();
 			// do the minute output
-			CLogStorage ls(_LogDefs);
-			ls.saveMinutly(_LogInfos);
 
+			_LogMutex.enter();
+			CLogStorage ls(_LogDefs);
+			ls.saveMinutely(_LogInfos);
 			_LogMutex.leave();
 
 			_LastMinuteOutput = now;
@@ -556,7 +556,7 @@ public:
 
 	void doHourlyProcess()
 	{
-		// 1- generate the ourly output
+		// 1- generate the hourly output
 		CLogStorage ls(_LogDefs);
 		ls.saveHourly(_LogInfos);
 		// 2- remove minute outputs
@@ -566,7 +566,7 @@ public:
 		
 		for (uint i=0; i<files.size(); ++i)
 		{
-			if (files[i].find("minutly") != string::npos)
+			if (files[i].find("minutely") != string::npos)
 			{
 				// ok, this is a minute output, remove it
 				CFile::deleteFile(files[i]);
@@ -577,7 +577,7 @@ public:
 	}
 
 
-	/// Rebuild the last 'hourly' from residual minutly files found on disk
+	/// Rebuild the last 'hourly' from residual minutely files found on disk
 	void consolidatePreviousFiles()
 	{
 		CLogStorage ls;
@@ -588,7 +588,7 @@ public:
 		
 		for (uint i=0; i<files.size(); ++i)
 		{
-			if (files[i].find("minutly") != string::npos && files[i].find(".binlog") == files[i].size()-7)
+			if (files[i].find("minutely") != string::npos && files[i].find(".binlog") == files[i].size()-7)
 			{
 				ls.loadLogs(files[i]);
 			}
@@ -600,7 +600,7 @@ public:
 		// delete minute files (even those .tmp file left by failed copy)
 		for (uint i=0; i<files.size(); ++i)
 		{
-			if (files[i].find("minutly") != string::npos)
+			if (files[i].find("minutely") != string::npos)
 			{
 				CFile::deleteFile(files[i]);
 			}
