@@ -117,7 +117,7 @@
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="../../../common/src;.;.."
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;NL_RELEASE_DEBUG"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
