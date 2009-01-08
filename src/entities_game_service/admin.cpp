@@ -3025,7 +3025,7 @@ NLMISC_COMMAND( displayWeather, "Display current weather at specified pos", "<x>
 
 		BELOW ARE OFFICIAL CSR COMMANDS
 
-/***********************************************************************************************************************/
+ ***********************************************************************************************************************/
 
 NLMISC_COMMAND( csrCmd, "Invoke a CSR command from service console or admin tool without the need to have a CSR logged in", "<csrCommandName> <command params>+" )
 {
@@ -4786,15 +4786,12 @@ NLMISC_COMMAND(changeHairCut, "change the haircut of a player", "<eid> <sheet na
 
 		END OF OFFICIAL CSR COMMANDS
 
-/***********************************************************************************************************************/
+ ***********************************************************************************************************************/
 
 
 ///////////////////////
 // DYN CHAT COMMANDS //
 ///////////////////////
-
-
-
 
 //============================================================================================================
 // create a new channel with a localized name
