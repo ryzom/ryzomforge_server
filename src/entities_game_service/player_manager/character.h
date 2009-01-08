@@ -2620,7 +2620,6 @@ private:
 	void initDatabase();
 
 	/**
-	/**
 	 * evaluate current sentence
 	 */
 	void evaluateSentence();
