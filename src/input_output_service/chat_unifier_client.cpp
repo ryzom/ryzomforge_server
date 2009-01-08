@@ -136,7 +136,9 @@ public:
 
 	void sendUnifiedDynChat(const NLMISC::CEntityId &dynCharId, const ucstring &senderName, const ucstring &text)
 	{
-#pragma message (NL_LOC_WRN "Add the message in the interface")
+#ifdef NL_OS_WINDOWS
+#	pragma message (NL_LOC_WRN "Add the message in the interface")
+#endif
 		CChatUnifierClientProxy::broadcast_dynChanBroadcast(_Peers.begin(), _Peers.end(), this, dynCharId, senderName, text);
 	}
 
