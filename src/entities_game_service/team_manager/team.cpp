@@ -1097,7 +1097,7 @@ void CTeam::updateMembersPositions(bool forceUpdate)
 			{
 //				sprintf(buffer, "GROUP:%d:POS", i );
 //				member2->_PropertyDatabase.setProp( buffer, (*it).second.Pos );
-				CBankAccessor_PLR::getGROUP().getArray(j).setPOS(member2->_PropertyDatabase, (*it).second.Pos);
+				CBankAccessor_PLR::getGROUP().getArray(i).setPOS(member2->_PropertyDatabase, (*it).second.Pos);
 			}
 			++j;
 		}
