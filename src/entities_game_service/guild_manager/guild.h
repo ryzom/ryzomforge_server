@@ -179,9 +179,9 @@ public:
 	/// put an item in guild inventory (set quantity to UINT_MAX for 'all stack')
 	void	putItem( CCharacter * user, uint32 slot, uint32 quantity, uint16 session );
 	/// user wanna take money
-	void	takeMoney( CCharacter * user, uint32 money, uint16 session );
+	void	takeMoney( CCharacter * user, sint64 money, uint16 session );
 	/// user wanna put money
-	void	putMoney( CCharacter * user, uint32 money, uint16 session );
+	void	putMoney( CCharacter * user, sint64 money, uint16 session );
 	/// get a guild item
 	const CGameItemPtr getItem( uint32 slot ) const
 	{

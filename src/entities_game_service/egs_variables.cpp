@@ -634,10 +634,11 @@ CVariable<sint32> FameMaxKaravanvKaravan( "egs", "FameMaxKaravanvKaravan", "Max 
 // female titles
 CVariable<bool> UseFemaleTitles("egs","UseFemaleTitles", "Use female titles when character is a female character", true, 0, true);
 
-// - Ring 
-extern NLMISC::CVariable<uint32> TickFrequencyNpcControlUpdate;
-CVariable<uint32> TickFrequencyNpcControlUpdate("egs","TickFrequencyNpcControlUpdate","Min time in tick between 2 updates of udate of npc control", 6, 0, true);
+// - NPC Icons
+CVariable<uint32> ClientNPCIconRefreshTimerDelay("egs", "ClientNPCIconRefreshTimerDelay", "Max number of gamecycles between 2 refreshes of a single mission giver NPC", 60*10, 0, true, CPlayerManager::onNPCIconTimerChanged);
 
+// - Ring 
+CVariable<uint32> TickFrequencyNpcControlUpdate("egs","TickFrequencyNpcControlUpdate","Min time in tick between 2 updates of udate of npc control", 6, 0, true);
 
 // Scores
 CVariable<sint32> PhysicalCharacteristicsBaseValue( "egs", "PhysicalCharacteristicsBaseValue", "Physical characteristic base value used to compute base score value", 10, 0, true );

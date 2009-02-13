@@ -548,6 +548,7 @@ bool CBot::finalizeSpawn(RYAI_MAP_CRUNCH::CWorldPosition const& botWPos, CAngle 
 	// Use base class method to avoid overload in 
 	spawnBot->CModEntityPhysical::setTheta(spawnTheta);
 	
+	this->initAdditionalMirrorValues(); // let derived class do its additional inits before declaring the entity
 	CMirrors::declareEntity(row);
 	linkToWorldMap(this, spawnBot->pos(), getAIInstance()->botMatrix());
 	

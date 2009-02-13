@@ -956,6 +956,10 @@ void CBankAccessor_PLR::TGROUP::TMISSIONS::TArray::TGOALS::TArray::init(ICDBStru
 	nlassert(node != NULL);
 	_TEXT = node;
 	
+	node  = parent->getNode( ICDBStructNode::CTextId("NPC_ALIAS"), false );
+	nlassert(node != NULL);
+	_NPC_ALIAS = node;
+	
 
 	// branch init
 	
@@ -2350,6 +2354,10 @@ void CBankAccessor_PLR::TMISSIONS::TArray::TGOALS::TArray::init(ICDBStructNode *
 	node  = parent->getNode( ICDBStructNode::CTextId("TEXT"), false );
 	nlassert(node != NULL);
 	_TEXT = node;
+	
+	node  = parent->getNode( ICDBStructNode::CTextId("NPC_ALIAS"), false );
+	nlassert(node != NULL);
+	_NPC_ALIAS = node;
 	
 
 	// branch init

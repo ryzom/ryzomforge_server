@@ -161,6 +161,7 @@ bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsin
 	Tags.NonAbandonnable = false;
 	Tags.NeedValidation = false;
 	Tags.FailIfInventoryIsFull = false;
+	Tags.HideIconOnGiverNPC = false;
 	
 	Prerequisits.FameId = (TStringId)0;
 	Prerequisits.Title = CHARACTER_TITLE::NB_CHARACTER_TITLE;
@@ -216,6 +217,7 @@ bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsin
 
 	bool rewardTag = false;
 	bool displayNextStep = true;
+	bool displayNextIconOnStepNPC = true;
 		
 	//get the alias
 	if ( !CPrimitivesParser::getAlias(prim, Alias))
@@ -437,6 +439,8 @@ bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsin
 				Tags.NonAbandonnable = true;
 			else if ( script[0] == "fail_if_inventory_is_full" )
 				Tags.FailIfInventoryIsFull = true;
+			else if ( script[0] == "hide_icon_on_giver_npc" )
+				Tags.HideIconOnGiverNPC = true;
 			else if ( script[0] == "req_season")
 				ret = parseSeason( i+1, script, Prerequisits.Season ) && ret;
 			else if ( script[0] == "req_skill" )
@@ -528,6 +532,8 @@ bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsin
 			}
 			else if ( script[0] == "hide_obj" )
 				displayNextStep = false;
+			else if ( script[0] == "hide_icon_on_step_npc" )
+				displayNextIconOnStepNPC = false;
 
 			// parse parent mission
 			else if ( script[0] == "parent" )
@@ -731,6 +737,8 @@ bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsin
 					
 					if ( displayNextStep == false )
 						step->setDisplayed( false );
+					if ( displayNextIconOnStepNPC == false )
+						step->setIconDisplayedOnStepNPC( false );
 						/*	if ( ( oooDisplayed == false && outOfOrderStep != (currentStep + 1) ) ||
 						( displayNextStep == false ) )
 						step->displayed(false);
@@ -742,6 +750,7 @@ bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsin
 					currentStep++;
 					Steps.push_back(step);
 					displayNextStep = true;
+					displayNextIconOnStepNPC = true;
 					setObjInOOO = false;
 					continue;
 				}
@@ -2020,6 +2029,7 @@ uint32 CMissionTemplate::testPrerequisits( CCharacter * user, CPrerequisitInfos 
 			}
 		}
 
+		// check team prerequisits
 		if( Prerequisits.TeamSize )
 		{
 			prereqDesc.Validated = true;
@@ -2074,6 +2084,7 @@ uint32 CMissionTemplate::testPrerequisits( CCharacter * user, CPrerequisitInfos 
 			}
 		}
 
+		// check season prerequisits
 		if (Prerequisits.Season != EGSPD::CSeason::Invalid)
 		{
 			prereqDesc.Validated = true;
@@ -2120,6 +2131,7 @@ uint32 CMissionTemplate::testPrerequisits( CCharacter * user, CPrerequisitInfos 
 			}
 		}
 
+		// check known bricks
 		for ( uint i = 0; i < Prerequisits.KnownActions.size(); i++ )
 		{
 			prereqDesc.Validated = true;
@@ -2151,6 +2163,7 @@ uint32 CMissionTemplate::testPrerequisits( CCharacter * user, CPrerequisitInfos 
 			}
 		}
 
+		// check encyclopedia
 		if (Prerequisits.EncycloReqAlbum != -1)
 		{
 			prereqDesc.Validated = true;
@@ -2223,6 +2236,7 @@ uint32 CMissionTemplate::testPrerequisits( CCharacter * user, CPrerequisitInfos 
 			}
 		}
 
+		// check event faction
 		if ( !Prerequisits.EventFaction.empty() )
 		{
 			prereqDesc.Validated = true;

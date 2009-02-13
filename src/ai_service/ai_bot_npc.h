@@ -247,6 +247,8 @@ public:
 	void setVisualProperties(std::string input);
 
 	inline void setMaxHitRangeForPlayer(float maxHitRange) { _MaxHitRangeForPC = maxHitRange; }
+//	void setMissionStepIconHidden(bool hide) { _MissionIconFlags.IsMissionStepIconDisplayable = !hide; }
+//	void setMissionGiverIconHidden(bool hide) { _MissionIconFlags.IsMissionGiverIconDisplayable = !hide; }
 	
 	// Read accessors for NPC base parameters ---------------------------
 	NLMISC::CSheetId getStats() const { return getSheet()->SheetId(); }
@@ -299,6 +301,7 @@ public:
 protected:
 	virtual void sheetChanged();
 	bool finalizeSpawnNpc();
+	virtual void initAdditionalMirrorValues();
 		
 protected:
 	// stuff supplied by CAIBot ------------------
@@ -306,6 +309,18 @@ protected:
 	// position & orientation
 	// mode and behaviour
 	
+	// A static bot object with a fauna sheet must not display SheetName but botobject name
+	bool _FaunaBotUseBotName;
+
+//	struct
+//	{
+//		/// Allows to hide icons for current missions steps having interactions with this NPC
+//		bool		IsMissionStepIconDisplayable : 1;
+//
+//		/// Allows to hide icons for missions proposed by this NPC
+//		bool		IsMissionGiverIconDisplayable : 1;
+//	} _MissionIconFlags;
+
 	// look parameters ---------------------------
 	bool			_Hat;
 	
@@ -321,8 +336,7 @@ protected:
 	CAIPos _StartPos;
 	
 	std::vector<NLMISC::CSheetId> _LootList;
-	bool _FaunaBotUseBotName; // a static bot object with a fauna sheet must not display SheetName but botobject name
-	
+
 	// static chat parameters --------------------
 	NLMISC::CSmartPtr<CNpcChatProfileImp> _ChatProfile;
 	

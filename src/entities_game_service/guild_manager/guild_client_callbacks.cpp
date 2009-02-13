@@ -163,7 +163,7 @@ void cbClientGuildPutMoney( NLNET::CMessage& msgin, const std::string & serviceN
 	H_AUTO(cbClientGuildPutMoney);
 
 	CEntityId id;
-	uint32 money;
+	sint64 money;
 	uint16 session;
 	msgin.serial( id );
 	msgin.serial( money );
@@ -198,7 +198,7 @@ void cbClientGuildTakeMoney( NLNET::CMessage& msgin, const std::string & service
 	H_AUTO(cbClientGuildTakeMoney);
 
 	CEntityId id;
-	uint32 money;
+	sint64 money;
 	uint16 session;
 	msgin.serial( id );
 	msgin.serial( money );

@@ -149,6 +149,7 @@ class CMissionStepTalk : public IMissionStepTemplate
 		return ret;
 	}
 
+	virtual TAIAlias getInvolvedBot(bool& invalidIsGiver) const { invalidIsGiver=true; return _Bot; }
 
 	std::string _PhraseId;
 	TVectorParamCheck _Params;
@@ -255,6 +256,8 @@ class CMissionGiveMoney : public IMissionStepTemplate
 		else
 			retParams.back().Identifier = "giver";
 	}
+
+	virtual TAIAlias getInvolvedBot(bool& invalidIsGiver) const { invalidIsGiver=true; return _Bot; }
 
 	bool checkPlayerGift( CMission * instance, CCharacter * user )
 	{
@@ -486,6 +489,8 @@ class CMissionStepGiveItem : public IMissionStepTemplate
 		else
 			retParams.back().Identifier = "giver";
 	}
+
+	virtual TAIAlias getInvolvedBot(bool& invalidIsGiver) const { invalidIsGiver=true; return _Bot; }
 
 	//***********************
 	bool checkPlayerGift( CMission * instance, CCharacter * user )

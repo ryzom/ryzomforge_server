@@ -308,7 +308,7 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot )
 			y = c->getState().Y();
 					
 			// Send the bot name to the client if not already done (or if the name has changed)
-			CMirrorPropValueRO<TYPE_NAME_STRING_ID> botNameId( TheDataset, c->getEntityRowId(), DSPropertyNAME_STRING_ID );
+			//CMirrorPropValueRO<TYPE_NAME_STRING_ID> botNameId( TheDataset, c->getEntityRowId(), DSPropertyNAME_STRING_ID );
 			params[0].Type = STRING_MANAGER::bot;
 			params[0].setEIdAIAlias( c->getId(), CAIAliasTranslator::getInstance()->getAIAlias( c->getId()) );
 			msg = "COMPASS_BOT";
@@ -526,7 +526,7 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 	if ( stepIndex != 0xFFFFFFFF )
 	{
 		EGSPD::CActiveStepPD * step = _Mission->getSteps( stepIndex );
-		nlassert( step );
+		nlassert( step ); // TODO: fails if two members of a team with a 'give item' team mission give an item at the exact same time - from CTeam::processTeamMissionStepEvent() from CCharacter::acceptExchange() from cbClientValidateMissionGift()
 		resultEnum = processEventForStep(userRow, *step, event);
 		if ( resultEnum != CMissionEvent::StepEnds )
 			return resultEnum;
@@ -1075,46 +1075,38 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 
 	typename DBType::TArray	&missionEntry = missionDb.getArray(_ClientIndex);
 	
-//	user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:TYPE",dbPrefix.c_str(),_ClientIndex), templ->Type);
 	missionEntry.setTYPE(user._PropertyDatabase, templ->Type);
-//	user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:ICON",dbPrefix.c_str(),_ClientIndex),templ->Icon );
 	missionEntry.setICON(user._PropertyDatabase, templ->Icon);
-//	user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:TITLE",dbPrefix.c_str(),_ClientIndex),templ->sendTitleText( user.getEntityRowId(),giverRow));
-	missionEntry.setTITLE(user._PropertyDatabase, templ->sendTitleText( user.getEntityRowId(),giverRow));
-//	user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:DETAIL_TEXT",dbPrefix.c_str(),_ClientIndex),_Mission->sendDesc( user.getEntityRowId() ) );
+
+	if (missionEntry.getTITLE(user._PropertyDatabase) == 0) // new missions are always written in a free slot
+	{
+		// Make TITLE never change for a mission in progress, only write it once (sendTitleText() generates a new string id every time it is called)
+		missionEntry.setTITLE(user._PropertyDatabase, templ->sendTitleText( user.getEntityRowId(),giverRow));
+	}
 	missionEntry.setDETAIL_TEXT(user._PropertyDatabase, _Mission->sendDesc( user.getEntityRowId() ));
-	
+
 	if (_Mission->getCriticalPartEndDate() != 0 && (_Mission->getEndDate() == 0 || _Mission->getCriticalPartEndDate() < _Mission->getEndDate()) )
-//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:END_DATE",dbPrefix.c_str(),_ClientIndex),_Mission->getCriticalPartEndDate() );
 		missionEntry.setEND_DATE(user._PropertyDatabase, _Mission->getCriticalPartEndDate());
 	else
-//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:END_DATE",dbPrefix.c_str(),_ClientIndex),_Mission->getEndDate() );
 		missionEntry.setEND_DATE(user._PropertyDatabase, _Mission->getEndDate());
 
-//	user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:BEGIN_DATE",dbPrefix.c_str(),_ClientIndex), _Mission->getBeginDate() );
 	missionEntry.setBEGIN_DATE(user._PropertyDatabase, _Mission->getBeginDate());
 	if (!_Mission->getFinished())
 	{
-//		user._PropertyDatabase.setProp( toString( "%sMISSIONS:%u:FINISHED", dbPrefix.c_str(), _ClientIndex), 0 );
 		missionEntry.setFINISHED(user._PropertyDatabase, 0);
 	}
 	else // Mission is finished
 	{
 		if (_Mission->getMissionSuccess())
-//			user._PropertyDatabase.setProp( toString( "%sMISSIONS:%u:FINISHED", dbPrefix.c_str(), _ClientIndex), 1 );
 			missionEntry.setFINISHED(user._PropertyDatabase, 1);
 		else // Mission is finished but failed
-//			user._PropertyDatabase.setProp( toString( "%sMISSIONS:%u:FINISHED", dbPrefix.c_str(), _ClientIndex), 2 );
 			missionEntry.setFINISHED(user._PropertyDatabase, 2);
 	}
-//	user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:ABANDONNABLE",dbPrefix.c_str(),_ClientIndex), !templ->Tags.NonAbandonnable );
 	missionEntry.setABANDONNABLE(user._PropertyDatabase, !templ->Tags.NonAbandonnable);
 				
 	if ( _Mission->getStepsBegin() == _Mission->getStepsEnd() )
-//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:OR_STEPS",dbPrefix.c_str(),_ClientIndex ), 0 );
 		missionEntry.setOR_STEPS(user._PropertyDatabase, 0);
 	else
-//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:OR_STEPS",dbPrefix.c_str(),_ClientIndex ), templ->Steps[ (*_Mission->getStepsBegin()).second.getIndexInTemplate() - 1]->isAny() );
 		missionEntry.setOR_STEPS(user._PropertyDatabase, templ->Steps[ (*_Mission->getStepsBegin()).second.getIndexInTemplate() - 1]->isAny());
 				
 	uint stepIdx = 0;
@@ -1173,6 +1165,25 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 		else
 			currentOOO = 0xFFFFFFFF;
 		
+		// Send NPCs related to the goals (for icon)
+		TAIAlias involvedBot = CAIAliasTranslator::Invalid;
+		if ( display && step->isIconDisplayedOnStepNPC() )
+		{
+//			CCreature *bot = CreatureManager.getCreature(giverRow);
+//			if (bot && bot->isMissionStepIconDisplayable())
+//			{
+				bool invalidIsGiver;
+				involvedBot = step->getInvolvedBot(invalidIsGiver);
+				if ((involvedBot == CAIAliasTranslator::Invalid) && invalidIsGiver)
+					involvedBot = _Mission->getGiver();
+//			}
+		}
+#ifdef NL_DEBUG
+		nlassert(CAIAliasTranslator::Invalid == 0); // nlctassert would not compile (VC6)
+#endif
+
+		missionEntry.getGOALS().getArray(stepIdx).setNPC_ALIAS(user._PropertyDatabase, involvedBot);
+
 		// do not display step that have the display flag set to false
 		// if the step is in an overridden OOO. Only display the first step
 		if ( display )
@@ -1193,7 +1204,6 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			uint32 stepTxt = step->sendRpStepText( &user,states, giverId );
 			if( stepTxt!=0 && !RPTxtOOOWritten )
 			{
-//				user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:GOALS:%u:TEXT",dbPrefix.c_str(),_ClientIndex,stepIdx ), stepTxt );
 				missionEntry.getGOALS().getArray(stepIdx).setTEXT(user._PropertyDatabase, stepTxt);
 				stepIdx++;
 				if( step->getOOOStepIndex() != 0xFFFFFFFF )
@@ -1206,7 +1216,6 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			stepTxt = step->sendStepText( &user,states, giverId );
 			if( stepTxt!=0 )
 			{
-//				user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:GOALS:%u:TEXT",dbPrefix.c_str(),_ClientIndex,stepIdx ), stepTxt );
 				missionEntry.getGOALS().getArray(stepIdx).setTEXT(user._PropertyDatabase, stepTxt);
 				stepIdx++;
 			}
@@ -1264,7 +1273,6 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			uint32 stepTxt = step->sendRpStepText( &user,states, giverId );
 			if(stepTxt!=0)
 			{
-//				user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:HISTO:%u:TEXT",dbPrefix.c_str(),_ClientIndex,stepDoneIdx ), stepTxt );
 				missionEntry.getHISTO().getArray(stepDoneIdx).setTEXT(user._PropertyDatabase, stepTxt);
 				stepDoneIdx++;
 				// roleplay text replaces all step text of step any
@@ -1279,7 +1287,6 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 						DontDisplayStepAnyInHisto = false;
 					// Send standard (or overriden) step texts
 					stepTxt = step->sendStepText(&user,states, giverId );
-//					user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:HISTO:%u:TEXT",dbPrefix.c_str(),_ClientIndex,stepDoneIdx ), stepTxt );
 					missionEntry.getHISTO().getArray(stepDoneIdx).setTEXT(user._PropertyDatabase, stepTxt);
 					stepDoneIdx++;
 				}
@@ -1289,12 +1296,11 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 	
 	for ( uint i = stepIdx; i < NB_STEP_PER_MISSION; i++ )
 	{
-//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:GOALS:%u:TEXT",dbPrefix.c_str(),_ClientIndex,i ), 0);
 		missionEntry.getGOALS().getArray(i).setTEXT(user._PropertyDatabase, 0);
+		missionEntry.getGOALS().getArray(i).setNPC_ALIAS(user._PropertyDatabase, CAIAliasTranslator::Invalid);
 	}
 	for ( uint i = stepDoneIdx; i < NB_HISTO_PER_MISSION; i++ )
 	{
-//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:HISTO:%u:TEXT",dbPrefix.c_str(),_ClientIndex,i ), 0);
 		missionEntry.getHISTO().getArray(i).setTEXT(user._PropertyDatabase, 0);
 	}
 	
@@ -1302,19 +1308,9 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 	uint nbEntry = _updateCompass(user, missionDb);
 	for ( uint i = nbEntry ; i < NB_JOURNAL_COORDS; i++ )
 	{
-		if (i >= 8)
-		{
-			nlwarning("In mission '%s' : invalid access to CBD entry MISSIONS:%u:TARGET%u : TARGET is out of 8 range (starting at %u after _updateCompass())", templ->getMissionName().c_str(), _ClientIndex, i, nbEntry);
-		}
-		else
-		{
-			//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:TARGET%u:X",dbPrefix.c_str(),_ClientIndex,i ), 0);
-			missionEntry.getTARGET(i).setX(user._PropertyDatabase, 0);
-			//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:TARGET%u:Y",dbPrefix.c_str(),_ClientIndex,i ), 0);
-			missionEntry.getTARGET(i).setY(user._PropertyDatabase, 0);
-			//		user._PropertyDatabase.setProp( NLMISC::toString( "%sMISSIONS:%u:TARGET%u:TITLE",dbPrefix.c_str(),_ClientIndex,i ), 0);
-			missionEntry.getTARGET(i).setTITLE(user._PropertyDatabase, 0);
-		}
+		missionEntry.getTARGET(i).setX(user._PropertyDatabase, 0);
+		missionEntry.getTARGET(i).setY(user._PropertyDatabase, 0);
+		missionEntry.getTARGET(i).setTITLE(user._PropertyDatabase, 0);
 	}
 }
 
@@ -1412,7 +1408,6 @@ uint CMissionBaseBehaviour::_updateCompass(CCharacter & user, DBType &missionDb)
 			maxClientIndex = MaxGroupMissionCount;
 		if ( _ClientIndex < maxClientIndex )
 		{
-//			ICDBStructNode *node = user._PropertyDatabase.getICDBStructNodeFromName( NLMISC::toString( "%sMISSIONS:%u:TARGET%u", dbPrefix.c_str(), _ClientIndex, compassIdx ) );
 //			if ( node )
 //			{
 			if (compassIdx >= 8)

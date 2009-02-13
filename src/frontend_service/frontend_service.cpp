@@ -92,6 +92,8 @@ CVariable<string>	StopWebServerSysCommand("FS", "StopWebServerSysCommand", "Syst
 CVariable<bool>		PublishFSHostAsIP("FS", "PublishFSHostAsIP", "Publish FSHost to the WS as IP:port instead of hostname:post", false, 0, true);
 CVariable<uint32>	DelayBeforeUPDAlert("FS", "DelayBeforeUPDAlert", "Delay (in s) before raising an alert when the service has not received UPD packet", 10*60, 0, true);	// 10m, default
 
+CVariable<bool>		VerboseFEStatsTime("fs", "VerboseFEStatsTime", "Verbose FESTATS and FETIME", false, 0, true);
+
 std::string	getPatchingAddress()
 {
 	std::string	la;
@@ -1023,14 +1025,14 @@ void cbServiceDown( const string& serviceName, NLNET::TServiceId serviceId, void
  */
 void	cbAckUnknown(CClientHost *client, CAction *action)
 {
-	nlinfo("FERECV: client %d acked action %d", client->clientId(), action->Code);
+	nldebug("FERECV: client %d acked action %d", client->clientId(), action->Code);
 }
 
 
 void	cbAckDummy(CClientHost *client, CAction *action)
 {
 	CActionDummy	*dummy = (CActionDummy*)(action);
-	nlinfo("Client %d acked dummy %d", client->clientId(), dummy->Dummy1);
+	nldebug("FERECV: Client %d acked dummy %d", client->clientId(), dummy->Dummy1);
 }
 
 
@@ -1478,7 +1480,7 @@ bool CFrontEndService::update()
 	// Display statistics
 	CycleWatch.stop();
 	static TTime lastdisplay = CTime::getLocalTime();
-	if ( CTime::getLocalTime() - lastdisplay > 1000 )
+	if ( VerboseFEStatsTime.get() && (CTime::getLocalTime() - lastdisplay > 1000) )
 	{
 		TMsDuration cyclepartialaverage = CycleWatch.getPartialAverage();
 		nlinfo( "FETIME: Time in ms: Receive=%u Send=%u UserLoop=%u Cycle=%u (%.1f cps)",

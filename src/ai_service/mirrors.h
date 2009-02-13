@@ -51,6 +51,7 @@ public:
 
 	static void					initSheet( const TDataSetRow& entityIndex, const NLMISC::CSheetId& sheetId );
 	static void					initSheetServer( const TDataSetRow& entityIndex, const NLMISC::CSheetId& sheetId );
+	static void					initNPCAlias( const TDataSetRow& entityIndex, TAIAlias alias );
 	static void					setPosAndTheta( const TDataSetRow& entityIndex, sint32 posX, sint32 posY, sint32 posZ, float angleRad );
 	static void					setTheta( const TDataSetRow& entityIndex, float angleRad );
 	static void					setBehaviour( const TDataSetRow& entityIndex, MBEHAV::EBehaviour b );

@@ -314,6 +314,8 @@ class CMissionStepBuyItem : public IMissionStepItem
 			textPtr = &stepText;
 	}
 	
+	virtual TAIAlias getInvolvedBot(bool& invalidIsGiver) const { invalidIsGiver=true; return _Bot; }
+
 	bool _HasBot;
 	TAIAlias _Bot;
 
@@ -396,6 +398,8 @@ class CMissionStepSellItem : public IMissionStepItem
 			textPtr = &stepText;
 	}
 	
+	virtual TAIAlias getInvolvedBot(bool& invalidIsGiver) const { invalidIsGiver=true; return _Bot; }
+
 	bool _HasBot;
 	TAIAlias _Bot;
 

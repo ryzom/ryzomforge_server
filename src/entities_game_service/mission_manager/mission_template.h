@@ -280,6 +280,7 @@ public:
 		bool NonAbandonnable		:1;
 		bool NeedValidation			:1;
 		bool FailIfInventoryIsFull	:1;
+		bool HideIconOnGiverNPC		:1;
 	}Tags;
 
 	std::string HashKey;

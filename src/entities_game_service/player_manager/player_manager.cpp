@@ -1404,8 +1404,8 @@ void CPlayerManager::disconnectPlayer( uint32 userId )
 		}
 
 
-		// Remove the player from the mirror (harmless if not in mirror yet, except warnings)
-		if ( ! charId.isUnknownId() )
+		// Remove the player from the mirror (only if already in mirror)
+		if ( (!charId.isUnknownId()) && FeTempDataset->getDataSetRow( charId ).isValid() )
 			Mirror.removeEntity( charId );
 
 		nlinfo( "<cbClientDisconnection> player %u is disconnected", userId );
@@ -1587,6 +1587,22 @@ void CPlayerManager::registerCharacterName()
 	}
 }
 
+//---------------------------------------------------
+// onNPCIconTimerChanged
+//---------------------------------------------------
+void CPlayerManager::onNPCIconTimerChanged(NLMISC::IVariable &var)
+{
+	// Send new timer to all players online.
+	const CPlayerManager::TMapPlayers& player = PlayerManager.getPlayers();
+	for( CPlayerManager::TMapPlayers::const_iterator it = player.begin(); it != player.end(); ++it )
+	{
+		CCharacter* character = it->second.Player->getActiveCharacter();
+		if( character )
+		{
+			character->sendNpcMissionGiverTimer( true ); // force sending if the value returns to default
+		}
+	}
+}
 
 //---------------------------------------------------
 // tickUpdate :

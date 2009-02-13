@@ -28,7 +28,7 @@ TPropertyIndex DSPropertyTickPos;
 TPropertyIndex DSPropertyLocalX;
 TPropertyIndex DSPropertyLocalY;
 TPropertyIndex DSPropertyLocalZ;
-TPropertyIndex DSPropertyStunned;
+//TPropertyIndex DSPropertyStunned;
 TPropertyIndex DSFirstPropertyAvailableImpulseBitSize;
 
 
@@ -97,6 +97,7 @@ void CEntityContainer::initMirror()
 	_DataSet->declareProperty( "Z", PSOReadOnly );
 	_DataSet->declareProperty( "Theta", PSOReadOnly );
 	_DataSet->declareProperty( "Sheet", PSOReadOnly );
+	_DataSet->declareProperty( "NPCAlias", PSOReadOnly );
 	_DataSet->declareProperty( "Behaviour", PSOReadOnly );
 	_DataSet->declareProperty( "NameIndex", PSOReadOnly );
 	_DataSet->declareProperty( "Target", PSOReadOnly );
@@ -112,7 +113,7 @@ void CEntityContainer::initMirror()
 	_DataSet->declareProperty( "LocalY", PSOReadOnly );
 	_DataSet->declareProperty( "LocalZ", PSOReadOnly );
 	_DataSet->declareProperty( "Bars", PSOReadOnly );
-	_DataSet->declareProperty( "Stunned", PSOReadOnly ); // to block or not incoming messages from the client
+	//_DataSet->declareProperty( "Stunned", PSOReadOnly ); // to block or not incoming messages from the client
 	_DataSet->declareProperty( "AvailableImpulseBitSize", PSOWriteOnly ); // to avoid other FS to receive changes
 	_DataSet->declareProperty( "TargetList", PSOReadOnly );
 	_DataSet->declareProperty( "VisualFX", PSOReadOnly );	
@@ -154,7 +155,7 @@ void CEntityContainer::initMirror()
 	DSPropertyLocalX = getPropertyIndex( "LocalX" );
 	DSPropertyLocalY = getPropertyIndex( "LocalY" );
 	DSPropertyLocalZ = getPropertyIndex( "LocalZ" );
-	DSPropertyStunned = getPropertyIndex( "Stunned" );
+	//DSPropertyStunned = getPropertyIndex( "Stunned" );
 	DSFirstPropertyAvailableImpulseBitSize = getPropertyIndex( "AvailableImpulseBitSize" );
 	DSPropertyTARGET_LIST = mapVisualPropIndex( "TargetList", PROPERTY_TARGET_LIST );
 	DSPropertyVISUAL_FX = mapVisualPropIndex( "VisualFX", PROPERTY_VISUAL_FX );
@@ -165,6 +166,7 @@ void CEntityContainer::initMirror()
 	DSPropertyPVP_CLAN = mapVisualPropIndex( "PvpClan", PROPERTY_PVP_CLAN );
 	DSPropertyOWNER_PEOPLE = mapVisualPropIndex( "OwnerPeople", PROPERTY_OWNER_PEOPLE );
 	DSPropertyOUTPOST_INFOS = mapVisualPropIndex( "OutpostInfos", PROPERTY_OUTPOST_INFOS );
+	DSPropertyNPC_ALIAS = getPropertyIndex( "NPCAlias" );
 
 	// Resize the entity container
 	_Entities.resize( _DataSet->maxNbRows() );

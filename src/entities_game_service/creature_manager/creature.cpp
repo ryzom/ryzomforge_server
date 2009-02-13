@@ -134,6 +134,9 @@ CCreature::CCreature() : CEntityBase(true)
 	_TicketFameRestriction = CStaticFames::INVALID_FACTION_INDEX;
 	_TicketFameRestrictionValue = 0;
 	_MaxHitRangeForPC = -1.f;
+
+//	_MissionIconFlags.IsMissionStepIconDisplayable = true;
+//	_MissionIconFlags.IsMissionGiverIconDisplayable = true;
 }
 
 //-----------------------------------------------
@@ -353,6 +356,9 @@ CCreature * CCreature::getCreatureCopy( const NLMISC::CEntityId & entityId, sint
 	
 	creature->_GodMode = _GodMode;
 	creature->_Invulnerable = _Invulnerable;
+
+//	creature->_MissionIconFlags.IsMissionStepIconDisplayable = _MissionIconFlags.IsMissionStepIconDisplayable;
+//	creature->_MissionIconFlags.IsMissionGiverIconDisplayable = _MissionIconFlags.IsMissionGiverIconDisplayable;
 
 	creature->mirrorizeEntityState();
 	CreatureManager.addCreature( entityId, creature );
@@ -1442,6 +1448,10 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 		_BotChatProgram |= 1 << BOTCHATTYPE::TradeItemFlag;
 
 	_MaxHitRangeForPC = description.getMaxHitRangeForPC();
+
+//	_MissionIconFlags.IsMissionStepIconDisplayable = description.getIsMissionStepIconDisplayable();
+//	_MissionIconFlags.IsMissionGiverIconDisplayable = description.getIsMissionGiverIconDisplayable();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1622,7 +1632,7 @@ CGameItemPtr CCreature::getNpcItem( const NLMISC::CSheetId &sheet, uint16 qualit
 		}
 	}
 	
-	nldebug("Failed to create NPC item %s with quality %d for entity %s (%s)", sheet.toString().c_str(), quality, _Id.toString().c_str(), getType().toString().c_str() );
+	nlwarning("Failed to create NPC item %s with quality %d for entity %s (%s)", sheet.toString().c_str(), quality, _Id.toString().c_str(), getType().toString().c_str() );
 
 	return CGameItemPtr(NULL);
 } // getNpcItem //

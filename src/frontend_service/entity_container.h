@@ -53,7 +53,7 @@ extern TPropertyIndex DSPropertyTickPos;
 extern TPropertyIndex DSPropertyLocalX;
 extern TPropertyIndex DSPropertyLocalY;
 extern TPropertyIndex DSPropertyLocalZ;
-extern TPropertyIndex DSPropertyStunned;
+//extern TPropertyIndex DSPropertyStunned;
 extern TPropertyIndex DSFirstPropertyAvailableImpulseBitSize;
 
 

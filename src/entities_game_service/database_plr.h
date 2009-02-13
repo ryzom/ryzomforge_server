@@ -2043,6 +2043,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		ICDBStructNode	*_BranchNode;
 
 		ICDBStructNode	*_TEXT;
+		ICDBStructNode	*_NPC_ALIAS;
 		
 
 	public:
@@ -2073,6 +2074,26 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		ICDBStructNode *getTEXTCDBNode()
 		{
 			return _TEXT;
+		}
+	
+		void setNPC_ALIAS(CCDBSynchronised &dbGroup, uint32 value, bool forceSending = false)
+		{
+			
+
+			_setProp(dbGroup, _NPC_ALIAS, value, forceSending);
+		}
+
+		uint32 getNPC_ALIAS(const CCDBSynchronised &dbGroup)
+		{
+			uint32 value;
+			_getProp(dbGroup, _NPC_ALIAS, value);
+
+			return value;
+		}
+		
+		ICDBStructNode *getNPC_ALIASCDBNode()
+		{
+			return _NPC_ALIAS;
 		}
 	
 	};
@@ -3358,16 +3379,14 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 			return _ACCEPTED;
 		}
 	
-		void setMONEY(CCDBSynchronised &dbGroup, uint32 value, bool forceSending = false)
+		void setMONEY(CCDBSynchronised &dbGroup, uint64 value, bool forceSending = false)
 		{
-			
-
 			_setProp(dbGroup, _MONEY, value, forceSending);
 		}
 
-		uint32 getMONEY(const CCDBSynchronised &dbGroup)
+		uint64 getMONEY(const CCDBSynchronised &dbGroup)
 		{
-			uint32 value;
+			uint64 value;
 			_getProp(dbGroup, _MONEY, value);
 
 			return value;
@@ -6533,6 +6552,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		ICDBStructNode	*_BranchNode;
 
 		ICDBStructNode	*_TEXT;
+		ICDBStructNode	*_NPC_ALIAS;
 		
 
 	public:
@@ -6563,6 +6583,26 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		ICDBStructNode *getTEXTCDBNode()
 		{
 			return _TEXT;
+		}
+	
+		void setNPC_ALIAS(CCDBSynchronised &dbGroup, uint32 value, bool forceSending = false)
+		{
+			
+
+			_setProp(dbGroup, _NPC_ALIAS, value, forceSending);
+		}
+
+		uint32 getNPC_ALIAS(const CCDBSynchronised &dbGroup)
+		{
+			uint32 value;
+			_getProp(dbGroup, _NPC_ALIAS, value);
+
+			return value;
+		}
+		
+		ICDBStructNode *getNPC_ALIASCDBNode()
+		{
+			return _NPC_ALIAS;
 		}
 	
 	};

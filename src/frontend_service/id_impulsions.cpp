@@ -245,6 +245,35 @@ void impulsionExecuteFaber( CEntityId& sender, CBitMemStream &bms, TGameCycle ga
 }
 
 
+//-----------------------------------------------
+//	cbImpulsionGetNpcIconDesc
+//-----------------------------------------------
+void cbImpulsionGetNpcIconDesc( CEntityId& sender, CBitMemStream &bms, TGameCycle gamecycle, uint16 serviceId )
+{
+	try
+	{
+		vector<uint32> npcKeys;
+		uint8 nb8;
+		bms.serial( nb8 );
+		npcKeys.resize( nb8 );
+		for (uint i=0; i!=(uint)nb8; ++i)
+		{
+			bms.serial( npcKeys[i] );
+		}
+		CMessage msgout("CLIENT:NPC_ICON:GET_DESC");
+		msgout.serial( sender );
+		msgout.serialCont( npcKeys );
+		CUnifiedNetwork::getInstance()->send("EGS", msgout);
+		//nldebug("Forwarding GET_DESC to EGS (%hu NPCs)", nb8 );
+	}
+	catch ( Exception& e )
+	{
+		nlwarning("<cbImpulsionGetNpcIconDesc> %s", e.what());
+		return;
+	}
+}
+
+
 /*
  * General receiving function for impulsions by CEntityId from client to server
  */
@@ -488,5 +517,6 @@ void	initImpulsionId()
 	GenericXmlMsgHeaderMngr.setUserData("MODULE_GATEWAY:FEOPEN",		(uint64)cbImpulsionIdGatewayOpen, 0);	
 	GenericXmlMsgHeaderMngr.setUserData("MODULE_GATEWAY:GATEWAY_MSG",	(uint64)cbImpulsionIdGatewayMessage, 0);	
 	GenericXmlMsgHeaderMngr.setUserData("MODULE_GATEWAY:FECLOSE",		(uint64)cbImpulsionIdGatewayClose, 0);	
+	GenericXmlMsgHeaderMngr.setUserData("NPC_ICON:GET_DESC",			(uint64)cbImpulsionGetNpcIconDesc, 0);
 }
 

@@ -456,6 +456,9 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 		}
 	}
 	
+	// We don't define getInvolvedBot() here, because 1) we don't want an icon on bots to kill,
+	// and 2) at the moment only one bot can be returned
+
 	std::vector< CSubStep > _SubSteps;
 
 	MISSION_STEP_GETNEWPTR(CMissionStepKillNpc)
@@ -550,6 +553,8 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 		retParams.back().Identifier = Target;
 
 	}
+
+	// See comment in CMissionStepKillNpc about getInvolvedBot()
 
 	bool checkTextConsistency()
 	{

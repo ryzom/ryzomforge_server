@@ -549,7 +549,7 @@ public :
 
 	#define RY_SEND_IMPULSE_TO_CLIENT_END \
 		msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length()); \
-		sendMessageViaMirror( NLNET::TServiceId(id.getDynamicId()), msgout );
+		NLNET::CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(id.getDynamicId()), msgout );
 
 	void sendImpulseToClient(const NLMISC::CEntityId & id,const std::string & msgName )
 	{
@@ -635,6 +635,8 @@ public :
 	// The name unifier as renamed a character
 	void characterRenamed(uint32 charId, const std::string &newName);
 
+	/// ClientNPCIconRefreshTimerDelay has changed
+	static void onNPCIconTimerChanged(NLMISC::IVariable &var);
 
 private:
 	// init called after addAllCharForStringIdRequest(), when eid translator is ready (ie all char names have been registered)

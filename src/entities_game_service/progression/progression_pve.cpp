@@ -1949,6 +1949,9 @@ bool CCharacterActions::dispatchXpGain( TDataSetRow actor, TDataSetRow creatureR
 					CFameInterface::getInstance().addFameIndexed(eid, faction, creatureFameByKill, true);
 				else
 					CFameInterface::getInstance().addFameIndexed(eid, faction, FameByKill, true);
+
+				// We don't inform the client right now, the timer will take care of this
+				//character->sendEventForMissionAvailabilityCheck();
 			}
 		}
 		delete (*it).second;

@@ -31,7 +31,7 @@ public:
 	//@{
 	/// ctor
 	inline IMissionStepTemplate()
-		:_OOOStepIndex(0xFFFFFFFF),_Any(false),_Displayed(true),_IsInOverridenOOO(false) {}	
+		:_OOOStepIndex(0xFFFFFFFF),_Any(false),_Displayed(true),_IconDisplayedOnStepNPC(true),_IsInOverridenOOO(false) {}	
 
 	//BRIANCODE my appologies, need access to this data from CMissionStepGiveItem	
 	struct CSubStep
@@ -73,6 +73,8 @@ public:
 	virtual uint32	sendRpStepText(CCharacter * user,const std::vector<uint32>& stepStates,const NLMISC::CEntityId & giver);
 	///\return the text id of the step text
 	virtual uint32	sendStepText(CCharacter * user,const std::vector<uint32>& stepStates,const NLMISC::CEntityId & giver);
+	///\return the alias of the NPC/bot involved in the step, or CAIAliasTranslator::Invalid if there is none (or if specified as "giver", in which case invalidIsGiver is set to true)
+	virtual TAIAlias getInvolvedBot(bool& invalidIsGiver) const { invalidIsGiver=false; return CAIAliasTranslator::Invalid; }
 	/// check if the current player gift is ok
 	virtual bool	checkPlayerGift( CMission* instance, CCharacter * user );
 	/// callback called when the step is activated by a player (mission beginning or later when character comes back to game). stepIndex starts at 0 here.
@@ -103,6 +105,10 @@ public:
 	bool											isDisplayed(){ return _Displayed;}
 	///\set displayed value
 	void											setDisplayed(bool displayed){ _Displayed = displayed;}
+	///\return true if the step is displayed
+	bool											isIconDisplayedOnStepNPC() const { return _IconDisplayedOnStepNPC;}
+	///\set displayed value
+	void											setIconDisplayedOnStepNPC(bool displayed){ _IconDisplayedOnStepNPC = displayed;}
 	/// return true if the step is in an OOO block which text wad overriden
 	bool isInOverridenOOO() { return _IsInOverridenOOO; };
 	/// set the isInOverridenOOO flag ( see previous method )
@@ -140,6 +146,8 @@ protected:
 	bool								_Any;
 	/// true if the step is displayed
 	bool								_Displayed;
+	/// true if an icon is displayed on NPC having an interaction for current step
+	bool								_IconDisplayedOnStepNPC;
 	/// The source line of the mission
 	uint32								_SourceLine;
 	/// true if we have to add default params to the step overriden text

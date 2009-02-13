@@ -372,7 +372,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 			bms.serial(webHost);
 			
 			msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
-			sendMessageViaMirror( NLNET::TServiceId(c->getId().getDynamicId()), msgout );
+			CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(c->getId().getDynamicId()), msgout ); // sendMessageViaMirror() not needed to FS in general
 		}
 		else
 		{
@@ -869,6 +869,10 @@ void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 					// whether client has to use female titles for female characters
 					bool bFemaleTitles = UseFemaleTitles;
 					PlayerManager.sendImpulseToClient(charId,"GUILD:USE_FEMALE_TITLES",bFemaleTitles);
+
+					// update mision giver icon timer if non-default
+					ch->sendNpcMissionGiverTimer(false);
+
 					// log this event
 					log_Character_Select(uint32(ch->getId().getShortId()>>4), ch->getId(), ch->getName().toUtf8());
 					return;
@@ -2810,7 +2814,7 @@ void cbExchangeSeeds( NLNET::CMessage& msgin, const std::string &serviceName, NL
 	
 	///\todo : why not  an uint64?
 	CEntityId charId;
-	uint32 quantity;
+	sint64 quantity;
 	msgin.serial( charId );
 	msgin.serial( quantity );
 	CCharacter * c = PlayerManager.getChar( charId );
@@ -2818,7 +2822,7 @@ void cbExchangeSeeds( NLNET::CMessage& msgin, const std::string &serviceName, NL
 	{
 		c->setAfkState(false);
 		c->incInterfaceCounter();
-		c->exchangeMoney( (uint64) quantity);
+		c->exchangeMoney(quantity);
 	}
 	else
 		nlwarning("<cbExchangeSeeds> Unknown character %s", charId.toString().c_str() );

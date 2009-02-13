@@ -2799,7 +2799,7 @@ void CCharacter::postLoadTreatment()
 	/* update flags for active effects */
 	_ForbidPowerEndDates.writeUsablePowerFlags(_UsablePowerFlags);
 	if ( _ForbidAuraUseEndDate > CTickEventHandler::getGameCycle())
-		_UsablePowerFlags ^= ( uint32(1) << uint32(BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags) );
+		_UsablePowerFlags ^= ( (uint32(1)) << (uint32(BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags)) );
 	updateBrickFlagsDBEntry();
 
 	_ModifiersInDB.writeInDatabase(_PropertyDatabase);
@@ -10839,7 +10839,7 @@ void CCharacter::addExchangeItems(CCharacter* trader,vector<CGameItemPtr >& item
 // exchangeMoney
 // 
 //-----------------------------------------------
-void CCharacter::exchangeMoney(const uint64 & money)
+void CCharacter::exchangeMoney(const uint64 &money)
 {
 	bool exchangeWithBot;
 	if (!checkExchangeActors(&exchangeWithBot))
@@ -10860,7 +10860,7 @@ void CCharacter::exchangeMoney(const uint64 & money)
 		if (c != NULL)
 		{
 //			c->_PropertyDatabase.setProp( "EXCHANGE:MONEY", quantity );
-			CBankAccessor_PLR::getEXCHANGE().setMONEY(c->_PropertyDatabase, uint32(quantity) );
+			CBankAccessor_PLR::getEXCHANGE().setMONEY(c->_PropertyDatabase, quantity );
 //			c->_PropertyDatabase.setProp( "EXCHANGE:ID", ++_ExchangeId );
 			CBankAccessor_PLR::getEXCHANGE().setID(c->_PropertyDatabase, ++_ExchangeId );
 		}
@@ -12081,25 +12081,29 @@ void CCharacter::updateSavedMissions()
 					y = c->getState().Y();
 						
 					// Send the bot name to the client if not already done (or if the name has changed)
-					CMirrorPropValueRO<TYPE_NAME_STRING_ID> botNameId( TheDataset, c->getEntityRowId(), DSPropertyNAME_STRING_ID );
+					//CMirrorPropValueRO<TYPE_NAME_STRING_ID> botNameId( TheDataset, c->getEntityRowId(), DSPropertyNAME_STRING_ID );
 					params[0].Type = STRING_MANAGER::bot;
 					params[0].setEIdAIAlias( c->getId(), CAIAliasTranslator::getInstance()->getAIAlias(c->getId()) );
 					msg = "COMPASS_BOT";
+					uint32 txt = STRING_MANAGER::sendStringToClient( _EntityRowId,msg,params );
+					PlayerManager.sendImpulseToClient( _Id, "JOURNAL:ADD_COMPASS_BOT", x,y,txt, c->getEntityRowId().getCompressedIndex() );
+
 				}
 				else 
 				{
 					CPlace * place = CZoneManager::getInstance().getPlaceFromId( (uint16)(*itCompass).second.getPlace() );
 					if ( place )
-
-					x = place->getCenterX();
-					y = place->getCenterY();
-					
-					params[0].Identifier = place->getName();
-					params[0].Type = STRING_MANAGER::place;
-					msg = "COMPASS_PLACE";
+					{
+						x = place->getCenterX();
+						y = place->getCenterY();
+						
+						params[0].Identifier = place->getName();
+						params[0].Type = STRING_MANAGER::place;
+						msg = "COMPASS_PLACE";
+						uint32 txt = STRING_MANAGER::sendStringToClient( _EntityRowId,msg,params );
+						PlayerManager.sendImpulseToClient( _Id, "JOURNAL:ADD_COMPASS", x,y,txt );
+					}
 				}	
-				uint32 txt = STRING_MANAGER::sendStringToClient( _EntityRowId,msg,params );
-				PlayerManager.sendImpulseToClient( _Id, "JOURNAL:ADD_COMPASS", x,y,txt );
 			}
 			++it;
 		}
@@ -14559,31 +14563,15 @@ void CCharacter::online(bool onlineStatus)
 	vector<CEntityId>::iterator it;
 	for (it = friendOf.begin() ; it != friendOf.end() ; ++it)
 	{
+		// notify active character matching the id (ignoring the dynamic part because it may have changed)
 		CEntityId &id = (*it);
-		// if friend is here, set status
-		CCharacter *character = PlayerManager.getChar(id);
-		if (character)
+		uint32 playerId = PlayerManager.getPlayerId(id);
+		CCharacter *character = PlayerManager.getActiveChar(playerId);
+		if (character && character->getId().getShortId() == id.getShortId())
 		{
 			character->setContactOnlineStatus(_Id, onlineStatus);
 		}
-		// not found, maybe juste the dynamic ID that have changed, so make a more careful check
-		else
-		{
-			uint32 playerId = PlayerManager.getPlayerId(id);
-			CPlayer *player = PlayerManager.getPlayer(playerId);
-			if (player != NULL)
-			{
-				character = player->getActiveCharacter();
-				if (character && character->getId().getShortId() == id.getShortId() )
-				{
-					// update id to be faster on next update
-					id = character->getId();
-					character->setContactOnlineStatus(_Id, onlineStatus);
-				}
-			}
-		}
 	}
-
 
 	// add / remove from dyn chat
 	if (onlineStatus)
@@ -15675,7 +15663,7 @@ void CCharacter::checkScoresValues( SCORES::TScores score, CHARACTERISTICS::TCha
 	baseRegenerateAction += RegenOffset;
 	if(	fabs((_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos * 100.0f) - (100.0f * baseRegenerateRepos)) > 0.001)
 	{
-		nldebug("<CCharacter::checkScoresValues> For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(), SCORES::toString(score).c_str(), baseRegenerateRepos, _PhysScores._PhysicalScores[ score ].BaseRegenerateRepos);
+		nlwarning("<CCharacter::checkScoresValues> For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(), SCORES::toString(score).c_str(), baseRegenerateRepos, _PhysScores._PhysicalScores[ score ].BaseRegenerateRepos);
 		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
 		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
 	}
@@ -19090,9 +19078,9 @@ void CCharacter::updateConsumableFamily()
 		for(uint j=i; j < MaxBonusMalusDisplayed; ++j)
 		{
 //			_PropertyDatabase.setProp( _DataIndexReminder->DisableConsumable.Family[j], 0 );
-			CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray(i).setFAMILY(_PropertyDatabase, 0);
+			CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray(j).setFAMILY(_PropertyDatabase, 0);
 //			_PropertyDatabase.setProp( _DataIndexReminder->DisableConsumable.DisableTime[j], 0 );
-			CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray(i).setDISABLE_TIME(_PropertyDatabase, 0);
+			CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray(j).setDISABLE_TIME(_PropertyDatabase, 0);
 		}
 	}
 }
@@ -19326,5 +19314,144 @@ void CCharacter::forageSuccessModifier( ECOSYSTEM::EECosystem eco, sint32 mod )
 		_ForageSuccessModifiers[(uint8)eco] = mod;
 //		_PropertyDatabase.setProp( NLMISC::toString("CHARACTER_INFO:SUCCESS_MODIFIER:ECO:%u:FORAGE",(uint8)eco), mod );
 		CBankAccessor_PLR::getCHARACTER_INFO().getSUCCESS_MODIFIER().getECO().getArray(eco).setFORAGE(_PropertyDatabase, (sint16)mod );
+	}
+}
+
+
+// Along with Uptime, helps knowing the average frequency of queries 
+CVariable<uint32> NbNpcMissionGiverDescQueriesAll("egs", "NbNpcMissionGiverDescQueriesAll", "Counted for all requested NPCs", 0);
+CVariable<uint32> NbNpcMissionGiverDescQueriesHavingMissions("egs", "NbNpcMissionGiverDescQueriesHavingMissions", "Counted for NPCs having missions only", 0);
+
+void CCharacter::sendNpcMissionGiverIconDesc( const std::vector<uint32>& npcKeys )
+{
+	//H_AUTO(SendNpcMissionGiverIconDesc); see USRCB_CLIENT:NPC_ICON:GET_DESC
+	CBitMemStream bms;
+	GenericMsgManager.pushNameToStream("NPC_ICON:SET_DESC", bms);
+	uint8 nb8 = npcKeys.size();
+	bms.serial( nb8 );
+
+	for ( std::vector<uint32>::const_iterator ink=npcKeys.begin(); ink!=npcKeys.end(); ++ink )
+	{
+		NbNpcMissionGiverDescQueriesAll = NbNpcMissionGiverDescQueriesAll.get() + 1;
+
+		const TAIAlias& npcAlias = *ink;
+		CEntityId npcEntityId = CAIAliasTranslator::getInstance()->getEntityId( npcAlias );
+		bms.serial( (uint32&)npcAlias );
+		uint32 state;
+		if ( npcEntityId.isUnknownId() ) // no more valid
+		{
+			state = NPC_ICON::NotAMissionGiver;
+			bms.serial( state );
+			continue;
+		}
+
+		// Check if the NPC qualifies for mission availability
+		CCreature *creature = CreatureManager.getCreature( npcEntityId );
+		if ( creature->getMissionVector().empty() /*||(!creature->isMissionGiverIconDisplayable())*/ )
+		{
+			state = NPC_ICON::NotAMissionGiver;
+			bms.serial( state );
+			continue;
+		}
+
+		H_AUTO(SendNpcMissionGiverIconDesc_HasMissions);
+		NbNpcMissionGiverDescQueriesHavingMissions = NbNpcMissionGiverDescQueriesHavingMissions.get() + 1;
+
+		// Report if the character can take at least one mission from the NPC, or has already taken all of them, or cannot take anyone yet
+		bool hasAvailableAutoMission = false, hasAvailableListMission = false,
+			 hasAutoMission = false, hasListMission = false,
+			 hasAllTakenListMission = true;
+		for ( uint i=0; i!=creature->getMissionVector().size(); ++i )
+		{
+			// Get the template
+			const CMissionTemplate *templ = CMissionManager::getInstance()->getTemplate( creature->getMissionVector()[i] );
+			if ( (!templ) || templ->Tags.NotProposed || templ->Tags.HideIconOnGiverNPC )
+				continue;
+			if ( !templ->AutoText.empty() )
+			{
+				hasAutoMission = true;
+
+				// Test the mission prerequisits with this player
+				H_AUTO(MissionGiverTestPrerequisitsAuto);
+				uint32 res = templ->testPrerequisits(this, true);
+				if ( res == MISSION_DESC::PreReqSuccess )
+				{
+					hasAvailableAutoMission = true;
+					break; // short-cut, no need to test remaining missions
+				}
+				// MISSION_DESC::PreReqFailAlreadyDone: 
+			}
+			else
+			{
+				hasListMission = true;
+
+				// Test the mission prerequisits with this player
+				H_AUTO(MissionGiverTestPrerequisitsList);
+				uint32 res = templ->testPrerequisits(this, true);
+				switch ( res )
+				{
+				case MISSION_DESC::PreReqSuccess:
+					hasAvailableListMission = true; // still test remaining missions in case they are Auto missions
+					break;
+				case MISSION_DESC::PreReqFail:
+					hasAllTakenListMission = false;
+					break;
+				default:;
+				}
+			}
+		}
+		if ( hasAvailableAutoMission )
+		{
+			state = NPC_ICON::AutoHasAvailableMission;
+		}
+		else if ( hasListMission )
+		{
+			if ( hasAvailableListMission ) // at least one PreReqSuccess mission 
+				state = NPC_ICON::ListHasAvailableMission;
+			else if ( hasAllTakenListMission ) // (no PreReqSucess) and no PreReqFail mission (only
+				state = NPC_ICON::ListHasAlreadyTakenMissions; // PreReqFailAlreadyDone or PreReqFailRunning)
+			else // (no PreReqSuccess) and at least one PreReqFail
+				state = NPC_ICON::ListHasOutOfReachMissions;
+		}
+		else if ( hasAutoMission ) // has neither Auto nor List available missions
+		{
+			state = NPC_ICON::AutoHasUnavailableMissions;
+		}
+		else // none of the missions need an icon
+		{
+			state = NPC_ICON::NotAMissionGiver;
+		}
+		bms.serial( state );
+	}
+	CMessage msgout( "IMPULSION_ID" );
+	msgout.serial( _Id );
+	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
+	CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(_Id.getDynamicId()), msgout );
+}
+
+
+void CCharacter::sendEventForMissionAvailabilityCheck()
+{
+	CBitMemStream bms;
+	GenericMsgManager.pushNameToStream("NPC_ICON:SVR_EVENT_MIS_AVL", bms);
+	CMessage msgout( "IMPULSION_ID" );
+	msgout.serial( _Id );
+	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
+	CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(_Id.getDynamicId()), msgout );
+}
+
+
+void CCharacter::sendNpcMissionGiverTimer(bool force)
+{
+	NLMISC::TGameCycle delayVar = (NLMISC::TGameCycle)ClientNPCIconRefreshTimerDelay.get();
+	if (force || (delayVar != NPC_ICON::DefaultClientNPCIconRefreshTimerDelayGC))
+	{
+		CBitMemStream bms;
+		GenericMsgManager.pushNameToStream("NPC_ICON:SET_TIMER", bms);
+		bms.serial( delayVar );
+		CMessage msgout( "IMPULSION_ID" );
+		msgout.serial( _Id );
+		msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
+		CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(_Id.getDynamicId()), msgout );
 	}
 }

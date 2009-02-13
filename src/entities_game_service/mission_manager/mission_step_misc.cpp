@@ -397,6 +397,19 @@ class CMissionStepTargetNpc : public IMissionStepTarget
 		return "MIS_TARGET_NPC_";
 	}
 
+	virtual TAIAlias getInvolvedBot(bool& invalidIsGiver) const
+	{
+		if (_SubSteps.empty())
+		{
+			invalidIsGiver = false; 
+			return CAIAliasTranslator::Invalid;
+		}
+		
+		invalidIsGiver = true;
+		STRING_MANAGER::TParam aliasParam;
+		_SubSteps.front()->fillParam(aliasParam);
+		return aliasParam.Int;
+	}
 	
 	MISSION_STEP_GETNEWPTR(CMissionStepTargetNpc)
 };

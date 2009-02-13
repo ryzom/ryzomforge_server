@@ -244,6 +244,7 @@ protected:
 	
 	virtual void sheetChanged();
 	bool finalizeSpawn(RYAI_MAP_CRUNCH::CWorldPosition const& botWPos, CAngle const& spawnTheta, float botMeterSize);
+	virtual void initAdditionalMirrorValues() {}
 	void setSheetDelayed(uint32 step);
 	void setSheetDelayed0();
 	void setSheetDelayed1();

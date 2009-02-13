@@ -107,6 +107,7 @@ void CMirrors::initMirror()
 	DataSet->declareProperty( "Theta", PSOReadWrite );
 	DataSet->declareProperty( "Sheet", PSOReadWrite );
 	DataSet->declareProperty( "SheetServer", PSOReadWrite );
+	DataSet->declareProperty( "NPCAlias", PSOWriteOnly );
 	DataSet->declareProperty( "Mode", PSOReadWrite | PSONotifyChanges );
 	DataSet->declareProperty( "Behaviour", PSOReadWrite | PSONotifyChanges );
 	DataSet->declareProperty( "Target", PSOReadWrite | PSONotifyChanges );
@@ -576,6 +577,11 @@ void CMirrors::initSheetServer( const TDataSetRow& entityIndex, const NLMISC::CS
 	value = sheetId.asInt();
 }
 
+void CMirrors::initNPCAlias( const TDataSetRow& entityIndex, TAIAlias alias )
+{
+	CMirrorPropValue<TYPE_ALIAS> value( *DataSet, entityIndex, DSPropertyNPC_ALIAS );
+	value = alias;
+}
 
 TDataSetRow CMirrors::target( const TDataSetRow& entityIndex )
 {

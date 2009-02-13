@@ -66,6 +66,7 @@ void cbGwTrDisconnection ( TClientId clientId );
 
 
 CVariable<string>	SaveShardRoot("variables", "SaveShardRoot", "Root directory of all files saved by any shard", "", 0, true, NULL, false);
+extern CVariable<bool> VerboseFEStatsTime;
 
 
 /*
@@ -246,7 +247,9 @@ void CFeReceiveSub::readIncomingData()
 	if ( CTime::getLocalTime() - lastdisplay > 5000 )
 	{
 		// Message stats
-		displayDatagramStats( lastdisplay );
+		if ( VerboseFEStatsTime.get() )
+			displayDatagramStats( lastdisplay );
+
 		lastdisplay = CTime::getLocalTime();
 		_RcvCounter = 0;
 		CFrontEndService::instance()->sendSub()->sendCounter() = 0;
@@ -272,7 +275,7 @@ void CFeReceiveSub::readIncomingData()
 	}
 
 	RecvWatch.stop();
-	if ( RecvWatch.getDuration() > 20 ) // does not include the vision updating
+	if ( VerboseFEStatsTime.get() && (RecvWatch.getDuration() > 20) ) // does not include the vision updating
 	{
 		nlinfo( "FETIME: Time of receiving: AllButVision peak=%u", RecvWatch.getDuration() );
 	}

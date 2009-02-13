@@ -785,7 +785,9 @@ void CFameManager::cbFameDelta( NLNET::CMessage& msgin, const std::string &servi
 	msgin.serial(propagate);
 
 	getInstance().addFameIndexed(entityId, faction, deltaFame, serviceName, propagate);
-
+	
+	// We don't inform the client right now, the timer will take care of this
+	//character->sendEventForMissionAvailabilityCheck();
 }
 
 void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sint32 deltaFame, const std::string &serviceName, bool propagate, TFamePropagation propagationType)
@@ -2080,6 +2082,9 @@ NLMISC_COMMAND (adjustCharacterFame, "For a character, adjust a specific clan by
 
 	CFameInterface::getInstance().addFameIndexed(id, factionIndex, fameAdjustment);
 	log.displayNL("Character's new fame value: %d",CFameInterface::getInstance().getFameIndexed(id,factionIndex));
+
+	// We don't inform the client right now, the timer will take care of this
+	//character->sendEventForMissionAvailabilityCheck();
 
 	return true;
 }

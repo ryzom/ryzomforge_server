@@ -974,8 +974,14 @@ void CMissionManager::deInstanciateMission(CMission * mission)
 				if ( (*it).second.getPlace() == CAIAliasTranslator::Invalid )
 				{
 					params[0].Type = STRING_MANAGER::bot;
-					params[0].setEIdAIAlias( CAIAliasTranslator::getInstance()->getEntityId( (*it).second.getBotId() ),  (*it).second.getBotId()  );
+					CEntityId entityId = CAIAliasTranslator::getInstance()->getEntityId( (*it).second.getBotId() );
+					params[0].setEIdAIAlias( entityId, (*it).second.getBotId() );
 					msg = "COMPASS_BOT";
+					for ( uint i = 0; i < entities.size();i++ )
+					{
+						uint32 text = STRING_MANAGER::sendStringToClient( entities[i],msg,params );
+						PlayerManager.sendImpulseToClient( getEntityIdFromRow(entities[i]), "JOURNAL:REMOVE_COMPASS_BOT", text, TheDataset.getDataSetRow(entityId).getCompressedIndex() );
+					}
 				}
 				else
 				{
@@ -985,12 +991,12 @@ void CMissionManager::deInstanciateMission(CMission * mission)
 						params[0].Identifier = place->getName();
 						params[0].Type = STRING_MANAGER::place;
 						msg = "COMPASS_PLACE";
+						for ( uint i = 0; i < entities.size();i++ )
+						{
+							uint32 text = STRING_MANAGER::sendStringToClient( entities[i],msg,params );
+							PlayerManager.sendImpulseToClient( getEntityIdFromRow(entities[i]), "JOURNAL:REMOVE_COMPASS", text );
+						}
 					}
-				}
-				for ( uint i = 0; i < entities.size();i++ )
-				{
-					uint32 text = STRING_MANAGER::sendStringToClient( entities[i],msg,params );
-					PlayerManager.sendImpulseToClient( getEntityIdFromRow(entities[i]), "JOURNAL:REMOVE_COMPASS", text );
 				}
 			}
 		}

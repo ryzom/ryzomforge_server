@@ -506,6 +506,9 @@ public:
 
 	float getMaxHitRangeForPC() { return _MaxHitRangeForPC; }
 
+//	bool isMissionStepIconDisplayable() const { return _MissionIconFlags.IsMissionStepIconDisplayable; }
+//	bool isMissionGiverIconDisplayable() const { return _MissionIconFlags.IsMissionGiverIconDisplayable; }
+
 	void setUserModelId(const std::string &id);
 	const std::string getUserModelId() const { return _UserModelId; }
 
@@ -644,6 +647,7 @@ private:
 	bool							_TicketForNeutral;
 	sint32							_TicketFameRestriction;
 	sint32							_TicketFameRestrictionValue;
+//	} _MissionIconFlags;
 
 	float							_MaxHitRangeForPC;
 	std::string						_UserModelId;

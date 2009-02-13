@@ -1558,6 +1558,11 @@ class CMissionActionRecvFame : public IMissionAction
 		{
 			CEntityId eid = TheDataset.getEntityId(entities[i]);
 			CFameInterface::getInstance().addFameIndexed(eid, _Faction, _Value, true);
+
+			// Make the client refresh the icons on mission giver NPCs, at once
+			CCharacter *character = PlayerManager.getChar(entities[i]);
+			if (character)
+				character->sendEventForMissionAvailabilityCheck();
 		}
 
 	};

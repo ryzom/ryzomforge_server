@@ -837,12 +837,12 @@ void CGuild::takeItem( CCharacter * user, uint32 slot, uint32 quantity, uint16 s
 }
 
 //----------------------------------------------------------------------------
-void	CGuild::takeMoney( CCharacter * user, uint32 money, uint16 session )
+void	CGuild::takeMoney( CCharacter * user, sint64 money, uint16 session )
 {
 	nlassert(user);
 	if ( money > _Money )
 	{
-		nlwarning( "takeMoney guild %u user %s : money = %u, max = %u",_Id,user->getId().toString().c_str(),money,_Money);
+		nlwarning( "takeMoney guild %u user %s : money = %"NL_I64"u, max = %"NL_I64"u",_Id,user->getId().toString().c_str(),money,_Money);
 		return;
 	}
 	if ( ! _GuildInventoryView->checkMoneySession( session ) )
@@ -867,12 +867,12 @@ void	CGuild::takeMoney( CCharacter * user, uint32 money, uint16 session )
 }
 
 //----------------------------------------------------------------------------
-void CGuild::putMoney( CCharacter * user, uint32 money, uint16 session )
+void CGuild::putMoney( CCharacter * user, sint64 money, uint16 session )
 {
 	nlassert(user);
 	if ( money > user->getMoney() )
 	{
-		nlwarning( "putMoney guild %u user %s : money = %u, max = %u",_Id,user->getId().toString().c_str(),money,_Money);
+		nlwarning( "putMoney guild %u user %s : money = %"NL_I64"u, max = %"NL_I64"u",_Id,user->getId().toString().c_str(),money,_Money);
 		return;
 	}
 
@@ -1694,6 +1694,9 @@ bool CGuild::setDeclaredCult(PVP_CLAN::TPVPClan newClan, bool noCheck)
 			&& _DeclaredCult == PVP_CLAN::None)
 		{
 			CFameInterface::getInstance().addFameIndexed(getEId(),PVP_CLAN::getFactionIndex(newClan), FameMinToDeclare - CFameInterface::getInstance().getFameIndexed(getEId(),PVP_CLAN::getFactionIndex(newClan)));
+
+			// We don't inform the client right now, the timer will take care of this
+			//character->sendEventForMissionAvailabilityCheck();
 		}
 		_DeclaredCult = newClan;
 		CFameManager::getInstance().enforceFameCaps(getEId(), getAllegiance());
@@ -1725,6 +1728,9 @@ bool CGuild::setDeclaredCiv(PVP_CLAN::TPVPClan newClan, bool noCheck)
 			&& _DeclaredCiv == PVP_CLAN::None)
 		{
 			CFameInterface::getInstance().addFameIndexed(getEId(),PVP_CLAN::getFactionIndex(newClan), FameMinToDeclare - CFameInterface::getInstance().getFameIndexed(getEId(),PVP_CLAN::getFactionIndex(newClan)));
+
+			// We don't inform the client right now, the timer will take care of this
+			//character->sendEventForMissionAvailabilityCheck();
 		}
 		_DeclaredCiv = newClan;
 		CFameManager::getInstance().enforceFameCaps(getEId(), getAllegiance());

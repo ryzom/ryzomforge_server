@@ -2304,10 +2304,70 @@ void maxHitRange_f_(CStateInstance* entity, CScriptStack& stack)
 		if (bot->getRyzomType() == RYZOMID::npc)
 		{
 			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
-			botNpc->setMaxHitRangeForPlayer(maxHitRange);				
+			botNpc->setMaxHitRangeForPlayer(maxHitRange);
 		}
 	}
 }
+
+////----------------------------------------------------------------------------
+///** @page code
+//
+//@subsection hideMissionStepIcon_b_
+//Allows to hide icons for current missions steps having interactions with this NPC (default: shown)
+//
+//Arguments: b(hide) ->
+//@param[in] hide true to hide the icon for all mission steps relating to this NPC (default: false)
+//
+//*/
+//// CBotNpc
+//void hideMissionStepIcon_b_(CStateInstance* entity, CScriptStack& stack)
+//{
+//	bool b = (bool&)stack.top(); stack.pop();
+//	CGroup* group = entity->getGroup();
+//	CGroupNpc* npcGroup = NLMISC::safe_cast<CGroupNpc*>(group);
+//	
+//	FOREACH(botIt, CCont<CBot>,	group->bots())
+//	{
+//		CBot* bot = *botIt;
+//		
+//		if (!bot->isSpawned()) return;	
+//		if (bot->getRyzomType() == RYZOMID::npc)
+//		{
+//			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
+//			botNpc->setMissionStepIconHidden(b);
+//		}
+//	}
+//}
+//
+////----------------------------------------------------------------------------
+///** @page code
+//
+//@subsection hideMissionGiverIcon_b_
+//Allows to hide icons for missions proposed by this NPC (default: shown)
+//
+//Arguments: b(hide) ->
+//@param[in] hide true to hide the icon for all missions propsed by this NPC (default: false)
+//
+//*/
+//// CBotNpc
+//void hideMissionGiverIcon_b_(CStateInstance* entity, CScriptStack& stack)
+//{
+//	bool b = (bool&)stack.top(); stack.pop();
+//	CGroup* group = entity->getGroup();
+//	CGroupNpc* npcGroup = NLMISC::safe_cast<CGroupNpc*>(group);
+//	
+//	FOREACH(botIt, CCont<CBot>,	group->bots())
+//	{
+//		CBot* bot = *botIt;
+//		
+//		if (!bot->isSpawned()) return;	
+//		if (bot->getRyzomType() == RYZOMID::npc)
+//		{
+//			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
+//			botNpc->setMissionGiverIconHidden(b);
+//		}
+//	}
+//}
 
 
 std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
@@ -2363,9 +2423,10 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, startScenarioTiming_f_);
 	REGISTER_NATIVE_FUNC(functions, endScenarioTiming_f_);
 
-
 	REGISTER_NATIVE_FUNC(functions, maxHitRange_f_);
 
+//	REGISTER_NATIVE_FUNC(functions, hideMissionStepIcon_b_);
+//	REGISTER_NATIVE_FUNC(functions, hideMissionGiverIcon_b_);
 
 
 #undef REGISTER_NATIVE_FUNC

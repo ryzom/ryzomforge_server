@@ -66,7 +66,7 @@ void CWeatherEverywhere::init()
 	sheetVec.clear();
 	const CStaticWorld *staticWorld = CSheets::getWorldForm( CSheetId("ryzom.world") );
 	nlassert( staticWorld );
-	nlassertex( staticWorld->Continents.size() == CONTINENT::NB_CONTINENTS, ("ryzom.world should contain exactly the same number of continents as the enum size CONTINENT::TContinent") ); 
+	nlassertex( staticWorld->Continents.size() == CONTINENT::NB_CONTINENTS, ("ryzom.world should contain exactly the same number of continents as the enum size CONTINENT::TContinent (=%u), not %u", (uint)(CONTINENT::NB_CONTINENTS), staticWorld->Continents.size()) ); 
 	UFormLoader *formLoader = UFormLoader::createLoader();
 	_WeatherFunctionsBySeasonByContinent.resize( staticWorld->Continents.size() );
 	for ( uint iContinent=0; iContinent!=CONTINENT::NB_CONTINENTS; ++iContinent )

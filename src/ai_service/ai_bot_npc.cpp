@@ -586,6 +586,9 @@ void CBotNpc::fillDescriptionMsg(RYMSG::TGenNpcDescMsg& msg) const
 		msg.getOptionalProperties().push_back("FactionAttackableBelow:" + itFaction->first + ":" + NLMISC::toString(itFaction->second));
 
 	msg.setMaxHitRangeForPC(_MaxHitRangeForPC);
+
+//	msg.setIsMissionStepIconDisplayable(_MissionIconFlags.IsMissionStepIconDisplayable);
+//	msg.setIsMissionGiverIconDisplayable(_MissionIconFlags.IsMissionGiverIconDisplayable);
 	msg.setUserModelId(_UserModelId);
 	msg.setCustomLootTableId(_CustomLootTableId);
 	msg.setPrimAlias(_PrimAlias);
@@ -622,6 +625,21 @@ bool CBotNpc::finalizeSpawnNpc()
 	getSpawn()->spawnGrp().botHaveSpawn(this);
 	
 	return true;
+}
+
+void CBotNpc::initAdditionalMirrorValues()
+{
+	// Write the Mission Alias to mirror now - it must be done before CMirrors::declareEntity()
+	// to ensure the FS will receive the Sheet and it at the same time, hence it can't be
+	// done in finalizeSpawnNpc(), which is called after that
+	EGSPD::CPeople::TPeople race = getSheet()->Race();
+	if (race < EGSPD::CPeople::Creature ||
+		race == EGSPD::CPeople::Kami ||
+		race == EGSPD::CPeople::Unknown) // only for humanoid NPCs and bot objects (beware, even some creatures have the entity type RYZOMID::npc)
+	{
+		//if ((_ChatProfile != NULL) && (!_ChatProfile->getMissions().empty())) // only if the bot has missions to give: not
+		CMirrors::initNPCAlias(getSpawn()->dataSetRow(), getAlias());
+	}
 }
 
 bool CBotNpc::spawn()
@@ -1105,7 +1123,9 @@ void CBotNpc::setStartPos(double x, double y, float theta, AITYPES::TVerticalPos
 void CBotNpc::init()
 {
 	_ChatProfile = NULL;
-	_MaxHitRangeForPC = -1.f;
+	_MaxHitRangeForPC = -1.0f;
+//	_MissionIconFlags.IsMissionStepIconDisplayable = true;
+//	_MissionIconFlags.IsMissionGiverIconDisplayable = true;
 	
 	equipmentInit();
 }

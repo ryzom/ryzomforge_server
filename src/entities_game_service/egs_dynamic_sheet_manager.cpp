@@ -330,7 +330,7 @@ void CDynamicSheetManager::deleteCustomDataByPrimAlias(uint32 primAlias)
 
 	nldebug("<CDynamicSheetManager::deleteCustomDataByPrimAlias> Deleting custom data for alias '%u'", primAlias); 
 
-	TModifiedCreaturesMap::iterator upperBound = _CreaturesMap.upper_bound(idLow);
+	TModifiedCreaturesMap::iterator upperBound = _CreaturesMap.upper_bound(idLow); // works because (primAlias, "") can't be part of the map (otherwise would not be included in the deletion)
 	TModifiedCreaturesMap::iterator lowerBound = _CreaturesMap.lower_bound(idHigh);
 	if (upperBound != _CreaturesMap.end())
 		_CreaturesMap.erase(upperBound, lowerBound);

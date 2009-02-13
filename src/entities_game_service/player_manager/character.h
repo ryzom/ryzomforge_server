@@ -3539,6 +3539,15 @@ public:
 	bool			getGodModeSave() const	{ return _GodModeSave;}
 	/// Set the gobmode save flag, NB : just for persistence, do not change nothing.
 	void			setGodModeSave(bool godMode)	{ _GodModeSave = godMode;}
+
+	/// Test the character against mission prerequisits for the specified list of mission giver NPCs
+	void			sendNpcMissionGiverIconDesc( const std::vector<uint32>& npcKeys );
+
+	/// Inform the client that an event that might change mission availability just occured
+	void			sendEventForMissionAvailabilityCheck();
+
+	/// Send the current timer period if is different from the default or force is true
+	void			sendNpcMissionGiverTimer(bool force);
 };
 
 

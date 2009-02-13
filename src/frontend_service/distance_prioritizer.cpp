@@ -726,7 +726,12 @@ void		CDistancePrioritizer::arbitrateNPCDiscreetProperties(const CPropertyHistor
 		arbitrateDiscreetProperty( entry, NAME_STRING_ID );
 
 	arbitrateDiscreetProperty( entry, TARGET_ID );	// NPC can never be in Slot 0
-	arbitrateDiscreetProperty( entry, CONTEXTUAL );
+
+	// Specific distance for NPCs' contextual property
+	GET_VP_NODE(CONTEXTUAL)->BranchHasPayload =
+		TVPNodeServer::PrioContext.DistanceCE < THRESHOLD_CONTEXTUAL_NPC
+		&& discreetPropertyHasChanged( entry.Properties[PROPERTY_CONTEXTUAL], sentity->VP_CONTEXTUAL, PROPERTY_CONTEXTUAL, (TYPE_CONTEXTUAL*)NULL );
+
 	arbitrateDiscreetPropertyWithoutThreshold( entry, MODE );
 	arbitrateDiscreetProperty( entry, BARS );
 	arbitrateDiscreetProperty( entry, VPA );
@@ -968,13 +973,25 @@ void		fillSHEET( TOutBox& outbox, TPropIndex )
 	LOG_WHAT_IS_SENT( "%u: Filling buffer for C%hu S%hu P%hu SHEET at bitpos %d - value %"NL_I64"u", CTickEventHandler::getGameCycle(), TVPNodeServer::PrioContext.ClientId, (uint16)TVPNodeServer::PrioContext.Slot, PROPERTY_SHEET, outbox.getPosInBit(), ap->getValue() );
 
 	// Add row into the action
-
-
 	ap->packFast( outbox );
 	CFrontEndService::instance()->history()->store( TVPNodeServer::PrioContext.ClientId, TVPNodeServer::PrioContext.ClientHost->sendNumber(), ap );
 	//CActionFactory::getInstance()->remove( (CAction*&)ap );
 	REMOVE_AP();
 	++(TVPNodeServer::PrioContext.ClientHost->NbActionsSentAtCycle);
+
+	// Include alias if non-null in mirror (only for mission giver NPCs)
+	CMirrorPropValueRO<TYPE_ALIAS> aliasProp( TheDataset, TVPNodeServer::PrioContext.EntityIndex, DSPropertyNPC_ALIAS );
+	if (aliasProp() != 0)
+	{
+		bool aliasBit = true;
+		outbox.serialBitAndLog( aliasBit );
+		outbox.serialAndLog1( const_cast<TYPE_ALIAS&>(aliasProp()) ); // no need to store in history, alias never changes for an entity
+	}
+	else
+	{
+		bool aliasBit = false;
+		outbox.serialBitAndLog( aliasBit );
+	}
 
 #ifdef TEST_LOST_PACKET
 	if ( TestPacketLost.get() )
@@ -1101,7 +1118,7 @@ void		fillTARGET_LIST( TOutBox& outbox, TPropIndex )
 
 	// serialises branch has payload
 	bool	payLoad = true;
-	outbox.serial(payLoad);
+	outbox.serialBitAndLog(payLoad);
 
 	// restricts to 256 entities
 	uint	longListSize = TargetSlotsList.size();
@@ -1111,7 +1128,7 @@ void		fillTARGET_LIST( TOutBox& outbox, TPropIndex )
 	uint8	listSize = (uint8)longListSize;
 
 	// serialises short size
-	outbox.serial(listSize);
+	outbox.serialAndLog1(listSize);
 
 	// serialises slot list
 	if (listSize > 0)

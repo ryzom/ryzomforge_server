@@ -458,6 +458,8 @@ extern NLMISC::CVariable<sint32>				FameMaxKaravanvKaravan;
 
 extern NLMISC::CVariable<bool>					UseFemaleTitles;
 
+// - NPC Icons
+extern NLMISC::CVariable<uint32>				ClientNPCIconRefreshTimerDelay;
 
 // - Ring 
 extern NLMISC::CVariable<uint32>				TickFrequencyNpcControlUpdate;

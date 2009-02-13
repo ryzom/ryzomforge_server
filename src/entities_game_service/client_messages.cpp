@@ -3205,6 +3205,28 @@ void cbRingMissionSelectAction( NLNET::CMessage& msgin, const std::string & serv
 	}
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//		CLIENT:NPC_ICON
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void cbGetNpcIconDesc( NLNET::CMessage& msgin, const std::string & serviceName, NLNET::TServiceId serviceId )
+{
+	CEntityId eid;
+	vector<uint32> npcKeys;
+	
+	msgin.serial( eid );
+	msgin.serialCont( npcKeys );
+
+	CCharacter *ch = PlayerManager.getChar( eid );
+	if( ch )
+	{
+		ch->sendNpcMissionGiverIconDesc( npcKeys );
+	}
+}
+
+
 //----------------------------
 //	CbClientArray
 //----------------------------
@@ -3449,7 +3471,9 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:DM_GIFT:VALIDATE",				cbDMGiftValidate },
 
 	{ "CLIENT:RING_MISSION:MISSION_RING_SELECT",cbRingMissionSelectAction },
-};
+
+	{ "CLIENT:NPC_ICON:GET_DESC",				cbGetNpcIconDesc },
+}; 
 
 
 
