@@ -1672,7 +1672,7 @@ void COutpost::banishGuildForDefense( uint32 guildId )
 //----------------------------------------------------------------------------
 void COutpost::unBanishPlayerForAttack( NLMISC::CEntityId& id )
 {
-	set<CEntityId>::const_iterator it = _AttackBanishedPlayers.find( id );
+	set<CEntityId>::iterator it = _AttackBanishedPlayers.find( id );
 	if( it != _AttackBanishedPlayers.end() )
 		_AttackBanishedPlayers.erase( it );
 }
@@ -1680,7 +1680,7 @@ void COutpost::unBanishPlayerForAttack( NLMISC::CEntityId& id )
 //----------------------------------------------------------------------------
 void COutpost::unBanishPlayerForDefense( NLMISC::CEntityId& id )
 {
-	set<CEntityId>::const_iterator it = _DefenseBanishedPlayers.find( id );
+	set<CEntityId>::iterator it = _DefenseBanishedPlayers.find( id );
 	if( it != _DefenseBanishedPlayers.end() )
 		_DefenseBanishedPlayers.erase( it );
 }
@@ -1688,7 +1688,7 @@ void COutpost::unBanishPlayerForDefense( NLMISC::CEntityId& id )
 //----------------------------------------------------------------------------
 void COutpost::unBanishGuildForAttack( uint32 guildId )
 {
-	set<uint32>::const_iterator it = _AttackBanishedGuilds.find( guildId );
+	set<uint32>::iterator it = _AttackBanishedGuilds.find( guildId );
 	if( it != _AttackBanishedGuilds.end() )
 		_AttackBanishedGuilds.erase( it );
 }
@@ -1696,7 +1696,7 @@ void COutpost::unBanishGuildForAttack( uint32 guildId )
 //----------------------------------------------------------------------------
 void COutpost::unBanishGuildForDefense( uint32 guildId )
 {
-	set<uint32>::const_iterator it = _DefenseBanishedGuilds.find( guildId );
+	set<uint32>::iterator it = _DefenseBanishedGuilds.find( guildId );
 	if( it != _DefenseBanishedGuilds.end() )
 		_DefenseBanishedGuilds.erase( it );
 }
