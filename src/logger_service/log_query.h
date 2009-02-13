@@ -4,6 +4,11 @@
 #define LOG_QUERY_H
 
 #include "nel/misc/types_nl.h"
+
+#if defined(NL_COMP_VC8) || defined(NL_COMP_VC9)
+#	include <memory>
+#endif
+
 #include "nel/misc/common.h"
 
 #include "server_share/logger_service_itf.h"
