@@ -1088,7 +1088,7 @@ void CDamageScoreManager::playerDeath(CCharacter * victimChar, const CCharacter 
 		return;
 
 	PVP_CLAN::TPVPClan finalBlowerFaction;
-	if (!playerInFactionPvP(finalBlower, &victimFaction))
+	if (!playerInFactionPvP(finalBlower, &finalBlowerFaction))
 		return;
 
 	// check if victim and final blower are in PvP Faction (by tag or by a pvp versus zone)
