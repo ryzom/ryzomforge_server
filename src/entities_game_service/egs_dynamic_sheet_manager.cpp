@@ -12,8 +12,6 @@ using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
 
-
-
 CDynamicSheetManager *CDynamicSheetManager::_Instance = 0;
 
 CDynamicSheetManager *CDynamicSheetManager::getInstance()
@@ -26,7 +24,6 @@ CDynamicSheetManager *CDynamicSheetManager::getInstance()
 	}
 	return _Instance;
 }
-
 
 void CDynamicSheetManager::release()
 {
@@ -54,8 +51,6 @@ void cbDeleteCustomDataByPrimAlias(NLNET::CMessage& msgin, const std::string &se
 	CDynamicSheetManager::getInstance()->deleteCustomDataByPrimAlias(primAlias);
 }
 
-
-//bool CDynamicSheetManager::isAlreadyStored(const std::string &modelId)
 bool CDynamicSheetManager::isAlreadyStored(CCustomElementId id)
 {
 	TModifiedCreaturesMap::const_iterator it = _CreaturesMap.find(id);
@@ -69,67 +64,57 @@ bool CDynamicSheetManager::isAlreadyStored(CCustomElementId id)
 */
 void CDynamicSheetManager::getUserModelsFromMsg(NLNET::CMessage &msgin, NLNET::TServiceId serviceId)
 {
-	nldebug("<CDynamicSheetManager::getUserModelsFromMsg>Receiving UserModels from AIS");
-	msgin.serial(_ScriptData);
-	
-	_LoadingSuccessful.clear();
+	nldebug("Receiving UserModels from AIS");
+	CScriptData scriptData;
+	msgin.serial(scriptData);
 
-	TScripts::iterator it;
-	for (it = _ScriptData.scripts.begin(); it != _ScriptData.scripts.end(); ++it)
+	for (TScripts::iterator it = scriptData.scripts.begin(); it != scriptData.scripts.end(); ++it)
 	{
-		if (isAlreadyStored(it->first) == true)
+		if (isAlreadyStored(it->first))
 		{
-			nlwarning("Warning: user model '%s' already defined, skipping it.", it->first.Id.c_str());
-			continue;
+			nlwarning("User model '%s' already defined, skipping it.", it->first.Id.c_str());
 		}
-		instanciateDynamicSheet(it->first, it->second, serviceId);
+		else
+		{
+			instanciateDynamicSheet(it->first, it->second, serviceId);
+		}
 	}
-
-	_ScriptData.scripts.clear();
 }
-
 
 /**
 * create the custom loot tables objects
 */
-//bool CDynamicSheetManager::addCustomLootTable(const std::string &tableId, CCustomLootTable lootTable)
-bool CDynamicSheetManager::addCustomLootTable(CCustomElementId	id, 
-											  CCustomLootTable	lootTable,
-											  NLNET::TServiceId serviceId)
-{	
-
+void CDynamicSheetManager::addCustomLootTable(CCustomElementId id, CCustomLootTable lootTable, NLNET::TServiceId serviceId)
+{
 	if (_CustomLootTables.find(id) != _CustomLootTables.end())
 	{
-		nlwarning("<CDynamicSheetManager::addCustomLootTable> Custom loot table '%s' already present in manager", id.Id.c_str());
-		return false;
+		nlwarning("Custom loot table '%s' already present in manager", id.Id.c_str());
+		return;
 	}
-	
-	std::vector<std::string> tmpVector;
 
-	//CStaticLootTable currentLootTable;
+	vector<string> tmpVector;
+
 	CCustomLootTables table;
 
 	TScripts::iterator it;
 	for (it = lootTable.lootSets.scripts.begin(); it != lootTable.lootSets.scripts.end(); ++it)
 	{
 		CStaticLootSet tmplootSet;
-		std::string probaStr = it->first.Id;
-		//uint32 primAlias = it->first.PrimAlias;
+		string probaStr = it->first.Id;
 		uint16 proba = static_cast<uint16>(atoi(probaStr.c_str()));
 		TScriptContent script = it->second;
-		
-		TScriptContent::iterator it2 = script.begin();
+
 		uint32 lineNb = 0;
-		for (; it2 != script.end(); ++it2)
+		for (TScriptContent::iterator it2 = script.begin(); it2 != script.end(); ++it2)
 		{
-			//for each script line..
+			// for each script line..
 			tmpVector.clear();	
 			splitString((*it2), " ", tmpVector);
 			++lineNb;
 
 			if (tmpVector.size() != 3)
 			{
-				nlwarning("<CDynamicSheetManager::addCustomLootTable> CustomLootTable '%s' : Too many tokens or missing tokens in uncommented line %i, skipping it", id.Id.c_str(), lineNb);
+				nlwarning("CustomLootTable '%s' : Too many tokens or missing tokens in uncommented line %d, skipping it", id.Id.c_str(), lineNb);
 				continue;
 			}
 
@@ -137,95 +122,73 @@ bool CDynamicSheetManager::addCustomLootTable(CCustomElementId	id,
 			item.Item = tmpVector[0];
 			item.Level = static_cast<uint16>(atoi(tmpVector[1].c_str()));
 			item.Quantity = static_cast<uint16>(atoi(tmpVector[2].c_str()));
-			nldebug("New Item: name='%s' quality=%i quantity=%i", item.Item.c_str(), item.Level, item.Quantity);
+			nldebug("New Item: name='%s' quality=%d quantity=%d", item.Item.c_str(), item.Level, item.Quantity);
 
 			tmplootSet.ItemLoot.push_back(item);
 		}
-		//currentLootTable.CustomLootSets.insert(make_pair(proba, tmplootSet));
 		table.Table.CustomLootSets.insert(make_pair(proba, tmplootSet));
 	}
-	//currentLootTable.MoneyLvlFactor = lootTable.moneyFactor;
-	//currentLootTable.MoneyBase = lootTable.moneyBase;
-	//currentLootTable.MoneyDropProbability = lootTable.moneyProba;
 
 	table.Table.MoneyLvlFactor = lootTable.moneyFactor;
 	table.Table.MoneyBase = lootTable.moneyBase;
 	table.Table.MoneyDropProbability = lootTable.moneyProba;
-	
+
 	table.ServiceId = serviceId;
 
 	_CustomLootTables.insert(make_pair(id, table));
-	nldebug("done with table: id='%s'", id.Id.c_str());
-	
-		
+	nldebug("Done with table: id='%s'", id.Id.c_str());
+
 	return true;
 }
 
-
 void CDynamicSheetManager::getCustomLootTablesFromMsg(NLNET::CMessage &msgin, NLNET::TServiceId serviceId)
 {
-	nldebug("<CDynamicSheetManager::getCustomLootTablesFromMsg> Receiving CustomLootTables from AIS");
+	nldebug("Receiving CustomLootTables from AIS");
 
-	msgin.serial(_ReceivedCustomLootTables);
+	CCustomLootTableManager receivedCustomLootTables;
+	msgin.serial(receivedCustomLootTables);
 
-	TCustomLootTable::const_iterator it = _ReceivedCustomLootTables.tables.begin();
-	for (; it != _ReceivedCustomLootTables.tables.end(); ++it)
+	for (TCustomLootTable::const_iterator it = receivedCustomLootTables.tables.begin(); it != receivedCustomLootTables.tables.end(); ++it)
 	{
 		addCustomLootTable(it->first, it->second, serviceId);
 	}
-
-	_ReceivedCustomLootTables.tables.clear();
 }
 
 void CDynamicSheetManager::init()
 {	
-	//array of callback
+	// array of callback
 	NLNET::TUnifiedCallbackItem _cbArray[] =
 	{
-		{	"USER_MODELS", cbGetUserModels				},
-		{	"CUSTOM_LOOT_TABLES", cbGetCustomLootTables },
-		{	"DELCUSTOM", cbDeleteCustomDataByPrimAlias	}
+		{ "USER_MODELS", cbGetUserModels },
+		{ "CUSTOM_LOOT_TABLES", cbGetCustomLootTables },
+		{ "DELCUSTOM", cbDeleteCustomDataByPrimAlias }
 	};
 	CUnifiedNetwork::getInstance()->addCallbackArray( _cbArray, sizeof(_cbArray) / sizeof(_cbArray[0]) );
 }
 
-CDynamicSheetManager::CDynamicSheetManager()
-{
-
-}
-
-CDynamicSheetManager::~CDynamicSheetManager()
-{
-
-}
-
-
 /**
 * create the dynamic sheet that will then be stored into the manager
 */
-/*void CDynamicSheetManager::instanciateDynamicSheet(const std::string		&modelId, 
-												   std::vector<std::string>	scriptData,
-												   uint16					serviceId)*/
 void CDynamicSheetManager::instanciateDynamicSheet(CCustomElementId			modelId, 
 												   std::vector<std::string>	scriptData,
 												   NLNET::TServiceId		serviceId)
 {
 	if (scriptData.size() == 0 || scriptData[0].empty())
 	{
-		nlwarning("<DynamicSheetManager::instanciateDynamicSheet> Cannot instanciate empty model : '%s'.", modelId.Id.c_str());
+		nlwarning("Cannot instanciate empty model : '%s'.", modelId.Id.c_str());
 		return;
 	}
-	
+
 	if (_CreaturesMap.find(modelId) != _CreaturesMap.end())
 	{
-		nlwarning("<CDynamicSheetManager::instanciateDynamicSheet> sheet '%s' already present in manager", modelId.Id.c_str());
+		nlwarning("Sheet '%s' already present in manager", modelId.Id.c_str());
 		return;
 	}
-	
-	nldebug("<DynamicSheetManager::instanciateDynamicSheet> instanciating sheet associated to model '%s' and alias '%u'", modelId.Id.c_str(), modelId.PrimAlias);
+
+	nldebug("Instanciating sheet associated to model '%s' and alias '%u'", modelId.Id.c_str(), modelId.PrimAlias);
 	//scriptData[0] is the base sheetId for userModel
 	std::string sheetIdFilename = scriptData[0] + ".creature";
-	
+
 	//first create a temp sheet containing all normal attributes
 	NLMISC::CSheetId sheetId = NLMISC::CSheetId(sheetIdFilename);
 	const CStaticCreatures *form = CSheets::getCreaturesForm(sheetId);
@@ -233,11 +196,11 @@ void CDynamicSheetManager::instanciateDynamicSheet(CCustomElementId			modelId,
 	//copy the normal sheet (unmodified attributes will have correct values in comparison with the base sheet)
 	CStaticCreatures *sheetCopy = new CStaticCreatures(*form);
 
-	//and apply user model definied modifications on the copy
+	//and apply user model defined modifications on the copy
 	bool errors = sheetCopy->applyUserModel(modelId, scriptData);
-	
+
 	CUserModels userModel;
-	
+
 	//XXXXX!!!
 	//keep the id of the ais that sent the user models in order to free the resources if the services goes down
 	userModel.ServiceId = serviceId;
@@ -245,12 +208,11 @@ void CDynamicSheetManager::instanciateDynamicSheet(CCustomElementId			modelId,
 
 	//store the smartptr into the manager
 	_CreaturesMap.insert(make_pair(modelId, userModel));
+
 	//if errors happened during the modifications, the npc that possesses a user model as a sheet will have its name
 	//changed from "botName" to "<ERROR>botName"
-	_LoadingSuccessful.insert(make_pair(modelId, errors));
-
+	_UserModelLoadingErrors.insert(make_pair(modelId, errors));
 }
-
 
 CStaticCreatures *CDynamicSheetManager::getDynamicSheet(uint32 primAlias, const std::string &userModelId)
 {
@@ -264,23 +226,21 @@ CStaticCreatures *CDynamicSheetManager::getDynamicSheet(uint32 primAlias, const 
 	return 0;
 }
 
-
 bool CDynamicSheetManager::scriptErrors(uint32 primAlias, const std::string &userModelId)
 {
 	CCustomElementId id(primAlias, userModelId);
-	TScriptErrors::const_iterator it = _LoadingSuccessful.find(id);
-	if (it != _LoadingSuccessful.end())
+	TScriptErrors::const_iterator it = _UserModelLoadingErrors.find(id);
+	if (it != _UserModelLoadingErrors.end())
 	{
-		return it->second;	
+		return it->second;
 	}
-	nlwarning("<CDynamicSheetManager::scriptErrors> Can't find UserModel script '%s' associated to primAlias '%u'", userModelId.c_str(), primAlias);
+	nlwarning("Can't find UserModel script '%s' associated to primAlias '%u'", userModelId.c_str(), primAlias);
 	return true;
-
 }
 
 void CDynamicSheetManager::releaseCustomDataByServiceId(NLNET::TServiceId serviceId)
 {	
-	//release usermodels 
+	// release usermodels
 	TModifiedCreaturesMap::iterator it = _CreaturesMap.begin();
 	while(it != _CreaturesMap.end())
 	{
@@ -288,30 +248,28 @@ void CDynamicSheetManager::releaseCustomDataByServiceId(NLNET::TServiceId servic
 		{
 			TModifiedCreaturesMap::iterator itToErase = it;
 			++it;
-			nldebug("<CDynamicSheetManager::releaseCustomDataByServiceId> '%s' model erased from manager because associated service '%u' is down", 
-				itToErase->first.Id.c_str(), serviceId.get());
+			nldebug("'%s' model erased from manager because associated service '%u' is down", itToErase->first.Id.c_str(), serviceId.get());
 			
-			//also remove error information about that user model
-			TScriptErrors::iterator error = _LoadingSuccessful.find(it->first);
-			if (error != _LoadingSuccessful.end())
+			// also remove error information about that user model
+			TScriptErrors::iterator error = _UserModelLoadingErrors.find(it->first);
+			if (error != _UserModelLoadingErrors.end())
 			{
-				_LoadingSuccessful.erase(error);
+				_UserModelLoadingErrors.erase(error);
 			}
 			_CreaturesMap.erase(itToErase);
-			
+
 			continue;
 		}
 		++it;
 	}
-	
+
 	TCustomTables::iterator itTables = _CustomLootTables.begin();
 	while (itTables != _CustomLootTables.end())
 	{
 		if (itTables->second.ServiceId == serviceId)
 		{
 			TCustomTables::iterator itToErase = itTables;
-			nldebug("<CDynamicSheetManager::releaseCustomDataByServiceId> '%s' custom loot table erased from manager because associated service '%u' is down",
-				itToErase->first.Id.c_str(), serviceId.get());
+			nldebug("'%s' custom loot table erased from manager because associated service '%u' is down", itToErase->first.Id.c_str(), serviceId.get());
 			++itTables;
 			_CustomLootTables.erase(itToErase);
 
@@ -319,8 +277,6 @@ void CDynamicSheetManager::releaseCustomDataByServiceId(NLNET::TServiceId servic
 		}
 		++itTables;
 	}
-
-
 }
 
 void CDynamicSheetManager::deleteCustomDataByPrimAlias(uint32 primAlias)
@@ -328,7 +284,7 @@ void CDynamicSheetManager::deleteCustomDataByPrimAlias(uint32 primAlias)
 	CCustomElementId idLow(primAlias, "");
 	CCustomElementId idHigh(primAlias + 1, "");
 
-	nldebug("<CDynamicSheetManager::deleteCustomDataByPrimAlias> Deleting custom data for alias '%u'", primAlias); 
+	nldebug("Deleting custom data for alias '%u'", primAlias); 
 
 	TModifiedCreaturesMap::iterator upperBound = _CreaturesMap.upper_bound(idLow); // works because (primAlias, "") can't be part of the map (otherwise would not be included in the deletion)
 	TModifiedCreaturesMap::iterator lowerBound = _CreaturesMap.lower_bound(idHigh);
@@ -349,7 +305,6 @@ CStaticLootTable *CDynamicSheetManager::getLootTable(uint32 primAlias, const std
 	{
 		return &(it->second.Table);
 	}
-	nlwarning("<CDynamicSheetManager::getLootTable> Unable to find custom table '%s'associated to primAlias '%u' returning NULL", tableId.c_str(), primAlias);
-	return NULL;
+	nlwarning("Unable to find custom table '%s' associated to primAlias '%u' returning NULL", tableId.c_str(), primAlias);
+	return 0;
 }
-
