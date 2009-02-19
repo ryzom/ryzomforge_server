@@ -138,7 +138,7 @@ void CDynamicSheetManager::addCustomLootTable(CCustomElementId id, CCustomLootTa
 	_CustomLootTables.insert(make_pair(id, table));
 	nldebug("Done with table: id='%s'", id.Id.c_str());
 
-	return true;
+	return;
 }
 
 void CDynamicSheetManager::getCustomLootTablesFromMsg(NLNET::CMessage &msgin, NLNET::TServiceId serviceId)
