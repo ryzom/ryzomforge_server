@@ -645,7 +645,8 @@ public:
 	//method used specifically to modify protect table
 	bool applyProtectModification(uint index, const std::string &attr, const std::string &newValue);
 	//apply attributes modifications defined in a UserModel
-	//bool applyUserModel(const std::string &modelId, const std::vector<std::string> &scriptData);
+	
+	// return *true* if there are errors
 	bool applyUserModel(CCustomElementId modelId, const std::vector<std::string> &scriptData);
 };
 typedef NLMISC::CSmartPtr<CStaticCreatures> CStaticCreaturesPtr;
@@ -830,14 +831,15 @@ public:
 	/// loot_set and proba
 	std::map<NLMISC::CSheetId,uint16> LootSets;
 	
-	/// used when a custom loot table is applied to the creature
-	/// proba and lootSets (no sheetId, because each loot set is script defined)
-	std::map<uint16, CStaticLootSet> CustomLootSets;
+	// used when a custom loot table is applied to the creature
+	// proba and lootSets (no sheetId, because each loot set is script defined)
+	// we *must* use a multimap because uint16 is the proba and if we have 3 items with the same proba and use a std::map, only one item will be available.
+	std::multimap<uint16, CStaticLootSet> CustomLootSets;
 
 	/// factor used to compute money amount from creature level
 	float	MoneyLvlFactor;
 
-	/// money static ammount
+	/// money static amount
 	sint32	MoneyBase;
 
 	/// probability of money drop

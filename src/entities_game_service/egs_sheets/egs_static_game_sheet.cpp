@@ -2079,14 +2079,14 @@ CSheetId CStaticLootTable::selectRandomLootSet() const
 	{
 		probabilitySum += (*itconst).second;
 	}
-	
+
 	// choose a random number between and probabilitySum
 	uint32 randWeight;
 	if( probabilitySum == 0 )
 		randWeight = 0;
 	else
 		randWeight = RandomGenerator.rand(probabilitySum-1) + 1;
-	
+
 	// "concatenate" weights of each index, when the random value is reached we'll have the index to use
 	uint16 w = 0;
 	for( itconst = LootSets.begin(); itconst != LootSets.end(); ++itconst )
@@ -2101,22 +2101,19 @@ CSheetId CStaticLootTable::selectRandomLootSet() const
 	{
 		return (*itconst).first;
 	}
+
 	nlwarning("<CStaticLootTable::selectRandomLootSet> can't find any lootset rand=%d probabilitySum=%d weightCount=%d",randWeight,probabilitySum,LootSets.size());
-	
 	return CSheetId::Unknown;
+}
 
-} // CStaticLootTable::selectRandomLootSet //
-
-
-/// selectRandomLootSet
 const CStaticLootSet *CStaticLootTable::selectRandomCustomLootSet() const
 {
 	if( CustomLootSets.empty() )
-		return NULL;
+		return 0;
 
 	// compute the probability sum
 	uint16 probabilitySum = 0;
-	std::map<uint16, CStaticLootSet>::const_iterator it = CustomLootSets.begin();
+	multimap<uint16, CStaticLootSet>::const_iterator it = CustomLootSets.begin();
 	for( ; it != CustomLootSets.end(); ++it )
 	{
 		probabilitySum += (*it).first;
@@ -2139,15 +2136,15 @@ const CStaticLootSet *CStaticLootTable::selectRandomCustomLootSet() const
 			break;
 		}
 	}
+
 	if( it != CustomLootSets.end() )
 	{
 		return &(it->second);
 	}
-	nlwarning("<CStaticLootTable::selectRandomCustomLootSet> can't find any lootset rand=%d probabilitySum=%d weightCount=%d",randWeight,probabilitySum,CustomLootSets.size());
-	
-	return NULL;
 
-} // CStaticLootTable::selectRandomLootSet //
+	nlwarning("Can't find any lootset rand=%d probabilitySum=%d weightCount=%d",randWeight,probabilitySum,CustomLootSets.size());
+	return 0;
+}
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// Static Race Statistics //////////////////////////////
