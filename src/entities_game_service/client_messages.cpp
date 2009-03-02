@@ -3019,7 +3019,7 @@ void cbClientReturnToMainland( NLNET::CMessage& msgin, const std::string & servi
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// returns 0 on sucess, anything else is error:
+/// returns 0 on success, anything else is error:
 /// -1: Invalid inventory
 /// -2: Invalid slot
 /// -3: Empty slot
@@ -3060,10 +3060,55 @@ void cbClientEventSetItemCustomText( NLNET::CMessage& msgin, const std::string &
 	msgin.serial(slot);
 	msgin.serial(text);
 
-	// Verify that sender is valid and has the rights to send this message.
 	CCharacter* character = PlayerManager.getChar(eid);
-	if (character && character->havePriv(":DEV:SGM:GM:EM:"))
-		clientEventSetItemCustomText(character, inventory, slot, text);
+	if(!character) return;
+
+	if (!character->havePriv(":DEV:SGM:EM:"))
+	{
+		// it should be the crafter of the item, check
+		if (inventory==INVENTORIES::UNDEFINED) return;
+		CInventoryPtr invent = character->getInventory(inventory);
+		if (slot >= invent->getSlotCount()) return;
+		if (invent->getItem(slot) == NULL) return;
+		CGameItemPtr item = invent->getItem(slot);
+
+		const NLMISC::CEntityId &crafterEId = item->getCreator();
+		const NLMISC::CEntityId &userEId = character->getId();
+
+		if(crafterEId != userEId)
+		{
+			string name = CEntityIdTranslator::getInstance()->getByEntity(userEId).toString();
+			nlwarning("HACK: %s %s tries to set custom text on an item he didn't crafted", userEId.toString().c_str(), name.c_str());
+			return;
+		}
+
+		// text must not be too big
+		if(text.size() > 256)
+		{
+			string name = CEntityIdTranslator::getInstance()->getByEntity(userEId).toString();
+			nlwarning("HACK: %s %s tries to set custom text of a size > 256 (%d)", userEId.toString().c_str(), name.c_str(), text.size());
+			return;
+		}
+
+		// the item must have the good family
+		const CStaticItem * form = item->getStaticForm();
+		if (!form) return;
+		ITEMFAMILY::EItemFamily family = form->Family;
+		if (!ITEMFAMILY::isTextCustomizable(family))
+		{
+			string name = CEntityIdTranslator::getInstance()->getByEntity(userEId).toString();
+			nlwarning("HACK: %s %s tries to set custom text on a item that is not text customizable (%s)", userEId.toString().c_str(), name.c_str(), ITEMFAMILY::toString(family).c_str());
+			return;
+		}
+
+		// force that the begin of the text for non admin is %mfc
+		if(!text.empty() && text.substr(0, 4) != ucstring("%mfc"))
+		{
+			text = ucstring("%mfc") + text;
+		}
+	}
+
+	clientEventSetItemCustomText(character, inventory, slot, text);
 }
 
 
@@ -3486,8 +3531,3 @@ void CClientMessages::init()
 void CClientMessages::release()
 {
 }
-
-
-
-
-
