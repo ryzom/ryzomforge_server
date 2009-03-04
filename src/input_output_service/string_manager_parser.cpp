@@ -473,7 +473,7 @@ void CStringManager::parsePhraseDoc(ucstring &doc, uint langNum)
 	};
 
 	// remove any comment
-	NLMISC::CI18N::remove_C_Comment(doc);
+	NLMISC::CI18N::removeCComment(doc);
 
 	//broke the text into phrase block
 	ucstring block;
@@ -1935,7 +1935,7 @@ void CStringManager::init(NLMISC::CLog *log)
 //		//	NLMISC::CI18N::readTextFile(filename, ucs);
 		//	CReadClauseFile reader;
 		//	reader.readClauseFile(filename, phrases, ucs);
-		//	NLMISC::CI18N::remove_C_Comment(ucs);
+		//	NLMISC::CI18N::removeCComment(ucs);
 
 		//	if (!parseClauseStrings(ucs))
 		//	{
