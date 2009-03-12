@@ -121,11 +121,11 @@ uint8 CGuild::getMembersSession()const
 //}
 
 //----------------------------------------------------------------------------
-void CGuild::spendMoney(uint32 money)
+void CGuild::spendMoney(uint64 money)
 {
 	if ( money > _Money )
 	{
-		nlwarning( "spendMoney guild %u : money = %u, max = %u", _Id, money, _Money);
+		nlwarning( "spendMoney guild %u : money = %"NL_I64"u, max = %"NL_I64"u", _Id, money, _Money);
 		return;
 	}
 
@@ -136,7 +136,7 @@ void CGuild::spendMoney(uint32 money)
 }
 
 //----------------------------------------------------------------------------
-void CGuild::addMoney(uint32 money)
+void CGuild::addMoney(uint64 money)
 {
 	_GuildInventoryView->updateSessionForMoneyTransaction();
 	CGuildPD::setMoney( _Money + money );
@@ -837,7 +837,7 @@ void CGuild::takeItem( CCharacter * user, uint32 slot, uint32 quantity, uint16 s
 }
 
 //----------------------------------------------------------------------------
-void	CGuild::takeMoney( CCharacter * user, sint64 money, uint16 session )
+void	CGuild::takeMoney( CCharacter * user, uint64 money, uint16 session )
 {
 	nlassert(user);
 	if ( money > _Money )
@@ -867,7 +867,7 @@ void	CGuild::takeMoney( CCharacter * user, sint64 money, uint16 session )
 }
 
 //----------------------------------------------------------------------------
-void CGuild::putMoney( CCharacter * user, sint64 money, uint16 session )
+void CGuild::putMoney( CCharacter * user, uint64 money, uint16 session )
 {
 	nlassert(user);
 	if ( money > user->getMoney() )

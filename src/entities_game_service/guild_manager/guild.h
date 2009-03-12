@@ -85,9 +85,9 @@ public:
 	/// add an amount of XP
 //	void addXP( uint32 xp );
 	/// spend an amount of money
-	void spendMoney(uint32 money);
+	void spendMoney(uint64 money);
 	/// add an amount of money
-	void addMoney(uint32 money);
+	void addMoney(uint64 money);
 	/// set money
 	void setMoney(uint64 money);
 	/// clear the guild charge points
@@ -179,9 +179,9 @@ public:
 	/// put an item in guild inventory (set quantity to UINT_MAX for 'all stack')
 	void	putItem( CCharacter * user, uint32 slot, uint32 quantity, uint16 session );
 	/// user wanna take money
-	void	takeMoney( CCharacter * user, sint64 money, uint16 session );
+	void	takeMoney( CCharacter * user, uint64 money, uint16 session );
 	/// user wanna put money
-	void	putMoney( CCharacter * user, sint64 money, uint16 session );
+	void	putMoney( CCharacter * user, uint64 money, uint16 session );
 	/// get a guild item
 	const CGameItemPtr getItem( uint32 slot ) const
 	{

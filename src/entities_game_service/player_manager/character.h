@@ -1051,7 +1051,7 @@ public:
 	///exchange money
 	void exchangeMoney( const uint64& quantity);
 
-	/// check if each character have enought room in bag for exchange
+	/// check if each character have enough room in bag for exchange
 	bool validateExchange();
 		
 	///invalidate an exchange

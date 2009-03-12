@@ -3548,7 +3548,7 @@ static void parseCustomLootTableRec(const IPrimitive			*prim,
 			args.push_back(CAIActions::CArg(moneyFactor));
 		}
 
-		sint32 moneyBase = static_cast<sint32>(strtol(strMoneyBase.c_str(), &ptr, 10));
+		uint32 moneyBase = static_cast<uint32>(strtol(strMoneyBase.c_str(), &ptr, 10));
 		if (ptr != NULL && *ptr == '\0' && errno != ERANGE)
 		{
 			args.push_back(CAIActions::CArg(moneyBase));

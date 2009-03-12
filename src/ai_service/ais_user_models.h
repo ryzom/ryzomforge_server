@@ -34,9 +34,9 @@ public:
 
 	const CCustomLootTableManager &getCustomLootTables() { return _CustomLootTables;}
 	
-	bool isUserModel(uint32 primAlias, const std::string &id);
+	bool isUserModel(uint32 primAlias, const std::string &id) const;
 
-	bool isCustomLootTable(uint32 primAlias, const std::string &id);
+	bool isCustomLootTable(uint32 primAlias, const std::string &id) const;
 	
 	/** Add a custom loot table in the struct that will be sent to EGS
 	* @param tableId the id of the added table, defined in the worldEdit custom_loot_table node.
@@ -50,7 +50,7 @@ public:
 							TScripts			lootSets,
 							float				moneyProba,
 							float				moneyFactor,
-							sint32				moneyBase);
+							uint32				moneyBase);
 	
 	/** Delete all datas that were loaded from a given primitive (allow to dynamically load/reload custom datas)
 	* The alias is the static part of the primitive alias basis. This alias is used as part of the identifier 

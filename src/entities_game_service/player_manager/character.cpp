@@ -388,7 +388,7 @@ CCharacter::CCharacter():	CEntityBase(false),
 	
 	// pvp for player with privilege inactive
 	_PriviledgePvp = false;
-	// agroable undefined
+	// aggroable undefined
 	_Aggroable = true;
 	_AggroableOverride = -1;
 	

@@ -392,7 +392,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP(uint8,	_HandsColor)\
 	PROP(uint64,_Money)\
 \
-	/* property for backup character HP indendently of what happend in ring session*/\
+	/* property for backup character HP interdependently of what happened in ring session*/\
 	PROP(sint32,_HPB)\
 \
 	LPROP_MAP2(FactionPoints, string, uint32,\

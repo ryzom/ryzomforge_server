@@ -3,8 +3,6 @@
  * $Id: npc_description_messages.h,v 1.56 2007/05/30 16:32:23 verquerre Exp $
  */
 
-
-
 #ifndef RY_NPC_DESCRIPTION_MESSAGES_H
 #define RY_NPC_DESCRIPTION_MESSAGES_H
 
@@ -22,11 +20,11 @@
 // Logging and debugging stuff...
 //----------------------------------------------------------------
 
-// The following serve for controling verbose nature of logging - LOG is undefined at end of file
+// The following serve for controlling verbose nature of logging - LOG is undefined at end of file
 extern bool VerboseNpcDescriptionMsgLog;
 #define LOG if (!(VerboseNpcDescriptionMsgLog && Mode==4)) {} else nlinfo
 
-// build a man-readable description of a chat parameter set fomr component parts
+// build a man-readable description of a chat parameter set from component parts
 std::string buildChatDebugString(const std::vector<uint32> &ShopCategories,
 								 const std::vector<NLMISC::CSheetId> &ItemTypesForSale,
 								 const std::vector<uint32> &MissionIds);
@@ -119,229 +117,30 @@ protected:
 };
 
 //----------------------------------------------------------------
-// Message sent by AIS to EGS in reaction to EGS's service up 
-// Messages also sent when new NPC entities are spawned
-//----------------------------------------------------------------
-
-//----------------------------------------------------------------
-// Descrition of an NPC bot
-//class CNpcBotDescription : public CMirrorTransportClass
-//{
-//public:
-//	CNpcBotDescription	()
-//	{
-//	}
-//	// public data
-//	uint32				Alias;
-//	uint32				GrpAlias;
-//	std::vector<uint32> MissionIds;
-//
-//	std::vector<uint32>				ShopCategories;
-//
-//	// Standard Explicit Item
-//	std::vector<NLMISC::CSheetId>	ItemTypesForSale;
-//	std::vector<uint32>				ItemQualitiesForSale;
-//	std::vector<sint32>				ItemPrices;				// -1 indicate: use standard price, else use specific price
-//	std::vector<uint8>				ItemFactionType;		// PVP_CLAN::TPVPClan
-//	std::vector<uint32>				ItemFactionPointPrice;
-//	
-//	// Named Item
-//	std::vector<std::string>	NamedItemName;				// must correspond to a phrase id (in named_items.txt)
-//	std::vector<uint32>			NamedItemPrice;
-//	std::vector<uint8>			NamedItemFactionType;		// PVP_CLAN::TPVPClan
-//	std::vector<uint32>			NamedItemFactionPointPrice;
-//
-//	// Explicit .sphrase Actions
-//	std::vector<NLMISC::CSheetId>	ExplicitActionTradeList;
-//	bool							FilterExplicitActionTradeByPlayerRace;
-//	uint32							ExplicitActionSPType;
-//	bool							FilterExplicitActionTradeByBotRace;
-//	
-//	std::string			WelcomePhrase;
-//	std::string			WebPage;
-//	std::string			WebPageName;
-//	NLMISC::CSheetId	Sheet;
-//	TDataSetRow			EntityIndex;
-//	bool				PlayerAttackable;
-//	bool				BotAttackable;
-//	// active sheath description
-//	NLMISC::CSheetId	RightHandItem;
-//	NLMISC::CSheetId	LeftHandItem;
-//	uint8				RightHandItemQuality;
-//	uint8				LeftHandItemQuality;
-//	/// True if this bot can give dynamic mission
-//	bool				DynamicMissionGiver;
-//	bool				DontFollow;
-//	// if that bot is a building bot it will be caught by outpost system
-//	bool				BuildingBot;
-//
-//	/// optionnal and rare properties
-//	std::vector< std::string > OptionalProperties;
-//
-//
-//	/// List of news channel.
-//	std::vector<std::string>	NewsChannels;
-//
-//	/// titles of the bot context options ContextOptionsDetails.size() == ContextOptionsTitles.size()
-//	std::vector< std::string > ContextOptionsTitles;
-//	/// detail text of the option WARNING: we assert that ContextOptionsDetails.size() == ContextOptionsTitles.size()
-//	std::vector< std::string > ContextOptionsDetails;
-//
-//	std::vector<NLMISC::CSheetId>	lootList;				// list of loot 
-//	
-//	NLMISC::CSheetId	Outpost;
-
-//	float				MaxHitRangeForPC;	// Max effective hit range for PC against this npc
-	
-//	virtual void description ()
-//	{
-//		className ("CNpcBotDescription");
-//		property ("alias", PropUInt32, (uint32)0, Alias);
-//		property ("grpAlias", PropUInt32, (uint32)0, GrpAlias);
-//		property ("serverSheet", PropSheetId, NLMISC::CSheetId::Unknown,Sheet);
-//		property ("entityIndex", PropDataSetRow, TDataSetRow(), EntityIndex);
-//		property ("playerAttackable", PropBool, false, PlayerAttackable);
-//		property ("botAttackable", PropBool, false, BotAttackable);
-//		propertyCont ("missions", PropUInt32, MissionIds);
-//		propertyCont ("shopTypes", PropUInt32, ShopCategories);
-//		propertyCont ("shopItemTypes", PropSheetId, ItemTypesForSale);
-//		propertyCont ("shopItemQualities", PropUInt32, ItemQualitiesForSale);
-//		propertyCont ("shopItemPrices", PropSInt32, ItemPrices);
-//		propertyCont ("shopItemFactionType", PropUInt8, ItemFactionType);
-//		propertyCont ("shopItemFactionPointPrice", PropUInt32, ItemFactionPointPrice);
-//		
-//		propertyCont ("shopNItemName", PropString, NamedItemName);
-//		propertyCont ("shopNItemPrice", PropUInt32, NamedItemPrice);
-//		propertyCont ("shopNItemFactionType", PropUInt8, NamedItemFactionType);
-//		propertyCont ("shopNItemFactionPointPrice", PropUInt32, NamedItemFactionPointPrice);
-//
-//		propertyCont ("ExplicitActionTradeList", PropSheetId, ExplicitActionTradeList);
-//		property ("FilterExplicitActionTradeByPlayerRace", PropBool, false, FilterExplicitActionTradeByPlayerRace);
-//		property ("ExplicitActionSPType", PropUInt32, (uint32)0, ExplicitActionSPType);
-//		property ("FilterExplicitActionTradeByBotRace", PropBool, true, FilterExplicitActionTradeByBotRace);
-//
-//		property ("welcomePhrase", PropString, std::string(), WelcomePhrase);
-//		property ("webPage", PropString, std::string(), WebPage);
-//		property ("webPageName", PropString, std::string(), WebPageName);
-//		property ("dynamicMissionGiver", PropBool, false, DynamicMissionGiver);
-//		property ("DontFollow", PropBool, false, DontFollow);		
-//		property ("BuildingBot", PropBool, false, BuildingBot);		
-//
-//		propertyCont ("newsChannel", PropString, NewsChannels);
-//		
-//		property ("rightHandItem", PropSheetId, NLMISC::CSheetId::Unknown, RightHandItem);
-//		property ("leftHandItem", PropSheetId, NLMISC::CSheetId::Unknown, LeftHandItem);
-//		property ("rightHandItemQuality", PropUInt8, (uint8)0, RightHandItemQuality);
-//		property ("leftHandItemQuality", PropUInt8, (uint8)0, LeftHandItemQuality);
-//
-//		propertyCont ("ContextOptionsTitles",	PropString,  ContextOptionsTitles);
-//		propertyCont ("ContextOptionsDetails",	PropString, ContextOptionsDetails);
-//		propertyCont ("lootList",				PropSheetId, lootList);
-//		propertyCont ("OptionalProperties",		PropString, OptionalProperties);
-//		
-//		property ("Outpost",		PropSheetId, NLMISC::CSheetId::Unknown, Outpost);
-//		
-//		
-//		LOG("NPC BOT: %8u: %u: %s: %s : RH %s %d: LH %s %d: %s : welcome = '%s' contextTitles size:%u contextDetails size:%u",
-//			EntityIndex.getIndex(),
-//			Alias,
-//			Sheet.toString().c_str(), /*Level,*/
-//			"chatDebugStringDisabled",
-////			buildChatDebugString(ShopCategories, ItemTypesForSale, MissionIds).c_str(),
-//			RightHandItem.toString().c_str(),
-//			RightHandItemQuality,
-//			LeftHandItem.toString().c_str(),
-//			LeftHandItemQuality,
-////			AmmoItem.toString().c_str(),
-////			AmmoItemQuality,
-//			PlayerAttackable ? "Player Attackable" : "NOT Player Attackable",
-//			BotAttackable ? "Bot Attackable" : "NOT Bot Attackable",
-//			WelcomePhrase.empty() ? "default" : WelcomePhrase.c_str(),
-//			ContextOptionsTitles.size(),
-//			ContextOptionsDetails.size()
-//			);
-//	}
-//
-//	virtual void callback (const std::string &name, NLNET::TServiceId id) {};
-//};
-
-
-//----------------------------------------------------------------
-// Descrition of an NPC bot group
-
-//class CNpcGrpDescription : public CMirrorTransportClass
-//{
-//public:
-//	uint32 Alias;
-//	NLMISC::CEntityId Eid;
-//
-//	uint32 grpId() { return (uint32)Eid.getShortId(); }
-//	uint32 mgrId() { return (uint32)Eid.getShortId()|0xfffff; }
-//
-//	virtual void description ()
-//	{
-//		className ("CNpcGrpDescription");
-//		property ("alias", PropUInt32, (uint32)0, Alias);
-//		property ("eid", PropEntityId, NLMISC::CEntityId::Unknown, Eid);
-//
-//		LOG("NPC GRP: %s: %u",Eid.toString().c_str(),Alias);
-//	}
-//
-//	virtual void callback (const std::string &name, NLNET::TServiceId id) {};
-//};
-
-
-//----------------------------------------------------------------
-// Descrition of an NPC bot group manager
-
-//class CNpcMgrDescription : public CMirrorTransportClass
-//{
-//public:
-//	uint32 Alias;
-//	NLMISC::CEntityId Eid;
-//
-//	uint32 mgrId() { return (uint32)Eid.getShortId(); }
-//
-//	virtual void description ()
-//	{
-//		className ("CNpcMgrDescription");
-//		property ("alias", PropUInt32, (uint32)0, Alias);
-//		property ("eid", PropEntityId, NLMISC::CEntityId::Unknown, Eid);
-//
-//		LOG("NPC MGR: %s: %u",Eid.toString().c_str(),Alias);
-//	}
-//
-//	virtual void callback (const std::string &name, NLNET::TServiceId id) {};
-//};
-
-
-//----------------------------------------------------------------
 // List of Character starting chat or ending chat with bot
 
-class CCharacterBotChatBeginEnd : public CMirrorTransportClass
+struct CCharacterBotChatBeginEnd : public CMirrorTransportClass
 {
-public:
-	// Container contains pair of Player character / bot whith start or end chating
+	// Container contains pair of Player character / bot which start or end chating
 	std::vector< TDataSetRow > BotChatStart;
 	std::vector< TDataSetRow > BotChatEnd;
-	
+
 	virtual void description ()
 	{
 		className ("CCharacterBotChatBeginEnd");
 		propertyCont ("botChatStart",	PropUInt32, BotChatStart);
 		propertyCont ("botChatEnd",		PropUInt32, BotChatEnd);
 	}
-	
-	virtual void callback (const std::string &name, NLNET::TServiceId id) {};
+
+	virtual void callback (const std::string &name, NLNET::TServiceId id) { }
 };
 
-class CCharacterDynChatBeginEnd : public CMirrorTransportClass
+struct CCharacterDynChatBeginEnd : public CMirrorTransportClass
 {
-public:
-	// Container contains only bot whith start or end chating
+	// Container contains only bot which start or end chating
 	std::vector< TDataSetRow > DynChatStart;
 	std::vector< TDataSetRow > DynChatEnd;
-	
+
 	virtual void description ()
 	{
 		className ("CCharacterDynChatBeginEnd");
@@ -349,16 +148,12 @@ public:
 		propertyCont ("dnChatEnd",		PropUInt32, DynChatEnd);
 	}
 
-	
-	virtual void callback (const std::string &name, NLNET::TServiceId id) {};
+	virtual void callback (const std::string &name, NLNET::TServiceId id) { }
 };
 
-class CCustomElementId
+struct CCustomElementId
 {
-public:
-	CCustomElementId(uint32 alias = 0, const std::string &id = ""):PrimAlias(alias),Id(id)
-	{
-	}
+	CCustomElementId(uint32 alias = 0, const std::string &id = "") : PrimAlias(alias), Id(id) { }
 	uint32		PrimAlias;
 	std::string	Id;
 	void serial(NLMISC::IStream &f);
@@ -374,8 +169,6 @@ inline bool operator<(const CCustomElementId &leftHand, const CCustomElementId &
 		return true;
 	return false;
 }
-	
-
 
 //all script lines
 typedef std::vector<std::string> TScriptContent;
@@ -384,40 +177,31 @@ typedef std::map<CCustomElementId, TScriptContent> TScripts;
 
 //class used for serialization when receiving AIS user_model msg
 //also used to represent custom loot set (key : drop proba, value : set script) 
-class CScriptData
+struct CScriptData
 {
-public:
-	TScripts scripts;
+	TScripts Scripts;
 	void serial(NLMISC::IStream &f);
 };
 
-
-
 //used for serialization when receiving AIS custom loot table msg
 //contains all loot sets of the table, and money infos used for dappers drop
-class CCustomLootTable
+struct CCustomLootTable
 {
-public:
-	CScriptData			lootSets;
-	float				moneyFactor;
-	float				moneyProba;
-	sint32				moneyBase;
-
+	CScriptData			LootSets;
+	float				MoneyFactor;
+	float				MoneyProba;
+	uint32				MoneyBase;
 	void serial(NLMISC::IStream &f);
-
 };
 
 //key : pair<primAlias, customLootTableId>, value : all associated custom loot sets + money info
 typedef std::map<CCustomElementId, CCustomLootTable> TCustomLootTable;
 
-class CCustomLootTableManager
+struct CCustomLootTableManager
 {
-public:
-	TCustomLootTable	tables;
-	
+	TCustomLootTable	Tables;
 	void serial(NLMISC::IStream &f);
 };
-
 
 #undef LOG
 

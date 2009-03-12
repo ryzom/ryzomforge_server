@@ -4482,8 +4482,6 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	
 		void setMONEY(CCDBSynchronised &dbGroup, uint64 value, bool forceSending = false)
 		{
-			
-
 			_setProp(dbGroup, _MONEY, value, forceSending);
 		}
 
@@ -4491,17 +4489,14 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		{
 			uint64 value;
 			_getProp(dbGroup, _MONEY, value);
-
 			return value;
 		}
-		
+
 		ICDBStructNode *getMONEYCDBNode()
 		{
 			return _MONEY;
 		}
-	
 	};
-		
 
 	private:
 		ICDBStructNode	*_BranchNode;
@@ -4524,11 +4519,8 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 			return _BranchNode;
 		}
 
-		
 		void setMONEY(CCDBSynchronised &dbGroup, uint64 value, bool forceSending = false)
 		{
-			
-
 			_setProp(dbGroup, _MONEY, value, forceSending);
 		}
 
@@ -5922,8 +5914,6 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	
 		void setMONEY_SHEET(CCDBSynchronised &dbGroup, NLMISC::CSheetId value, bool forceSending = false)
 		{
-			
-
 			_setProp(dbGroup, _MONEY_SHEET, value, forceSending);
 		}
 

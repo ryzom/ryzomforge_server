@@ -514,8 +514,6 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	
 		void setMONEY(CCDBGroup &dbGroup, uint64 value, bool forceSending = false)
 		{
-			
-
 			_setProp(dbGroup.Database, _MONEY, value, forceSending);
 		}
 

@@ -133,6 +133,7 @@ DEFINE_ACTION(ContextGlobal,CUSTOMLT)
 	uint32 tablesNb; 
 	if (it->get(tablesNb) == false)
 	{
+		nlwarning("<CAIUserModelManager::CUSTOMLT>Unable to retrieve number of parsed loot tables, abort.");
 		return;
 	}
 	nldebug("<CAIUserModelManager::CUSTOMLT>Number of parsed loot tables: %u", tablesNb);
@@ -142,6 +143,7 @@ DEFINE_ACTION(ContextGlobal,CUSTOMLT)
 	uint32 primAlias;
 	if (it->get(primAlias) == false)
 	{
+		nlwarning("<CAIUserModelManager::CUSTOMLT>Unable to retrieve primitive alias, abort.");
 		return;
 	}
 	
@@ -185,7 +187,7 @@ DEFINE_ACTION(ContextGlobal,CUSTOMLT)
 			return;
 		}
 
-		sint32 moneyBase;
+		uint32 moneyBase;
 		if ((++it)->get(moneyBase) == false)
 		{
 			nlwarning("<CAIUserModelManager::CUSTOMLT> unable to get moneyBase");
@@ -222,13 +224,19 @@ DEFINE_ACTION(ContextGlobal,CUSTOMLT)
 			// FIXME: test on proba value...
 			if (proba == 0 || proba > 100)
 			{
-				nlwarning("<CUSTOMLT> invalid proba value for lootset %i in custom loot table '%s', don't send custom loot tables info to EGS",
+				nlwarning("<CUSTOMLT> invalid drop proba value for lootset %i in custom loot table '%s', skip the lootset",
 					j + 1, lootTableId.c_str() );
-				return;
+				continue;
 			}
 			lootSets.insert(make_pair(CCustomElementId(0, dropProba), lootSetContent));
 		}
 		
+		if (lootSets.empty())
+		{
+			nlwarning("<CUSTOMLT> Don't add empty lootsets to customloot table, skip loot table '%s'.", lootTableId.c_str());
+			continue;
+		}
+
 		nldebug("<CAIUserModelManager> Adding table '%s' to manager with primAlias '%u'", lootTableId.c_str(), primAlias);
 		CAIUserModelManager::getInstance()->addCustomLootTable(primAlias, lootTableId,lootSets,
 				moneyProba, moneyFactor, moneyBase);
@@ -279,7 +287,7 @@ void CAIUserModelManager::addToUserModels(uint32				primAlias,
 										  const std::string		&userModelId, 
 										  const TScriptContent	&userModel)
 {
-	bool inserted = _UserModels.scripts.insert(make_pair(CCustomElementId(primAlias, userModelId), userModel)).second;
+	bool inserted = _UserModels.Scripts.insert(make_pair(CCustomElementId(primAlias, userModelId), userModel)).second;
 	if (!inserted)
 	{
 		nlwarning("<AIUserModelManager::addToUserModels> tried to register twice the same user model with id: '%s'", userModelId.c_str());
@@ -294,22 +302,22 @@ void CAIUserModelManager::sendUserModels()
 	const CScriptData &scriptData = CAIUserModelManager::getInstance()->getUserModels();
 	msgout.serial(const_cast<CScriptData&>(scriptData));
 	
-	nldebug("<CAIUserModelManager> Sending user models to EGS");
+	nldebug("<CAIUserModelManager> Sending %u user models to EGS", scriptData.Scripts.size());
 	sendMessageViaMirror("EGS", msgout);
 }
 
-bool CAIUserModelManager::isUserModel(uint32 primAlias, const std::string &userModelId)
+bool CAIUserModelManager::isUserModel(uint32 primAlias, const std::string &userModelId) const
 {	
 	CCustomElementId id(primAlias, userModelId);
 
-	return _UserModels.scripts.find(id) != _UserModels.scripts.end();
+	return _UserModels.Scripts.find(id) != _UserModels.Scripts.end();
 }
 
-bool CAIUserModelManager::isCustomLootTable(uint32 primAlias, const std::string &lootTableId)
+bool CAIUserModelManager::isCustomLootTable(uint32 primAlias, const std::string &lootTableId) const
 {
 	CCustomElementId id(primAlias, lootTableId);
 	
-	return _CustomLootTables.tables.find(id) != _CustomLootTables.tables.end();
+	return _CustomLootTables.Tables.find(id) != _CustomLootTables.Tables.end();
 }
 
 
@@ -327,7 +335,7 @@ void CAIUserModelManager::addCustomLootTable(uint32				primAlias,
 											 TScripts			lootSets,
 											 float				moneyProba,
 											 float				moneyFactor,
-											 sint32				moneyBase
+											 uint32				moneyBase
 											 )
 {
 	if (CAIUserModelManager::getInstance()->isCustomLootTable(primAlias, tableId) == true)
@@ -336,15 +344,15 @@ void CAIUserModelManager::addCustomLootTable(uint32				primAlias,
 		return;
 	}
 	CScriptData tableContent;
-	tableContent.scripts = lootSets;
+	tableContent.Scripts = lootSets;
 	CCustomLootTable customLootTable;
 
-	customLootTable.lootSets = tableContent;
-	customLootTable.moneyProba = moneyProba;
-	customLootTable.moneyFactor = moneyFactor;
-	customLootTable.moneyBase = moneyBase;
+	customLootTable.LootSets = tableContent;
+	customLootTable.MoneyProba = moneyProba;
+	customLootTable.MoneyFactor = moneyFactor;
+	customLootTable.MoneyBase = moneyBase;
 
-	_CustomLootTables.tables.insert(make_pair(CCustomElementId(primAlias, tableId), customLootTable));
+	_CustomLootTables.Tables.insert(make_pair(CCustomElementId(primAlias, tableId), customLootTable));
 }
 
 
@@ -352,16 +360,16 @@ void CAIUserModelManager::deleteCustomDataByPrimAlias(uint32 primAlias)
 {
 	CCustomElementId idLow(primAlias, "");
 	CCustomElementId idHigh(primAlias + 1, "");
-	TScripts::iterator upperBound = _UserModels.scripts.upper_bound(idLow);
-	TScripts::iterator lowerBound = _UserModels.scripts.lower_bound(idHigh);
-	if (upperBound != _UserModels.scripts.end())
-		_UserModels.scripts.erase(upperBound, lowerBound);
+	TScripts::iterator upperBound = _UserModels.Scripts.upper_bound(idLow);
+	TScripts::iterator lowerBound = _UserModels.Scripts.lower_bound(idHigh);
+	if (upperBound != _UserModels.Scripts.end())
+		_UserModels.Scripts.erase(upperBound, lowerBound);
 	
-	TCustomLootTable::iterator upperBoundLootTables = _CustomLootTables.tables.upper_bound(idLow);
-	TCustomLootTable::iterator lowerBoundLootTables = _CustomLootTables.tables.lower_bound(idHigh);
+	TCustomLootTable::iterator upperBoundLootTables = _CustomLootTables.Tables.upper_bound(idLow);
+	TCustomLootTable::iterator lowerBoundLootTables = _CustomLootTables.Tables.lower_bound(idHigh);
 
-	if (upperBoundLootTables != _CustomLootTables.tables.end())
-		_CustomLootTables.tables.erase(upperBoundLootTables, lowerBoundLootTables);
+	if (upperBoundLootTables != _CustomLootTables.Tables.end())
+		_CustomLootTables.Tables.erase(upperBoundLootTables, lowerBoundLootTables);
 
 	if (EGSHasMirrorReady)
 	{

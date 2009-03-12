@@ -840,7 +840,7 @@ public:
 	float	MoneyLvlFactor;
 
 	/// money static amount
-	sint32	MoneyBase;
+	uint32	MoneyBase;
 
 	/// probability of money drop
 	float	MoneyDropProbability;

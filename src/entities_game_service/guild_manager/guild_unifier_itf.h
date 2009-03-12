@@ -293,11 +293,7 @@ namespace GU
 
 		void setGuildDesc(const ucstring &value)
 		{
-
-
 				_GuildDesc = value;
-
-				
 		}
 			// 
 		uint64 getGuildMoney() const
@@ -307,9 +303,7 @@ namespace GU
 
 		void setGuildMoney(uint64 value)
 		{
-
 				_GuildMoney = value;
-
 		}
 			// 
 		uint32 getGuildCreationDate() const

@@ -68,7 +68,7 @@ void CDynamicSheetManager::getUserModelsFromMsg(NLNET::CMessage &msgin, NLNET::T
 	CScriptData scriptData;
 	msgin.serial(scriptData);
 
-	for (TScripts::iterator it = scriptData.scripts.begin(); it != scriptData.scripts.end(); ++it)
+	for (TScripts::iterator it = scriptData.Scripts.begin(); it != scriptData.Scripts.end(); ++it)
 	{
 		if (isAlreadyStored(it->first))
 		{
@@ -97,7 +97,7 @@ void CDynamicSheetManager::addCustomLootTable(CCustomElementId id, CCustomLootTa
 	CCustomLootTables table;
 
 	TScripts::iterator it;
-	for (it = lootTable.lootSets.scripts.begin(); it != lootTable.lootSets.scripts.end(); ++it)
+	for (it = lootTable.LootSets.Scripts.begin(); it != lootTable.LootSets.Scripts.end(); ++it)
 	{
 		CStaticLootSet tmplootSet;
 		string probaStr = it->first.Id;
@@ -129,14 +129,14 @@ void CDynamicSheetManager::addCustomLootTable(CCustomElementId id, CCustomLootTa
 		table.Table.CustomLootSets.insert(make_pair(proba, tmplootSet));
 	}
 
-	table.Table.MoneyLvlFactor = lootTable.moneyFactor;
-	table.Table.MoneyBase = lootTable.moneyBase;
-	table.Table.MoneyDropProbability = lootTable.moneyProba;
-
+	table.Table.MoneyLvlFactor = lootTable.MoneyFactor;
+	table.Table.MoneyBase = lootTable.MoneyBase;
+	table.Table.MoneyDropProbability = lootTable.MoneyProba;
+	
 	table.ServiceId = serviceId;
 
 	_CustomLootTables.insert(make_pair(id, table));
-	nldebug("Done with table: id='%s'", id.Id.c_str());
+	nldebug("done with table: id='%s'", id.Id.c_str());
 
 	return;
 }
@@ -148,7 +148,7 @@ void CDynamicSheetManager::getCustomLootTablesFromMsg(NLNET::CMessage &msgin, NL
 	CCustomLootTableManager receivedCustomLootTables;
 	msgin.serial(receivedCustomLootTables);
 
-	for (TCustomLootTable::const_iterator it = receivedCustomLootTables.tables.begin(); it != receivedCustomLootTables.tables.end(); ++it)
+	for (TCustomLootTable::const_iterator it = receivedCustomLootTables.Tables.begin(); it != receivedCustomLootTables.Tables.end(); ++it)
 	{
 		addCustomLootTable(it->first, it->second, serviceId);
 	}
