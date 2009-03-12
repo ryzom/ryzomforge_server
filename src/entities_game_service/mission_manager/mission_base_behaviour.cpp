@@ -564,7 +564,7 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 			if ( indexInTemplate - 1 != currentStepIdx )
 			{
 				// Call the cancel handler on the other 'any' steps that not need be successfully processed
-				templ->Steps[ currentStepIdx ]->onCancelStepAny( _Mission, currentStepIdx );
+				templ->Steps[ currentStepIdx ]->onCancelStepAny( _Mission, indexInTemplate - 1 );
 			}
 			_Mission->addToStepsDone( indexInTemplate );
 			_Mission->deleteFromSteps( ( *_Mission->getStepsBegin() ).first );
