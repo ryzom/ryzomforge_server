@@ -450,6 +450,7 @@ void CCreature::displayModifiedAttributes(CEntityId id, NLMISC::CLog &log)
 		log.displayNL("XPLevel : %i [%i]", _XPLevel, baseForm->getXPLevel());
 		log.displayNL("TauntLevel : %i [%i]", _TauntLevel, baseForm->getTauntLevel());
 		log.displayNL("XPGainOnCreature : %f [%f]", _XPGainOnCreature, baseForm->getXPGainOnCreature());*/
+		log.displayNL("Regen: %f [%f]",_PhysScores._PhysicalScores[SCORES::hit_points].CurrentRegenerate, baseForm->getRegen(SCORES::hit_points));
 		log.displayNL("DodgeAsDefense : %d [%d]", _DodgeAsDefense, baseForm->getDodgeAsDefense());
 	}
 }
