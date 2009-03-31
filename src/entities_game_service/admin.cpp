@@ -252,6 +252,7 @@ AdminCommandsInit[] =
 		"savePlayerActiveChar",				false,
 		"reloadPlayer",						false,
 		"characterMissionDump",				true,
+		"targetMissionDump",				true,
 		"removeMission",					true,
 		"addMission",						true,
 		// CSR variables
