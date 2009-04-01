@@ -1662,14 +1662,14 @@ public:
 	// Buy kami or karavan pact for a respawn point
 	void buyPact( const std::string& PactName ); 
 
-	/// set forbid aura use end date
-	void setForbidAuraUseEndDate(NLMISC::TGameCycle endDate);
+	/// set forbid aura use start and end dates
+	void setForbidAuraUseDates(NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate);
 
 	/// get forbid aura use end date
 	NLMISC::TGameCycle getForbidAuraUseEndDate() const;
 
 	/// add an aura to ineffective auras
-	void useAura(POWERS::TPowerType auraType, NLMISC::TGameCycle date, const NLMISC::CEntityId &userId);
+	void useAura(POWERS::TPowerType auraType, NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate, const NLMISC::CEntityId &userId);
 
 	/// check if aura is effective, return true if effective
 	bool isAuraEffective(POWERS::TPowerType auraType, NLMISC::TGameCycle &endDate, const NLMISC::CEntityId &userId);
@@ -1704,7 +1704,10 @@ public:
 	void resetCombatEventFlags();
 
 	/// get combat event flags bitfield
-	uint32 getCombatEventFlags() const;
+	//uint32 getCombatEventFlags() const;
+
+	/// return true if combat event flag is active
+	bool isCombatEventFlagActive(BRICK_FLAGS::TBrickFlag flag) const;
 
 	/// update brick flags DB value
 	void updateBrickFlagsDBEntry();
@@ -2611,6 +2614,12 @@ private:
 	/// reset combat flags when date reached
 	void updateCombatEventFlags();
 
+	/// update power flags tick info
+	void setPowerFlagDates();
+
+	/// update aura flags tick info
+	void setAuraFlagDates();
+
 	/// update power and aura flags
 	void updatePowerAndAuraFlags();
 
@@ -3068,6 +3077,9 @@ private:
 
 	uint16						_SavedVersion;
 
+	// keep starting charac values, use them as an offset of current charac values when listing charac bricks player can buy
+	std::vector<uint8>			_StartingCharacteristicValues;
+
 	/** 
 	 * date when the player will be able to start a new action, before this date new actions will be refused
 	 * this is set when a player disengage from a combat before the combat action latency has ended (anti exploit)
@@ -3083,11 +3095,13 @@ private:
 	//// Bonus extraction time coming from known passive bricks (not saved but computed by computeForageBonus() at loading)
 	NLMISC::TGameCycle			_ForageBonusExtractionTime;
 
+	/// date since when this player can't use auras
+	NLMISC::TGameCycle			_ForbidAuraUseStartDate;
 	/// date when this player will be able to use auras again
 	NLMISC::TGameCycle			_ForbidAuraUseEndDate;
 
 	/// vector of power types and the date when player will be able to use them again
-	CPowerActivationDateVector	_ForbidPowerEndDates;
+	CPowerActivationDateVector	_ForbidPowerDates;
 
 	/// vector of auras ineffective on this player
 	CAuraActivationDateVector	_IneffectiveAuras;
@@ -3100,22 +3114,32 @@ private:
 
 	/// nb of auras affecting this player
 	uint8						_NbAuras;
+	
+	// for a power/combat event, stores start and end ticks
+	struct CFlagTickRange {
 
-	/// bitfield of combat event flags that are currently 'active'
-	uint32						_ActiveCombatEventFlags;
-	/// keep old flags values to update Db only when value has changed
-	uint32						_OldCombatEventFlags;
+		uint32 StartTick;
+		uint32 EndTick;
 
-	/// Usable Power and Auras flags
-	uint32						_UsablePowerFlags;
-	/// keep old flags values to update Db only when value has changed
-	uint32						_OldUsablePowerFlags;
+		uint32 OldStartTick;
+		uint32 OldEndTick;
+
+		CFlagTickRange()
+		{
+			StartTick = 0;
+			EndTick = 0;
+			OldStartTick = 0;
+			OldEndTick = 0;
+		}
+	};
+	std::vector<CFlagTickRange>	_CombatEventFlagTicks;
+	std::vector<CFlagTickRange>	_PowerFlagTicks;
 	
 	// class used for apply/store for persistent effects
 	CPersistentEffect			_PersistentEffects;
 
 	/// timer for each flag, when date is reached, reset flag
-	NLMISC::TGameCycle			_CombatEventResetDate[BRICK_FLAGS::NbCombatFlags];
+//	NLMISC::TGameCycle			_CombatEventResetDate[BRICK_FLAGS::NbCombatFlags];
 
 	/// total malus due to wearing equipment
 	float						_WearEquipmentMalus;

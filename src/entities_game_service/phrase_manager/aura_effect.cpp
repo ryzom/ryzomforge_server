@@ -141,7 +141,7 @@ void CAuraRootEffect::createEffectOnEntity(CEntityBase *entity, CEntityBase *cre
 			effect->setEffectDisabledEndDate( CTickEventHandler::getGameCycle() + _TargetDisableTime );
 			
 			entity->addSabrinaEffect(effect);
-			character->useAura(_PowerType, CTickEventHandler::getGameCycle() + _TargetDisableTime, creator->getId());
+			character->useAura(_PowerType, CTickEventHandler::getGameCycle(), CTickEventHandler::getGameCycle() + _TargetDisableTime, creator->getId());
 
 			//send message to newly affected entity
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::power_type);

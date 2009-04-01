@@ -24,12 +24,13 @@ struct CPowerActivationDate
 
 	POWERS::TPowerType	PowerType;
 	uint16				ConsumableFamilyId; // ~0 mean is not a consumable who create this power
+	NLMISC::TGameCycle	DeactivationDate;
 	NLMISC::TGameCycle	ActivationDate;
 
-	CPowerActivationDate() : PowerType(POWERS::UnknownType), ConsumableFamilyId((uint16)~0), ActivationDate(0)
+	CPowerActivationDate() : PowerType(POWERS::UnknownType), ConsumableFamilyId((uint16)~0), DeactivationDate(0), ActivationDate(0)
 	{}
 
-	CPowerActivationDate(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle date) : PowerType(type), ConsumableFamilyId(consumableFamilyId), ActivationDate(date)
+	CPowerActivationDate(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle dateOff, NLMISC::TGameCycle dateOn) : PowerType(type), ConsumableFamilyId(consumableFamilyId), DeactivationDate(dateOff), ActivationDate(dateOn)
 	{}
 
 	void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
@@ -97,7 +98,7 @@ public:
 
 	void clear();
 
-	void disableAura(POWERS::TPowerType type, NLMISC::TGameCycle date, const NLMISC::CEntityId &userId);
+	void disableAura(POWERS::TPowerType type, NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate, const NLMISC::CEntityId &userId);
 
 	void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
 

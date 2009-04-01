@@ -532,10 +532,6 @@ void CBankAccessor_PLR::TFLAGS::init(ICDBStructNode *parent)
 
 	// leaf init
 	
-	node  = parent->getNode( ICDBStructNode::CTextId("BRICK_FLAGS"), false );
-	nlassert(node != NULL);
-	_BRICK_FLAGS = node;
-	
 	node  = parent->getNode( ICDBStructNode::CTextId("CRITICAL"), false );
 	nlassert(node != NULL);
 	_CRITICAL = node;
@@ -547,6 +543,49 @@ void CBankAccessor_PLR::TFLAGS::init(ICDBStructNode *parent)
 	node  = parent->getNode( ICDBStructNode::CTextId("DODGE"), false );
 	nlassert(node != NULL);
 	_DODGE = node;
+	
+
+	// branch init
+	
+	node  = parent->getNode( ICDBStructNode::CTextId("BRICK_TICK_RANGE"), false );
+	nlassert(node != NULL);
+	_BRICK_TICK_RANGE.init(node);
+	
+}
+
+
+void CBankAccessor_PLR::TFLAGS::TBRICK_TICK_RANGE::init(ICDBStructNode *parent)
+{
+	ICDBStructNode *node = parent;
+
+	_BranchNode = node;
+
+	// leaf init
+	
+
+	// branch init
+	
+	for (uint i=0; i<64; ++i)
+	{
+		node  = parent->getNode( ICDBStructNode::CTextId(NLMISC::toString("%u", i)), false );
+		nlassert(node != NULL);
+		_Array[i].init(node, i);
+	}
+	
+}
+
+
+void CBankAccessor_PLR::TFLAGS::TBRICK_TICK_RANGE::TArray::init(ICDBStructNode *parent, uint index)
+{
+	ICDBStructNode *node = parent;
+
+	_BranchNode = node;
+
+	// leaf init
+	
+	node  = parent->getNode( ICDBStructNode::CTextId("TICK_RANGE"), false );
+	nlassert(node != NULL);
+	_TICK_RANGE = node;
 	
 
 	// branch init

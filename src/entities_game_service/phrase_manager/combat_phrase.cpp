@@ -4386,14 +4386,15 @@ bool CCombatPhrase::checkOpening()
 	CCharacter *player = PlayerManager.getChar(_Attacker->getEntityRowId());
 	if (!player) return true;
 
-	const uint32 flags = player->getCombatEventFlags();
+	//const uint32 flags = player->getCombatEventFlags();
 	BRICK_FLAGS::TBrickFlag flag = BRICK_FLAGS::UnknownFlag;
 	bool success = true;
 
 	for (uint i = 0 ; i < _OpeningNeededFlags.size() && success ; ++i)
 	{
 		flag  = _OpeningNeededFlags[i];
-		if ( !( flags & (1<<flag) ) )
+		//if ( !( flags & (1<<flag) ) )
+		if( player->isCombatEventFlagActive(flag) == false )
 		{
 			//nlwarning("COMBAT : player %s tried to take an opening needing %s but failed", player->getId().toString().c_str(), BRICK_FLAGS::toString(flag).c_str());
 			success = false;

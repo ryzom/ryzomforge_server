@@ -392,7 +392,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP(uint8,	_HandsColor)\
 	PROP(uint64,_Money)\
 \
-	/* property for backup character HP interdependently of what happened in ring session*/\
+	/* property for backup character HP independently of what happened in ring session*/\
 	PROP(sint32,_HPB)\
 \
 	LPROP_MAP2(FactionPoints, string, uint32,\
@@ -418,6 +418,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	LPROP(string, _SDBPvPPath, if (!_SDBPvPPath.empty()))\
 	PROP(uint32,_GuildId)\
 	PROP(uint8, _CreationPointsRepartition)\
+	PROP_GAME_CYCLE_COMP(_ForbidAuraUseStartDate)\
 	PROP_GAME_CYCLE_COMP(_ForbidAuraUseEndDate)\
 	PROP2(_Title, string, CHARACTER_TITLE::toString(getTitle()), setTitle(CHARACTER_TITLE::toCharacterTitle(val)))\
 \
@@ -465,7 +466,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP_VECT(CEntityId,_IsIgnoredBy)\
 \
 	STRUCT(_MemorizedPhrases)\
-	STRUCT2(_ForbidPowerEndDates, _ForbidPowerEndDates.store(pdr), _ForbidPowerEndDates.apply(pdr))\
+	STRUCT2(_ForbidPowerDates, _ForbidPowerDates.store(pdr), _ForbidPowerDates.apply(pdr))\
 	STRUCT2(_IneffectiveAuras, _IneffectiveAuras.store(pdr), _IneffectiveAuras.apply(pdr))\
 	STRUCT2(_ConsumableOverdoseEndDates, _ConsumableOverdoseEndDates.store(pdr), _ConsumableOverdoseEndDates.apply(pdr))\
 	STRUCT(_ModifiersInDB)\
@@ -503,6 +504,12 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 		SCORES::toString((SCORES::TScores)i),\
 		_ScorePermanentModifiers[i],\
 		SCORES::TScores k=SCORES::toScore(key); if (k!=SCORES::unknown) _ScorePermanentModifiers[k]=val)\
+\
+	LPROP_MAP2(StartingCharacteristicValues,string,uint8,\
+		for(uint32 i=0;i<CHARACTERISTICS::NUM_CHARACTERISTICS;++i),\
+		CHARACTERISTICS::toString((CHARACTERISTICS::TCharacteristics)i),\
+		_StartingCharacteristicValues[i],\
+		CHARACTERISTICS::TCharacteristics k=CHARACTERISTICS::toCharacteristic(key); if (k!=CHARACTERISTICS::Unknown) _StartingCharacteristicValues[k]=val)\
 \
 	PROP(uint32, _FirstConnectedTime)\
 	PROP(uint32, _LastConnectedTime)\
@@ -716,7 +723,8 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 #define PERSISTENT_CLASS CPowerActivationDate
 
 #define PERSISTENT_DATA\
-	LPROP2(ActivationDate, NLMISC::TGameCycle,  if(ActivationDate >= CTickEventHandler::getGameCycle()), ActivationDate - CTickEventHandler::getGameCycle(), ActivationDate = val)\
+	PROP2(DeactivationDate, NLMISC::TGameCycle, CTickEventHandler::getGameCycle() - DeactivationDate, DeactivationDate = val)\
+	PROP2(ActivationDate, NLMISC::TGameCycle, ActivationDate - CTickEventHandler::getGameCycle(), ActivationDate = val)\
 	PROP(uint16, ConsumableFamilyId)\
 	PROP2(PowerType,string,POWERS::toString(PowerType),PowerType=POWERS::toPowerType(val))\
 

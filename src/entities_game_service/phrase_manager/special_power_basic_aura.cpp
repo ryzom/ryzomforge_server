@@ -44,7 +44,7 @@ void CSpecialPowerBasicAura::apply()
 	}
 
 	// disable auras
-	actor->setForbidAuraUseEndDate(CTickEventHandler::getGameCycle() + _DisablePowerTime);
+	actor->setForbidAuraUseDates(CTickEventHandler::getGameCycle(), CTickEventHandler::getGameCycle() + _DisablePowerTime);
 
 	const TGameCycle endDate = _Duration + CTickEventHandler::getGameCycle();
 

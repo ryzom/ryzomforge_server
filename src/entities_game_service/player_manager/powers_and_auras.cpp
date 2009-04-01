@@ -13,6 +13,7 @@
 //-----------------------------------------------------------------------------
 void CPowerActivationDate::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
 {
+	f.serial( DeactivationDate );
 	f.serial( ActivationDate );
 	if (f.isReading())
 	{
@@ -140,6 +141,7 @@ void CPowerActivationDateVector::activate()
 	
 	while (it != PowerActivationDates.end())
 	{
+		(*it).DeactivationDate = time - (*it).DeactivationDate; // the value saved is time length since deactivation, here we transform length into a date
 		(*it).ActivationDate += time;
 		++it;
 	}
@@ -158,9 +160,9 @@ void CAuraActivationDateVector::clear()
 }
 
 //-----------------------------------------------------------------------------
-void CAuraActivationDateVector::disableAura(POWERS::TPowerType type, NLMISC::TGameCycle date, const NLMISC::CEntityId &userId)
+void CAuraActivationDateVector::disableAura(POWERS::TPowerType type, NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate, const NLMISC::CEntityId &userId)
 {
-	_AuraActivationDates.push_back( CPowerActivationDate(type,(uint16)~0,date) );
+	_AuraActivationDates.push_back( CPowerActivationDate(type,(uint16)~0, startDate, endDate) );
 	_AuraUsers.push_back(userId);
 }
 

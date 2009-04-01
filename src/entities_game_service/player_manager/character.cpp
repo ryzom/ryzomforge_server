@@ -199,7 +199,6 @@ CVariable<bool>				ForceQuarteringRight("egs","ForceQuarteringRight", "Allow any
 CVariable<bool>				AllowAnimalInventoryAccessFromAnyStable("egs", "AllowAnimalInventoryAccessFromAnyStable", "If true a player can access to his animal inventory (if the animal is inside a stable) from any stable over the world", true, 0, true );
 CVariable<uint32>			FreeTrialSkillLimit("egs", "FreeTrialSkillLimit", "Level limit for characters belonging to free trial accounts", 19,0,true);
 CVariable<uint32>			CraftFailureProbaMpLost("egs", "CraftFailureProbaMpLost", "Probabilité de destruction de chaque MP en cas d'echec du craft", 50,0,true);
-CVariable<uint32>			StartCharacteristicsValue("egs", "StartCharacteristicsValue", "Valeur de départ des characteristique à la create perso", 10,0,true);
 
 
 // Number of login stats keeped for a character
@@ -471,14 +470,30 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_TeamId= CTEAM::InvalidTeamId;
 
 	// init combat flags
-	_ActiveCombatEventFlags = 0;
-	_OldCombatEventFlags = 0;
+	_CombatEventFlagTicks.resize(32);
+	for( uint i=0; i<32; ++i )
+	{
+		_CombatEventFlagTicks[i].StartTick = 0;
+		_CombatEventFlagTicks[i].EndTick = 0;
+		_CombatEventFlagTicks[i].OldStartTick = 0;
+		_CombatEventFlagTicks[i].OldEndTick = 0;
+	}
 
-	// power flags
-	_UsablePowerFlags = 0xffffffff;
-	_OldUsablePowerFlags = 0xffffffff;
+	// init power and aura flags
+	_ForbidAuraUseStartDate = 0;
 	_ForbidAuraUseEndDate = 0;
+	_PowerFlagTicks.resize(32);
+	for( uint i=0; i<32; ++i )
+	{
+		_PowerFlagTicks[i].StartTick = 0;
+		_PowerFlagTicks[i].EndTick = 0;
+		_PowerFlagTicks[i].OldStartTick = 0;
+		_PowerFlagTicks[i].OldEndTick = 0;
+	}
 	
+	// resize charac vector
+	_StartingCharacteristicValues.resize(CHARACTERISTICS::NUM_CHARACTERISTICS);
+
 	_NbAuras = 0;	
 	
 	_WearEquipmentMalus = 0.0f;
@@ -634,6 +649,7 @@ void CCharacter::clear()
 	_Money=0;
 	_GuildId=0;
 	_CreationPointsRepartition=0;
+	_ForbidAuraUseStartDate=0;
 	_ForbidAuraUseEndDate=0;
 	_Title= CHARACTER_TITLE::Refugee;
 
@@ -669,7 +685,7 @@ void CCharacter::clear()
 	_IsIgnoredBy.clear();
 
 	_MemorizedPhrases.clear();
-	_ForbidPowerEndDates.clear();
+	_ForbidPowerDates.clear();
 	_IneffectiveAuras.clear();
 	_ConsumableOverdoseEndDates.clear();
 	_ModifiersInDB.clear();
@@ -688,6 +704,14 @@ void CCharacter::clear()
 	for(uint32 i=0;i<EGSPD::CSPType::EndSPType;++i)
 		_SpType[i]=0.0;
 
+	sint32 startingCharacteristicValuesSize= _StartingCharacteristicValues.size();
+	_StartingCharacteristicValues.clear();
+	_StartingCharacteristicValues.resize(startingCharacteristicValuesSize);
+
+//	for(uint32 i=0;i<INVENTORIES::NUM_INVENTORY;++i)
+//		if (_Inventory[i]!=NULL)
+//			_Inventory[i].deleteItem();
+	
 	for(uint32 i=0;i<INVENTORIES::NUM_INVENTORY;++i)
 		_Inventory[i]->clearInventory();
 
@@ -1447,7 +1471,7 @@ void CCharacter::kill(TDataSetRow killerRowId)
 	_Mode = MBEHAV::DEATH;
 
 	removeAllSpells();
-	_ForbidPowerEndDates.clearConsumable();
+	_ForbidPowerDates.clearConsumable();
 
 	_PhysScores._PhysicalScores[SCORES::hit_points].Current = -_PhysScores._PhysicalScores[SCORES::hit_points].Max / 2;
 	setBars();	
@@ -1855,7 +1879,7 @@ void CCharacter::displayPowerFlags()
 	for (uint i = 0 ; i < 32 ; ++i)
 	{
 		BRICK_FLAGS::TBrickFlag flag = (BRICK_FLAGS::TBrickFlag) (BRICK_FLAGS::BeginPowerFlags + i);
-		nldebug("Power %s, flag = %u", BRICK_FLAGS::toString(flag).c_str(), (_UsablePowerFlags & (uint32(1)<<i))>>i);
+		nldebug("Power %s, flag = %u startTick = %u endTick = %u", BRICK_FLAGS::toString(flag).c_str(), i, _PowerFlagTicks[i].StartTick, _PowerFlagTicks[i].EndTick);
 	}
 }
 
@@ -2797,11 +2821,14 @@ void CCharacter::postLoadTreatment()
 	{
 	H_AUTO(UpdateFlagForActiveEffect);
 	/* update flags for active effects */
-	_ForbidPowerEndDates.writeUsablePowerFlags(_UsablePowerFlags);
-	if ( _ForbidAuraUseEndDate > CTickEventHandler::getGameCycle())
-		_UsablePowerFlags ^= ( (uint32(1)) << (uint32(BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags)) );
+	if( _ForbidAuraUseEndDate>0 && _ForbidAuraUseStartDate==0 )
+	{
+		// thus timer won't look like infinte on client(can happen due to old save file where startDate didn't exist)
+		_ForbidAuraUseStartDate = CTickEventHandler::getGameCycle();
+	}
+	setPowerFlagDates();
+	setAuraFlagDates();
 	updateBrickFlagsDBEntry();
-
 	_ModifiersInDB.writeInDatabase(_PropertyDatabase);
 	}
 
@@ -3907,7 +3934,8 @@ void CCharacter::initDatabase()
 	CBankAccessor_PLR::getINTERFACES().setFLAGS(_PropertyDatabase, 0);
 
 	// combat flags
-	_ForbidPowerEndDates.writeUsablePowerFlags(_UsablePowerFlags);
+	//_ForbidPowerDates.writeUsablePowerFlags(_UsablePowerFlags);
+	setPowerFlagDates();
 	updateBrickFlagsDBEntry();
 
 	// defense interface
@@ -7554,13 +7582,16 @@ void CCharacter::setStartStatistics( const CCreateCharMsg& createCharMsg )
 	for( i = 0; i < CHARACTERISTICS::NUM_CHARACTERISTICS; ++i )
 	{
 		// at level 1 for formula dependency with regenerate value
-		_PhysCharacs._PhysicalCharacteristics[ i ].Base = StartCharacteristicsValue;
+		_PhysCharacs._PhysicalCharacteristics[ i ].Base = 10;
 		_PhysCharacs._PhysicalCharacteristics[ i ].Modifier = 0;
 
 		_PhysCharacs._PhysicalCharacteristics[ i ].RegenerateModifier = 0;
 		
 		_PhysCharacs._PhysicalCharacteristics[ i ].Max = _PhysCharacs._PhysicalCharacteristics[ i ].Base;
 		_PhysCharacs._PhysicalCharacteristics[ i ].Current = _PhysCharacs._PhysicalCharacteristics[ i ].Base;
+
+		// Keep starting value
+		_StartingCharacteristicValues[i] = (uint8)_PhysCharacs._PhysicalCharacteristics[ i ].Base;
 	}
 
 	// set root skills of skill tree to 1
@@ -8466,7 +8497,7 @@ void CCharacter::setDatabase()
 	// activate effects active on character
 	_PersistentEffects.activate();
 	// activate forbid power end date, infective aura end date and consumable overdose timer
-	_ForbidPowerEndDates.activate();
+	_ForbidPowerDates.activate();
 	_IneffectiveAuras.activate();
 	_ConsumableOverdoseEndDates.activate();
 	// init the RRPs
@@ -13502,26 +13533,85 @@ void CCharacter::protectedSlot( SLOT_EQUIPMENT::TSlotEquipment slot)
 //-----------------------------------------------
 void CCharacter::updateCombatEventFlags()
 {
-	// as players do not spend all their time fighting, _ActiveCombatEventFlags is often = 0
-	if (_ActiveCombatEventFlags == 0)
-		return;
-	
 	const TGameCycle date = CTickEventHandler::getGameCycle();
 	for (uint i = 0 ; i < BRICK_FLAGS::NbCombatFlags ; ++i)
 	{
-		if ( (_ActiveCombatEventFlags & (1<<i)) && (_CombatEventResetDate[i] <= date) )
+		if( _CombatEventFlagTicks[i].EndTick <= date )
 		{
-			_ActiveCombatEventFlags ^= (1<<i);
+			_CombatEventFlagTicks[i].StartTick = 0;
+			_CombatEventFlagTicks[i].EndTick = 0;
 		}
 	}
-
+	
 	// update database if flags have changed
-	if (_OldCombatEventFlags != _ActiveCombatEventFlags)
+	bool updateDB = false;
+	for (uint i = 0 ; i < BRICK_FLAGS::NbCombatFlags ; ++i )
 	{
-		_OldCombatEventFlags = _ActiveCombatEventFlags;
+		if( _CombatEventFlagTicks[i].OldEndTick != _CombatEventFlagTicks[i].EndTick )
+		{
+			updateDB = true;
+			_CombatEventFlagTicks[i].OldStartTick = _CombatEventFlagTicks[i].StartTick;
+			_CombatEventFlagTicks[i].OldEndTick = _CombatEventFlagTicks[i].EndTick;
+		}
+	}
+	if( updateDB )
+	{
 		updateBrickFlagsDBEntry();
 	}
 } // updateCombatEventFlags //
+
+
+//-----------------------------------------------
+// setPowerFlagDates
+//-----------------------------------------------
+void CCharacter::setPowerFlagDates()
+{
+	const NLMISC::TGameCycle time = CTickEventHandler::getGameCycle();
+	
+	// powers
+	std::vector <CPowerActivationDate>::iterator it = _ForbidPowerDates.PowerActivationDates.begin();
+	while (it != _ForbidPowerDates.PowerActivationDates.end())
+	{
+		uint32 flag = BRICK_FLAGS::powerTypeToFlag((*it).PowerType) - BRICK_FLAGS::BeginPowerFlags;
+
+		if ( (*it).ActivationDate <= time && _ForbidPowerDates.doNotClear == false )
+		{
+			// erase returns an iterator that designates the first element remaining beyond any elements removed, or end() if no such element exists.
+			it = _ForbidPowerDates.PowerActivationDates.erase(it);
+			_PowerFlagTicks[flag].StartTick = 0;
+			_PowerFlagTicks[flag].EndTick = 0;
+		}
+		else
+		{
+			_PowerFlagTicks[flag].StartTick = (*it).DeactivationDate;
+			_PowerFlagTicks[flag].EndTick = (*it).ActivationDate;
+			++it;
+		}
+	}
+	
+} // setPowerFlagDates //
+
+
+//-----------------------------------------------
+// setAuraFlagDates
+//-----------------------------------------------
+void CCharacter::setAuraFlagDates()
+{
+	const NLMISC::TGameCycle time = CTickEventHandler::getGameCycle();
+	
+	uint32 flag = BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags;
+	if ( _ForbidAuraUseEndDate > time )
+	{
+		_PowerFlagTicks[flag].StartTick = _ForbidAuraUseStartDate;
+		_PowerFlagTicks[flag].EndTick = _ForbidAuraUseEndDate;		
+	}
+	else
+	{
+		_PowerFlagTicks[flag].StartTick = 0;
+		_PowerFlagTicks[flag].EndTick = 0;
+	}
+	
+} // setAuraFlagDates //
 
 
 //-----------------------------------------------
@@ -13529,24 +13619,28 @@ void CCharacter::updateCombatEventFlags()
 //-----------------------------------------------
 void CCharacter::updatePowerAndAuraFlags()
 {
-	// only refesh when auras or powers are disabled
-	if (_UsablePowerFlags == 0xffffffff)
-		return;
-	
-	// check power
-	_ForbidPowerEndDates.writeUsablePowerFlags(_UsablePowerFlags);
+	// set powers flags
+	setPowerFlagDates();
 
-	// check aura
-	if ( _ForbidAuraUseEndDate >  CTickEventHandler::getGameCycle() )
-	{
-		_UsablePowerFlags ^= (1<<31);
-	}
+	// set aura flag
+	setAuraFlagDates();
 	
-	if ( _OldUsablePowerFlags != _UsablePowerFlags )
+	// update database if flags have changed
+	bool updateDB = false;
+	for (uint i = 0 ; i < 32 ; ++i )
 	{
-		_OldUsablePowerFlags = _UsablePowerFlags;
+		if( _PowerFlagTicks[i].EndTick != _PowerFlagTicks[i].OldEndTick )
+		{
+			updateDB = true;
+			_PowerFlagTicks[i].OldStartTick = _PowerFlagTicks[i].StartTick;
+			_PowerFlagTicks[i].OldEndTick = _PowerFlagTicks[i].EndTick;
+		}
+	}
+	if( updateDB )
+	{
 		updateBrickFlagsDBEntry();
-	}	
+	}
+
 } // updatePowerAndAuraFlags //
 
 
@@ -15722,7 +15816,7 @@ void CCharacter::checkCharacAndScoresValues()
 	for ( sint charac = 0 ; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS ; ++charac)
 	{
 		// compute theorical value
-		tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+		tvalue = _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
 		// compare
 		if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
@@ -18474,19 +18568,24 @@ void CCharacter::dateOfNextAllowedAction(NLMISC::TGameCycle date)
 
 //------------------------------------------------------------------------------
 
-void CCharacter::setForbidAuraUseEndDate(NLMISC::TGameCycle endDate)
+void CCharacter::setForbidAuraUseDates(NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate)
 { 
-	_ForbidAuraUseEndDate = endDate; 
-	_UsablePowerFlags ^= (1 << (BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags) );
+	_ForbidAuraUseStartDate = startDate;
+	_ForbidAuraUseEndDate = endDate;
+
+	uint32 flag = BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags;
+	_PowerFlagTicks[flag].StartTick = startDate;
+	_PowerFlagTicks[flag].EndTick = endDate;
+
 	updateBrickFlagsDBEntry();
 }
 
 
 //------------------------------------------------------------------------------
 
-void CCharacter::useAura(POWERS::TPowerType auraType, NLMISC::TGameCycle date, const NLMISC::CEntityId &userId)
+void CCharacter::useAura(POWERS::TPowerType auraType, NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate, const NLMISC::CEntityId &userId)
 {
-	_IneffectiveAuras.disableAura( auraType, date, userId );
+	_IneffectiveAuras.disableAura( auraType, startDate, endDate, userId );
 }
 
 
@@ -18502,22 +18601,26 @@ bool CCharacter::isAuraEffective(POWERS::TPowerType auraType, NLMISC::TGameCycle
 
 bool CCharacter::canUsePower(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle &endDate)
 {
-	return _ForbidPowerEndDates.isPowerAllowed(type, consumableFamilyId, endDate);
+	return _ForbidPowerDates.isPowerAllowed(type, consumableFamilyId, endDate);
 }
 
 
 //------------------------------------------------------------------------------
 
-void CCharacter::forbidPower(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle date)
+void CCharacter::forbidPower(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle endDate)
 {
-	if (date <= CTickEventHandler::getGameCycle())
+	TGameCycle startDate = CTickEventHandler::getGameCycle();
+
+	if (endDate <= startDate)
 		return;
 #if !FINAL_VERSION
 	nlassert(type >=0 && type < POWERS::NbTypes);
 #endif
-	_ForbidPowerEndDates.PowerActivationDates.push_back( CPowerActivationDate(type, consumableFamilyId, date) );
+	_ForbidPowerDates.PowerActivationDates.push_back( CPowerActivationDate(type, consumableFamilyId, startDate, endDate) );
 	
-	_UsablePowerFlags &= ~(1 << (BRICK_FLAGS::powerTypeToFlag(type) - BRICK_FLAGS::BeginPowerFlags) );
+	uint flag = BRICK_FLAGS::powerTypeToFlag(type) - BRICK_FLAGS::BeginPowerFlags;
+	_PowerFlagTicks[flag].StartTick = startDate;
+	_PowerFlagTicks[flag].EndTick = endDate;
 	updateBrickFlagsDBEntry();
 }
 
@@ -18526,10 +18629,15 @@ void CCharacter::forbidPower(POWERS::TPowerType type, uint16 consumableFamilyId,
 
 void CCharacter::resetPowerFlags()
 {
-	_ForbidPowerEndDates.clear();
+	_ForbidPowerDates.clear();
 	_IneffectiveAuras.clear();
+	_ForbidAuraUseStartDate = 0;
 	_ForbidAuraUseEndDate = 0;
-	_UsablePowerFlags = 0xffffffff;
+	for( uint i=0; i<32; ++i )
+	{
+		_PowerFlagTicks[i].StartTick = 0;
+		_PowerFlagTicks[i].EndTick = 0;
+	}
 	_ConsumableOverdoseEndDates.clear();
 	updateBrickFlagsDBEntry();
 }
@@ -18542,8 +18650,9 @@ void CCharacter::resetCombatEventFlag(BRICK_FLAGS::TBrickFlag flag)
 	BOMB_IF( (BRICK_FLAGS::NbCombatFlags > 32), "BRICK_FLAGS::NbCombatFlags should be less than 32", return );
 	BOMB_IF( (flag < 0 || flag >= BRICK_FLAGS::NbCombatFlags), "Invalid brick flag!", return );
 
-	_ActiveCombatEventFlags ^= (1<< (uint)flag);
-	_CombatEventResetDate[uint(flag)] = 0;
+	_CombatEventFlagTicks[flag].StartTick = 0;
+	_CombatEventFlagTicks[flag].EndTick = 0;
+//	_CombatEventResetDate[uint(flag)] = 0;
 }
 
 
@@ -18554,8 +18663,10 @@ void CCharacter::setCombatEventFlag(BRICK_FLAGS::TBrickFlag flag)
 	BOMB_IF( (BRICK_FLAGS::NbCombatFlags > 32), "BRICK_FLAGS::NbCombatFlags should be less than 32", return );
 	BOMB_IF( (flag < 0 || flag >= BRICK_FLAGS::NbCombatFlags), "Invalid brick flag!", return );
 
-	_ActiveCombatEventFlags |= (1<< (uint)flag);
-	_CombatEventResetDate[uint(flag)] = CTickEventHandler::getGameCycle() + CombatFlagLifetime;
+//	_CombatEventResetDate[uint(flag)] = CTickEventHandler::getGameCycle() + CombatFlagLifetime;
+
+	_CombatEventFlagTicks[flag].StartTick = CTickEventHandler::getGameCycle();
+	_CombatEventFlagTicks[flag].EndTick = _CombatEventFlagTicks[flag].StartTick + CombatFlagLifetime;
 }
 
 
@@ -18563,7 +18674,12 @@ void CCharacter::setCombatEventFlag(BRICK_FLAGS::TBrickFlag flag)
 
 void CCharacter::resetCombatEventFlags()
 {
-	_ActiveCombatEventFlags = 0;
+	// reset ticks for each combat flags then update DB
+	for( uint i=0; i<BRICK_FLAGS::NbCombatFlags; ++i )
+	{
+		_CombatEventFlagTicks[i].StartTick = 0;
+		_CombatEventFlagTicks[i].EndTick = 0;
+	}
 	updateBrickFlagsDBEntry();
 }
 
@@ -18572,9 +18688,17 @@ void CCharacter::resetCombatEventFlags()
 
 void CCharacter::updateBrickFlagsDBEntry()
 {
-	const uint64 flags = (uint64(_UsablePowerFlags)<<32) + _ActiveCombatEventFlags;
-//	_PropertyDatabase.setProp("FLAGS:BRICK_FLAGS", flags);
-	CBankAccessor_PLR::getFLAGS().setBRICK_FLAGS(_PropertyDatabase, flags);
+	// combat event flags
+	for( uint i=0; i<32; ++i )
+	{
+		CBankAccessor_PLR::getFLAGS().getBRICK_TICK_RANGE().getArray(i).setTICK_RANGE(_PropertyDatabase, (uint64(_CombatEventFlagTicks[i].EndTick)<<32) + _CombatEventFlagTicks[i].StartTick);
+	}
+
+	// powers + aura flags
+	for( uint i=0; i<32; ++i )
+	{
+		CBankAccessor_PLR::getFLAGS().getBRICK_TICK_RANGE().getArray(i+32).setTICK_RANGE(_PropertyDatabase, (uint64(_PowerFlagTicks[i].EndTick)<<32) + _PowerFlagTicks[i].StartTick);
+	}
 }
 
 

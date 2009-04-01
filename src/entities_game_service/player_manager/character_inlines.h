@@ -577,9 +577,23 @@ inline uint8 CCharacter::nbAuras() const
 
 //------------------------------------------------------------------------------
 
-inline uint32 CCharacter::getCombatEventFlags() const
+//inline uint32 CCharacter::getCombatEventFlags() const
+//{
+//	return _ActiveCombatEventFlags;
+//}
+
+//------------------------------------------------------------------------------
+inline bool CCharacter::isCombatEventFlagActive(BRICK_FLAGS::TBrickFlag flag) const
 {
-	return _ActiveCombatEventFlags;
+	if( flag < 32 )
+	{
+		return (_CombatEventFlagTicks[flag].EndTick != 0);
+	}
+	else
+	{
+		nlwarning("<CCharacter::isCombatEventFlagActive> flag %d is not a combat event, it should be <32",flag);
+		return false;
+	}
 }
 
 //------------------------------------------------------------------------------

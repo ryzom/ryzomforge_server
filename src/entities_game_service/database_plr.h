@@ -1129,14 +1129,85 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	{	
 	public:
 		
+	class TBRICK_TICK_RANGE
+	{	
+	public:
+		
+	class TArray
+	{	
+	public:
+		
 
 	private:
 		ICDBStructNode	*_BranchNode;
 
-		ICDBStructNode	*_BRICK_FLAGS;
+		ICDBStructNode	*_TICK_RANGE;
+		
+
+	public:
+		void init(ICDBStructNode *parent, uint index);
+
+		// accessor to branch node
+		ICDBStructNode *getCDBNode()
+		{
+			return _BranchNode;
+		}
+
+		
+		void setTICK_RANGE(CCDBSynchronised &dbGroup, uint64 value, bool forceSending = false)
+		{
+			
+
+			_setProp(dbGroup, _TICK_RANGE, value, forceSending);
+		}
+
+		uint64 getTICK_RANGE(const CCDBSynchronised &dbGroup)
+		{
+			uint64 value;
+			_getProp(dbGroup, _TICK_RANGE, value);
+
+			return value;
+		}
+		
+		ICDBStructNode *getTICK_RANGECDBNode()
+		{
+			return _TICK_RANGE;
+		}
+	
+	};
+		
+
+	private:
+		ICDBStructNode	*_BranchNode;
+
+		TArray _Array[64];
+		
+
+	public:
+		void init(ICDBStructNode *parent);
+
+		// accessor to branch node
+		ICDBStructNode *getCDBNode()
+		{
+			return _BranchNode;
+		}
+
+		TArray &getArray(uint32 index)
+		{
+			nlassert(index < 64);
+			return _Array[index];
+		}
+		
+	};
+		
+
+	private:
+		ICDBStructNode	*_BranchNode;
+
 		ICDBStructNode	*_CRITICAL;
 		ICDBStructNode	*_PARRY;
 		ICDBStructNode	*_DODGE;
+		TBRICK_TICK_RANGE	_BRICK_TICK_RANGE;
 		
 
 	public:
@@ -1149,26 +1220,6 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		}
 
 		
-		void setBRICK_FLAGS(CCDBSynchronised &dbGroup, uint64 value, bool forceSending = false)
-		{
-			
-
-			_setProp(dbGroup, _BRICK_FLAGS, value, forceSending);
-		}
-
-		uint64 getBRICK_FLAGS(const CCDBSynchronised &dbGroup)
-		{
-			uint64 value;
-			_getProp(dbGroup, _BRICK_FLAGS, value);
-
-			return value;
-		}
-		
-		ICDBStructNode *getBRICK_FLAGSCDBNode()
-		{
-			return _BRICK_FLAGS;
-		}
-	
 		void setCRITICAL(CCDBSynchronised &dbGroup, uint8 value, bool forceSending = false)
 		{
 			
@@ -1228,9 +1279,14 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		{
 			return _DODGE;
 		}
-	
+
+		TBRICK_TICK_RANGE &getBRICK_TICK_RANGE()
+		{
+			return _BRICK_TICK_RANGE;
+		}
+
 	};
-		
+	
 	class TTARGET
 	{	
 	public:
