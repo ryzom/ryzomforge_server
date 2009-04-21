@@ -1355,6 +1355,7 @@ void CGameItem::clear()
 
 	_TypeSkillMods.clear();
 	_PhraseId.clear();
+	_CustomText.clear();
 }
 
 void CGameItem::setStackSize(uint32 size)
