@@ -11,27 +11,27 @@
 	 //
 	 // -	la « team » avec le plus de dégâts est la seule a gagner l’xp de la créature
 	 //
-	 // -	Tout joueur membre d’une team ayant fait une action ‘de combat’ a moins de X mètres de la créature tuée par son groupe gagne sa part 
-	 // d’Xp, qu’il soit ou non dans l’aggro list de la créature. L’Xp est réparti équitablement entre les joueurs éligibles. 
-	 // Chaque créature a une valeur d’XP fixe renseignée dans sa fiche. Cette valeur est multipliée par le facteur d’Xp obtenu par l’écart 
-	 // de niveau entre la créature (XpLevel) et la plus forte skill utilisée par n’importe quel membre du groupe (magie ou combat, soins compris). 
+	 // -	Tout joueur membre d’une team ayant fait une action ‘de combat’ a moins de X mètres de la créature tuée par son groupe gagne sa part
+	 // d’Xp, qu’il soit ou non dans l’aggro list de la créature. L’Xp est réparti équitablement entre les joueurs éligibles.
+	 // Chaque créature a une valeur d’XP fixe renseignée dans sa fiche. Cette valeur est multipliée par le facteur d’Xp obtenu par l’écart
+	 // de niveau entre la créature (XpLevel) et la plus forte skill utilisée par n’importe quel membre du groupe (magie ou combat, soins compris).
 	 // Chaque team a un « poids » égal a 1 + 0.8 par membre au délà de 1 (cette valeur de 0.8 est réglable dans le cfg de l’egs)
 	 // Une fois le total d’Xp calculé on divise par le « poids » de la team et on donne a chacun sa part.
 	 //
-	 //  NB : Si un joueur éligible se trouve a plus de Y mètres de la créature ET qu’il n’est plus dans l’aggro list au moment de la mort de 
-	 //	 celle-ci il ne gagne pas sa part mais il compte dans la division !! 
-	 //	 
+	 //  NB : Si un joueur éligible se trouve a plus de Y mètres de la créature ET qu’il n’est plus dans l’aggro list au moment de la mort de
+	 //	 celle-ci il ne gagne pas sa part mais il compte dans la division !!
+	 //
 	 //	 -	Si un joueur rejoint une team il ‘fusionne’ ses dégâts avec celle-ci.
-	 //	 
-	 //	 -	Si un joueur quitte une team il ‘emmène’ une partie des dégâts sur chaque créature pour laquelle il aurait pu gagner de l’XP. 
+	 //
+	 //	 -	Si un joueur quitte une team il ‘emmène’ une partie des dégâts sur chaque créature pour laquelle il aurait pu gagner de l’XP.
 	 //	 Cette partie est tout simplement le total des dégâts de la team divisé par le nb de membres avant son départ.
-	 //	 
+	 //
 	 //	 -	Si tous les membres de la team sortent de l’aggro list d’une créature leurs degats sur celle-ci sont transférés sur le compte d'une
 	 //	 créature fictive. Par exemple on a 2 joueurs sans team, l’un fait 99% des degats et meurt et respawn, ses 99% sont transférés à une
 	 //	 créature fictive. Le 2ème joueur achève la créature, il a fait 1% des degats, la créature fictive a fait le plus de dégats et donc aucun
 	 //	 joueur réel ne gagne d’XP.
-	 //	 
-	 //	 - ATTENTION : les gardes et autres npcs sont aussi comptabilisés pour leur degats, et n’ont pas de ‘range’ de validité (par contre 
+	 //
+	 //	 - ATTENTION : les gardes et autres npcs sont aussi comptabilisés pour leur degats, et n’ont pas de ‘range’ de validité (par contre
 	 //	 ils doivent etre ds l’aggro liste ??). Ce qui veut dire que si une créature est gravement blessée par un garde le joueur qui l’achève
 	 //	 ne gagne rien.
 	 //
@@ -132,7 +132,7 @@ void CCharacterProgressionPVE::actionReport( TReportAction& reportAction, bool i
 		return;
 	}
 	CEntityBase * target = CEntityBaseManager::getEntityBasePtr( reportAction.TargetRowId );
-	
+
 	// memorize damage
 	if (target && reportAction.Hp > 0)
 	{
@@ -178,7 +178,7 @@ void CCharacterProgressionPVE::actionReport( TReportAction& reportAction, bool i
 					}
 
 					list<TDataSetRow> enabledCreatures;
-					
+
 					if (useSkillForDeltaLevel)
 					{
 						// if no damage reported yet, report it now to add target creature as team ennemy
@@ -216,7 +216,7 @@ void CCharacterProgressionPVE::actionReport( TReportAction& reportAction, bool i
 					{
 						if (*it == reportAction.TargetRowId)
 							continue;
-						
+
 						CEntityBase *creature = CreatureManager.getCreature(*it);
 						if (creature)
 						{
@@ -233,7 +233,7 @@ void CCharacterProgressionPVE::actionReport( TReportAction& reportAction, bool i
 			if( target )
 			{
 				curativeActionReported( reportAction, actor, target, incActionCounter );
-				// no longer need following 
+				// no longer need following
 				/*if ( actor->getId().getType() == RYZOMID::player)
 				{
 					CCharacter *playerChar = dynamic_cast<CCharacter*> (actor);
@@ -242,7 +242,7 @@ void CCharacterProgressionPVE::actionReport( TReportAction& reportAction, bool i
 						nlwarning("Entity %s type is player but dynamic_cast in CCharacter * returns NULL ?!", actor->getId().toString().c_str());
 						return;
 					}
-					
+
 					list<TDataSetRow> enabledCreatures;
 					enableXpGainForPlayer(actor->getId(), (uint16)playerChar->getSkillBaseValue(reportAction.Skill), enabledCreatures);
 					for (list<TDataSetRow>::iterator it = enabledCreatures.begin() ; it != enabledCreatures.end() ; ++it)
@@ -316,7 +316,7 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 	// get most effective team or single player
 	const sint16 index = creatureTakenDmg.getMaxInflictedDamageTeamIndex();
 
-	// max damage have been done by players 
+	// max damage have been done by players
 	if (index != -1)
 	{
 		CCreature *creaturePtr = CreatureManager.getCreature(creature);
@@ -486,7 +486,7 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 				}
 			}
 		}
-		
+
 		CCreature *creaturePtr = CreatureManager.getCreature(creature);
 		if (creaturePtr)
 		{
@@ -510,7 +510,7 @@ double CCharacterProgressionPVE::getProgressionFactor( CEntityBase * actor, sint
 		CSheetId sheet("skills.skill_tree");
 		const CStaticSkillsTree * SkillsTree = CSheets::getSkillsTreeForm( sheet );
 		nlassert( SkillsTree );
-		
+
 		if( skill == SKILLS::unknown )
 		{
 			nlwarning("<PROGRESSION>%s invalid skill. table type = '%s'",actor->getId().toString().c_str(),SUCCESS_TABLE_TYPE::toString(tableType).c_str() );
@@ -519,7 +519,7 @@ double CCharacterProgressionPVE::getProgressionFactor( CEntityBase * actor, sint
 
 		// calculate the xp points gain
 		double XpGain = 0;
-		
+
 		// Found compatible unlocked skill
 		sint32 skillval = 0;
 		sint skillValue = 0;
@@ -539,7 +539,7 @@ double CCharacterProgressionPVE::getProgressionFactor( CEntityBase * actor, sint
 			{
 				nlwarning( "<MAGIC>invalid creature form %s in entity %s", actor->getType().toString().c_str(), actor->getId().toString().c_str() );
 				return 0.0;
-			}	
+			}
 			skillValue = form->getAttackLevel() + 10;
 		}
 		// Delta level with player skill factor multiplier
@@ -550,7 +550,7 @@ double CCharacterProgressionPVE::getProgressionFactor( CEntityBase * actor, sint
 		}
 		deltaLvl *= (sint32)50 / minimum;
 	}
-	
+
 	return CStaticSuccessTable::getXPGain(tableType, deltaLvl);
 }
 
@@ -644,11 +644,11 @@ void CCharacterProgressionPVE::curativeActionReported( const TReportAction& repo
 	CCharacter * targetedPlayer = dynamic_cast< CCharacter * >( target );
 	if( targetedPlayer == NULL )
 		return;
-	
+
 	CCharacter * actorPlayer = dynamic_cast< CCharacter * >( actor );
 	if( actorPlayer == NULL )
 		return;
-		
+
 	// check actor and target are member or the same team
 	if ( (actor == target) || ( (targetedPlayer->getTeamId() != CTEAM::InvalidTeamId) && (targetedPlayer->getTeamId() == actorPlayer->getTeamId()) ) )
 	{
@@ -682,7 +682,7 @@ void CCharacterProgressionPVE::curativeActionReported( const TReportAction& repo
 				return;
 			}
 		}
-		
+
 		// memorize action for all creatures in combat
 		vector<TDataSetRow> &creatures = (*itTeam).second;
 		for (uint i = 0 ; i < creatures.size() ; ++i)
@@ -691,14 +691,14 @@ void CCharacterProgressionPVE::curativeActionReported( const TReportAction& repo
 			const double distance = PHRASE_UTILITIES::getDistance(actorPlayer->getEntityRowId(), creatures[i]);
 			if (distance > (double)MaxDistanceForXpGain)
 				continue;
-			
+
 			TCreatureTakenDamageContainer::iterator itc = _CreatureTakenDamage.find(creatures[i]);
 			//nlassert(itc != _CreatureTakenDamage.end());
 			BOMB_IF( itc == _CreatureTakenDamage.end(), "team has wounded a creature but creature has no registered damage", return);
 			const sint16 index = (*itc).second.getIndexForTeam(teamId);
 			//nlassert(index >= 0);
 			BOMB_IF( index < 0, "team has wounded a creature but creature has no registered damage from team", return);
-			
+
 			(*itc).second.PlayerInflictedDamage[index].enableXP(actorPlayer->getId(), (uint16)actorPlayer->getSkillBaseValue(reportAction.Skill));
 
 			TCharacterActionsContainer::iterator it = _CharacterActions.find( reportAction.TargetRowId );
@@ -711,7 +711,7 @@ void CCharacterProgressionPVE::curativeActionReported( const TReportAction& repo
 
 				(*itActions).second->addAction( creatures[i], reportAction.Skill, incActionCounter );
 			}
-			
+
 		}
 	}
 }
@@ -892,7 +892,7 @@ void CCharacterProgressionPVE::playerJoinsTeam(const NLMISC::CEntityId &playerId
 			(*itCreature).second.PlayerInflictedDamage[index].TeamId = teamId;
 		}
 
-		_TeamsWoundedCreatures.insert( make_pair(teamId, playerAttackedCreatures) );		
+		_TeamsWoundedCreatures.insert( make_pair(teamId, playerAttackedCreatures) );
 	}
 	else
 	{
@@ -920,7 +920,7 @@ void CCharacterProgressionPVE::playerJoinsTeam(const NLMISC::CEntityId &playerId
 
 					// remove entry for player
 					(*itCreature).second.PlayerInflictedDamage.erase( (*itCreature).second.PlayerInflictedDamage.begin() + indexPlayer );
-					
+
 					found = true;
 				}
 			}
@@ -957,7 +957,7 @@ void CCharacterProgressionPVE::playerLeavesTeam(const NLMISC::CEntityId &playerI
 
 	vector<TDataSetRow> &teamAttackedCreatures = (*itTeam).second;
 	vector<TDataSetRow> playerAttackedCreatures;
-	
+
 	uint8 teamSize;
 
 	for ( uint i = 0 ; i < teamAttackedCreatures.size() ; ++i)
@@ -990,10 +990,13 @@ void CCharacterProgressionPVE::playerLeavesTeam(const NLMISC::CEntityId &playerI
 
 		CTeamDamage damage(playerId);
 		damage.TotalDamage = (*itCreature).second.PlayerInflictedDamage[index].TotalDamage / teamSize;
-		
+
 		(*itCreature).second.PlayerInflictedDamage[index].TotalDamage -= damage.TotalDamage;
 		(*itCreature).second.PlayerInflictedDamage[index].removeMember(playerId);
-		
+
+		// vl: do that to fix the 3k XP exploit when you quit a team after almost kill a mob
+		damage.MaxSkillValue = (*itCreature).second.PlayerInflictedDamage[index].MaxSkillValue;
+
 		// add damage on this creature for removed player
 		(*itCreature).second.PlayerInflictedDamage.push_back(damage);
 	}
@@ -1028,7 +1031,7 @@ void CCharacterProgressionPVE::disbandTeam(uint16 teamId, const list<CEntityId> 
 	{
 		TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(teamAttackedCreatures[i]);
 		BOMB_IF( itCreature == _CreatureTakenDamage.end(), "PROGRESSION_BUG : disband Team,team has damage registered on a creature but creature has no registered damage", return);
-		
+
 		const sint16 index = (*itCreature).second.getIndexForTeam(teamId);
 		BOMB_IF( index < 0, "PROGRESSION_BUG: Player leaves team, team has damage registered on a creature but creature has no registered damage for this team", return);
 
@@ -1048,7 +1051,7 @@ void CCharacterProgressionPVE::disbandTeam(uint16 teamId, const list<CEntityId> 
 	{
 		TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(teamAttackedCreatures[i]);
 		nlassert(itCreature != _CreatureTakenDamage.end());
-		
+
 		const sint16 index = (*itCreature).second.getIndexForTeam(teamId);
 		nlassert(index >= 0);
 
@@ -1059,11 +1062,11 @@ void CCharacterProgressionPVE::disbandTeam(uint16 teamId, const list<CEntityId> 
 		for (uint j = 0 ; j < teamDamage.TeamMembers.size() ; ++j)
 		{
 			if (teamDamage.TeamMembers[j].GainXp)
-			{		
+			{
 				++teamSize;
 			}
 		}
-	
+
 		// compute the part of total damage attributed to each team member
 		const uint32 damage = teamDamage.TotalDamage / teamSize;
 
@@ -1080,7 +1083,7 @@ void CCharacterProgressionPVE::disbandTeam(uint16 teamId, const list<CEntityId> 
 				// add this creature to the player attacked creatures
 			}
 		}
-		
+
 		(*itCreature).second.PlayerInflictedDamage.erase((*itCreature).second.PlayerInflictedDamage.begin()+index);
 	}
 
@@ -1089,7 +1092,7 @@ void CCharacterProgressionPVE::disbandTeam(uint16 teamId, const list<CEntityId> 
 		_PlayersWoundedCreatures.insert( make_pair( (*it), teamAttackedCreatures) );
 	}
 */
-	
+
 }
 
 //----------------------------------------------------------------------------
@@ -1103,24 +1106,24 @@ void CCharacterProgressionPVE::clearPlayerDamage(const NLMISC::CEntityId &player
 		// team has inflicted no damage on a creature yet
 		if (itTeam == _TeamsWoundedCreatures.end())
 			return;
-		
+
 		vector<TDataSetRow> &teamAttackedCreatures = (*itTeam).second;
-		
+
 		// get team
 		const CTeam *team = TeamManager.getTeam(teamId);
 		if (!team)
 			return;
-		
+
 		for ( uint i = 0 ; i < teamAttackedCreatures.size() ; )
 		{
 			TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(teamAttackedCreatures[i]);
 			//nlassert(itCreature != _CreatureTakenDamage.end());
 			BOMB_IF( itCreature == _CreatureTakenDamage.end(), "PROGRESSION_BUG: clear player damage, remfromteam, found attacked creature with no registered damage ", return);
-			
+
 			const sint16 index = (*itCreature).second.getIndexForTeam(teamId);
 			//nlassert(index >= 0);
 			BOMB_IF( index < 0, "PROGRESSION_BUG: clear player damage, remfromteam, found attacked creature with no registered damage for this team", return);
-		
+
 			if (removeDamageFromTeam == true)
 			{
 				uint8 teamSize = (*itCreature).second.PlayerInflictedDamage[index].TeamMembers.size();
@@ -1133,7 +1136,7 @@ void CCharacterProgressionPVE::clearPlayerDamage(const NLMISC::CEntityId &player
 			{
 				(*itCreature).second.PlayerInflictedDamage[index] = (*itCreature).second.PlayerInflictedDamage.back();
 				(*itCreature).second.PlayerInflictedDamage.pop_back();
-				
+
 				teamAttackedCreatures[i] = teamAttackedCreatures.back();
 				teamAttackedCreatures.pop_back();
 				// do not inc i
@@ -1147,23 +1150,23 @@ void CCharacterProgressionPVE::clearPlayerDamage(const NLMISC::CEntityId &player
 	else
 	{
 		TEntityAttackedCreature::iterator itPlayer = _PlayersWoundedCreatures.find(playerId);
-		
+
 		// player has inflicted no damage on a creature yet, so nothing to do
 		if (itPlayer == _PlayersWoundedCreatures.end())
 			return;
-		
+
 		vector<TDataSetRow> &playerAttackedCreatures = (*itPlayer).second;
-		
+
 		for ( uint i = 0 ; i < playerAttackedCreatures.size() ; ++i)
 		{
 			TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(playerAttackedCreatures[i]);
 			//nlassert(itCreature != _CreatureTakenDamage.end());
 			BOMB_IF( itCreature == _CreatureTakenDamage.end(), "PROGRESSION_BUG: clear player damage, found attacked creature with no registered damage ", return);
-				
+
 			const sint16 index = (*itCreature).second.getIndexForPlayer(playerId);
 			//nlassert(index >= 0);
 			BOMB_IF( index < 0, "PROGRESSION_BUG: clear player damage, found attacked creature with no registered damage for this player", return);
-			(*itCreature).second.PlayerInflictedDamage.erase((*itCreature).second.PlayerInflictedDamage.begin() + index);			
+			(*itCreature).second.PlayerInflictedDamage.erase((*itCreature).second.PlayerInflictedDamage.begin() + index);
 		}
 
 		_PlayersWoundedCreatures.erase(itPlayer);
@@ -1177,32 +1180,32 @@ void CCharacterProgressionPVE::clearCreatureInflictedDamage(TDataSetRow creature
 {
 	if (!creature.isValid() || !TheDataset.isDataSetRowStillValid(creature))
 		return;
-	
+
 	const CEntityId creatureId = TheDataset.getEntityId(creature);
 
 	TEntityAttackedCreature::iterator itCreature = _CreaturesWoundedCreatures.find(creatureId);
-	
+
 	// creature has inflicted no damage on a creature yet, so nothing to do
 	if (itCreature == _CreaturesWoundedCreatures.end())
 		return;
-	
+
 	vector<TDataSetRow> &attackedCreatures = (*itCreature).second;
-	
+
 	for ( uint i = 0 ; i < attackedCreatures.size() ; ++i)
 	{
 		TCreatureTakenDamageContainer::iterator itTaken = _CreatureTakenDamage.find(attackedCreatures[i]);
 		BOMB_IF( itTaken == _CreatureTakenDamage.end(), "PROGRESSION_BUG: clear creature inflicted damage, found attacked creature with no registered damage ", return);
 
 		CCreatureTakenDamage &takenDmg = (*itTaken).second;
-			
+
 		const sint16 index = takenDmg.getIndexForCreature(creatureId);
 		BOMB_IF( index < 0, "PROGRESSION_BUG: clear creature inflicted damage, found attacked creature with no registered damage for removed creature", return);
 
 		takenDmg.TotalCreatureInflictedDamage -= takenDmg.CreatureInflictedDamage[index].TotalDamage;
 
-		takenDmg.CreatureInflictedDamage.erase(takenDmg.CreatureInflictedDamage.begin() + index);			
+		takenDmg.CreatureInflictedDamage.erase(takenDmg.CreatureInflictedDamage.begin() + index);
 	}
-	
+
 	_CreaturesWoundedCreatures.erase(itCreature);
 }
 
@@ -1216,7 +1219,7 @@ void CCharacterProgressionPVE::lostAggro(TDataSetRow creature, TDataSetRow playe
 
 	// forget the xp gain
 	forgetXpGain(creature, player);
-	
+
 	CEntityId playerId = TheDataset.getEntityId(player);
 
 	// get creatures wounded by player
@@ -1233,11 +1236,11 @@ void CCharacterProgressionPVE::lostAggro(TDataSetRow creature, TDataSetRow playe
 				TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(creature);
 				//nlassert(itCreature != _CreatureTakenDamage.end());
 				BOMB_IF( itCreature == _CreatureTakenDamage.end(), "PROGRESSION_BUG: player lost aggro, found attacked creature with no registered damage ", return);
-				
+
 				const sint16 index = (*itCreature).second.getIndexForPlayer(playerId);
 				//nlassert(index >= 0);
 				BOMB_IF( index < 0, "PROGRESSION_BUG: player lost aggro, found attacked creature with no registered damage for this player", return);
-				
+
 				playerAttackedCreatures.erase(playerAttackedCreatures.begin() + i);
 			//	(*itCreature).second.PlayerInflictedDamage.erase((*itCreature).second.PlayerInflictedDamage.begin() + index);
 				CCharacter *playerChar = PlayerManager.getChar(playerId);
@@ -1256,7 +1259,7 @@ void CCharacterProgressionPVE::lostAggro(TDataSetRow creature, TDataSetRow playe
 	CCharacter *playerChar = PlayerManager.getChar(playerId);
 	if (!playerChar)
 		return;
-	
+
 	// get player team
 	const uint16 teamId = playerChar->getTeamId();
 	if (teamId == CTEAM::InvalidTeamId)
@@ -1265,7 +1268,7 @@ void CCharacterProgressionPVE::lostAggro(TDataSetRow creature, TDataSetRow playe
 	TTeamsAttackedCreature::iterator itTeam = _TeamsWoundedCreatures.find(teamId);
 	if (itTeam == _TeamsWoundedCreatures.end())
 		return;
-	
+
 	// if team members no longer has aggro with this creature, remove all entries for it
 	if ( !checkAggroForTeam(teamId, creature) )
 	{
@@ -1277,11 +1280,11 @@ void CCharacterProgressionPVE::lostAggro(TDataSetRow creature, TDataSetRow playe
 				TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(teamAttackedCreatures[i]);
 				//nlassert(itCreature != _CreatureTakenDamage.end());
 				BOMB_IF( itCreature == _CreatureTakenDamage.end(), "PROGRESSION_BUG: player lost aggro (is in team), found attacked creature with no registered damage ", return);
-				
+
 				const sint16 index = (*itCreature).second.getIndexForTeam(teamId);
 				//nlassert(index >= 0);
 				BOMB_IF( index < 0, "PROGRESSION_BUG: player lost aggro (is in team), found attacked creature with no registered damage for this team", return);
-				
+
 				teamAttackedCreatures.erase(teamAttackedCreatures.begin() + i);
 			//	(*itCreature).second.PlayerInflictedDamage.erase((*itCreature).second.PlayerInflictedDamage.begin() + index);
 				CCharacter *playerChar = PlayerManager.getChar(playerId);
@@ -1289,9 +1292,9 @@ void CCharacterProgressionPVE::lostAggro(TDataSetRow creature, TDataSetRow playe
 					(*itCreature).second.transferDamageOnFictitiousCreature(playerId, playerChar->getTeamId());
 				else
 					(*itCreature).second.transferDamageOnFictitiousCreature(playerId, CTEAM::InvalidTeamId);
-				
+
 				return;
-			}	
+			}
 		}
 	}
 }
@@ -1321,7 +1324,7 @@ bool CCharacterProgressionPVE::checkAggroForTeam( uint16 teamId, TDataSetRow cre
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -1383,7 +1386,7 @@ void CCharacterProgressionPVE::addDamage(const NLMISC::CEntityId &actorId, const
 			{
 				vector<TDataSetRow> creatures;
 				creatures.push_back(targetRowId);
-				_CreaturesWoundedCreatures.insert(make_pair(actorId, creatures));					
+				_CreaturesWoundedCreatures.insert(make_pair(actorId, creatures));
 			}
 		}
 	}
@@ -1435,7 +1438,7 @@ void CCharacterProgressionPVE::addDamage(const NLMISC::CEntityId &actorId, const
 				CTeamDamage playerDamage(actorId);
 				playerDamage.TotalDamage = (float)damage;
 				takenDmg->PlayerInflictedDamage.push_back(playerDamage);
-				
+
 				TEntityAttackedCreature::iterator itPlayer = _PlayersWoundedCreatures.find(actorId);
 				if (itPlayer != _PlayersWoundedCreatures.end())
 				{
@@ -1445,7 +1448,7 @@ void CCharacterProgressionPVE::addDamage(const NLMISC::CEntityId &actorId, const
 				{
 					vector<TDataSetRow> creatures;
 					creatures.push_back(targetRowId);
-					_PlayersWoundedCreatures.insert(make_pair(actorId, creatures));					
+					_PlayersWoundedCreatures.insert(make_pair(actorId, creatures));
 				}
 			}
 		}
@@ -1462,9 +1465,9 @@ void CCharacterProgressionPVE::enableXpGainForPlayer(const CEntityId &playerId, 
 		return;
 
 	enabledCreatures.clear();
-	
+
 	const uint16 teamId = playerChar->getTeamId();
-	if ( teamId == CTEAM::InvalidTeamId)	
+	if ( teamId == CTEAM::InvalidTeamId)
 	{
 		TEntityAttackedCreature::iterator itPlayer = _PlayersWoundedCreatures.find(playerId);
 		if (itPlayer != _PlayersWoundedCreatures.end())
@@ -1472,14 +1475,14 @@ void CCharacterProgressionPVE::enableXpGainForPlayer(const CEntityId &playerId, 
 			for (uint i = 0 ; i < (*itPlayer).second.size() ; ++i)
 			{
 				enabledCreatures.push_back((*itPlayer).second[i]);
-			
+
 				TCreatureTakenDamageContainer::iterator itc = _CreatureTakenDamage.find((*itPlayer).second[i]);
 				//nlassert(itc != _CreatureTakenDamage.end());
 				BOMB_IF( itc == _CreatureTakenDamage.end(), "player has wounded a creature but creature has no registered damage", return);
 				const sint16 index = (*itc).second.getIndexForPlayer(playerId);
 				//nlassert(index >= 0);
 				BOMB_IF( index < 0, "player has wounded a creature but creature has no registered damage from player", return);
-				
+
 				if ( (*itc).second.PlayerInflictedDamage[index].MaxSkillValue < skillValue)
 					(*itc).second.PlayerInflictedDamage[index].MaxSkillValue = skillValue;
 			}
@@ -1500,7 +1503,7 @@ void CCharacterProgressionPVE::enableXpGainForPlayer(const CEntityId &playerId, 
 			const double distance = PHRASE_UTILITIES::getDistance(playerChar->getEntityRowId(), creatures[i]);
 			if (distance > (double)MaxDistanceForXpGain)
 				continue;
-				
+
 			TCreatureTakenDamageContainer::iterator itc = _CreatureTakenDamage.find(creatures[i]);
 			//nlassert(itc != _CreatureTakenDamage.end());
 			BOMB_IF( itc == _CreatureTakenDamage.end(), "team has wounded a creature but creature has no registered damage", return);
@@ -1528,7 +1531,7 @@ void CCharacterProgressionPVE::removeCreature(TDataSetRow creature)
 	TCreatureTakenDamageContainer::iterator itCreatureDamage = _CreatureTakenDamage.find(creature);
 	if (itCreatureDamage == _CreatureTakenDamage.end())
 		return;
-	
+
 	// clear damage inflicted by players and teams on this creature
 	const vector<CTeamDamage> &damage = (*itCreatureDamage).second.PlayerInflictedDamage;
 	for (uint i = 0 ; i < damage.size() ; ++i )
@@ -1536,11 +1539,11 @@ void CCharacterProgressionPVE::removeCreature(TDataSetRow creature)
 		if (damage[i].TeamId != CTEAM::InvalidTeamId)
 		{
 			TTeamsAttackedCreature::iterator itTeam = _TeamsWoundedCreatures.find(damage[i].TeamId);
-			
+
 			BOMB_IF( itTeam == _TeamsWoundedCreatures.end(), "creature memorized damage from team but team has no registered damage", return);
 
 			vector<TDataSetRow> &creatures = (*itTeam).second;
-			
+
 			uint j;
 			const uint size = creatures.size();
 			for (j = 0  ; j < size ; ++j)
@@ -1551,7 +1554,7 @@ void CCharacterProgressionPVE::removeCreature(TDataSetRow creature)
 					break;
 				}
 			}
-			
+
 			BOMB_IF( j >= size, "creature memorized damage from team but team has no registered damage on this creature", return);
 
 			if (creatures.empty())
@@ -1572,10 +1575,10 @@ void CCharacterProgressionPVE::removeCreature(TDataSetRow creature)
 		else
 		{
 			TEntityAttackedCreature::iterator itPlayer = _PlayersWoundedCreatures.find(damage[i].PlayerId);
-			
+
 			BOMB_IF( itPlayer == _PlayersWoundedCreatures.end(), "creature memorized damage from player but player has no registered damage", return);
 			vector<TDataSetRow> &creatures = (*itPlayer).second;
-			
+
 			uint j;
 			const uint size = creatures.size();
 			for (j = 0  ; j < size ; ++j)
@@ -1586,7 +1589,7 @@ void CCharacterProgressionPVE::removeCreature(TDataSetRow creature)
 					break;
 				}
 			}
-			
+
 			BOMB_IF( j >= size, "creature memorized damage from player but player has no registered damage on this creature", return);
 
 			if (creatures.empty())
@@ -1607,7 +1610,7 @@ void CCharacterProgressionPVE::removeCreature(TDataSetRow creature)
 			TEntityAttackedCreature::iterator itCreature = _CreaturesWoundedCreatures.find(creatureDamage[i].CreatureId);
 			BOMB_IF( itCreature == _CreaturesWoundedCreatures.end(), "creature memorized damage from creature but second creature has no registered damage", return);
 			vector<TDataSetRow> &creatures = (*itCreature).second;
-			
+
 			uint j;
 			const uint size = creatures.size();
 			for (j = 0  ; j < size ; ++j)
@@ -1619,12 +1622,12 @@ void CCharacterProgressionPVE::removeCreature(TDataSetRow creature)
 				}
 			}
 			BOMB_IF( j >= size, "creature memorized damage from player but player has no registered damage on this creature", return);
-	
+
 			if (creatures.empty())
 				_CreaturesWoundedCreatures.erase(itCreature);
 		}
 	}
-	
+
 	_CreatureTakenDamage.erase(itCreatureDamage);
 }
 
@@ -1651,7 +1654,7 @@ void CCharacterProgressionPVE::transferDamageOnFictitiousCreature(TDataSetRow pl
 		return;
 
 	CEntityId playerId = TheDataset.getEntityId(playerRowId);
-	
+
 	// get creatures wounded by player
 	TEntityAttackedCreature::iterator itPlayer = _PlayersWoundedCreatures.find(playerId);
 	if (itPlayer != _PlayersWoundedCreatures.end())
@@ -1663,12 +1666,12 @@ void CCharacterProgressionPVE::transferDamageOnFictitiousCreature(TDataSetRow pl
 			// clear player damage against this creature
 			TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(playerAttackedCreatures[nbCreatures-1]);
 			BOMB_IF( itCreature == _CreatureTakenDamage.end(), "PROGRESSION_BUG: found attacked creature with no registered damage ", return);
-			
+
 			const sint16 index = (*itCreature).second.getIndexForPlayer(playerId);
 			BOMB_IF( index < 0, "PROGRESSION_BUG: found attacked creature with no registered damage for this player", return);
 
 			(*itCreature).second.transferDamageOnFictitiousCreature(playerId, teamId);
-			
+
 			playerAttackedCreatures.pop_back();
 
 			--nbCreatures;
@@ -1681,24 +1684,24 @@ void CCharacterProgressionPVE::transferDamageOnFictitiousCreature(TDataSetRow pl
 	CCharacter *playerChar = PlayerManager.getChar(playerId);
 	if (!playerChar)
 		return;
-	
+
 	// player is in team
 	if (teamId == CTEAM::InvalidTeamId)
 		return;
-	
+
 	TTeamsAttackedCreature::iterator itTeam = _TeamsWoundedCreatures.find(teamId);
 	if (itTeam == _TeamsWoundedCreatures.end())
 		return;
-	
+
 	vector<TDataSetRow> &teamAttackedCreatures = (*itTeam).second;
 	for ( uint i = 0 ; i < teamAttackedCreatures.size() ; )
 	{
 		TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(teamAttackedCreatures[i]);
 		BOMB_IF( itCreature == _CreatureTakenDamage.end(), "PROGRESSION_BUG: (is in team), found attacked creature with no registered damage ", return);
-		
+
 		const sint16 index = (*itCreature).second.getIndexForTeam(teamId);
 		BOMB_IF( index < 0, "PROGRESSION_BUG: (is in team), found attacked creature with no registered damage for this team", return);
-		
+
 		if ( (*itCreature).second.transferDamageOnFictitiousCreature(playerId, teamId) )
 		{
 			teamAttackedCreatures[i] = teamAttackedCreatures.back();
@@ -1723,7 +1726,7 @@ void CCharacterProgressionPVE::transferDamageOnFictitiousCreature(TDataSetRow pl
 		return;
 
 	CEntityId playerId = TheDataset.getEntityId(playerRowId);
-	
+
 	// Find creature
 	TCreatureTakenDamageContainer::iterator itCreature = _CreatureTakenDamage.find(creatureRowId);
 	if (itCreature != _CreatureTakenDamage.end() )
@@ -1749,15 +1752,15 @@ void CCharacterProgressionPVE::transferDamageOnFictitiousCreature(TDataSetRow pl
 			return;
 		}
 	}
-	
+
 	CCharacter *playerChar = PlayerManager.getChar(playerId);
 	if (!playerChar)
 		return;
-	
+
 	// player is in team
 	if (teamId == CTEAM::InvalidTeamId)
 		return;
-	
+
 	// remove damage from team to target
 	itCreature = _CreatureTakenDamage.find(creatureRowId);
 	if (itCreature != _CreatureTakenDamage.end() )
@@ -1838,7 +1841,7 @@ void CCharacterActions::addAction( const TDataSetRow& target, SKILLS::ESkills sk
 /*void CCharacterActions::addCurativeAction( const TReportAction& reportAction )
 {
 	// no xp gain if curative action restore no energy
-	/*if( reportAction.Hp + reportAction.Sap + reportAction.Sta + reportAction.Focus == 0 ) 
+	/*if( reportAction.Hp + reportAction.Sap + reportAction.Sta + reportAction.Focus == 0 )
 		return 0;
 
 	uint32 TotalHpDmg = 0;
@@ -1850,7 +1853,7 @@ void CCharacterActions::addAction( const TDataSetRow& target, SKILLS::ESkills sk
 	double xpGainForSapRestore = 0.0f;
 	double xpGainForStaRestore = 0.0f;
 	double xpGainForFocusRestore = 0.0f;
-		
+
 	for( TSkillProgressPerOpponentContainer::iterator it = _SkillProgressPerOpponent.begin(); it != _SkillProgressPerOpponent.end(); ++it )
 	{
 		TotalHpDmg += (*it).second->hp();
@@ -1883,14 +1886,14 @@ void CCharacterActions::addAction( const TDataSetRow& target, SKILLS::ESkills sk
 }
 */
 
-	
+
 //----------------------------------------------------------------------------
 // dispatchXpGain: a creature dead dispatch xp gained for it
 //----------------------------------------------------------------------------
 bool CCharacterActions::dispatchXpGain( TDataSetRow actor, TDataSetRow creatureRowId, float equivalentXpMembers, float xpFactor, const list<CEntityId> &teamMembers )
 {
 	CCharacter * c = dynamic_cast< CCharacter * >( CEntityBaseManager::getEntityBasePtr( actor ) );
-	if( c == 0 ) 
+	if( c == 0 )
 		return false; // actor is disconnected before creature death ?
 
 	BOMB_IF(equivalentXpMembers < 1.0f, "equivalentXpMembers < 1!", equivalentXpMembers = 1.0f);
@@ -1933,7 +1936,7 @@ bool CCharacterActions::dispatchXpGain( TDataSetRow actor, TDataSetRow creatureR
 
 	// compute xp gain on creature, cap xp gain per player to MaxXPGainPerPlayer
 	const float xpGainPerOpponent = min( MaxXPGainPerPlayer.get(), float(xpFactor * maxXPGain / equivalentXpMembers) );
-	
+
 	TSkillProgressPerOpponentContainer::iterator it = _SkillProgressPerOpponent.find( creatureRowId );
 	if( it != _SkillProgressPerOpponent.end() )
 	{
@@ -1971,7 +1974,7 @@ bool CCharacterActions::forgetXpGain( TDataSetRow creature )
 	{
 		delete (*it).second;
 		_SkillProgressPerOpponent.erase( it );
-	}		
+	}
 	return (_SkillProgressPerOpponent.begin() != _SkillProgressPerOpponent.end());
 }
 
@@ -2020,8 +2023,8 @@ bool CSkillProgress::applyXp( CCharacter * c, float xpGainPerOpponent )
 		if (_SkillsProgress[i].Skill != SKILLS::unknown)
 			totalNbActions += _SkillsProgress[i].NbActions;
 	}
-	
-	
+
+
 	// We use a map to store total gain by skill and a set to store skills with no gain actions
 	// The goal is to send a unique xp info message per skill
 	set<SKILLS::ESkills> noGain;
@@ -2030,7 +2033,7 @@ bool CSkillProgress::applyXp( CCharacter * c, float xpGainPerOpponent )
 	sint lastNonNullXPGainIndex = -1;
 	vector<double> xpGainVect;
 	xpGainVect.resize(size);
-	
+
 	// in the first loop we compute all xp gains and get the index which will tell us when to start sending xp info messages
 	for( uint i = 0; i < size; ++i )
 	{
@@ -2043,9 +2046,9 @@ bool CSkillProgress::applyXp( CCharacter * c, float xpGainPerOpponent )
 
 		// compute part of xp gain to apply on this skill
 		double xpGain = _SkillsProgress[ i ].NbActions / totalNbActions * xpGainPerOpponent;
-		
+
 		xpGainVect[i] = xpGain;
-		
+
 		if( xpGain > 0.0 )
 		{
 			// this index is used to know when we can flush the send xp message buffer
@@ -2061,7 +2064,7 @@ bool CSkillProgress::applyXp( CCharacter * c, float xpGainPerOpponent )
 	if( lastNonNullXPGainIndex > -1 )
 	{
 		map<SKILLS::ESkills,CXpProgressInfos> gainBySkill;
-		
+
 		for( uint i = 0; i < size; ++i )
 		{
 			if( xpGainVect[i] > 0.0 )
@@ -2091,7 +2094,7 @@ bool CSkillProgress::applyXp( CCharacter * c, float xpGainPerOpponent )
 				params[1].Int = max((sint32)1, sint32(100*(*itGainSkill).second.TotalXpGain) );
 				params[2].Int = max((sint32)1, sint32(100*((*itGainSkill).second.TotalXpGain - ((*itGainSkill).second.XpBonus+(*itGainSkill).second.RingXpBonus))) );
 				PHRASE_UTILITIES::sendDynamicSystemMessage(c->getEntityRowId(), "XP_CATALYSER_PROGRESS_NORMAL_GAIN", params);
-				
+
 				if( (*itGainSkill).second.XpBonus > 0 )
 				{
 					catalyserCount += (*itGainSkill).second.CatalyserCount;
@@ -2133,16 +2136,16 @@ bool CSkillProgress::applyXp( CCharacter * c, float xpGainPerOpponent )
 	set<SKILLS::ESkills>::iterator itNoGain;
 	for( itNoGain = noGain.begin(); itNoGain != noGain.end(); ++itNoGain )
 	{
-		
+
 		if ( (*itNoGain) != (uint32)(SKILLS::unknown) && !IsRingShard)
 		{
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::skill);
 			params[0].Enum = (*itNoGain);
-		
+
 			PHRASE_UTILITIES::sendDynamicSystemMessage( c->getEntityRowId(), "PROGRESS_NO_GAIN", params);
 		}
 	}
-	
+
 	return gain;
 }
 
@@ -2166,7 +2169,7 @@ bool CSkillProgress::applyXp( CCharacter * c, float xpGainPerOpponent )
 			return;
 		}
 	}
-	
+
 	CAdversary ca;
 	ca.entityRowId( Aggressor );
 	ca.damageMade( dmg );
@@ -2184,7 +2187,7 @@ void CCreatureOpponent::despawn()
 	{
 		CCharacterProgressionPVE::getInstance()->forgetXpGain( _TargetRowId, _Adversary[ i ].entityRowId() );
 	}
-}	
+}
 
 
 //----------------------------------------------------------------------------
@@ -2224,7 +2227,7 @@ void CCreatureTakenDamage::attributeKillsForMission(TDataSetRow victimRowId)
 	for ( uint i = 0; i < PlayerInflictedDamage.size(); i++ )
 		minDamage += PlayerInflictedDamage[i].TotalDamage;
 	minDamage = KillAttribMinFactor * minDamage;
-	
+
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		// if total damage is sufficient attribute kill
@@ -2253,19 +2256,19 @@ void CCreatureTakenDamage::attributeKill( TDataSetRow killerRowId, TDataSetRow v
 	{
 		return;
 	}
-	
+
 	CCreature *killedCreature = CreatureManager.getCreature(victimRowId);
 	if (!killedCreature)
 	{
 		nlwarning("Cannot find creature from row id %s", victimRowId.toString().c_str());
 		return;
 	}
-	
+
 	CNPCGroup * group = CreatureManager.getNPCGroup( killedCreature->getAIGroupAlias() );
-	
+
 	CMissionEventKill event(victimRowId,CMissionEvent::NoGroup);
 	killer->processMissionEvent( event );
-	
+
 	if ( group )
 	{
 		if ( std::find( group->PlayerKillers.begin(),group->PlayerKillers.end(),killerRowId) == group->PlayerKillers.end() )
@@ -2293,7 +2296,7 @@ bool CCreatureTakenDamage::transferDamageOnFictitiousCreature(const CEntityId &p
 			retValue = true;
 			found = true;
 		}
-		else if ( teamId != CTEAM::InvalidTeamId && PlayerInflictedDamage[i].TeamId == teamId) 
+		else if ( teamId != CTEAM::InvalidTeamId && PlayerInflictedDamage[i].TeamId == teamId)
 		{
 			if (PlayerInflictedDamage[i].TeamMembers.empty())
 				return false;
@@ -2302,7 +2305,7 @@ bool CCreatureTakenDamage::transferDamageOnFictitiousCreature(const CEntityId &p
 
 			damage = PlayerInflictedDamage[i].TotalDamage / PlayerInflictedDamage[i].TeamMembers.size();
 			PlayerInflictedDamage[i].TotalDamage -= damage;
-			
+
 			PlayerInflictedDamage[i].removeMember(playerId);
 			if (PlayerInflictedDamage[i].TeamMembers.empty())
 			{
@@ -2311,7 +2314,7 @@ bool CCreatureTakenDamage::transferDamageOnFictitiousCreature(const CEntityId &p
 				retValue = true;
 			}
 		}
-	
+
 		if (found)
 		{
 			TotalCreatureInflictedDamage += damage;
@@ -2325,7 +2328,7 @@ bool CCreatureTakenDamage::transferDamageOnFictitiousCreature(const CEntityId &p
 					return retValue;
 				}
 			}
-			
+
 			CCreatureInflictedDamage dam;
 			dam.TotalDamage = damage;
 			dam.CreatureId = CEntityId::Unknown;
@@ -2351,16 +2354,16 @@ void CCreatureTakenDamage::attributeKill( uint16 teamId, TDataSetRow victimRowId
 		nlwarning("Cannot find creature from reow id %s", victimRowId.toString().c_str());
 		return;
 	}
-	
+
 	CTeam * team = TeamManager.getRealTeam( teamId);
 	if ( !team )
 	{
 		nlwarning("Cannot find real team %u, error", teamId);
 		return;
 	}
-	
+
 	CNPCGroup * group = CreatureManager.getNPCGroup( killedCreature->getAIGroupAlias() );
-	
+
 	CCharacter * user = PlayerManager.getChar( team->getLeader() );
 
 	if ( user && user->getEnterFlag())

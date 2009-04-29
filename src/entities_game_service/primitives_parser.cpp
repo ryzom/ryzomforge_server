@@ -38,7 +38,7 @@ void CPrimitivesParser::init()
 	{
 	if (!_LigoConfig.readPrimitiveClass (WORLD_EDITOR_CLASSES_FILE, false))
 	{
-		// Should be in l:\leveldesign\world_edit_files
+		// Should be in l:\leveldesign\world_editor_files
 		nlerror ("Can't load ligo primitive config file world_editor_classes.xml");
 		}
 		_LigoInit = true;
@@ -79,11 +79,11 @@ void CPrimitivesParser::init()
 		const vector<std::string> &prims = CPrimitiveCfg::getMap(mapConfigNames[i]);
 
 		nlinfo("CPrimitivesParser : loading %d primitives files for mapConfigName '%s' in continent '%s'", prims.size(), mapConfigNames[i].c_str(), CPrimitiveCfg::getContinentNameOf(mapConfigNames[i]).c_str());
-		// resize the primitive vector		
+		// resize the primitive vector
 		// parse all the selected files
 		vector<string>::const_iterator first(prims.begin()), last(prims.end());
 		for	(;first != last; ++first, ++numLoadedPrim)
-		{			
+		{
 			const	string fullName = CPath::lookup( *first );
 
 			if	(loadedPrimitives.find(fullName)!=loadedPrimitives.end())	//	don't want to load a primitive twice!
@@ -107,9 +107,9 @@ void CPrimitivesParser::init()
 				nlwarning("<CPrimitivesParser ctor> exception launched : %s",e.what() );
 				_Primitives.pop_back();
 			}
-			
+
 		}
-		
+
 	}
 }// CPrimitivesParser ctor
 
@@ -126,7 +126,7 @@ bool CPrimitivesParser::loadPrimitive(const char* fileName,CPrimitives & primiti
 	if (cachePrimsVar)
 	{
 		cachePrims = cachePrimsVar->asInt() != 0;
-	}	
+	}
 	bool cachePrimsLog = false;
 	CConfigFile::CVar *cachePrimsLogVar = IService::getInstance()->ConfigFile.getVarPtr("CachePrimsLog");
 	if (cachePrimsLogVar)
@@ -191,7 +191,7 @@ bool CPrimitivesParser::loadPrimitive(const char* fileName,CPrimitives & primiti
 			CFile::createDirectory(IService::getInstance()->WriteFilesDirectory.toString()+"primitive_cache");
 			COFile saveBin(binFileName);
 			primitives.serial(saveBin);
-		}		
+		}
 	}
 	return true;
 
@@ -228,10 +228,10 @@ uint32 CPrimitivesParser::aliasGetStaticPart(uint32 alias)
 {
 	uint32 staticPart;
 	uint32 dynPart;
-	
+
 	staticPart = (alias & _LigoConfig.getStaticAliasMask()) >> _LigoConfig.getDynamicAliasSize();
 	dynPart = alias & _LigoConfig.getDynamicAliasMask();
-	
+
 	return staticPart;
 }
 
@@ -239,10 +239,10 @@ uint32 CPrimitivesParser::aliasGetDynamicPart(uint32 alias)
 {
 	uint32 staticPart;
 	uint32 dynPart;
-	
+
 	staticPart = (alias & _LigoConfig.getStaticAliasMask()) >> _LigoConfig.getDynamicAliasSize();
 	dynPart = alias & _LigoConfig.getDynamicAliasMask();
-	
+
 	return dynPart;
 }
 
