@@ -3192,8 +3192,7 @@ NLMISC_COMMAND( renamePlayerForEvent, "rename a player for the event", "<CSR eId
 	if ( args.size() != 3 )
 		return false;
 	
-	ucstring oldName( capitalize(args[1]) );
-	ucstring newName( capitalize(args[2]) );
+	ucstring newName( args[2] );
 	TRY_GET_CHARACTER
 	CCharacter * target = PlayerManager.getCharacterByName( CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(),args[1]) );
 	if ( !target || !TheDataset.isAccessible( target->getEntityRowId() ) )
