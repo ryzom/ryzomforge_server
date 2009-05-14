@@ -844,18 +844,20 @@ void CCharacterShoppingList::buyItem( uint16 itemNumber, uint32 quantity )
 			return;
 		}
 	}
-
+	uint32 displayPrice = 0;
 	// consume the money
 	switch (shop->ItemTrade->getPriceInfo().getCurrency().getValue())
 	{
 	case RYMSG::TTradeCurrency::tc_dappers:
 		// Spend dappers
+		displayPrice = dapperPrice;
 		_Character->spendMoney( dapperPrice * stackSize );
 
 		break;
 	case RYMSG::TTradeCurrency::tc_faction_points:
 		// Spend Faction Point
 		{
+			displayPrice = factionPrice;
 			PVP_CLAN::TPVPClan clan = shop->ItemTrade->getPriceInfo().getFaction();
 			uint32 nTotalFP = factionPrice * stackSize;
 			uint32 nNbFP = _Character->getFactionPoint(clan);
@@ -874,7 +876,7 @@ void CCharacterShoppingList::buyItem( uint16 itemNumber, uint32 quantity )
 	SM_STATIC_PARAMS_4(params, STRING_MANAGER::item, STRING_MANAGER::integer, STRING_MANAGER::integer, STRING_MANAGER::integer);
 	params[0].SheetId = shop->ItemTrade->getSheetId();
 	params[1].Int = stackSize;
-	params[2].Int = dapperPrice * stackSize;
+	params[2].Int = displayPrice * stackSize;
 	if (shop->ItemTrade->getPriceInfo().getCurrency() == RYMSG::TTradeCurrency::tc_faction_points)
 		params[3].Int = shop->ItemTrade->getPriceInfo().getAmount() * stackSize;
 	else
