@@ -689,6 +689,7 @@ void CCharacterShoppingList::buyItem( uint16 itemNumber, uint32 quantity )
 	}
 
 	uint32 dapperPrice = 0;
+	uint32 factionPrice = 0;
 
 	/// check for enough money
 	switch (shop->ItemTrade->getPriceInfo().getCurrency().getValue())
@@ -725,7 +726,8 @@ void CCharacterShoppingList::buyItem( uint16 itemNumber, uint32 quantity )
 			PVP_CLAN::TPVPClan clan = shop->ItemTrade->getPriceInfo().getFaction();
 			if ((clan >= PVP_CLAN::BeginClans) && (clan <= PVP_CLAN::EndClans))
 			{
-				if (_Character->getFactionPoint(clan) < (shop->ItemTrade->getPriceInfo().getAmount()*quantity))
+				factionPrice = getSellPrice( shop->ItemTrade, shop->ShopUnit->getShopUnitType() == IShopUnit::DynamicShop );
+				if (_Character->getFactionPoint(clan) < (factionPrice*quantity))
 				{
 					// return player information 'not enough faction point'
 					_Character->sendDynamicSystemMessage( _Character->getId(), "OPS_NOT_ENOUGHT_FACTION_POINTS" );
@@ -855,7 +857,7 @@ void CCharacterShoppingList::buyItem( uint16 itemNumber, uint32 quantity )
 		// Spend Faction Point
 		{
 			PVP_CLAN::TPVPClan clan = shop->ItemTrade->getPriceInfo().getFaction();
-			uint32 nTotalFP = shop->ItemTrade->getPriceInfo().getAmount() * stackSize;
+			uint32 nTotalFP = factionPrice * stackSize;
 			uint32 nNbFP = _Character->getFactionPoint(clan);
 			_Character->setFactionPoint(clan, nNbFP - nTotalFP);
 		}
