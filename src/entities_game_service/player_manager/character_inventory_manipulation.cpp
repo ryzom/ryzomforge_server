@@ -2711,6 +2711,8 @@ void CCharacter::rechargeItem(INVENTORIES::TInventory invId, uint32 slot)
 		nlassert(rightHandItem != NULL);
 
 		// reload sap in right hand item
+		if (sapRechargeItem->sapLoad() == 0)
+			sapRechargeItem->setSapLoad(sapRechargeItem->quality());
 		rightHandItem->reloadSapLoad(sapRechargeItem->sapLoad());
 
 		// consume sap recharge (destroy it)
