@@ -3448,7 +3448,7 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 		{
 			vector< pair< bool, uint32 > > texts;
 			(*it).second->sendContextTexts( _EntityRowId, c->getEntityRowId(),texts );
-			for ( uint k = 0; k < texts.size(); k++)
+			for ( uint k = 0; k < max(texts.size(), 8); k++)
 			{
 //				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) , texts[k].second );
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(_PropertyDatabase, texts[k].second );
@@ -3468,7 +3468,7 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 			{
 				vector< pair< bool, uint32 > > texts;
 				team->getMissions()[j]->sendContextTexts( _EntityRowId, c->getEntityRowId(),texts );
-				for ( uint k = 0; k < texts.size(); k++)
+				for ( uint k = 0; k < max(texts.size(), 8); k++)
 				{
 //					_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) , texts[k].second );
 					CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(_PropertyDatabase, texts[k].second );
@@ -3496,7 +3496,7 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 
 			vect.push_back( param );
 			
-			for ( uint j = 0; j < c->getContextTexts().size(); j++ )
+			for ( uint j = 0; j < max(c->getContextTexts().size(), 8); j++ )
 			{
 				uint32 text = STRING_MANAGER::sendStringToClient(_EntityRowId, c->getContextTexts()[j].first.c_str(),vect );
 //				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) , text );
@@ -3510,7 +3510,7 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 		}
 
 		// send auto missions
-		for ( uint j = 0; j < c->getMissionVector().size(); j++ )
+		for ( uint j = 0; j < max(c->getMissionVector().size(), 8); j++ )
 		{
 			const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( c->getMissionVector()[j] );
 			if ( (templ != NULL) && !templ->AutoText.empty() )
