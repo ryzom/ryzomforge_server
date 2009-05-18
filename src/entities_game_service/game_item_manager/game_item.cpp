@@ -1050,7 +1050,7 @@ void CGameItem::consumeSapLoad( uint32 sapConsumed )
 //-----------------------------------------------
 void CGameItem::setSapLoad( uint32 sap )
 {
-	if( _SheetId == NLMISC::CSheetId("item_sap_recharge.sitem") )
+	if ((_SheetId == NLMISC::CSheetId("item_sap_recharge.sitem")) || (_SheetId == NLMISC::CSheetId("light_sap_recharge.sitem")))
 	{
 		_SapLoad = sap;
 	} 
