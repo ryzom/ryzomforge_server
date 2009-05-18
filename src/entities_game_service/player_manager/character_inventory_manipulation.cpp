@@ -2534,6 +2534,7 @@ void CCharacter::enchantOrRechargeItem(INVENTORIES::TInventory invId, uint32 slo
 {
 	static const CSheetId crystalSheetId("crystalized_spell.sitem");
 	static const CSheetId rechargeSheetId("item_sap_recharge.sitem");
+	static const CSheetId lightRechargeSheetId("light_sap_recharge.sitem");
 
 	if (!EnchantSystemEnabled)
 		return;
@@ -2553,7 +2554,7 @@ void CCharacter::enchantOrRechargeItem(INVENTORIES::TInventory invId, uint32 slo
 	{
 		enchantItem(invId, slot);
 	}
-	else if (item->getSheetId() == rechargeSheetId)
+	else if ((item->getSheetId() == rechargeSheetId) || (item->getSheetId() == lightRechargeSheetId))
 	{
 		rechargeItem(invId, slot);
 	}
@@ -2567,6 +2568,7 @@ bool CCharacter::checkSlotsForEnchantOrRecharge(INVENTORIES::TInventory invId, u
 {
 	static const CSheetId crystalSheetId("crystalized_spell.sitem");
 	static const CSheetId rechargeSheetId("item_sap_recharge.sitem");
+	static const CSheetId lightRechargeSheetId("light_sap_recharge.sitem");
 
 	if (!EnchantSystemEnabled)
 		return false;
@@ -2610,7 +2612,7 @@ bool CCharacter::checkSlotsForEnchantOrRecharge(INVENTORIES::TInventory invId, u
 	else
 	{
 		// check if the item is a recharge
-		if (item->getSheetId() != rechargeSheetId)
+		if ((item->getSheetId() != rechargeSheetId) && (item->getSheetId() != lightRechargeSheetId))
 		{
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::item);
 			params[0].SheetId = item->getSheetId();
