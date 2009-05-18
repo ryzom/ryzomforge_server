@@ -3448,8 +3448,9 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 		{
 			vector< pair< bool, uint32 > > texts;
 			(*it).second->sendContextTexts( _EntityRowId, c->getEntityRowId(),texts );
-			for ( uint k = 0; k < max(texts.size(), 8); k++)
+			for ( uint k = 0; k < texts.size(); k++)
 			{
+				if(i >= NB_CONTEXT_DYN_TEXTS) break; // no more room in the context menu, don't fill more or it'll assert
 //				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) , texts[k].second );
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(_PropertyDatabase, texts[k].second );
 //				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PLAYER_GIFT_NEEDED",i),texts[k].first  );
@@ -3468,8 +3469,9 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 			{
 				vector< pair< bool, uint32 > > texts;
 				team->getMissions()[j]->sendContextTexts( _EntityRowId, c->getEntityRowId(),texts );
-				for ( uint k = 0; k < max(texts.size(), 8); k++)
+				for ( uint k = 0; k < texts.size(); k++)
 				{
+					if(i >= NB_CONTEXT_DYN_TEXTS) break; // no more room in the context menu, don't fill more or it'll assert
 //					_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) , texts[k].second );
 					CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(_PropertyDatabase, texts[k].second );
 //					_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PLAYER_GIFT_NEEDED",i),texts[k].first  );
@@ -3495,9 +3497,10 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 			param.setEIdAIAlias( targetId, CAIAliasTranslator::getInstance()->getAIAlias( targetId) );
 
 			vect.push_back( param );
-			
-			for ( uint j = 0; j < max(c->getContextTexts().size(), 8); j++ )
+
+			for ( uint j = 0; j < c->getContextTexts().size(); j++ )
 			{
+				if(i >= NB_CONTEXT_DYN_TEXTS) break; // no more room in the context menu, don't fill more or it'll assert
 				uint32 text = STRING_MANAGER::sendStringToClient(_EntityRowId, c->getContextTexts()[j].first.c_str(),vect );
 //				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) , text );
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(_PropertyDatabase, text);
@@ -3510,13 +3513,14 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 		}
 
 		// send auto missions
-		for ( uint j = 0; j < max(c->getMissionVector().size(), 8); j++ )
+		for ( uint j = 0; j < c->getMissionVector().size(); j++ )
 		{
 			const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( c->getMissionVector()[j] );
 			if ( (templ != NULL) && !templ->AutoText.empty() )
 			{
 				if (templ->testPrerequisits(this, false) == MISSION_DESC::PreReqSuccess)
 				{
+					if(i >= NB_CONTEXT_DYN_TEXTS) break; // no more room in the context menu, don't fill more or it'll assert
 					uint32 text = templ->sendAutoText(_EntityRowId,_CurrentInterlocutor);
 //					_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) , text );
 					CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(_PropertyDatabase, text );
@@ -3542,7 +3546,7 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 		// WebPage Title
 		if( programm & (1<<BOTCHATTYPE::WebPageFlag) )
 		{
-			// send the wep page title
+			// send the web page title
 			uint32 text = STRING_MANAGER::sendStringToClient(_EntityRowId, c->getWebPageName(), TVectorParamCheck() );
 //			_PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_TITLE" , text );
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_TITLE(_PropertyDatabase, text );
