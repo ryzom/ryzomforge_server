@@ -9,7 +9,7 @@ AIS data are taken from multiple kind of files. One of these filetypes is the pr
 
 @section Structure
 
-The structure of that file is controlled by another XML file called world_edit_classes.xml. There is only a few basic node types in primitive files, but these nodes are highly paramterizable and can describe a wide range of data structures. The content of these parameters is what is controlled by the world_edit_classes.xml file.
+The structure of that file is controlled by another XML file called world_editor_classes.xml. There is only a few basic node types in primitive files, but these nodes are highly paramterizable and can describe a wide range of data structures. The content of these parameters is what is controlled by the world_editor_classes.xml file.
 
 Primitive files are created with the World Editor, a dedicated tool. The files are then read by several services, which can only intepret a subset of the primitive content. In the World Editor the file is a tree of nodes called primitives, each node having parameters called fields. This does not closely reflect the XML structures. In fact although primitives are XML nodes, fields are also XML nodes, subnodes of the primitive node, of predefined standard types, the field name and content being XML parameters of the XML subnode.
 

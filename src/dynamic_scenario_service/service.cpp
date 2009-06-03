@@ -31,7 +31,7 @@
 using namespace NLNET;
 using namespace NLMISC;
 using namespace R2;
- 
+
 
 // force admin module to link in
 extern void admin_modules_forceLink();
@@ -144,7 +144,7 @@ static void cbExecCommandResult(CMessage &msgin, const std::string &serviceName,
 	{
 		NLMISC::InfoLog->displayNL("%s",lines[i].c_str());
 	}
-}	
+}
 
 static void cbBotDespawnNotification(NLNET::CMessage &msgin, const std::string &serviceName, TServiceId sid)
 {
@@ -157,19 +157,19 @@ static void cbBotDespawnNotification(NLNET::CMessage &msgin, const std::string &
 	CServerAnimationModule* module = safe_cast<CServerAnimationModule*>(imodule);
 
 	module->onBotDespawnNotification(creatureId);
-	
+
 }
 
 TUnifiedCallbackItem CbArray[]=
 {
-	{"translateAndForward", cbForwardToStringManagerModule}, 
+	{"translateAndForward", cbForwardToStringManagerModule},
 	{"DYN_CHAT:FORWARD", cbDynChatForward},
 	{"DSS_START_ACT", cbDssStartAct},
 	{"translateAndForwardArg", cbForwardToStringManagerModuleWithArg},
 	{"SESSION_ACK", cbSessionAck},
 	{"EXEC_COMMAND_RESULT",	cbExecCommandResult},
 	{"BOT_DESPAWN_NOTIFICATION", cbBotDespawnNotification},
-	{"BOT_DEATH_NOTIFICATION", cbBotDespawnNotification},	
+	{"BOT_DEATH_NOTIFICATION", cbBotDespawnNotification},
 	{"----", NULL}
 };
 
@@ -191,7 +191,7 @@ void cbServiceUp(const std::string &serviceName, TServiceId serviceId, void *)
 			}
 
 			{
-				
+
 				IServerEditionModule*imodule = dms->getEditionModule();
 				CServerEditionModule* module = safe_cast<CServerEditionModule*>(imodule);
 				if( module )
@@ -231,7 +231,7 @@ void cbServiceDown(const std::string &serviceName, TServiceId serviceId, void *)
 		if( dms )
 		{
 			{
-				
+
 				IServerEditionModule*imodule = dms->getEditionModule();
 				CServerEditionModule* module = safe_cast<CServerEditionModule*>(imodule);
 				if( module )
@@ -272,7 +272,7 @@ void CDynamicScenarioService::init()
 {
 	_Dms = NULL;
 
-	// initialize callbacks for service up / down	
+	// initialize callbacks for service up / down
 	CUnifiedNetwork::getInstance()->setServiceUpCallback("*", cbServiceUp, NULL);
 	CUnifiedNetwork::getInstance()->setServiceDownCallback( "*", cbServiceDown, NULL);
 
@@ -295,7 +295,7 @@ void CDynamicScenarioService::init()
 	// Init ligo
 	if (!R2LigoConfig.readPrimitiveClass ("world_editor_classes.xml", false))
 	{
-		// Should be in l:\leveldesign\world_edit_files
+		// Should be in l:\leveldesign\world_editor_files
 		nlerror ("Can't load ligo primitive config file world_editor_classes.xml");
 	}
 	R2LigoConfig.updateDynamicAliasBitCount(16);
@@ -305,10 +305,10 @@ void CDynamicScenarioService::init()
 
 
 
-   
+
 	// setup the update systems
 	setUpdateTimeout(100);
-	
+
 
 	IModuleManager &mm = IModuleManager::getInstance();
 	IModule * serverGw = mm.createModule("StandardGateway", "serverGw", "");
@@ -316,7 +316,7 @@ void CDynamicScenarioService::init()
 
 	NLNET::IModuleSocket *socketServerGw = mm.getModuleSocket("serverGw");
 	nlassert(socketServerGw != NULL);
-	_Dms = new CDynamicMapService(ConfigFile, socketServerGw);	
+	_Dms = new CDynamicMapService(ConfigFile, socketServerGw);
 	_Dms->init2();
 
 	// open the server gw with a layer 3 transport
@@ -336,7 +336,7 @@ bool CDynamicScenarioService::update()
 
 void CDynamicScenarioService::release()
 {
-	
+
 
 	CSheetId::uninit();
 	delete _Dms;
@@ -345,7 +345,7 @@ void CDynamicScenarioService::release()
 	IModule * clientGw = mm.getLocalModule("serverGw");
 	nlassert(clientGw != NULL);
 	mm.deleteModule(clientGw);
-	
+
 	CSingletonRegistry::getInstance()->release();
 
 }

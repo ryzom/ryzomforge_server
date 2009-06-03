@@ -1,5 +1,5 @@
 /** \file gpm_service.cpp
- * GPMS service is the service who manage position / collide off all entities in the game world 
+ * GPMS service is the service who manage position / collide off all entities in the game world
  *
  * $Id: gpm_service.cpp,v 1.133 2007/06/14 16:20:07 cado Exp $
  */
@@ -120,7 +120,7 @@ void cbConnection( const std::string &serviceName, NLNET::TServiceId serviceId, 
 TGameCycle TickStopGameCycle = 0;
 
 /*-----------------------------------------------------------------*\
-						cbDisconnection 
+						cbDisconnection
 \*-----------------------------------------------------------------*/
 void cbDisconnection( const std::string &serviceName, NLNET::TServiceId serviceId, void *arg )
 {
@@ -136,14 +136,14 @@ void cbDisconnection( const std::string &serviceName, NLNET::TServiceId serviceI
 	{
 		CWorldPositionManager::triggerUnsubscribe(serviceId);
 	}
-	
+
 } // cbDisconnection //
 
 
 void cbEGSConnection( const std::string &serviceName, NLNET::TServiceId serviceId, void *arg )
 {
 // The follwoing code commented out by Sadge because no refference could be found to reception of this message
-//	// transmit the names of the used continents to the EGS 
+//	// transmit the names of the used continents to the EGS
 //	try
 //	{
 //		CUsedContinent::TUsedContinentCont continents = CUsedContinent::instance().getContinents();
@@ -161,16 +161,16 @@ void cbEGSConnection( const std::string &serviceName, NLNET::TServiceId serviceI
 //				continentsNames.push_back(cvUsedContinents.asString(i));
 //			}
 //		}
-//*/	
+//*/
 //		CMessage msgout("USED_CONTINENTS");
 //		msgout.serialCont( continentsNames ),
 //		CUnifiedNetwork::getInstance()->send( "EGS", msgout );
 //	}
-//	catch(EUnknownVar &) 
+//	catch(EUnknownVar &)
 //	{
 //		nlwarning("<cbEGSConnection> UsedContinents not found, no continent used");
 //	}
-	
+
 	// send ESG all IA creatures
 	//CWorldPositionManager::sendAgentsToEGS();
 
@@ -194,7 +194,7 @@ void cbEVSDisconnection( const std::string &serviceName, NLNET::TServiceId servi
 
 
 /*--------------------------------------------------------------*\
-						cbSync()  
+						cbSync()
 \*--------------------------------------------------------------*/
 void cbSync()
 {
@@ -221,7 +221,7 @@ string	crashCallback()
 /****************************************************************\
  ************** callback table for input message ****************
 \****************************************************************/
-TUnifiedCallbackItem CbArray[] = 
+TUnifiedCallbackItem CbArray[] =
 {
 	{ "CB_UNUSED",					NULL }
 };
@@ -237,14 +237,14 @@ void	cbMirrorIsReady( CMirror *mirror )
 
 
 /****************************************************************\
-							init() 
+							init()
 \****************************************************************/
 // init the service
 void CGlobalPositionManagerService::init()
-{   
+{
 	setVersion (RYZOM_VERSION);
-	
-	// keep pointer on class	
+
+	// keep pointer on class
 	pCGPMS = this;
 
 	// set update time out
@@ -267,7 +267,7 @@ void CGlobalPositionManagerService::init()
 	bool		LoadPacsCol;
 
 	// init the class transport system
-	TRANSPORT_CLASS_REGISTER (CGPMPlayerPrivilegeInst);	
+	TRANSPORT_CLASS_REGISTER (CGPMPlayerPrivilegeInst);
 
 	GET_VAR_FROM_CF(CheckPlayerSpeed, true);
 	GET_VAR_FROM_CF(Verbose, false);
@@ -280,7 +280,7 @@ void CGlobalPositionManagerService::init()
 
 	GET_VAR_FROM_CF(LoadPacsCol, false);
 	GET_VAR_FROM_CF(LoadPacsPrims, true);
-	
+
 
 	CSheets::init();
 
@@ -293,7 +293,7 @@ void CGlobalPositionManagerService::init()
 	// Init ligo
 	if (!LigoConfig.readPrimitiveClass ("world_editor_classes.xml", false))
 	{
-		// Should be in l:\leveldesign\world_edit_files
+		// Should be in l:\leveldesign\world_editor_files
 		nlerror ("Can't load ligo primitive config file world_editor_classes.xml");
 	}
 /*	// read the continent name translator
@@ -334,7 +334,7 @@ void CGlobalPositionManagerService::init()
 				CWorldPositionManager::loadContinent(name, continents[i].ContinentName, continents[i].ContinentInstance);
 			}
 		}
-		catch(EUnknownVar &) 
+		catch(EUnknownVar &)
 		{
 			nlwarning("<CGlobalPositionManagerService::init> UsedContinents not found, no continent used");
 		}
@@ -406,7 +406,7 @@ void CGlobalPositionManagerService::initMirror()
 
 
 /****************************************************************\
-							update() 
+							update()
 \****************************************************************/
 // main loop
 bool CGlobalPositionManagerService::update()
@@ -461,12 +461,12 @@ void CGlobalPositionManagerService::ringShardProcessMirrorUpdates()
 	{
 		// lookup stats for the entity in the mirror
 		const NLMISC::CEntityId &eid= TheDataset.getEntityId( entityIndex );
-		CMirrorPropValueRO<sint32> aiInstance	( TheDataset, entityIndex, DSPropertyAI_INSTANCE ); 
-		CMirrorPropValueRO<sint32> x			( TheDataset, entityIndex, DSPropertyPOSX ); 
+		CMirrorPropValueRO<sint32> aiInstance	( TheDataset, entityIndex, DSPropertyAI_INSTANCE );
+		CMirrorPropValueRO<sint32> x			( TheDataset, entityIndex, DSPropertyPOSX );
 		CMirrorPropValueRO<sint32> y			( TheDataset, entityIndex, DSPropertyPOSY );
 		CMirrorPropValueRO<TYPE_WHO_SEES_ME> whoSeesMe	( TheDataset, entityIndex, DSPropertyWHO_SEES_ME );
 		R2_VISION::TInvisibilityLevel invisibility= (R2_VISION::TInvisibilityLevel)(whoSeesMe&((1<<R2_VISION::NUM_WHOSEESME_BITS)-1));
-		
+
 		// increment count of number of characters in AIInstance, instanciating new instance if required
 		pCGPMS->_checkAddCharacterToRingAIInstance(aiInstance);
 
@@ -513,8 +513,8 @@ void CGlobalPositionManagerService::ringShardProcessMirrorUpdates()
 		if (propIndex == DSPropertyAI_INSTANCE)
 		{
 			// lookup stats for the entity in the mirror
-			sint32 aiInstance=	CMirrorPropValueRO<sint32>( TheDataset, entityIndex, DSPropertyAI_INSTANCE ); 
-			sint32 x= CMirrorPropValueRO<sint32>( TheDataset, entityIndex, DSPropertyPOSX ); 
+			sint32 aiInstance=	CMirrorPropValueRO<sint32>( TheDataset, entityIndex, DSPropertyAI_INSTANCE );
+			sint32 x= CMirrorPropValueRO<sint32>( TheDataset, entityIndex, DSPropertyPOSX );
 			sint32 y= CMirrorPropValueRO<sint32>( TheDataset, entityIndex, DSPropertyPOSY );
 			CMirrorPropValueRO<TYPE_WHO_SEES_ME> whoSeesMe ( TheDataset, entityIndex, DSPropertyWHO_SEES_ME );
 			R2_VISION::TInvisibilityLevel invisibility= (R2_VISION::TInvisibilityLevel)(whoSeesMe&((1<<R2_VISION::NUM_WHOSEESME_BITS)-1));
@@ -535,7 +535,7 @@ void CGlobalPositionManagerService::ringShardProcessMirrorUpdates()
 			if (oldAiInstance==aiInstance)
 			{
 				// the aiInstance hasn't changed so just perform a move
-				// note: this happens systematicaly on appearance of a new entity - the ai instance is 
+				// note: this happens systematicaly on appearance of a new entity - the ai instance is
 				// setup once via code that manages appearance of new entities in mirror and it's setup
 				// again here... the coordinates are probably the same too but since I can't guarantee
 				// it I prefer to let the code do its stuff
@@ -556,7 +556,7 @@ void CGlobalPositionManagerService::ringShardProcessMirrorUpdates()
 		else if (propIndex == DSPropertyPOSX)
 		{
 			// lookup stats for the entity in the mirror
-			CMirrorPropValueRO<sint32> x ( TheDataset, entityIndex, DSPropertyPOSX ); 
+			CMirrorPropValueRO<sint32> x ( TheDataset, entityIndex, DSPropertyPOSX );
 			CMirrorPropValueRO<sint32> y ( TheDataset, entityIndex, DSPropertyPOSY );
 
 			// update the cell
@@ -572,7 +572,7 @@ void CGlobalPositionManagerService::ringShardProcessMirrorUpdates()
 		else if (propIndex == DSPropertyWHO_SEES_ME)
 		{
 			// lookup stats for the entity in the mirror
-			CMirrorPropValueRO<TYPE_WHO_SEES_ME> whoSeesMe ( TheDataset, entityIndex, DSPropertyWHO_SEES_ME ); 
+			CMirrorPropValueRO<TYPE_WHO_SEES_ME> whoSeesMe ( TheDataset, entityIndex, DSPropertyWHO_SEES_ME );
 
 			uint32 visibilityValue= ((uint32)whoSeesMe==0)? R2_VISION::WHOSEESME_INVISIBLE_DM: ((uint32)(whoSeesMe+1)==0)? R2_VISION::WHOSEESME_VISIBLE_MOB: (uint32)whoSeesMe;
 
@@ -648,7 +648,7 @@ void CGlobalPositionManagerService::processMirrorUpdates()
 
 
 /****************************************************************\
-						gpmsUpdate() 
+						gpmsUpdate()
 \****************************************************************/
 void CGlobalPositionManagerService::gpmsUpdate()
 {
@@ -680,7 +680,7 @@ void CGlobalPositionManagerService::gpmsUpdate()
 
 
 /****************************************************************\
-							release() 
+							release()
 \****************************************************************/
 void CGlobalPositionManagerService::release()
 {

@@ -60,4 +60,9 @@ touch: $(foreach dir,$(BUILD_DIRS),$(dir)-touch)
 %-touch:
 	+make -C $* touch
 
+packed_sheets: $(foreach dir,$(BUILD_DIRS),$(dir)-packed_sheets)
+
+%-packed_sheets:
+	-make -C $* packed_sheets
+
 .NOTPARALLEL: night all clean cleansheets update touch

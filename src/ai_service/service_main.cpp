@@ -159,10 +159,10 @@ void CAIService::init (void)
 
 	// read sheet_id.bin and don't prune out unknown files
 	CSheetId::init(false);
-	
+
     // Init singleton manager
 	CSingletonRegistry::getInstance()->init();
-	
+
 	// init static fame manager
 	CStaticFames::getInstance();
 
@@ -171,7 +171,7 @@ void CAIService::init (void)
 	// Init ligo
 	if (!LigoConfig.readPrimitiveClass ("world_editor_classes.xml", false))
 	{
-		// Should be in l:\leveldesign\world_edit_files
+		// Should be in l:\leveldesign\world_editor_files
 		nlerror ("Can't load ligo primitive config file world_editor_classes.xml");
 	}
 
@@ -182,7 +182,7 @@ void CAIService::init (void)
 	// setup the update systems
 	setUpdateTimeout(100);
 
-	
+
 
 	// init sub systems
 	CAIKeywords::init();
@@ -195,7 +195,7 @@ void CAIService::init (void)
 
 	// set the primitive context
 	NLLIGO::CPrimitiveContext::instance().CurrentLigoConfig = &LigoConfig;
-	
+
 	CAISActions::init();
 
 	CEGSInterface::init();
@@ -213,7 +213,7 @@ void CAIService::init (void)
 	if (clientCreature)
 	{
 		CAIS::instance().setClientCreatureDebug(clientCreature->asInt()!=0);
-	}	
+	}
 }
 
 
@@ -224,28 +224,28 @@ void CAIService::release()
 }
 
 
-void CAIService::tickRelease (void)	
+void CAIService::tickRelease (void)
 {
 	CWorldContainer::clear();
-	
+
 	// release sub systems
 	CAIS::instance().release();
-	
+
 	CAIDSInterface::release();
 	CVisualPropertiesInterface::release();
 	CCombatInterface::release();
 	CTimeInterface::release();
 	CEGSInterface::release();
-	
+
 	CAISActions::release();
-	
+
 	AISHEETS::CSheets::getInstance()->release();
 	CMessages::release();
-	
+
 	CMirrors::release();
-	
+
 	CFamilyProfileFactory::instance().release();
-	
+
 	CSingletonRegistry::getInstance()->release();
 }
 
@@ -316,7 +316,7 @@ uint ForceTicks=0;
 bool CAIService::update (void)
 {
 //	NLMEMORY::CheckHeap(true);
-	
+
 	UpdateWatches();
 //	NLMEMORY::CheckHeap(true);
 
@@ -330,7 +330,7 @@ bool CAIService::update (void)
 	}
 
 	CSingletonRegistry::getInstance()->serviceUpdate();
-	
+
 	return true;
 }
 
