@@ -2841,7 +2841,24 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		std::string csName = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
 	
 		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
-		NLMISC::ICommand::execute(res, *InfoLog);
+
+		CMemDisplayer *CmdDisplayer = new CMemDisplayer("TmpDebug");
+		CLog *CmdLogger = new CLog( CLog::LOG_NO );
+		CmdLogger->addDisplayer( CmdDisplayer );
+		NLMISC::ICommand::execute(res, *CmdLogger);
+		const std::deque<std::string>	&strs = CmdDisplayer->lockStrings ();
+		for (uint i = 0; i < strs.size(); i++)
+		{
+			InfoLog->displayNL(strs[i].c_str());
+
+			SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
+			params[0].Literal = strs[i];
+			CCharacter::sendDynamicSystemMessage( eid, "LITERAL", params );
+		}
+		CmdDisplayer->unlockStrings();
+		CmdLogger->removeDisplayer (CmdDisplayer);
+		delete CmdDisplayer;
+		delete CmdLogger;
 	}
 }
 

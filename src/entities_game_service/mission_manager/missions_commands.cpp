@@ -476,17 +476,11 @@ NLMISC_COMMAND(targetMissionDump,"dump missions of the target","<character_id>")
 	std::string text;
 	for ( map<TAIAlias, CMission*>::iterator it = target->getMissionsBegin(); it != target->getMissionsEnd(); ++it )
 	{
-		text += toString("Mission '%s' \t(alias %10u)  Bot Giver Alias: %10u\n",
+		log.displayNL("Mission '%s' \t(alias %10u)  Bot Giver Alias: %10u\n",
 			CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId((*it).first).c_str(),
 			(*it).first,
 			(*it).second->getGiver());
 	}
-
-	log.displayNL(text.c_str());
-
-	SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
-	params[0].Literal = text;
-	CCharacter::sendDynamicSystemMessage( eid, "LITERAL", params );
 
 	return true;
 }
