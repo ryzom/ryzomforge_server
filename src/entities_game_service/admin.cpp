@@ -196,7 +196,7 @@ AdminCommandsInit[] =
 		"setFamePlayer",					true,
 		"guildMOTD",						true,
 
-		// CSR commands		
+		// CSR commands
 		"motd",								false,
 		"broadcast",						false,
 		"summon",							true,
@@ -252,7 +252,6 @@ AdminCommandsInit[] =
 		"savePlayerActiveChar",				false,
 		"reloadPlayer",						false,
 		"characterMissionDump",				true,
-		"targetMissionDump",				true,
 		"removeMission",					true,
 		"addMission",						true,
 		// CSR variables
@@ -315,19 +314,19 @@ AdminCommandsInit[] =
 
 		"setPvpClan",						true, //remove it when interface fo choose pvp clan is ready
 		"setPvPTag",						true, //set pvp tag to true or false
-		
+
 		// stuff added by sadge for testing character read/ write stuff
 		"saveToXML",						true,
 		"loadFromXML",						true,
 		"saveToPDR",						true,
 		"loadFromPDR",						true,
-		
+
 		// queues related stuff
 		"acceptProposalForQueue",			true,
 		"awakePlayerInQueue",				true,
-		
+
 		"displayShopSelector",				true,
-		
+
 		"addFactionAttackableToTarget",		true,
 		"eventCreateNpcGroup",				true,
 		"eventNpcGroupScript",				true,
@@ -361,7 +360,7 @@ void cbRemoteClientCallback (uint32 rid, const std::string &cmd, const std::stri
 CAdminCommand * findAdminCommand(const string & name)
 {
 	H_AUTO(findAdminCommand);
-	
+
 	const uint nbCommands = AdminCommands.size();
 	for (uint i = 0; i < nbCommands; i++)
 	{
@@ -401,7 +400,7 @@ void initAdmin ()
 void initCommandsPrivileges(const std::string & fileName)
 {
 	H_AUTO(initCommandsPrivileges);
-	
+
 	loadCommandsPrivileges(fileName, true);
 }
 
@@ -514,7 +513,7 @@ static void loadCommandsPrivileges(const string & fileName, bool init)
 void initPositionFlags(const std::string & fileName)
 {
 	H_AUTO(initPositionFlags);
-	
+
 	string fileNameAndPath = Bsi.getLocalPath() + fileName;
 	if (CFile::fileExists(fileNameAndPath))
 	{
@@ -526,7 +525,7 @@ void initPositionFlags(const std::string & fileName)
 static void selectEntities (const string &entityName, vector <CEntityId> &entities)
 {
 	H_AUTO(selectEntities);
-	
+
 	if (entityName.empty ())
 		return;
 
@@ -726,7 +725,7 @@ void GET_CHARACTER_Helper(std::string& command, const NLMISC::CEntityId& id, con
 ENTITY_VARIABLE(HP, "Hit points of a player")
 {
 	ENTITY_GET_ENTITY
-	
+
 	if (get)
 	{
 		value = toString (e->currentHp());
@@ -740,7 +739,7 @@ ENTITY_VARIABLE(HP, "Hit points of a player")
 ENTITY_VARIABLE(MaxHP, "Max hit points of a player")
 {
 	ENTITY_GET_ENTITY
-	
+
 	if (get)
 	{
 		value = toString (e->maxHp());
@@ -754,7 +753,7 @@ ENTITY_VARIABLE(MaxHP, "Max hit points of a player")
 ENTITY_VARIABLE(Speed, "Speed modifier of an entity")
 {
 	ENTITY_GET_ENTITY
-		
+
 	if (get)
 	{
 		value = toString (e->getEventSpeedVariationModifier());
@@ -768,7 +767,7 @@ ENTITY_VARIABLE(Speed, "Speed modifier of an entity")
 ENTITY_VARIABLE(Name, "Name of a player")
 {
 	ENTITY_GET_ENTITY
-	
+
 	if (get)
 	{
 //		value = CEntityIdTranslator::getInstance()->getByEntity(entity).toString();
@@ -782,7 +781,7 @@ ENTITY_VARIABLE(Name, "Name of a player")
 ENTITY_VARIABLE(Money, "Money")
 {
 	ENTITY_GET_CHARACTER
-	
+
 	if (get)
 	{
 		value = toString("%"NL_I64"u", c->getMoney());
@@ -827,14 +826,14 @@ ENTITY_VARIABLE(Money, "Money")
 ENTITY_VARIABLE(MoneyGuild, "MoneyGuild")
 {
 	ENTITY_GET_CHARACTER
-	
+
 	CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
 	if (guild == NULL)
 	{
 		nlwarning("Invalid guild");
 		return;
 	}
-		
+
 	if (get)
 	{
 		value = toString("%"NL_I64"u", guild->getMoney());
@@ -842,7 +841,7 @@ ENTITY_VARIABLE(MoneyGuild, "MoneyGuild")
 	else
 	{
 		sint dir = 0;
-		
+
 		if (!value.empty())
 		{
 			if(value[0] == '+')			dir = +1;
@@ -858,7 +857,7 @@ ENTITY_VARIABLE(MoneyGuild, "MoneyGuild")
 			nlwarning ("You must provide a [<sign>]<value>");
 			return;
 		}
-		
+
 		if(dir == 0)
 		{
 			guild->setMoney(NLMISC::atoiInt64(value.c_str()));
@@ -871,7 +870,7 @@ ENTITY_VARIABLE(MoneyGuild, "MoneyGuild")
 			else
 				guild->spendMoney(val);
 		}
-		
+
 		nlinfo ("Player %s guild money is %"NL_I64"u", entity.toString().c_str(),guild->getMoney());
 	}
 }
@@ -879,7 +878,7 @@ ENTITY_VARIABLE(MoneyGuild, "MoneyGuild")
 ENTITY_VARIABLE(FactionPoint, "FactionPoint")
 {
 	ENTITY_GET_CHARACTER
-	
+
 	if (get)
 	{
 		string sTmp;
@@ -935,7 +934,7 @@ ENTITY_VARIABLE(FactionPoint, "FactionPoint")
 ENTITY_VARIABLE (Priv, "User privilege")
 {
 	ENTITY_GET_CHARACTER
-	
+
 	CPlayer *p = PlayerManager.getPlayer(PlayerManager.getPlayerId(c->getId()));
 	if (p == 0)
 	{
@@ -952,7 +951,7 @@ ENTITY_VARIABLE (Priv, "User privilege")
 		p->setUserPriv(value);
 		nlinfo ("%s have now this priv '%s'", entity.toString().c_str(), value.c_str());
 	}
-	
+
 	return;
 }
 
@@ -988,7 +987,7 @@ ENTITY_VARIABLE (FBT, "Focus Beta Tester")
 ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,<posz>][,<season>] | <bot_name> | <player_name> | home | <creature>")
 {
 	H_AUTO(Position);
-	
+
 	ENTITY_GET_ENTITY
 
 	vector<string> res;
@@ -999,13 +998,13 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 		x = e->getState().X() / 1000;
 		y = e->getState().Y() / 1000;
 		z = e->getState().Z() / 1000;
-		
+
 		value = toString ("%d,%d,%d", x, y, z);
 	}
 	else
 	{
 		if ( value.find(',') != string::npos )
-		{			
+		{
 			explode (value, string(","), res);
 			if (res.size() >= 2)
 			{
@@ -1024,7 +1023,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 				{
 					double minDistance = -1.;
 					CCreature * creature = NULL;
-					
+
 					TMapCreatures::const_iterator it;
 					const TMapCreatures& creatures = CreatureManager.getCreature();
 					for( it = creatures.begin(); it != creatures.end(); ++it )
@@ -1044,7 +1043,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 					{
 						x = creature->getState().X();
 						y = creature->getState().Y();
-						z = creature->getState().Z();	
+						z = creature->getState().Z();
 					}
 				}
 				else
@@ -1072,9 +1071,9 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 						nldebug ("<Position> Ignoring attempt to teleport because no NPC found matching name '%s'", value.c_str());
 						return;
 					}
-					
+
 					TAIAlias alias = aliases[0];
-					
+
 					const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
 					if ( botId != CEntityId::Unknown )
 					{
@@ -1085,7 +1084,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 						nlwarning ("'%s' has no eId. Is it Spawned???", value.c_str());
 						return;
 					}
-					
+
 				}
 				if (entityBase != 0)
 				{
@@ -1147,9 +1146,9 @@ NLMISC_COMMAND(changeMode," change_mode","<entity id(id:type:crea:dyn)> <mode>")
 	{
 		CEntityId id;
 		id.fromString( args[0].c_str() );
-		
+
 		MBEHAV::EMode mode = MBEHAV::EMode(atoi(args[1].c_str()));
-		
+
 		CEntityBase *e = 0;
 		if( id.getType() == 0 )
 		{
@@ -1189,7 +1188,7 @@ NLMISC_COMMAND(checkTargetSP," check target player skill points (if there is los
 
 	uint32 totalEarnedSp = targetPlayer->getTotalEarnedSP();
 	uint32 spentSp = targetPlayer->getActionsSPValue() - targetPlayer->getStartActionsSPValue();
-	
+
 	uint32 currentSp = (uint32) targetPlayer->getSP(EGSPD::CSPType::Craft);
 	currentSp += (uint32) targetPlayer->getSP(EGSPD::CSPType::Fight);
 	currentSp += (uint32) targetPlayer->getSP(EGSPD::CSPType::Magic);
@@ -1197,7 +1196,7 @@ NLMISC_COMMAND(checkTargetSP," check target player skill points (if there is los
 
 	// log result
 	log.displayNL("Player %s : Current SP total = %u, totalEarnedSp = %u, spentTotalSP = %u, MISSING SP = %d", targetPlayer->getId().toString().c_str(), currentSp, totalEarnedSp, spentSp, totalEarnedSp-spentSp-currentSp);
-	
+
 	// send result to asker
 	string strTemp = NLMISC::toString("Player %s : Current SP total = %u, totalEarnedSp = %u, spentTotalSP = %d, MISSING SP = %d",targetPlayer->getId().toString().c_str(), currentSp, totalEarnedSp, spentSp, totalEarnedSp-spentSp-currentSp);
 	chatToPlayer(eid, strTemp);
@@ -1230,7 +1229,7 @@ NLMISC_COMMAND (createItemInBag, "Create an item and put it in the player bag", 
 		log.displayNL("sheetId '%s' is Unknown", sheetName.c_str());
 		return false;
 	}
-	
+
 	// banners are the only items in game which use privilege
 	if( sheetName.find("banner") != -1 )
 	{
@@ -1290,7 +1289,7 @@ NLMISC_COMMAND (createItemInBag, "Create an item and put it in the player bag", 
 		log.displayNL ("Item '%s' created and set in the bag of the player %s", sheet.toString ().c_str(), eid.toString().c_str());
 	else
 		log.displayNL ("Failed to create and set the item '%s' for the player %s", sheet.toString ().c_str(), eid.toString().c_str());
-	
+
 	return res;
 }
 
@@ -1298,7 +1297,7 @@ NLMISC_COMMAND (createItemInTmpInv, "Create an item and put it in the player tem
 {
 	if (args.size () != 4) return false;
 	GET_CHARACTER
-		
+
 	string sheetName = args[1];
 	CSheetId sheet;
 	uint32 sheetId = atoi(sheetName.c_str());
@@ -1312,7 +1311,7 @@ NLMISC_COMMAND (createItemInTmpInv, "Create an item and put it in the player tem
 			sheetName += ".item";
 		sheet = CSheetId(sheetName.c_str());
 	}
-	
+
 	if (sheet == CSheetId::Unknown)
 	{
 		log.displayNL("sheetId '%s' is Unknown", sheetName.c_str());
@@ -1332,35 +1331,35 @@ NLMISC_COMMAND (createItemInTmpInv, "Create an item and put it in the player tem
 			if( sheetName.find("_sgm") != -1 && !player->havePriv(":SGM:") )	return false;
 		}
 	}
-		
+
 	const CStaticItem *form = CSheets::getForm (sheet);
 	if (form == 0)
 	{
 		log.displayNL ("sheetId '%s' is not found", sheetName.c_str());
 		return false;
 	}
-	
+
 	sint quantity = atoi(args[2].c_str());
 	if (quantity < 1)
 	{
 		log.displayNL ("Quantity must be > 0");
 		return false;
 	}
-	
+
 	sint quality = atoi(args[3].c_str());
 	if (quality < 1)
 	{
 		log.displayNL ("Quality must be > 0");
 		return false;
 	}
-	
+
 	bool res = c->createItemInInventory(INVENTORIES::temporary, quality, quantity, sheet);
-	
+
 	if (res)
 		log.displayNL ("Item '%s' created and set in the temp inventory of the player %s", sheet.toString ().c_str(), eid.toString().c_str());
 	else
 		log.displayNL ("Failed to create and set the item '%s' for the player %s", sheet.toString ().c_str(), eid.toString().c_str());
-	
+
 	return res;
 }
 
@@ -1388,7 +1387,7 @@ NLMISC_COMMAND (createItemInInv, "Create items and put them in the given invento
 		log.displayNL("sheetId '%s' is Unknown", sheetName.c_str());
 		return false;
 	}
-	
+
 	// banners are the only items in game which use privilege
 	if( sheetName.find("banner") != -1 )
 	{
@@ -1499,21 +1498,21 @@ NLMISC_COMMAND (createFullArmorSet, "Create and equip player with chosen full ar
 		"sleeves",
 		"vest",
 	};
-	
+
 	if (args.size () != 4) return false;
 	GET_CHARACTER
-	
+
 	const string &race = args[1];
 	const string &type = args[2];
 	const uint16 quality = atoi(args[3].c_str());
-	
+
 	const uint16 min = quality - (quality-1)%5;
 	const string minStr = (min < 10) ? string("0") + toString(min) : toString(min);
 	const uint16 max = min+4;
 	const string maxStr = (max < 10) ? string("0") + toString(max) : toString(max);
-	
+
 	const string endName = string("_") + minStr + string("_") + maxStr + string(".item");
-	
+
 	// create the armor pieces
 	if (type == "heavy")
 	{
@@ -1521,7 +1520,7 @@ NLMISC_COMMAND (createFullArmorSet, "Create and equip player with chosen full ar
 		{
 			const string sheetName = race + string("_") + type + string("_") + heavyArmors[i] + endName;
 			CSheetId sheetId(sheetName);
-			
+
 			if ( !c->createItemInInventory(INVENTORIES::bag, quality, 1, sheetId, eid) )
 			{
 				log.displayNL ("For entity %s Failed to create item %s", eid.toString().c_str(), sheetName.c_str() );
@@ -1534,7 +1533,7 @@ NLMISC_COMMAND (createFullArmorSet, "Create and equip player with chosen full ar
 		{
 			const string sheetName = race + string("_") + type + string("_") + armors[i] + endName;
 			CSheetId sheetId(sheetName);
-			
+
 			if ( !c->createItemInInventory(INVENTORIES::bag, quality, 1, sheetId, eid) )
 			{
 				log.displayNL ("For entity %s Failed to create item %s", eid.toString().c_str(), sheetName.c_str() );
@@ -1573,7 +1572,7 @@ NLMISC_COMMAND (forceTargetToDie, "(debug) Force entity target to die", "<eid>")
 		return false;
 
 	GET_CHARACTER
-	
+
 	// force sending of target as dead (can only be done on creature)
 	CCreature *target = CreatureManager.getCreature(c->getTargetDataSetRow());
 	if (target)
@@ -1593,14 +1592,14 @@ NLMISC_COMMAND (forceTargetToDie, "(debug) Force entity target to die", "<eid>")
 NLMISC_COMMAND (learnAllBricks, "Specified player learns all possible bricks for it's skill values", "<eid>")
 {
 	H_AUTO(learnAllBricks);
-	
+
 	if (args.size () != 1)
 		return false;
-	
+
 	GET_CHARACTER
-	
+
 	// get all phrases and bypass brick requirements
-	
+
 	vector<CSheetId> phrases;
 	vector<CSheetId> tempPhrases;
 
@@ -1643,7 +1642,7 @@ NLMISC_COMMAND (learnAllBricks, "Specified player learns all possible bricks for
 		phrases.insert( phrases.end(), tempPhrases.begin(), tempPhrases.end() );
 		tempPhrases.clear();
 	}
-	
+
 	// learn all bricks
 	uint nbBricks = 0;
 	for (uint i = 0; i < phrases.size() ; ++i)
@@ -1659,9 +1658,9 @@ NLMISC_COMMAND (learnAllBricks, "Specified player learns all possible bricks for
 			}
 		}
 	}
-	
+
 	log.displayNL ("%s learnt %u bricks", eid.toString().c_str(), nbBricks);
-	
+
 	return true;
 }
 
@@ -1669,17 +1668,17 @@ NLMISC_COMMAND (learnAllBricks, "Specified player learns all possible bricks for
 NLMISC_COMMAND (learnAllRolemasterBricks, "Specified player learns all possible bricks sold by rolemaster for it's skill values", "<eid>")
 {
 	H_AUTO(learnAllRolemasterBricks);
-	
+
 	if (args.size () != 1)
 		return false;
-	
+
 	GET_CHARACTER
-		
+
 		// get all phrases and bypass brick requirements
-		
+
 		vector<CSheetId> phrases;
 	vector<CSheetId> tempPhrases;
-	
+
 	static const EGSPD::CPeople::TPeople races[] =
 	{
 		EGSPD::CPeople::Common,
@@ -1688,9 +1687,9 @@ NLMISC_COMMAND (learnAllRolemasterBricks, "Specified player learns all possible 
 			EGSPD::CPeople::Matis,
 			EGSPD::CPeople::Zorai
 	};
-	
+
 	const uint nbRaces = sizeof(races) / sizeof(races[0]);
-	
+
 	for (uint i = 0 ; i < nbRaces ; ++i)
 	{
 		// fight
@@ -1719,7 +1718,7 @@ NLMISC_COMMAND (learnAllRolemasterBricks, "Specified player learns all possible 
 		phrases.insert( phrases.end(), tempPhrases.begin(), tempPhrases.end() );
 		tempPhrases.clear();
 	}
-	
+
 	// learn all bricks
 	uint nbBricks = 0;
 	for (uint i = 0; i < phrases.size() ; ++i)
@@ -1735,9 +1734,9 @@ NLMISC_COMMAND (learnAllRolemasterBricks, "Specified player learns all possible 
 			}
 		}
 	}
-	
+
 	log.displayNL ("%s learnt %u bricks", eid.toString().c_str(), nbBricks);
-	
+
 	return true;
 }
 
@@ -1745,16 +1744,16 @@ NLMISC_COMMAND (learnAllRolemasterBricks, "Specified player learns all possible 
 NLMISC_COMMAND (learnAllPhrases, "Specified player learns all possible phrases for it's skill values", "<eid>")
 {
 	H_AUTO(learnAllPhrases);
-	
+
 	if (args.size () != 1)
 		return false;
-	
+
 	GET_CHARACTER
 
 	// get all phrases and bypass brick requirements
 	vector<CSheetId> phrases;
 	vector<CSheetId> tempPhrases;
-	
+
 	static const EGSPD::CPeople::TPeople races[] =
 	{
 		EGSPD::CPeople::Common,
@@ -1763,9 +1762,9 @@ NLMISC_COMMAND (learnAllPhrases, "Specified player learns all possible phrases f
 		EGSPD::CPeople::Matis,
 		EGSPD::CPeople::Zorai
 	};
-	
+
 	const uint nbRaces = sizeof(races) / sizeof(races[0]);
-	
+
 	for (uint i = 0 ; i < nbRaces ; ++i)
 	{
 		// fight
@@ -1800,7 +1799,7 @@ NLMISC_COMMAND (learnAllPhrases, "Specified player learns all possible phrases f
 	for (uint i = 0; i < phrases.size() ; ++i)
 	{
 		uint16 index = c->getFirstFreeSlotInKnownPhrase();
-		
+
 		if ( !c->learnPrebuiltPhrase(phrases[i], index) )
 			log.displayNL ("%s FAILED to learn phrase id %s", eid.toString().c_str(), phrases[i].toString().c_str());
 		else
@@ -1817,7 +1816,7 @@ NLMISC_COMMAND(learnBrick, "Specified player learns given brick","<eid> <brickid
 {
 	if (args.size () != 2) return false;
 	GET_CHARACTER
-	
+
 	CSheetId brickId(args[1]);
 
 	c->addKnownBrick(brickId);
@@ -1841,7 +1840,7 @@ NLMISC_COMMAND (learnPhrase, "Specified player learns a phrase and set it at ind
 	}
 
 	uint16 index = c->getFirstFreeSlotInKnownPhrase();
-	
+
 	if ( c->learnPrebuiltPhrase(phraseId, index) )
 		log.displayNL ("%s learnt phrase id %s", eid.toString().c_str(), phraseId.toString().c_str());
 	else
@@ -1869,14 +1868,14 @@ NLMISC_COMMAND (logXpGain, "log or not xp gain infos for specified player", "<ei
 	PlayerManager.logXPGain(c->getEntityRowId(), flag);
 	log.displayNL ("Player %s. Flag logXpGain is now %s", eid.toString().c_str(), (flag?"ON":"OFF") );
 
-		
+
 	return true;
 }
 
 NLMISC_COMMAND (learnAllForagePhrases, "Learn all forage phrase, begin at specified index", "<eid> <index>" )
 {
 	H_AUTO(learnAllForagePhrases);
-	
+
 	if ( args.size() != 2 ) return false;
 	GET_CHARACTER
 
@@ -1906,10 +1905,10 @@ NLMISC_COMMAND (learnAllFaberPlans, "Specified player learns all faber plans", "
 {
 	if (args.size () != 1) return false;
 	GET_CHARACTER
-	
+
 	c->learnAllFaberPlans();
 	log.displayNL ("%s learnt all faber plans", eid.toString().c_str());
-	
+
 	return true;
 }
 */
@@ -1919,7 +1918,7 @@ NLMISC_COMMAND(giveMoney, "Give money to a player","<eid> <money>")
 {
 	if (args.size () != 2) return false;
 	GET_CHARACTER
-	
+
 	c->giveMoney ( NLMISC::atoiInt64( args[1].c_str() ) );
 	log.displayNL ("You gave money to player %s", eid.toString().c_str());
 
@@ -1931,7 +1930,7 @@ NLMISC_COMMAND(giveSP, "Give SP (skill points) to a player","<eid> <SP>")
 {
 	if (args.size () != 2) return false;
 	GET_CHARACTER
-	
+
 	uint32 nbSp = atol(args[1].c_str());
 
 	c->addSP( (double)nbSp );
@@ -1945,12 +1944,12 @@ NLMISC_COMMAND(respawn, "Same as '/a Position home' but without any privilege","
 	if (args.size () != 1) return false;
 	GET_CHARACTER
 
-//TODO rules of spawn point	
+//TODO rules of spawn point
 //	COfflineEntityState state = PlayerManager.getStartState (c->getActiveRole ());
 	COfflineEntityState state;
 	c->forbidNearPetTp();
 	c->tpWanted (state.X, state.Y, state.Z);
-	
+
 	return true;
 }
 
@@ -1963,7 +1962,7 @@ NLMISC_CATEGORISED_COMMAND(pdr,saveToXML,"save a character to an XML file","<eid
 	GET_CHARACTER
 
 	std::string fileName = args[1];
-		
+
 	if( c )
 	{
 		static CPersistentDataRecordRyzomStore	pdr;
@@ -1986,7 +1985,7 @@ NLMISC_CATEGORISED_COMMAND(pdr,loadFromXML,"load a character from an XML file","
 	GET_CHARACTER
 
 	std::string fileName = args[1];
-		
+
 	if( c )
 	{
 		ucstring			name=	 c->getName();
@@ -2018,9 +2017,9 @@ NLMISC_CATEGORISED_COMMAND(pdr,saveToPDR,"save a character to a binary PDR file"
 {
 	if (args.size () < 2) return false;
 	GET_CHARACTER
-		
+
 		std::string fileName = args[1];
-	
+
 	if( c )
 	{
 		static CPersistentDataRecordRyzomStore	pdr;
@@ -2029,7 +2028,7 @@ NLMISC_CATEGORISED_COMMAND(pdr,saveToPDR,"save a character to a binary PDR file"
 		pdr.writeToBinFile((fileName+".pdr").c_str());
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -2041,30 +2040,30 @@ NLMISC_CATEGORISED_COMMAND(pdr,loadFromPDR,"load a character from a binary PDR f
 {
 	if (args.size () < 2) return false;
 	GET_CHARACTER
-		
+
 		std::string fileName = args[1];
-	
+
 	if( c )
 	{
 		ucstring			name=	 c->getName();
 		uint32				guildId= c->getGuildId();
 		NLMISC::CEntityId	id=		 c->getId();
-		
+
 		static CPersistentDataRecord	pdr;
 		pdr.clear();
 		pdr.readFromBinFile((fileName+".pdr").c_str());
 		c->apply(pdr);
-		
+
 		c->setName(name);
 		c->setGuildId(guildId);
 		c->setId(id);
-		
+
 		c->allowNearPetTp();
 		c->tpWanted(c->getX(), c->getY(), c->getZ(), true, c->getHeading());
-		
+
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -2106,7 +2105,7 @@ NLMISC_COMMAND(addPetAnimal,"Add pet animal to character","<eid> <PetTicket>")
 	GET_CHARACTER
 
 	CSheetId ticket = CSheetId( args[1] );
-		
+
 	if( c )
 	{
 		if( ticket != CSheetId::Unknown )
@@ -2211,7 +2210,7 @@ NLMISC_COMMAND (addSkillPoints, "add skill points of given type (Fight = 0,	Magi
 {
 	if (args.size () < 3) return false;
 	GET_CHARACTER
-		
+
 	EGSPD::CSPType::TSPType type = (EGSPD::CSPType::TSPType) atoi (args[1].c_str());
 	if (type >= EGSPD::CSPType::EndSPType)
 	{
@@ -2220,11 +2219,11 @@ NLMISC_COMMAND (addSkillPoints, "add skill points of given type (Fight = 0,	Magi
 	}
 
 	uint32 nbSP = atoi (args[2].c_str());
-	
+
 	c->addSP( nbSP, type );
-	
+
 	log.displayNL ("Added %d skill points of type %u (%s) to player %s", nbSP, (uint8) type, EGSPD::CSPType::toString(type).c_str(), eid.toString().c_str());
-	
+
 	return true;
 } // addSkillPoints //
 
@@ -2233,17 +2232,17 @@ NLMISC_COMMAND (addXPToSkill, "Gain experience in a given skills", "<eid> <xp> <
 {
 	if (args.size () < 3) return false;
 	GET_CHARACTER
-	
+
 	uint32 xp = atoi (args[1].c_str());
-	
+
 	string skill = args[2];
-	
+
 	uint count;
 	if(args.size()==3)
 		count = 1;
 	else
 		count = atoi(args[3].c_str());
-	
+
 	count = min( count, (uint)100);
 
 	uint i;
@@ -2252,7 +2251,7 @@ NLMISC_COMMAND (addXPToSkill, "Gain experience in a given skills", "<eid> <xp> <
 		c->addXpToSkill( (double) xp, skill );
 	}
 	log.displayNL ("Added %d xp skill '%s' to player %s %d time(s)", xp, skill.c_str(), eid.toString().c_str(),count);
-	
+
 	return true;
 }
 
@@ -2260,10 +2259,10 @@ NLMISC_COMMAND(setSkillsToMaxValue, "Set skills character to max value of each s
 {
 	if (args.size () != 1) return false;
 	GET_CHARACTER
-		
+
 		c->setSkillsToMaxValue();
 	log.displayNL ("You set skills of player %s to max value of each skill", eid.toString().c_str());
-	
+
 	return true;
 }
 
@@ -2273,21 +2272,21 @@ NLMISC_COMMAND(cancelTopPhrase, "cancelTopPhrase","<eid>")
 	GET_CHARACTER
 
 	CPhraseManager::getInstance().cancelTopPhrase( c->getEntityRowId());
-	
+
 	return true;
 }
 
 NLMISC_COMMAND (clearFriendsList, "clear the friend list of a player", "<eid>")
 {
 	if ( args.size() < 1 ) return false;
-	GET_CHARACTER	
-	
+	GET_CHARACTER
+
 	if(c != 0)
 	{
 		c->clearFriendList();
 		log.displayNL("player %s friends list cleared",eid.toString().c_str());
 	}
-	
+
 	return true;
 }
 
@@ -2295,28 +2294,28 @@ NLMISC_COMMAND (clearFriendsList, "clear the friend list of a player", "<eid>")
 NLMISC_COMMAND (clearIgnoreList, "clear the ignore list of a player", "<eid>")
 {
 	if ( args.size() < 1 ) return false;
-	GET_CHARACTER	
-		
+	GET_CHARACTER
+
 	if(c != 0)
 	{
 		c->clearIgnoreList();
 		log.displayNL("player %s ignore list cleared",eid.toString().c_str());
 	}
-	
+
 	return true;
 }
 
 NLMISC_COMMAND (clearIsFriendOfList, "clear the ignore list of a player", "<eid>")
 {
 	if ( args.size() < 1 ) return false;
-	GET_CHARACTER	
-		
+	GET_CHARACTER
+
 	if(c != 0)
 	{
 		c->clearFriendOfList();
 		log.displayNL("player %s 'IsFriendOf' list cleared",eid.toString().c_str());
 	}
-	
+
 	return true;
 }
 
@@ -2349,7 +2348,7 @@ NLMISC_COMMAND(parry,"set the defense mode to parry","<player id(id:type:crea:dy
 		GET_CHARACTER
 		c->dodgeAsDefense(false);
 		log.displayNL("player id %s defense mode is now parry",c->getId().toString().c_str());
-		
+
 		return true;
 	}
 	return false;
@@ -2494,7 +2493,7 @@ NLMISC_COMMAND(respawnAfterDeath,"respawnAfterDeath at re-spawn point name, it m
 
 		// A death character can choose to re-spawn to a previously validated re-spawn point, a last of one re-spawn point is always valid
 		c->respawn( atoi(args[1].c_str() ) );
-		
+
 		return true;
 	}
 	return false;
@@ -2510,12 +2509,12 @@ NLMISC_COMMAND(resurrected,"Another PC resurrect PC by giving some energy","<pla
 	{
 		GET_CHARACTER
 		c->resurrected();
-		
+
 		return true;
 	}
 	return false;
 }
-	
+
 
 //-----------------------------------------------
 // Simulate buy kami / karavan pact until UI is ready
@@ -2529,7 +2528,7 @@ NLMISC_COMMAND(buyPact,"Buy Kami or Karavan pact","<player id(id:type:crea:dyn)>
 		// Character buy pact with Kami / Karavan by botchat (same has trade)
 		// effect is validate re-spawn point for one use
 		c->buyPact( args[1] );
-		
+
 		return true;
 	}
 	return false;
@@ -2544,7 +2543,7 @@ NLMISC_COMMAND(validateRespawnPoint,"Validate re-spawn point","<player id(id:typ
 	if( args.size() == 2 )
 	{
 		GET_CHARACTER
-		
+
 		c->getRespawnPoints().addRespawnPoint(atoi( args[1].c_str() ));
 		return true;
 	}
@@ -2555,7 +2554,7 @@ NLMISC_COMMAND(displayForageRM,"Display forageable raw materials near by or at t
 {
 	if ( args.size() < 1 ) return false;
 	GET_CHARACTER
-	
+
 	bool exactPos = ! ((args.size() > 1) && (args[1] == "0"));
 	bool extendedInfo = (args.size() > 2) && (args[2] == "1");
 	CFgProspectionPhrase::displayRMNearBy( c, exactPos, extendedInfo, &log );
@@ -2615,7 +2614,7 @@ NLMISC_COMMAND(setItemSapLoad,"set an item sap load","<eId><slot index in bag (s
 	}
 //trap	c->incSlotVersion( INVENTORIES::bag,slot);
 	log.displayNL("item in slot %u has now a sap load of %u",slot,sapLoad);
-	
+
 	return true;
 }
 
@@ -2631,7 +2630,7 @@ NLMISC_COMMAND( showFBT, "show Focus Beta Tester title if the player is a FBT", 
 		nlwarning ("ADMIN: Can't find player with UserId %d", PlayerManager.getPlayerId(c->getId()));
 		return false;
 	}
-	
+
 	if (!p->isBetaTester())
 	{
 		nlwarning ("ADMIN: UserId %d is not a FBT", PlayerManager.getPlayerId(c->getId()));
@@ -2648,7 +2647,7 @@ NLMISC_COMMAND( summonPet, "player can summon it's pet one time only", "<eid><Pe
 	if ( args.size() != 2 )
 		return false;
 	GET_CHARACTER
-		
+
 	uint32 index = atoi(args[1].c_str()) - 1;
 	const std::vector< CPetAnimal >& pet = c->getPlayerPets();
 	if( index < pet.size() )
@@ -2672,9 +2671,9 @@ NLMISC_COMMAND( allowSummonPet, "autorize player summon it's pet one time only",
 	if ( args.size() != 2 )
 		return false;
 	GET_CHARACTER
-	
+
 	uint32 index = atoi(args[1].c_str()) - 1;
-	
+
 	const std::vector< CPetAnimal >& pet = c->getPlayerPets();
 	if( index < pet.size() )
 	{
@@ -2688,7 +2687,7 @@ NLMISC_COMMAND( allowSummonPet, "autorize player summon it's pet one time only",
 
 
 //
-// 
+//
 // You can add here all variables to administrate this service.
 //
 //
@@ -2736,13 +2735,13 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 {
 	H_AUTO(cbClientAdmin);
 
-	
+
 	CEntityId eid;
 	msgin.serial (eid);
-	
+
 	bool onTarget;
 	msgin.serial (onTarget);
-	
+
 	CSString cmdName, arg;
 	msgin.serial (cmdName, arg);
 
@@ -2833,26 +2832,26 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 			}
 			res += " ";
 		}
-		
+
 		res += arg;
 
 		TLogContext_Item_Command itemCtx(onTarget ? c->getTarget() : eid);
 		TLogContext_Character_BuyRolemasterPhrase characterCtx(onTarget ? c->getTarget() : eid);
 		std::string csName = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
-	
+
 		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
 
-		CMemDisplayer *CmdDisplayer = new CMemDisplayer("TmpDebug");
+		CLightMemDisplayer *CmdDisplayer = new CLightMemDisplayer("CmdDisplayer");
 		CLog *CmdLogger = new CLog( CLog::LOG_NO );
 		CmdLogger->addDisplayer( CmdDisplayer );
-		NLMISC::ICommand::execute(res, *CmdLogger);
+		NLMISC::ICommand::execute(res, *CmdLogger, true);
 		const std::deque<std::string>	&strs = CmdDisplayer->lockStrings ();
 		for (uint i = 0; i < strs.size(); i++)
 		{
-			InfoLog->displayNL(strs[i].c_str());
+			InfoLog->displayNL(trim(strs[i]).c_str());
 
 			SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
-			params[0].Literal = strs[i];
+			params[0].Literal = trim(strs[i]);
 			CCharacter::sendDynamicSystemMessage( eid, "LITERAL", params );
 		}
 		CmdDisplayer->unlockStrings();
@@ -2866,7 +2865,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientAdminOffline);
-	
+
 	CEntityId eid;
 	msgin.serial (eid);
 
@@ -2920,7 +2919,7 @@ void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceNam
 	if (charEid == CEntityId::Unknown)
 	{
 		nlwarning ("ADMIN: Unknown character %s", characterName.c_str());
-		return;		
+		return;
 	}
 
 	if( cmdName == string("Position") )
@@ -2936,7 +2935,7 @@ void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceNam
 
 	// create the command line
 	string res = cmdName + " ";
-	
+
 	// add the eid of the player or target if necessary
 	if (cmd->AddEId)
 	{
@@ -2945,7 +2944,7 @@ void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceNam
 	}
 
 	res += arg;
-	
+
 	std::string csName = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
 	std::string targetName = NLMISC::toString("(%s,%s)", CEntityIdTranslator::getInstance()->getByEntity( ucstring(characterName) ).toString().c_str(), characterName.c_str() );
 
@@ -2968,7 +2967,7 @@ void cbRemoteClientCallback (uint32 rid, const std::string &cmd, const std::stri
 			CMessage msgout ("IMPULSION_ID");
 			msgout.serial (entities[i]);
 			CBitMemStream bms;
-			
+
 			if (!GenericMsgManager.pushNameToStream ("COMMAND:REMOTE_ADMIN", bms))
 				nlstopex (("Missing a message in the msg.xml"));
 
@@ -2998,7 +2997,7 @@ void cbClientRemoteAdmin( NLNET::CMessage& msgin, const std::string &serviceName
 	msgin.serial (answer);
 
 	vector<string> vara, vala;
-	
+
 	if (ICommand::isCommand(cmd))
 	{
 		vara.push_back ("__log");
@@ -3012,11 +3011,11 @@ void cbClientRemoteAdmin( NLNET::CMessage& msgin, const std::string &serviceName
 
 		vara.push_back ("entity");
 		vala.push_back (eid.toString());
-		
+
 		vara.push_back (cmd);
 		vala.push_back (answer);
 	}
-	
+
 	nlinfo ("ADMIN: received an answer from %s for command '%s' that is '%s' for rid %d", eid.toString().c_str(), cmd.c_str(), answer.c_str(), rid);
 
 	addRequestAnswer (rid, vara, vala);
@@ -3071,7 +3070,7 @@ NLMISC_COMMAND( motd, "set the current message of the day", "<message to be disp
 {
 	if ( args.empty() )
 		return false;
-	
+
 	string msg = args[0];
 	for ( uint i = 1; i < args.size(); i++ )
 	{
@@ -3091,14 +3090,14 @@ NLMISC_COMMAND( summon, "summon a player in front of the CSR", "<CSR eId><player
 	if ( !target || !TheDataset.isAccessible( target->getEntityRowId() ) )
 	{
 		CCharacter::sendDynamicSystemMessage( eid, "CSR_PENDING_CHARACTER_LOG" );
-		
+
 		COfflineEntityState state;
 		state.X = c->getState().X;
 		state.Y = c->getState().Y;
 		state.Z = c->getState().Z;
 		state.Heading = c->getState().Heading;
 		CGmTpPendingCommand::getInstance()->addTpPendingforCharacter( args[1], state );
-		
+
 		return true;
 	}
 	CHECK_RIGHT( c,target );
@@ -3208,7 +3207,7 @@ NLMISC_COMMAND( renamePlayerForEvent, "rename a player for the event", "<CSR eId
 {
 	if ( args.size() != 3 )
 		return false;
-	
+
 	ucstring newName( args[2] );
 	TRY_GET_CHARACTER
 	CCharacter * target = PlayerManager.getCharacterByName( CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(),args[1]) );
@@ -3281,7 +3280,7 @@ NLMISC_COMMAND( renameGuild, "rename a guild", "<CSR_eId> <guild_name>|<shardId:
 		TRY_GET_CHARACTER
 	}
 	GET_GUILD(1, true, NLMISC::CEntityId::Unknown);
-	
+
 	ucstring name( args[2] );
 	// check if name already exists in the player list
 	if ( NLMISC::CEntityIdTranslator::getInstance()->entityNameExists( name ) /*|| EGSPD::PDSLib.getStringManager().stringExists(name, RYZOMID::guildName)*/ )
@@ -3297,7 +3296,7 @@ NLMISC_COMMAND( renameGuild, "rename a guild", "<CSR_eId> <guild_name>|<shardId:
 		}
 		return false;
 	}
-	
+
 	guild->setName( name );
 
 	if (IGuildUnifier::getInstance() != NULL)
@@ -3328,7 +3327,7 @@ NLMISC_COMMAND( setGuildIcon, "set a guild icon", "<guild_name>|<shardId:guildId
 	if ( args.size() != 2)
 		return false;
 	GET_GUILD(0, true, NLMISC::CEntityId::Unknown);
-		
+
 	uint64 icon = atoiInt64( args[1].c_str() );
 	guild->setIcon( icon );
 
@@ -3346,14 +3345,14 @@ NLMISC_COMMAND( killMob, "kill a mob ( /a killMob )", "<CSR eId>" )
 	TRY_GET_CHARACTER
 
 	CCreature * creature = CreatureManager.getCreature( c->getTarget() );
-	if( creature == 0 ) 
-	{ 
-		nlwarning ("Unknown creature '%s'", c->getTarget().toString().c_str() ); 
+	if( creature == 0 )
+	{
+		nlwarning ("Unknown creature '%s'", c->getTarget().toString().c_str() );
 		return false;
 	}
 	if(!TheDataset.isAccessible(creature->getEntityRowId()))
 	{
-		nlwarning ("'%s' is not valid in mirror", c->getTarget().toString().c_str()); 
+		nlwarning ("'%s' is not valid in mirror", c->getTarget().toString().c_str());
 		return false;
 	}
 	if ( !creature->getContextualProperty().directAccessForStructMembers().attackable() )
@@ -3375,25 +3374,25 @@ NLMISC_COMMAND( dssTarget, "target a mob and send information to dss( /b dssTarg
 	TRY_GET_CHARACTER
 
 	CCreature * creature = CreatureManager.getCreature( c->getTarget() );
-	if( creature == 0 ) 
-	{ 
-		nlwarning ("Unknown creature '%s'", c->getTarget().toString().c_str() ); 
+	if( creature == 0 )
+	{
+		nlwarning ("Unknown creature '%s'", c->getTarget().toString().c_str() );
 		return false;
 	}
 	if(!TheDataset.isAccessible(creature->getEntityRowId()))
 	{
-		nlwarning ("'%s' is not valid in mirror", c->getTarget().toString().c_str()); 
+		nlwarning ("'%s' is not valid in mirror", c->getTarget().toString().c_str());
 		return false;
 	}
 
-	
+
 	NLMISC::CEntityId creatureId = creature->getId();
 	TAIAlias alias = CAIAliasTranslator::getInstance()->getAIAlias(creatureId);
 	TDataSetRow entityRowId = creature->getEntityRowId();
 
 	if (alias == CAIAliasTranslator::Invalid)
 	{
-		nlwarning ("'%s' has no alias translation", creatureId.toString().c_str()); 
+		nlwarning ("'%s' has no alias translation", creatureId.toString().c_str());
 		return false;
 	}
 	CMessage msgout("DSS_TARGET");
@@ -3401,7 +3400,7 @@ NLMISC_COMMAND( dssTarget, "target a mob and send information to dss( /b dssTarg
 	msgout.serial(creatureId); // eid of the mob
 	msgout.serial(alias); //mob targeted
 	msgout.serial(entityRowId); //datasetrow
-	
+
 	uint32 args_size = args.size() - 1;
 	uint32 i = 0;
 	msgout.serial(args_size);
@@ -3537,7 +3536,7 @@ NLMISC_COMMAND( stopMonitorMissions, "monitor a player missions", "<CSR id>" )
 	if ( args.size() != 1 )
 		return false;
 	GET_CHARACTER;
-	
+
 	CCharacter * target = PlayerManager.getChar( c->getAdminProperties().getMissionMonitoredUser() );
 	c->getAdminProperties().setMissionMonitoredUser( TDataSetRow::createFromRawIndex( INVALID_DATASET_ROW) );
 	if ( target )
@@ -3590,12 +3589,12 @@ NLMISC_COMMAND (changeVar, "change a variable of a player", "<eid> <var> <val>")
 {
 	if (args.size() != 3)
 		return false;
-	
+
 	CEntityId eid (args[0]);
-	
+
 	string var = args[1];
 	string value = args[2];
-	
+
 	CCharacter *e = PlayerManager.getChar(eid);
 	if(e != 0)
 	{
@@ -3606,7 +3605,7 @@ NLMISC_COMMAND (changeVar, "change a variable of a player", "<eid> <var> <val>")
 	{
 		log.displayNL("Unknown entity %s (not a player or a creature)", eid.toString().c_str());
 	}
-	
+
 	return true;
 }
 
@@ -3640,7 +3639,7 @@ NLMISC_COMMAND (unmute, "unmute a user", "<csr id> <player name>")
 		CCharacter::sendDynamicSystemMessage( eid, "CSR_BAD_TARGET" );
 		return true;
 	}
-	
+
 	PlayerManager.removeGMMute( eid, target->getId() );
 	return true;
 }
@@ -3654,7 +3653,7 @@ NLMISC_COMMAND (universe, "chat in universe mode", "<boolean>")
 	bool on = (args[1]=="1" || strlwr(args[1])=="on" || strlwr(args[1])=="true" );
 
 	CMessage msgOut("UNIVERSE_MODE");
-	
+
 	msgOut.serial( const_cast<CEntityId&>(eid) );
 	msgOut.serial( on );
 	CUnifiedNetwork::getInstance()->send( "IOS", msgOut );
@@ -3683,14 +3682,14 @@ NLMISC_COMMAND (muteUniverse, "mute the univers chat", "<csr id><player name><du
 		chatToPlayer (c->getId(), "Unknown command");
 		return true;
 	}
-	
+
 	if (!c->havePriv(cmd->Priv))
 	{
 		nlwarning ("ADMIN: Player %s doesn't have privilege to execute the client admin command '%s' ", c->getId().toString().c_str(), "muteUniverse");
 		chatToPlayer (c->getId(), "You don't have privilege to execute this command");
 		return true;
 	}
-	
+
 	NLMISC::TGameCycle cycle = (NLMISC::TGameCycle) ( atoi(args[2].c_str()) / CTickEventHandler::getGameTimeStep() + CTickEventHandler::getGameCycle() );
 	PlayerManager.muteUniverse( eid, cycle, target->getId() );
 	return true;
@@ -3718,14 +3717,14 @@ NLMISC_COMMAND (unmuteUniverse, "unmute the univers chat", "<csr id><player name
 		chatToPlayer (c->getId(), "Unknown command");
 		return true;
 	}
-	
+
 	if (!c->havePriv(cmd->Priv))
 	{
 		nlwarning ("ADMIN: Player %s doesn't have privilege to execute the client admin command '%s' ", c->getId().toString().c_str(), "unmuteUniverse");
 		chatToPlayer (c->getId(), "You don't have privilege to execute this command");
 		return true;
 	}
-	
+
 	PlayerManager.unmuteUniverse(eid, target->getId());
 	return true;
 }
@@ -3894,7 +3893,7 @@ NLMISC_COMMAND (infos, "give info on character (GodMode, Invisible...)", "")
 ENTITY_VARIABLE(Invisible, "Invisibility of a player")
 {
 	ENTITY_GET_ENTITY
-		
+
 	if (get)
 	{
 		value = R2_VISION::isEntityVisibleToPlayers(e->getWhoSeesMe()) ?"0":"1";
@@ -3907,7 +3906,7 @@ ENTITY_VARIABLE(Invisible, "Invisibility of a player")
 
 		// may be null !
 		CCharacter *c = dynamic_cast<CCharacter*>(e);
-		
+
 		uint64 val;
 
 		if (value=="1" || value=="on" || strlwr(value)=="true" )
@@ -3919,7 +3918,7 @@ ENTITY_VARIABLE(Invisible, "Invisibility of a player")
 			{
 				// seup the default value to use
 				val = R2_VISION::buildWhoSeesMe(R2_VISION::WHOSEESME_INVISIBLE_PLAYER,false);
-				
+
 				CPlayer * player = PlayerManager.getPlayer( PlayerManager.getPlayerId(entity) );
 				if (player != NULL )
 				{
@@ -3946,7 +3945,7 @@ ENTITY_VARIABLE(Invisible, "Invisibility of a player")
 			{
 				// seup the default value to use
 				val = R2_VISION::buildWhoSeesMe(R2_VISION::WHOSEESME_VISIBLE_PLAYER,false);
-				
+
 				CPlayer * player = PlayerManager.getPlayer( PlayerManager.getPlayerId(entity) );
 				if (player != NULL )
 				{
@@ -4037,7 +4036,7 @@ NLMISC_COMMAND(broadcast,"[repeat=<num repeat> or during=<time in seconds>] [eve
 				posMessage = posEgale + 1;
 		}
 	}
-	
+
 	pos = message.find("every");
 	if( pos != string::npos )
 	{
@@ -4080,7 +4079,7 @@ NLMISC_COMMAND(broadcast,"[repeat=<num repeat> or during=<time in seconds>] [eve
 		log.displayNL("Can't execute broadcast command, check you'r repeat/during/every parameters");
 		return false;
 	}
-	
+
 	log.displayNL("Execute Broadcast: repeat=%d during=%d every=%d message=%s", repeat, during, every, message.c_str() );
 	PlayerManager.broadcastMessage( repeat, during, every, message );
 	return true;
@@ -4090,7 +4089,7 @@ NLMISC_COMMAND(broadcast,"[repeat=<num repeat> or during=<time in seconds>] [eve
 ENTITY_VARIABLE (God, "God mode, invulnerability")
 {
 	ENTITY_GET_CHARACTER
-		
+
 	if (get)
 	{
 		value = c->godMode()?"1":"0";
@@ -4115,7 +4114,7 @@ ENTITY_VARIABLE (God, "God mode, invulnerability")
 ENTITY_VARIABLE (Invulnerable, "Invulnerable mode, invulnerability too all")
 {
 	ENTITY_GET_CHARACTER
-		
+
 	if (get)
 	{
 		value = c->invulnerableMode()?"1":"0";
@@ -4138,7 +4137,7 @@ ENTITY_VARIABLE (Invulnerable, "Invulnerable mode, invulnerability too all")
 ENTITY_VARIABLE (ShowFactionChannels, "Show faction channels")
 {
 	ENTITY_GET_CHARACTER
-		
+
 	if (get)
 	{
 		value = c->showFactionChannelsMode()?"1":"0";
@@ -4157,7 +4156,7 @@ ENTITY_VARIABLE (ShowFactionChannels, "Show faction channels")
 ENTITY_VARIABLE (PriviledgePVP, "Priviledge Pvp Mode")
 {
 	ENTITY_GET_CHARACTER
-		
+
 	if (get)
 	{
 		value = c->priviledgePVP()?"1":"0";
@@ -4361,7 +4360,7 @@ NLMISC_COMMAND(guildInvite, "send a guild invite to a player character", "<eid> 
 {
 	if(args.size() != 2 )
 		return false;
-	
+
 	CEntityId eId;
 	eId.fromString(args[0].c_str());
 
@@ -4377,7 +4376,7 @@ NLMISC_COMMAND(guildInvite, "send a guild invite to a player character", "<eid> 
 		return true;
 	}
 	if (!TheDataset.isAccessible(user->getEntityRowId()))
-	{ 
+	{
 		log.displayNL("'%s' is not valid in mirror", eId.toString().c_str());
 		return true;
 	}
@@ -4386,7 +4385,7 @@ NLMISC_COMMAND(guildInvite, "send a guild invite to a player character", "<eid> 
 	if ( !user->getModuleParent().getModule( gmModule ))
 	{
 		log.displayNL("<GUILD>'%s' has no valid guild module, Cant process command",eId.toString().c_str());
-		return true; 
+		return true;
 	}
 
 	uint32 guildId = user->getGuildId();
@@ -4394,7 +4393,7 @@ NLMISC_COMMAND(guildInvite, "send a guild invite to a player character", "<eid> 
 	if ( guild == NULL)
 	{
 		log.displayNL("<GUILD>'%s' Failed to find guild %u",eId.toString().c_str(), guildId);
-		return true; 
+		return true;
 	}
 
 	// make sure the guild is local
@@ -4402,7 +4401,7 @@ NLMISC_COMMAND(guildInvite, "send a guild invite to a player character", "<eid> 
 	{
 		log.displayNL("<GUILD>'%s' is in a foreign guild, Cant process command", eId.toString().c_str());
 		CCharacter::sendDynamicSystemMessage( eId, "GUILD_INVITE_ONLY_LOCAL_GUILD" );
-		return true; 
+		return true;
 	}
 
 	gmModule->inviteCharacterInGuild(PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1])));
@@ -4578,11 +4577,11 @@ NLMISC_COMMAND(setPvpClan, "set the pv clan for player", "<csr eid> <clan number
 {
 	if (args.size() != 2)
 		return false;
-	
+
 	TRY_GET_CHARACTER;
-	
+
 	uint8 clan = atoi(args[1].c_str());
-	
+
 	if ( c && c->getEnterFlag() )
 	{
 		if ( c->getPVPInterface().isValid() )
@@ -4638,16 +4637,16 @@ NLMISC_COMMAND(stopEvent, "stop previous started event", "<csr eid>")
 {
 	if (args.size() != 1)
 		return false;
-	
+
 	TRY_GET_CHARACTER;
-	
+
 	const string & eventName = CGameEventManager::getInstance().getGameEventName();
 	CGameEventManager::getInstance().resetGameEvent(string(""),string(""),string(""),string(""),string(""),false);
-	
+
 	SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
 	params[0].Literal.fromUtf8(eventName);
 	CCharacter::sendDynamicSystemMessage(eid, "CSR_STOP_EVENT", params);
-	
+
 	return true;
 }
 
@@ -4876,7 +4875,7 @@ NLMISC_COMMAND(setChanHistoricSize, "Set size of the historic for a localized ch
 		return true;
 	}
 	uint historicSize = atoi(args[1].c_str());
-	// 
+	//
 	if (historicSize > 1000)
 	{
 		nlwarning("Historic size too big");
@@ -4922,7 +4921,7 @@ NLMISC_COMMAND(removeChanClient, "remove a client to a channel", "<client name o
 	{
 		nlwarning("Unknown channel : %s", args[1].c_str());
 		return true;
-	}	
+	}
 	bool res = DynChatEGS.removeSession(chanID, c->getEntityRowId());
 	if (!res)
 	{
@@ -4942,7 +4941,7 @@ NLMISC_COMMAND(setChanClientWriteRight, "set write right for a client in the giv
 	{
 		nlwarning("Unknown channel : %s", args[1].c_str());
 		return true;
-	}	
+	}
 	bool res = DynChatEGS.setWriteRight(chanID, c->getEntityRowId(), atoi(args[2].c_str()) != 0);
 	if (!res)
 	{
@@ -4970,7 +4969,7 @@ NLMISC_COMMAND(chanList, "display the list of all channels", "<>")
 ENTITY_VARIABLE (Aggro, "Aggroable by creatures")
 {
 	ENTITY_GET_CHARACTER
-		
+
 		if (get)
 		{
 			value = toString (c->getAggroableOverride());
@@ -4982,7 +4981,7 @@ ENTITY_VARIABLE (Aggro, "Aggroable by creatures")
 				return;
 			c->setAggroableOverride(atoi(value.c_str()));
 			c->setAggroableSave(atoi(value.c_str()));
-			
+
 			sint8 aggroable = c->getAggroableOverride();
 			nlinfo ("%s aggroable = %d", entity.toString().c_str(), aggroable);
 			if (aggroable>0)
@@ -5020,37 +5019,37 @@ NLMISC_COMMAND(acceptProposalForQueue, "player accept to enter critical part (fo
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(awakePlayerInQueue, "awake player in given queue", "<eid> <queueId>")
-{	
+{
 	if (args.size() != 2) return false;
-	
+
 	CEntityId eid(args[0]);
 	uint32 queueId = atoi(args[1].c_str());
 
 	CMissionQueueManager::getInstance()->playerWakesUp( eid, queueId);
-	
+
 	return true;
 }
 
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(debugMissionsQueues, "dump mission queues for debug", "")
-{	
+{
 	CMissionQueueManager::getInstance()->dump();
-	
+
 	return true;
 }
 
 static bool serialMagicNumberMsg(const std::string &msgName, const std::string &userID, uint64 magicNumber)
 {
 	CMessage msgout( "IMPULSION_ID" );
-	CEntityId eid(userID);	
+	CEntityId eid(userID);
 	msgout.serial(eid);
 	CBitMemStream bms;
 	if ( ! GenericMsgManager.pushNameToStream(msgName, bms) )
 	{
 		nlwarning("Msg name %s not found", msgName.c_str());
 		return false;
-	}	
+	}
 	bms.serial(magicNumber);
 	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
 	CUnifiedNetwork::getInstance()->send(NLNET::TServiceId(eid.getDynamicId()), msgout );
@@ -5061,7 +5060,7 @@ static bool serialMagicNumberMsg(const std::string &msgName, const std::string &
 NLMISC_COMMAND(permanentBan, "permanently ban a player (player must be online)", "")
 {
 	if (args.size() != 1) return false;
-	return serialMagicNumberMsg("CONNECTION:PERMANENT_BAN", args[0], PermanentBanMSGMagicNumber);	
+	return serialMagicNumberMsg("CONNECTION:PERMANENT_BAN", args[0], PermanentBanMSGMagicNumber);
 }
 
 //----------------------------------------------------------------------------
@@ -5074,7 +5073,7 @@ NLMISC_COMMAND(permanentUnban, "unban a player (player must be online)", "")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(nbKnownPhrases, "display nb of known phrases for player", "<eid>")
 {
-	if (args.size() != 1) 
+	if (args.size() != 1)
 		return false;
 
 	CEntityId eid(args[0]);
@@ -5085,7 +5084,7 @@ NLMISC_COMMAND(nbKnownPhrases, "display nb of known phrases for player", "<eid>"
 		nlwarning("Player %s not found", eid.toString().c_str());
 		return true;
 	}
-	
+
 	const vector<CKnownPhrase> &kp = player->getKnownPhrases();
 	nlinfo("For player %s, size of Known Phrases vector = %u", eid.toString().c_str(), kp.size());
 
@@ -5104,7 +5103,7 @@ NLMISC_COMMAND(nbKnownPhrases, "display nb of known phrases for player", "<eid>"
 NLMISC_COMMAND(displayShopSelector, "display shop selector for a NPC", "")
 {
 	if (args.size() != 1) return false;
-	
+
 	CEntityId eid(args[0]);
 	CCreature *c = CreatureManager.getCreature( eid );
 	if( c != 0 )
@@ -5136,7 +5135,7 @@ NLMISC_COMMAND(addFactionAttackableToTarget, "Add a faction to attackable list t
 			}
 		}
 	}
-	
+
 	return true;
 }
 
@@ -5146,13 +5145,13 @@ NLMISC_COMMAND(taskPass, "pass a task from a rite", "<player eid> <rite> [<task>
 {
 	if (args.size () != 2 && args.size () != 3) return false;
 	GET_CHARACTER
-		
+
 	string rite = args[1];
 	uint32 nAlbum = 0;
 	uint32 nThema = 0;
 	uint32 taskCount = 0;
 	CSheets::getEncyclopedia().getRiteInfos( rite, nAlbum, nThema, taskCount );
-	
+
 	if( nAlbum!=0 && nThema!=0 && taskCount!=0 )
 	{
 		CCharacterEncyclopedia &rEncy = c->getEncyclopedia();
@@ -5187,7 +5186,7 @@ NLMISC_COMMAND(taskPass, "pass a task from a rite", "<player eid> <rite> [<task>
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setFamePlayer, "set the fame value of a player in the given faction", "<player eid> <faction> <fame>")
 {
-	if (args.size () != 3) 
+	if (args.size () != 3)
 		return false;
 
 	GET_CHARACTER
@@ -5195,7 +5194,7 @@ NLMISC_COMMAND(setFamePlayer, "set the fame value of a player in the given facti
 	string faction = args[1];
 	uint32 factionIndex	= PVP_CLAN::getFactionIndex( PVP_CLAN::fromString(faction) );
 	sint32 fame = atoi( args[2].c_str() );
-	
+
 	CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame, true);
 
 	return true;
@@ -5209,19 +5208,19 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 {
 	if (args.size () < 3) return false;
 	GET_ENTITY
-	
+
 	uint32 instanceNumber = e->getInstanceNumber();
 	sint32 x = e->getX();
 	sint32 y = e->getY();
 	sint32 z = e->getZ();
-	
+
 	uint32 nbBots = NLMISC::atoui(args[1].c_str());
 	if (nbBots<=0)
 	{
 		log.displayNL("invalid bot count");
 		return true;
 	}
-	
+
 	NLMISC::CSheetId sheetId(args[2]);
 	if (sheetId==NLMISC::CSheetId::Unknown)
 		sheetId = args[2] + ".creature";
@@ -5230,7 +5229,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		log.displayNL("invalid sheet id");
 		return true;
 	}
-	
+
 	double dispersionRadius = 10.;
 	if (args.size()>3)
 	{
@@ -5241,13 +5240,13 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 			return true;
 		}
 	}
-	
+
 	bool spawnBots = true;
 	if (args.size()>4)
 	{
 		NLMISC::fromString(args[4], spawnBots);
 	}
-	
+
 	CMessage msgout("EVENT_CREATE_NPC_GROUP");
 	uint32 messageVersion = 1;
 	msgout.serial(messageVersion);
@@ -5260,7 +5259,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	msgout.serial(dispersionRadius);
 	msgout.serial(spawnBots);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-	
+
 	return true;
 }
 
@@ -5269,11 +5268,11 @@ NLMISC_COMMAND(eventNpcGroupScript, "executes a script on an event npc group", "
 {
 	if (args.size () < 1) return false;
 	GET_ENTITY
-		
+
 	uint32 instanceNumber = e->getInstanceNumber();
-	
+
 	uint32 nbString = args.size();
-	
+
 	CMessage msgout("EVENT_NPC_GROUP_SCRIPT");
 	uint32 messageVersion = 1;
 	msgout.serial(messageVersion);
@@ -5284,7 +5283,7 @@ NLMISC_COMMAND(eventNpcGroupScript, "executes a script on an event npc group", "
 		msgout.serial(arg);
 	}
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-	
+
 	return true;
 }
 
@@ -5293,7 +5292,7 @@ NLMISC_COMMAND(eventSetBotName, "changes the name of a bot", "<bot eid> <name>")
 {
 	if (args.size () < 2) return false;
 	GET_ENTITY
-	
+
 	TDataSetRow row = e->getEntityRowId();
 	ucstring name;
 	name.fromUtf8(args[1]);
@@ -5301,7 +5300,7 @@ NLMISC_COMMAND(eventSetBotName, "changes the name of a bot", "<bot eid> <name>")
 	msgout.serial(row);
 	msgout.serial(name);
 	sendMessageViaMirror("IOS", msgout);
-	
+
 	return true;
 }
 
@@ -5310,14 +5309,14 @@ NLMISC_COMMAND(eventSetBotScale, "changes the scale of a bot (in % up to 255)", 
 {
 	if (args.size () < 2) return false;
 	GET_ENTITY
-		
+
 	TDataSetRow row = e->getEntityRowId();
 	uint32 scale = atoi(args[1].c_str());
 	if (scale>255)
 		scale = 0;
  	CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, row, DSPropertyVPB );
 	SET_STRUCT_MEMBER( visualPropertyB, PropertySubData.Scale, scale );
-	
+
 	return true;
 }
 
@@ -5326,16 +5325,16 @@ NLMISC_COMMAND(eventSetNpcGroupAggroRange, "changes the aggro range of a npc gro
 {
 	if (args.size() < 2) return false;
 	GET_ENTITY
-		
+
 	uint32 instanceNumber = e->getInstanceNumber();
-	
+
 	std::vector<std::string> args2;
-	
+
 	args2.push_back(args[0]);
 	args2.push_back(NLMISC::toString("()setAggro(%f, 0);", atof(args[1].c_str())));
 
 	uint32 nbString = args2.size();
-	
+
 	CMessage msgout("EVENT_NPC_GROUP_SCRIPT");
 	uint32 messageVersion = 1;
 	msgout.serial(messageVersion);
@@ -5346,7 +5345,7 @@ NLMISC_COMMAND(eventSetNpcGroupAggroRange, "changes the aggro range of a npc gro
 		msgout.serial(arg);
 	}
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-	
+
 	return true;
 }
 
@@ -5355,9 +5354,9 @@ NLMISC_COMMAND(eventSetFaunaBotAggroRange, "changes the aggro range of a fauna b
 {
 	if (args.size() < 2) return false;
 	GET_ENTITY
-		
+
 	uint32 instanceNumber = e->getInstanceNumber();
-	
+
 	uint32 messageVersion = 1;
 	string botName = args[0];
 	float notHungryRadius = (float)atof(args[1].c_str());
@@ -5367,7 +5366,7 @@ NLMISC_COMMAND(eventSetFaunaBotAggroRange, "changes the aggro range of a fauna b
 	float huntingRadius = -1.f;
 	if (args.size() > 3)
 		huntingRadius = (float)atof(args[3].c_str());
-	
+
 	CMessage msgout("EVENT_FAUNA_BOT_SET_RADII");
 	msgout.serial(messageVersion);
 	msgout.serial(botName);
@@ -5375,7 +5374,7 @@ NLMISC_COMMAND(eventSetFaunaBotAggroRange, "changes the aggro range of a fauna b
 	msgout.serial(hungryRadius);
 	msgout.serial(huntingRadius);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-	
+
 	return true;
 }
 
@@ -5384,17 +5383,17 @@ NLMISC_COMMAND(eventResetFaunaBotAggroRange, "reset the aggro range of a fauna b
 {
 	if (args.size() < 1) return false;
 	GET_ENTITY
-		
+
 	uint32 instanceNumber = e->getInstanceNumber();
-	
+
 	uint32 messageVersion = 1;
 	string botName = args[0];
-	
+
 	CMessage msgout("EVENT_FAUNA_BOT_RESET_RADII");
 	msgout.serial(messageVersion);
 	msgout.serial(botName);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-	
+
 	return true;
 }
 
@@ -5403,20 +5402,20 @@ NLMISC_COMMAND(eventSetBotCanAggro, "tells the bot if he can aggro or not", "<bo
 {
 	if (args.size() < 2) return false;
 	GET_ENTITY
-		
+
 	uint32 instanceNumber = e->getInstanceNumber();
-	
+
 	uint32 messageVersion = 1;
 	string botName = args[0];
 	bool canAggro = true;
 	NLMISC::fromString(args[1], canAggro);
-	
+
 	CMessage msgout("EVENT_BOT_CAN_AGGRO");
 	msgout.serial(messageVersion);
 	msgout.serial(botName);
 	msgout.serial(canAggro);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-	
+
 	return true;
 }
 
@@ -5425,9 +5424,9 @@ NLMISC_COMMAND(eventSetBotSheet, "Change the sheet of a bot", "<bot eid> <sheet 
 {
 	if (args.size() < 2) return false;
 	GET_ENTITY
-		
+
 	uint32 instanceNumber = e->getInstanceNumber();
-	
+
 	uint32 messageVersion = 3;
 	bool bAutoSpawnDespawn = false;
 	string botName = args[0];
@@ -5440,7 +5439,7 @@ NLMISC_COMMAND(eventSetBotSheet, "Change the sheet of a bot", "<bot eid> <sheet 
 		log.displayNL("Unknown sheet id '%s'", args[1].c_str());
 		return true;
 	}
-	
+
 	CMessage msgout("EVENT_BOT_SHEET");
 	msgout.serial(messageVersion);
 	msgout.serial(botName);
@@ -5448,7 +5447,7 @@ NLMISC_COMMAND(eventSetBotSheet, "Change the sheet of a bot", "<bot eid> <sheet 
 	msgout.serial(bAutoSpawnDespawn);
 	msgout.serial(sCustomName);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-	
+
 	return true;
 }
 
@@ -5459,7 +5458,7 @@ NLMISC_COMMAND(eventSetItemCustomText, "set an item custom text, which replaces 
 {
 	if (args.size() < 4)
 		return false;
-	
+
 	GET_CHARACTER
 	if (!c)
 	{
@@ -5472,9 +5471,9 @@ NLMISC_COMMAND(eventSetItemCustomText, "set an item custom text, which replaces 
 	inventory = INVENTORIES::toInventory(args[1]);
 	slot = atoi(args[2].c_str());
 	text.fromUtf8(args[3]);
-	
-	sint32 ret = clientEventSetItemCustomText(c, inventory, slot, text);		
-	
+
+	sint32 ret = clientEventSetItemCustomText(c, inventory, slot, text);
+
 	switch (ret)
 	{
 	case 0:
@@ -5503,7 +5502,7 @@ NLMISC_COMMAND(eventResetItemCustomText, "set an item custom text, which replace
 		log.displayNL("not enough parameters");
 		return false;
 	}
-	
+
 	GET_CHARACTER
 	INVENTORIES::TInventory	inventory = INVENTORIES::toInventory(args[1]);
 	if (inventory==INVENTORIES::UNDEFINED)
@@ -5523,13 +5522,13 @@ NLMISC_COMMAND(eventResetItemCustomText, "set an item custom text, which replace
 		log.displayNL("empty slot %u", slot);
 		return true;
 	}
-	
+
 	CGameItemPtr item = invent->getItem(slot);
 	item->setCustomText(ucstring());
 	// Following line was commented out by trap, reason unknown
 	c->incSlotVersion(INVENTORIES::bag, slot);
 	log.displayNL("item in slot %u has now its default text displayed", slot);
-	
+
 	return true;
 }
 
@@ -5542,14 +5541,14 @@ NLMISC_COMMAND(useCatalyser, "use an xp catalyser", "<eId> [<slot in bag>]")
 		log.displayNL("not enough parameters");
 		return false;
 	}
-	
+
 	GET_CHARACTER
 	sint32 slot = atoi(args[1].c_str());
 	if( slot > 0 )
 	{
 		c->useItem( (uint32)slot );
 	}
-		
+
 	return true;
 }
 
@@ -5557,7 +5556,7 @@ NLMISC_COMMAND(useCatalyser, "use an xp catalyser", "<eId> [<slot in bag>]")
 NLMISC_COMMAND(eventSetBotFaction, "changes the faction of a bot", "<bot eid> <faction>|default")
 {
 	if (args.size() < 2) return false;
-	
+
 	CEntityId eid(args[0]);
 	CCreature* creature = CreatureManager.getCreature(eid);
 	if (creature)
@@ -5574,7 +5573,7 @@ NLMISC_COMMAND(eventSetBotFaction, "changes the faction of a bot", "<bot eid> <f
 NLMISC_COMMAND(eventSetBotFameByKill, "changes the faction of a bot", "<bot eid> <faction>|default")
 {
 	if (args.size() < 2) return false;
-	
+
 	CEntityId eid(args[0]);
 	sint32 fame = 0;
 	NLMISC::fromString(args[1], fame);
@@ -5700,7 +5699,7 @@ NLMISC_COMMAND(farTPReplace, "Far TP a character. Pos in meters. Default values 
 		}
 	}
 
-	// Lock the stack to save it in this state, and make the client Far TP 
+	// Lock the stack to save it in this state, and make the client Far TP
 	c->setSessionId( SessionLockPositionStack );
 	c->requestFarTP( c->PositionStack.topToModify().SessionId, false );
 	return true;
@@ -5768,10 +5767,10 @@ NLMISC_COMMAND(teamInvite, "send a team invite to a player character", "<eid> <m
 {
 	if(args.size() != 2 )
 		return false;
-	
+
 	CEntityId eId;
 	eId.fromString(args[0].c_str());
-	
+
 	// check user
 	CCharacter * user = PlayerManager.getChar( eId );
 	if (!user)
@@ -5785,11 +5784,11 @@ NLMISC_COMMAND(teamInvite, "send a team invite to a player character", "<eid> <m
 		return true;
 	}
 	if (!TheDataset.isAccessible(user->getEntityRowId()))
-	{ 
+	{
 		log.displayNL("'%s' is not valid in mirror", eId.toString().c_str());
 		return true;
 	}
-	
+
 	// Get target
 	CCharacter	*invitedCharacter= PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
 	if(invitedCharacter == 0 || invitedCharacter->getEnterFlag() == false )
@@ -5797,7 +5796,7 @@ NLMISC_COMMAND(teamInvite, "send a team invite to a player character", "<eid> <m
 		CCharacter::sendDynamicSystemMessage( user->getId(),"TEAM_INVITED_CHARACTER_MUST_BE_ONLINE" );
 		return true;
 	}
-	
+
 	// Join
 	user->setAfkState(false);
 	TeamManager.joinProposal( user, invitedCharacter->getId() );
@@ -5823,7 +5822,7 @@ NLMISC_COMMAND(resetPVPTimers, "reset the pvp timers of a player", "<CSR eId><pl
 	CHECK_RIGHT( c,target );
 
 	target->resetPVPTimers();
-	
+
 	return true;
 }
 
@@ -5837,7 +5836,7 @@ NLMISC_COMMAND(revive, "player revives at full health at his location", "<eId>")
 	GET_CHARACTER
 
 	c->revive();
-	
+
 	return true;
 }
 

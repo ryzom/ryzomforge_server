@@ -455,36 +455,6 @@ NLMISC_COMMAND(failMissionCategory,"fail all missions of a specified category fo
 	return true;
 } // failMissionCategory
 
-
-//-----------------------------------------------
-// targetMissionDump
-//-----------------------------------------------
-NLMISC_COMMAND(targetMissionDump,"dump missions of the target","<character_id>")
-{
-	if (args.size() != 1)
-		return false;
-
-	GET_CHARACTER
-
-	if ( c->getTarget().getType() != RYZOMID::player )
-		return false;
-
-	CCharacter * target = PlayerManager.getChar( c->getTarget() );
-	if ( !target )
-		return false;
-
-	std::string text;
-	for ( map<TAIAlias, CMission*>::iterator it = target->getMissionsBegin(); it != target->getMissionsEnd(); ++it )
-	{
-		log.displayNL("Mission '%s' \t(alias %10u)  Bot Giver Alias: %10u\n",
-			CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId((*it).first).c_str(),
-			(*it).first,
-			(*it).second->getGiver());
-	}
-
-	return true;
-}
-
 //-----------------------------------------------
 // characterMissionDump
 //-----------------------------------------------
@@ -496,19 +466,14 @@ NLMISC_COMMAND(characterMissionDump,"dump character missions","<character_id>")
 	GET_CHARACTER
 
 	std::string text;
+	uint i = 0;
 	for ( map<TAIAlias, CMission*>::iterator it = c->getMissionsBegin(); it != c->getMissionsEnd(); ++it )
 	{
-		text += toString("Mission '%s' \t(alias %10u)  Bot Giver Alias: %10u\n",
+		log.displayNL("- %2d: Mission '%s' (alias %10u) Bot Giver Alias: %10u", i++,
 			CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId((*it).first).c_str(),
 			(*it).first,
 			(*it).second->getGiver());
 	}
-
-	log.displayNL(text.c_str());
-
-	SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
-	params[0].Literal = text;
-	CCharacter::sendDynamicSystemMessage( eid, "LITERAL", params );
 
 	return true;
 }
