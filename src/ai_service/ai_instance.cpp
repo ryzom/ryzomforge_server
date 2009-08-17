@@ -854,7 +854,6 @@ void cbEventNpcGroupScript( NLNET::CMessage& msgin, const std::string &serviceNa
 	vector<string> strings;
 	msgin.serial(messageVersion);
 	nlassert(messageVersion==1);
-	msgin.serial(botId);
 	msgin.serial(nbString);
 	strings.resize(nbString);
 	for (uint32 i=0; i<nbString; ++i)
