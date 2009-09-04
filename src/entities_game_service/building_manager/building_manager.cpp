@@ -73,21 +73,21 @@ void CBuildingManager::init()
 	nlassert( _Instance == NULL );
 
 	_Instance = new CBuildingManager;
-	
+
 	// register lift callbacks
 	NLNET::TUnifiedCallbackItem _cbArray[] =
 	{
-		{ "PTRIG_IN",				cbLiftIn		}, 
-		{ "PTRIG_OUT",				cbLiftOut		}, 
+		{ "PTRIG_IN",				cbLiftIn		},
+		{ "PTRIG_OUT",				cbLiftOut		},
 	};
-	
+
 	// register call back for lift trigger
 	CUnifiedNetwork::getInstance()->addCallbackArray( _cbArray, sizeof(_cbArray) / sizeof(_cbArray[0]) );
 
 	// init the player building sheet
 	_Instance->_PlayerBuildingSheet = CSheetId( "player_building.sitem" );
 	nlassert(_Instance->_PlayerBuildingSheet != CSheetId::Unknown );
-	
+
 	_Instance->_GuildBuildingSheet = CSheetId( "guild_main_building.sitem" );
 	nlassert(_Instance->_GuildBuildingSheet != CSheetId::Unknown );
 /*	_Instance->_RoleMasterSheets.resize( EGSPD::CSPType::EndSPType );
@@ -132,7 +132,7 @@ void CBuildingManager::init()
 			nlwarning("<BUILDING> Error while building triggers in file '%s'",first->FileName.c_str());
 	}
 	nlinfo("FINISHED PARSING TELEPORT INFOS");
-	
+
 	// init the room container
 	_Instance->_FirstFreeRoomId = 0;
 #ifdef NL_DEBUG
@@ -141,7 +141,7 @@ void CBuildingManager::init()
 	_Instance->_RoomAllocStep = 128;
 #endif
 	_Instance->reallocRooms();
-	
+
 }
 
 //----------------------------------------------------------------------------
@@ -204,7 +204,7 @@ bool CBuildingManager::parseBuildingTemplates( const NLLIGO::IPrimitive* prim, C
 	}
 	bool ret = true;
 	// Lookup recursively in the children
-	for (uint i=0;i<prim->getNumChildren();++i)	
+	for (uint i=0;i<prim->getNumChildren();++i)
 	{
 		const IPrimitive *child;
 		if ( prim->getChild(child,i) && child )
@@ -229,14 +229,14 @@ bool CBuildingManager::parsePhysicalBuildings( const NLLIGO::IPrimitive* prim, C
 			if ( _BuildingPhysicals.find( alias ) != _BuildingPhysicals.end() )
 			{
 				nlwarning("<BUILDING>building instance %s exists more than once", CPrimitivesParser::aliasToString(alias).c_str());
-				return false;	
+				return false;
 			}
 			nlverify( prim->getPropertyByName("building_template",value) );
 			map<string,CBuildingTemplate*>::iterator itTempl = parseData.BuildingTemplates.find( value );
 			if ( itTempl == parseData.BuildingTemplates.end() )
 			{
 				nlwarning("<BUILDING>building instance %s has an invalid template '%s'", CPrimitivesParser::aliasToString(alias).c_str(), value.c_str() );
-				return false;	
+				return false;
 			}
 			IBuildingPhysical * building = NULL;
 			if ( (*itTempl).second->Type == BUILDING_TYPES::Common )
@@ -262,7 +262,7 @@ bool CBuildingManager::parsePhysicalBuildings( const NLLIGO::IPrimitive* prim, C
 		}
 	}
 	// Lookup recursively in the children
-	for (uint i=0; i < prim->getNumChildren(); ++i)	
+	for (uint i=0; i < prim->getNumChildren(); ++i)
 	{
 		const IPrimitive *child;
 		if ( prim->getChild(child,i) && child )
@@ -292,7 +292,7 @@ bool CBuildingManager::parseTriggers( const NLLIGO::IPrimitive* prim, CBuildingP
 				return false;
 			}
 			CTrigger & trigger = _Triggers[triggerId];
-
+	nlwarning("trig %d %s - %s", triggerId, name.c_str(), prim->getName().c_str());
 			nlverify( prim->getPropertyByName("auto_teleport",value) );
 			trigger.AutoTeleport = (value == "true");
 
@@ -304,7 +304,7 @@ bool CBuildingManager::parseTriggers( const NLLIGO::IPrimitive* prim, CBuildingP
 
 			// parse the children destinations
 			const NLLIGO::IPrimitive * roomPrim = prim->getParent();
-				
+
 			for ( uint i = 0; i < prim->getNumChildren(); i++ )
 			{
 				const NLLIGO::IPrimitive* child = NULL;
@@ -314,7 +314,7 @@ bool CBuildingManager::parseTriggers( const NLLIGO::IPrimitive* prim, CBuildingP
 					string name;
 					nlverify( child->getPropertyByName("class",value) );
 					nlverify( child->getPropertyByName("name",name) );
-					
+
 					if ( value == "teleport_destination" )
 						dest = new CTPDestination(name);
 					else if ( value == "building_destination" )
@@ -338,7 +338,7 @@ bool CBuildingManager::parseTriggers( const NLLIGO::IPrimitive* prim, CBuildingP
 		}
 	}
 	// Lookup recursively in the children
-	for (uint i=0; i < prim->getNumChildren(); ++i)	
+	for (uint i=0; i < prim->getNumChildren(); ++i)
 	{
 		const IPrimitive *child;
 		if ( prim->getChild(child,i) && child )
@@ -350,7 +350,7 @@ bool CBuildingManager::parseTriggers( const NLLIGO::IPrimitive* prim, CBuildingP
 //----------------------------------------------------------------------------
 void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 triggerId )
 {
-	//GPMS can send a trigger msg more than one. So check if we already received it	
+	//GPMS can send a trigger msg more than one. So check if we already received it
 	TTriggerRequestCont::iterator itReq = _TriggerRequests.find( rowId );
 	if ( itReq != _TriggerRequests.end() )
 		return;
@@ -366,8 +366,8 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 	CTrigger & trigger = (*itTrigger).second;
 	// ignore empty triggers
 	if (  trigger.Destinations.empty() )
-		return;	
-	
+		return;
+
 	// get user
 	CCharacter * user= PlayerManager.getChar( rowId );
 	if ( !user )
@@ -376,12 +376,12 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 		return;
 	}
 
-	
+
 	// build a request for our user
 	CTriggerRequest request;
 	request.Page = 0;
 	request.Session = 0;
-	
+
 	CTriggerRequestEntry entry;
 	const uint destCount = trigger.Destinations.size();
 	for ( uint i = 0; i < destCount; i++ )
@@ -451,7 +451,7 @@ void CBuildingManager::fillTriggerPage(const NLMISC::CEntityId & eId, uint16 cli
 	{
 		// dont warn :client  may have quitted the trigger before sending the request
 		return;
-	}		
+	}
 	CTriggerRequest & request = (*it).second;
 
 	// set basic database information
@@ -487,7 +487,7 @@ void CBuildingManager::fillTriggerPage(const NLMISC::CEntityId & eId, uint16 cli
 		CBankAccessor_PLR::getASCENSOR().getArray(index).setNAME(user->_PropertyDatabase, txt);
 //		user->_PropertyDatabase.setProp( NLMISC::toString( "ASCENSOR:%u:ICON",index ),icon );
 		CBankAccessor_PLR::getASCENSOR().getArray(index).setICON(user->_PropertyDatabase,icon);
-		index++;	
+		index++;
 	}
 	// reset remaining parameters
 	for ( uint i = end; i < MaxEntryPerLiftPage; i++ )
@@ -507,18 +507,18 @@ void CBuildingManager::removeTriggerRequest( const TDataSetRow & rowId )
 	TTriggerRequestCont::iterator itReq = _TriggerRequests.find( rowId );
 	if ( itReq == _TriggerRequests.end() )
 		return;
-	
+
 	if ( (*itReq).second.Timer )
 		delete (*itReq).second.Timer;
 	_TriggerRequests.erase( itReq );
-	
+
 	CCharacter * user = PlayerManager.getChar( rowId );
 	if ( !user )
 	{
 		nlwarning("<BUILDING> row %u is invalid",rowId.getIndex() );
 		return;
 	}
-	
+
 	// tell client
 	CEntityId id = user->getId();
 	NLNET::CMessage msgout( "IMPULSION_ID" );
@@ -531,7 +531,7 @@ void CBuildingManager::removeTriggerRequest( const TDataSetRow & rowId )
 	}
 	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
 	sendMessageViaMirror( NLNET::TServiceId(id.getDynamicId()), msgout );
-	
+
 	// clear database
 //	user->_PropertyDatabase.setProp( "ASCENSOR:SESSION",0 );
 	CBankAccessor_PLR::getASCENSOR().setSESSION(user->_PropertyDatabase, 0);
@@ -609,7 +609,7 @@ void CBuildingManager::removePlayerFromRoom( CCharacter * user )
 #endif
 
 	CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, user->getEntityRowId(), DSPropertyCELL );
-	sint32 cell = mirrorCell;		
+	sint32 cell = mirrorCell;
 	if ( !isRoomCell(cell) )
 		return;
 	uint idx = getRoomIdxFromCell( cell );
@@ -664,7 +664,7 @@ inline void  CBuildingManager::reallocRooms()
 {
 	// here the current size of the vector is _FirstFreeBuildingId
 	_RoomInstances.resize(_FirstFreeRoomId + _RoomAllocStep);
-	
+
 	// we init the new building as unset
 	// if the GPMS is up we register the cells. There is code copy here because we want to avoid a test on the GPMS at each iteration
 	if ( GPMSIsUp )
@@ -692,7 +692,7 @@ inline void  CBuildingManager::reallocRooms()
 			_RoomInstances[i].Ptr = NULL;
 		}
 	}
-	
+
 }
 
 //----------------------------------------------------------------------------
@@ -749,7 +749,7 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 	{
 		return;
 	}
-	
+
 	// check if mounts are allowed
 	if ( !dest->arePetsAllowed() )
 	{
@@ -771,7 +771,7 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 */	}
 	else
 		user->allowNearPetTp();
-	
+
 	// reset database
 //	user->_PropertyDatabase.setProp( "ASCENSOR:SESSION",0 );
 	CBankAccessor_PLR::getASCENSOR().setSESSION(user->_PropertyDatabase,0 );
@@ -784,7 +784,7 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 //		user->_PropertyDatabase.setProp( NLMISC::toString( "ASCENSOR:%u:NAME",i), 0 );
 		CBankAccessor_PLR::getASCENSOR().getArray(i).setNAME(user->_PropertyDatabase, 0 );
 	}
-	
+
 	// get the destination zone
 	const CTpSpawnZone * zone = CZoneManager::getInstance().getTpSpawnZone( dest->getSpawnZoneId(user) );
 	if ( !zone )
@@ -805,7 +805,7 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 		// teleport the player
 		if ( cellId )
 		{
-			user->tpWanted(x,y,z,true,heading,0xFF,cellId);	
+			user->tpWanted(x,y,z,true,heading,0xFF,cellId);
 			if ( dest->isGuildRoomDestination() )
 				PlayerManager.sendImpulseToClient(user->getId(), "GUILD:OPEN_INVENTORY");
 		}
@@ -887,7 +887,7 @@ CBuildingPhysicalPlayer * CBuildingManager::parsePlayerCaretaker( const std::str
 void CBuildingManager::buildBuildingTradeList(const NLMISC::CEntityId & userId, uint16 session)
 {
 	H_AUTO(CBuildingManager_buildTradeGuildOptions);
-	
+
 	// Get the player
 	CCharacter * user = PlayerManager.getChar( userId );
 	if ( !user )
@@ -1036,7 +1036,7 @@ void CBuildingManager::buyBuildingOption(const NLMISC::CEntityId & userId, uint8
 {
 	// item log context
 	TLogContext_Item_BuyGuildOption	itemCtx(userId);
-		
+
 	// get all trade parameters
 	CCharacter * user = PlayerManager.getChar(userId);
 	if ( !user )
@@ -1052,7 +1052,7 @@ void CBuildingManager::buyBuildingOption(const NLMISC::CEntityId & userId, uint8
 		nlwarning("<BUILDING> char %s is not trading guild options or outpost building!!",userId.toString().c_str());
 		return;
 	}
-	
+
 	const vector<CTradePhrase> & phrases = user->currentPhrasesTradeList();
 	if ( idx >= phrases.size() )
 	{

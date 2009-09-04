@@ -78,7 +78,7 @@ RY_PDS::IPDBaseData* CMissionManager::missionFactoryPDGuild()
 	return new CMissionGuild;
 }
 
-/*void CDynMissionDescMsgImp::callback (const std::string &name, uint8 id) 
+/*void CDynMissionDescMsgImp::callback (const std::string &name, uint8 id)
 {
 //	CMissionManager::getInstance()->processDynRequestAnswer(*this);
 }// CDynMissionDescMsgImp callback
@@ -131,16 +131,16 @@ void CCAisActionMsgImp::callback(const std::string &name, NLNET::TServiceId id)
 							for ( map<uint32, EGSPD::CActiveStepPD>::const_iterator itStep = templ->Instances[i]->getStepsBegin(); itStep != templ->Instances[i]->getStepsEnd(); ++itStep )
 							{
 								nlassert( uint( (*itStep).second.getIndexInTemplate() - 1 ) < templ->Steps.size() );
-								
+
 								CMissionStepEscort *escortStep = dynamic_cast<CMissionStepEscort*> (templ->Steps[ (*itStep).second.getIndexInTemplate() - 1 ]);
 								if ( escortStep != NULL )
 								{
 									templ->Instances[i]->onFailure(false);
-									
+
 									exit = true;
 									break;
 								}
-							}							
+							}
 						}
 						else
 							nlwarning( "<CCAisActionMsgImp callback> *fail* mission %s  has a NULL instance ",Content[0].c_str() );
@@ -185,7 +185,7 @@ void CCAisActionMsgImp::callback(const std::string &name, NLNET::TServiceId id)
 void CHandledAIGroupSpawnedMsgImp::callback (const std::string &name, NLNET::TServiceId id)
 {
 	CMissionEventGroupSpawned event(this->GroupAlias);
-	
+
 	CCharacter * pChar = PlayerManager.getChar(this->PlayerRowId);
 	if (pChar != NULL)
 	{
@@ -195,7 +195,7 @@ void CHandledAIGroupSpawnedMsgImp::callback (const std::string &name, NLNET::TSe
 	{
 		nlwarning("<CHandledAIGroupSpawnedMsgImp callback> Character not found (%s)", PlayerRowId.toString().c_str());
 	}
-} // CHandledAIGroupSpawnedMsgImp callback 
+} // CHandledAIGroupSpawnedMsgImp callback
 
 // ****************************************************************************
 void CHandledAIGroupDespawnedMsgImp::callback (const std::string &name, NLNET::TServiceId id)
@@ -211,8 +211,8 @@ void CHandledAIGroupDespawnedMsgImp::callback (const std::string &name, NLNET::T
 	{
 		nlwarning("<CHandledAIGroupSpawnedMsgImp callback> Character not found (%s)", PlayerRowId.toString().c_str());
 	}
-} // CHandledAIGroupSpawnedMsgImp callback 
-	
+} // CHandledAIGroupSpawnedMsgImp callback
+
 
 void CMissionManager::init()
 {
@@ -238,7 +238,7 @@ CMissionManager::CMissionManager()
 
 	// get the emote list
 	EMOTE_LIST_PARSER::initEmoteList(_Emotes);
-	
+
 	// get the loaded primitives
 	const CPrimitivesParser::TPrimitivesList & primsList = CPrimitivesParser::getInstance().getPrimitives();
 //	const vector<string> & primNamesVect = CPrimitivesParser::getInstance().getPrimitiveFiles();
@@ -251,7 +251,7 @@ CMissionManager::CMissionManager()
 	bool parsingOk = true;
 
 	CMissionGlobalParsingData globalData;
-	
+
 	uint countBadMission = 0;
 
 	// parse missions
@@ -290,7 +290,7 @@ CMissionManager::CMissionManager()
 			}
 			else
 			{
-				(*it).second->copy( *(*itTest).second );				 
+				(*it).second->copy( *(*itTest).second );
 				(*itTest).second->Alias = globalData.CopyMissions[i].first;
 			}
 		}
@@ -309,7 +309,7 @@ CMissionManager::CMissionManager()
 			CHashMap< uint,CMissionTemplate* >::iterator it = _MissionTemplates.find( realAlias );
 			if ( it != _MissionTemplates.end() )
 			{
-				
+
 				std::map<TAIAlias,std::string>::iterator itName = globalData.NameMap.find( refAlias );
 				if ( itName != globalData.NameMap.end() )
 				{
@@ -318,9 +318,9 @@ CMissionManager::CMissionManager()
 					countRef++;
 					continue;
 				}
-				else 
+				else
 					MISLOG("'NAME NOT FOUND' alias = %s", CPrimitivesParser::aliasToString(refAlias).c_str());
-				
+
 			}
 			else
 				MISLOG("ref mission alias %s references bad mission alias %s, which could not be built",
@@ -329,7 +329,7 @@ CMissionManager::CMissionManager()
 		}
 		else
 			MISLOG("ref mission alias %s was not found!!!", CPrimitivesParser::aliasToString(refAlias).c_str() );
-		
+
 		CHashMap< uint, TAIAlias >::iterator itDel = itRef;
 		++itRef;
 		_RefMissions.erase( itDel );
@@ -369,7 +369,7 @@ CMissionManager::CMissionManager()
 			MISLOG("'%s' alias = %s",(*itName).second.c_str(), CPrimitivesParser::aliasToString((*it).first).c_str());
 			count++;
 		}
-		else 
+		else
 		{
 			MISLOG("'NAME NOT FOUND' alias = %s", CPrimitivesParser::aliasToString((*it).first).c_str());
 		}
@@ -396,7 +396,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 	{
 		missionIndex++;
 		prim->getPropertyByName("name",value);
-	
+
 		// parse the mission and put it in our manager
 		CMissionTemplate* templ = new CMissionTemplate();
 		if ( !templ->build( prim, globalData, _RefMissions, value, npcGiverAlias ) )
@@ -404,7 +404,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			MISLOG("Previous errors in mission %u '%s'%s in file '%s'",
 				missionIndex,
 				value.c_str(),
-				CPrimitivesParser::aliasToString(templ->Alias).c_str(), 
+				CPrimitivesParser::aliasToString(templ->Alias).c_str(),
 				filename.c_str() );
 			MissionLog.Log->displayNL(" \n");
 			delete templ;
@@ -414,15 +414,15 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 		CHashMap<uint,CMissionTemplate*>::iterator itAlias =  _MissionTemplates.find( templ->Alias );
 		if  (  itAlias != _MissionTemplates.end() )
 		{
-			
+
 			MISLOG("<MISSIONS> Alias previously used  (mission %u, editor_name '%s'%s in file '%s'). Prev mission title is '%s'",
 				missionIndex,
 				value.c_str(),
-				CPrimitivesParser::aliasToString(templ->Alias).c_str(), 
+				CPrimitivesParser::aliasToString(templ->Alias).c_str(),
 				filename.c_str(),
 				itAlias->second->getMissionName().c_str());
 			delete templ;
-			badMissionCount++;		
+			badMissionCount++;
 			return false;
 		}
 
@@ -438,7 +438,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			templ->EncycloThema = nThm;
 			templ->EncycloTask  = nTask;
 		}
-		
+
 		if (!templ->Tags.NeedValidation || isMissionValid(value, templ->HashKey))
 		{
 			_MissionTemplates.insert( make_pair( templ->Alias, templ ) );
@@ -449,7 +449,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			nlinfo("Mission validation: mission %s is not valid and not loaded", templ->getMissionName().c_str());
 			delete templ;
 		}
-		
+
 		return true;
 	}
 	//this is not a mission node, so lookup recursively in the children
@@ -461,10 +461,10 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			// try to get its alias. Replace any previous value
 			CPrimitivesParser::getAlias(prim, npcGiverAlias);
 		}
-			
+
 		// lookup recursively in the children
 		bool ok = true;
-		for (uint i=0;i<prim->getNumChildren();++i)	
+		for (uint i=0;i<prim->getNumChildren();++i)
 		{
 			const IPrimitive *child;
 			if ( !prim->getChild(child,i) || !parsePrimForMissions(child, filename, globalData, badMissionCount, npcGiverAlias) )
@@ -480,7 +480,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
  */
 void CMissionManager::tickUpdate()
 {
-	if( IsRingShard ) // Temporary Fix potential problem with multi shard instance Ring unification: 
+	if( IsRingShard ) // Temporary Fix potential problem with multi shard instance Ring unification:
 		return;	// Mission saved tick must be adapted for have relative value saved
 	std::list< CMission* >::iterator it = _TimedMissions.begin();
 	while( it != _TimedMissions.end() )
@@ -707,7 +707,7 @@ void CMissionManager::instanciateChargeMission(TAIAlias  alias, TAIAlias giver, 
 void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAlias giver, std::list< CMissionEvent * > & eventList, TAIAlias mainMission)
 {
 	nlassert(user);
-	
+
 	string sDebugPrefix = "user:" + user->getId().toString() + " miss:" + CPrimitivesParser::aliasToString(alias);
 
 	// get the template
@@ -772,7 +772,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 			nlassert(idx<MaxSoloMissionCount);
 			soloMission->setClientIndex(idx);
 		}
-		
+
 		// Add mission
 		user->addMission( soloMission );
 		inst = soloMission;
@@ -869,7 +869,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 		}
 		else
 		{
-			
+
 		}
 		*/
 	}
@@ -951,7 +951,7 @@ void CMissionManager::deInstanciateMission(CMission * mission)
 				}
 			}
 		}
-		
+
 		for ( uint i = 0; i < templ->Instances.size(); i++ )
 		{
 			if ( templ->Instances[i] == mission )
@@ -970,7 +970,7 @@ void CMissionManager::deInstanciateMission(CMission * mission)
 			string msg;
 			for ( map<uint32,EGSPD::CMissionCompassPD>::const_iterator it = mission->getCompassBegin(); it != mission->getCompassEnd(); ++it )
 			{
-				
+
 				if ( (*it).second.getPlace() == CAIAliasTranslator::Invalid )
 				{
 					params[0].Type = STRING_MANAGER::bot;
@@ -1008,7 +1008,7 @@ void CMissionManager::deInstanciateMission(CMission * mission)
 
 	mission->setEndDate(0);
 	mission->setBeginDate(0);
-	MISDBG("%s ok", sDebugPrefix.c_str());	
+	MISDBG("%s ok", sDebugPrefix.c_str());
 
 }// CMissionManager::deInstanciateMission
 
@@ -1036,7 +1036,7 @@ void CMissionManager::sendDebugJournal( CCharacter * user)
 		PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), title );
 //		PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), (uint32)user->_PropertyDatabase.getProp( NLMISC::toString( "MISSIONS:%u:DETAIL_TEXT",i) ) );
 		PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), missionItem.getDETAIL_TEXT(user->_PropertyDatabase) );
-		
+
 //		params[0].Int = (uint32)user->_PropertyDatabase.getProp( NLMISC::toString( "MISSIONS:%u:DELAY",i) );
 //		params[0].Int = missionItem.getDELAY(user->_PropertyDatabase);
 //		PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), "SOLE_INT",params );
@@ -1072,7 +1072,7 @@ void CMissionManager::sendDebugJournal( CCharacter * user)
 //			params[0].Int = (uint32)user->_PropertyDatabase.getProp( NLMISC::toString( "MISSIONS:%u:TARGET%u:X",i,j) );
 			params[0].Int = missionItem.getTARGET(j).getX(user->_PropertyDatabase);
 			PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), "SOLE_INT",params );
-			
+
 //			params[0].Int = (uint32)user->_PropertyDatabase.getProp( NLMISC::toString( "MISSIONS:%u:TARGET%u:Y",i,j) );
 			params[0].Int = missionItem.getTARGET(j).getY(user->_PropertyDatabase);
 			PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), "SOLE_INT",params );
@@ -1102,10 +1102,10 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 	uint32 botAlias = step->Bot;
 	if (botAlias==CAIAliasTranslator::Invalid)
 		botAlias = instance->getGiver();
-	
+
 	CCreature * bot = NULL;
 	CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, user->getEntityRowId(), DSPropertyCELL );
-	sint32 cell = mirrorCell;		
+	sint32 cell = mirrorCell;
 	if ( cell <= -2 )
 	{
 		IRoomInstance * room = CBuildingManager::getInstance()->getRoomInstanceFromCell( cell );
@@ -1130,7 +1130,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 	{
 		bot = CreatureManager.getCreature( CAIAliasTranslator::getInstance()->getEntityId( botAlias ) );
 	}
-		
+
 	if ( !bot )
 	{
 		nlwarning("<MISSIONS>%s invalid bot %u",user->getId().toString().c_str(),step->Bot );
@@ -1146,7 +1146,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 
 	// Remove any previous dyn chat that is not from that bot
 	// we first close all the concerned dyn chat interface on the client,then send EndDynchat event and finally remove the concerned entries from the map
-	// we have to do it in three passes because processMissionEvent can remove dyn chat entries. And we'd better avoid dereferencement on invalid iterators...	
+	// we have to do it in three passes because processMissionEvent can remove dyn chat entries. And we'd better avoid dereferencement on invalid iterators...
 	nlassert(user);
 	vector<TAIAlias> aliases;
 	// close all interfaces
@@ -1179,7 +1179,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 	{
 		user->processMissionEvent(event,aliases[i]);
 	}
-	// erase the user entries 	
+	// erase the user entries
 	it = _DynChats.find(user->getEntityRowId());
 	while (it!= _DynChats.end() && (*it).first == user->getEntityRowId())
 	{
@@ -1191,7 +1191,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 			{
 				// Send to AIS (to stop the bot). Important: there must be the same number of items pushed in DynChatEnd that in DynChatStart for the bot to resume.
 				CharacterDynChatBeginEnd.DynChatEnd.push_back( dynChat.Bot );
-				_DynChats.erase(tmpIt);			
+				_DynChats.erase(tmpIt);
 			}
 			else
 			{
@@ -1199,12 +1199,12 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 			}
 		}
 	}
-	
+
 	// if the player has a dynchat with this bot, make the new dyn chat sleep ( will be activated after first dyn chat )
-	// NB nico : the guideline is now to have only a single possible dynchat at a time, let this code 
+	// NB nico : the guideline is now to have only a single possible dynchat at a time, let this code
 	// as a fool keeper.
-	it = _DynChats.find( user->getEntityRowId() );	
-	bool openChat = true;	
+	it = _DynChats.find( user->getEntityRowId() );
+	bool openChat = true;
 	while ( it!= _DynChats.end() && (*it).first == user->getEntityRowId() )
 	{
 		CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator tmpIt = it;
@@ -1230,7 +1230,7 @@ void CMissionManager::addDynChat( CMission * instance, CMissionStepDynChat * ste
 			break;
 		}
 	}
-	
+
 	_DynChats.insert( make_pair( user->getEntityRowId(), dynChat ) );
 	CEntityId giverId = CAIAliasTranslator::getInstance()->getEntityId( instance->getGiver() );
 	if ( giverId == CEntityId::Unknown )
@@ -1292,14 +1292,14 @@ void CMissionManager::switchDynChatSpeaker(CCharacter * user, const NLMISC::CEnt
 		else
 			++it;
 	}
-	
+
 }// CMissionManager::switchDynChatSpeaker
 
 
 void CMissionManager::removeAllUserDynChat(CCharacter * user)
 {
 	// we first close all the concerned dyn chat interface on the client,then send EndDynchat event and finally remove the concerned entries from the map
-	// we have to do it in three passes because processMissionEvent can remove dyn chat entries. And we'd better avoid dereferencement on invalid iterators...	
+	// we have to do it in three passes because processMissionEvent can remove dyn chat entries. And we'd better avoid dereferencement on invalid iterators...
 	nlassert(user);
 	vector<TAIAlias> aliases;
 	// close all interfaces
@@ -1321,7 +1321,7 @@ void CMissionManager::removeAllUserDynChat(CCharacter * user)
 		CharacterDynChatBeginEnd.DynChatEnd.push_back( (*it).second.Bot );
 	}
 
-	// erase the user entries 
+	// erase the user entries
 	_DynChats.erase(user->getEntityRowId());
 
 	// For each concerned mission, send an end dyn chat event to the player, specifying the mission
@@ -1338,7 +1338,7 @@ void CMissionManager::removeMissionDynChat(CCharacter * user, CMission * instanc
 	nlassert(user);
 	nlassert(instance);
 	std::set<TDataSetRow> bots;
-	
+
 	CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
 	while ( it != _DynChats.end() && (*it).first == user->getEntityRowId()  )
 	{
@@ -1350,7 +1350,7 @@ void CMissionManager::removeMissionDynChat(CCharacter * user, CMission * instanc
 			// we dont send events because if we are here, it means that the mission is removed
 			// inform client
 			closeDynChat( user,(*itold).second.Bot );
-			
+
 			// erase the dyn chat
 			_DynChats.erase( itold );
 
@@ -1414,8 +1414,8 @@ void CMissionManager::dynChatChoice( CCharacter * user, const TDataSetRow & botR
             if ( choice >= dynChat->Answers.size() )
             {
                 nlwarning("MISSIONS: Invalid answer index %u for user %s on mission alias %s",
-					choice, 
-					user->getId().toString().c_str(), 
+					choice,
+					user->getId().toString().c_str(),
 					CPrimitivesParser::aliasToString(missionAlias).c_str());
                 return;
             }
@@ -1436,7 +1436,36 @@ void CMissionManager::dynChatChoice( CCharacter * user, const TDataSetRow & botR
 					// Send to AIS (to stop the bot). Important: there must be the same number of items pushed in DynChatEnd that in DynChatStart for the bot to resume.
 					CharacterDynChatBeginEnd.DynChatEnd.push_back( botRow );
 
-					_DynChats.erase(it);
+// HERE "it" IS INVALID, NEED TO FIND IT AGAIN TO ERASE IT
+
+					it = _DynChats.end(); // to be sure
+
+					{
+						/* We need to find the mission that we are working on as we invalidated the iterator
+						 * in the jump()
+						 */
+						CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator itToLookForMission = _DynChats.find( user->getEntityRowId() );
+						while (itToLookForMission != _DynChats.end() && (*itToLookForMission).first == user->getEntityRowId())
+						{
+							if ( (*itToLookForMission).second.Bot == botRow )
+							{
+								CMission * missionIterated = (*itToLookForMission).second.Mission;
+								if (missionIterated && inst  == missionIterated)
+								{
+									_DynChats.erase(itToLookForMission);
+									break;
+								}
+							}
+							++itToLookForMission;
+						}
+					}
+
+//            _DynChats.erase(it);
+
+// END PATCH
+
+
+
                     reStart = true;
                     switch ( inst->getProcessingState() )
                     {
@@ -1484,7 +1513,7 @@ void CMissionManager::dynChatChoice( CCharacter * user, const TDataSetRow & botR
             if ( i == nbJumpPoints )
             {
                 nlwarning("MISSIONS: Invalid jump point %s in mission alias %s",
-					dynChat->Answers[choice].Jump.c_str(), 
+					dynChat->Answers[choice].Jump.c_str(),
 					CPrimitivesParser::aliasToString(missionAlias).c_str());
                 return;
             }
@@ -1685,7 +1714,7 @@ inline void CMissionManager::openDynChat( CCharacter * user,const CCreature * bo
 		CMissionParser::solveEntitiesNames( params,user->getEntityRowId(),giverId );
 		dynStrings[i] = STRING_MANAGER::sendStringToClient(user->getEntityRowId(),dynChat->Answers[i-1].PhraseId, params );
 	}
-	
+
 	// Send to client
 	CMessage msgout( "IMPULSION_ID" );
 	CBitMemStream bms;
@@ -1698,7 +1727,7 @@ inline void CMissionManager::openDynChat( CCharacter * user,const CCreature * bo
 	bms.serial(index);
 	bms.serial(name);
 	bms.serialCont(dynStrings);
-	
+
 	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
 	sendMessageViaMirror( NLNET::TServiceId(user->getId().getDynamicId()), msgout );
 
@@ -1715,8 +1744,8 @@ inline void CMissionManager::initInstanciatedMission(CMission * inst, std::list<
 	// tag the last mission instantiation (for global repeat timer)
 //	templ->MissionStats.LastTryDate = CTickEventHandler::getGameCycle();
 //	templ->LastTryDate = CTickEventHandler::getGameCycle();
-	templ->Instances.push_back(inst); 
-	
+	templ->Instances.push_back(inst);
+
 	if ( templ->MonoTimer )
 	{
 		inst->setMonoEndDate( CTickEventHandler::getGameCycle() + templ->MonoTimer );
@@ -1753,7 +1782,7 @@ inline void CMissionManager::initInstanciatedMission(CMission * inst, std::list<
 			CMissionInstanceGuild * mission = dynamic_cast<CMissionInstanceGuild *>(inst);
 			nlassert( mission );
 			{
-				
+
 				CGuild * guild = mission->getGuild();
 				while( !eventList.empty() )
 				{
@@ -1797,8 +1826,8 @@ void CMissionManager::checkPlaceConstraints ( CMission* mission)
 	CCharacter * user = mission->getMainEntity();
 	if ( !user )
 		return;
-	
-	
+
+
 	/// check outside constraints
 	for ( map<TAIAlias, EGSPD::CMissionOutsidePlacePD>::iterator it = mission->getOutsidePlacesBegin(); it != mission->getOutsidePlacesEnd(); ++it )
 	{
@@ -1815,10 +1844,10 @@ void CMissionManager::checkPlaceConstraints ( CMission* mission)
 					checker.PlaceAlias =  place->getAlias();
 					checker.EndDate = (*it).second.getDelay() + CTickEventHandler::getGameCycle();
 					vect.push_back(checker);
-					
+
 					vector<TDataSetRow> entities;
 					mission->getEntities( entities );
-					
+
 					SM_STATIC_PARAMS_2(params, STRING_MANAGER::place, STRING_MANAGER::integer );
 					params[0].Identifier = place->getName();
 					params[1].Int = (*it).second.getDelay() / 10;
@@ -1851,10 +1880,10 @@ void CMissionManager::checkPlaceConstraints ( CMission* mission)
 				checker.PlaceAlias = place->getAlias();
 				checker.EndDate = (*itIn).second.getDelay() + CTickEventHandler::getGameCycle();
 				vect.push_back(checker);
-				
+
 				vector<TDataSetRow> entities;
 				mission->getEntities( entities );
-				
+
 				SM_STATIC_PARAMS_2(params, STRING_MANAGER::place, STRING_MANAGER::integer );
 				params[0].Identifier = place->getName();
 				params[1].Int = (*itIn).second.getDelay() / 10;
@@ -1863,8 +1892,8 @@ void CMissionManager::checkPlaceConstraints ( CMission* mission)
 					PHRASE_UTILITIES::sendDynamicSystemMessage(entities[i],"MIS_INSIDE_WARN", params);
 				}
 			}
-		}	
-	}	
+		}
+	}
 }
 
 
@@ -2098,7 +2127,7 @@ void CMissionManager::updateEscortTeam( const NLMISC::CEntityId & user )
 		if ( !team )
 			TeamManager.addFakeTeam( c );
 		msg.TeamId = c->getTeamId();
-		
+
 		CMirrorPropValueRO<uint32>	in(TheDataset, c->getEntityRowId(), DSPropertyAI_INSTANCE);
 		msg.InstanceNumber = in;
 		CWorldInstances::instance().msgToAIInstance(in, msg);
@@ -2126,12 +2155,12 @@ void CMissionManager::checkEscortFailure( TAIAlias group , bool groupWiped)
 bool CMissionManager::isMissionValid(std::string const& missionName, std::string const& hashKey)
 {
 	TMissionStatesContainer::iterator it = _MissionStates.find(missionName);
-	
+
 	bool allMissionValids = _ValidMissionStates.find("All")!=_ValidMissionStates.end();
 	bool missionHasState = it!=_MissionStates.end();
 	bool missionHasGoodHashKey = missionHasState && it->second.hashKey==hashKey;
 	bool missionStateIsValid = missionHasState && _ValidMissionStates.find(it->second.state)!=_ValidMissionStates.end();
-	
+
 	// check that we want all missions or that mission has a validation state, has a correct hash key and that its state is one of the valid states
 	return allMissionValids || (missionHasState && missionHasGoodHashKey && missionStateIsValid);
 }
@@ -2147,20 +2176,20 @@ void CMissionManager::loadMissionValidationFile(std::string const& filename)
 		for (uint i=0; i<var->size(); ++i)
 			_ValidMissionStates.insert(var->asString(i));
 	}
-	
+
 	// load the configuration file
 	CConfigFile cf;
 	string pathName = CPath::lookup(filename, false);
-	
+
 	if (pathName.empty())
 	{
 		nlwarning("Can't find index file '%s' in search path, no mission will be valid", filename.c_str());
 		return;
 	}
 	cf.load(pathName);
-	
+
 	set<string> authorizedStates;
-	
+
 	// get the variable
 	var = cf.getVarPtr("AuthorizedMissionStates");
 	if (var)
@@ -2186,7 +2215,7 @@ void CMissionManager::loadMissionValidationFile(std::string const& filename)
 			string mission = var->asString(i*missionStatesFields);
 			string state = var->asString(i*missionStatesFields+1);
 			string hashKey = var->asString(i*missionStatesFields+2);
-			
+
 			if (authorizedStates.empty() || authorizedStates.find(state)!=authorizedStates.end())
 				_MissionStates.insert(make_pair(mission, CMissionState(mission, state, hashKey)));
 		}
@@ -2263,7 +2292,7 @@ display_months:
 		delayStr += "ago";
 	}
 
-	log.displayNL("Mission '%s' \t(Alias=%10u): %10u success, %10u failure, %10u abandon (%8u try), last try at %10u (%s)", 
+	log.displayNL("Mission '%s' \t(Alias=%10u): %10u success, %10u failure, %10u abandon (%8u try), last try at %10u (%s)",
 		CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId(missionAlias).c_str(),
 		missionAlias,
 		tpl->MissionStats.SuccessCount,
@@ -2321,8 +2350,8 @@ struct TOrderByLastTry : public std::binary_function<const pair<TAIAlias, TMissi
 	}
 };
 
-NLMISC_COMMAND(displayMissionStats, 
-			   "Display statistical data for one or all the missions", 
+NLMISC_COMMAND(displayMissionStats,
+			   "Display statistical data for one or all the missions",
 			   "[<mission_name>] | [orderby try|success|fail|abandon|lastTry [desc]] [limit <count> [startat <index>]")
 {
 	enum TOrderBy
@@ -2349,7 +2378,7 @@ NLMISC_COMMAND(displayMissionStats,
 			log.displayNL("Invalid mission name '%s'", args[0].c_str());
 			return false;
 		}
-		
+
 		return CMissionManager::getInstance()->dumpMissionStat(log, alias);
 	}
 	else
@@ -2446,7 +2475,7 @@ NLMISC_COMMAND(displayMissionStats,
 		CMissionManager &mm = *(CMissionManager::getInstance());
 
 		std::hash_map< uint,CMissionTemplate* >::iterator first(mm._MissionTemplates.begin()), last(mm._MissionTemplates.end());
-		
+
 		for (; first !=last; ++first)
 		{
 			stats.push_back(make_pair(first->first, &(first->second->MissionStats)));
