@@ -201,11 +201,16 @@ CVariable<uint32>			FreeTrialSkillLimit("egs", "FreeTrialSkillLimit", "Level lim
 CVariable<uint32>			CraftFailureProbaMpLost("egs", "CraftFailureProbaMpLost", "Probabilité de destruction de chaque MP en cas d'echec du craft", 50,0,true);
 
 
-// Number of login stats keeped for a character
-CVariable<uint32> NBLoginStats("egs","NBLoginStats", "Nb logins stats keeped (logon time, logoff time", 50, 0, true );
+// Number of login stats kept for a character
+CVariable<uint32> NBLoginStats("egs","NBLoginStats", "Nb logins stats kept (logon time, logoff time", 50, 0, true );
 
-// Max Bonus/malus/consumable effects displayed by client (database corrsponding array must have the same size, and client must process the same size)
+// Max Bonus/malus/consumable effects displayed by client (database corresponding array must have the same size, and client must process the same size)
 const uint32 MaxBonusMalusDisplayed = 12;
+
+// We use this constant instead of the _StartingCharacteristicValues because _StartingCharacteristicValues is not working
+//TODO 
+//const uint32 StartCharacteristicsValue = 10;
+
 
 //CCharacter::CCharacterDbReminder*	CCharacter::_DataIndexReminder = NULL;
 
@@ -4470,13 +4475,13 @@ void CCharacter::updateVisualInformation( uint16 InventoryEmpty, uint16 SlotEmpt
 		if( SlotEmpty == INVENTORIES::right )
 		{
 			SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.WeaponRightHand, 0 );
-			SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.RTrail, 0 );
+			SET_STRUCT_MEMBER( _VisualPropertyB, PropertySubData.RTrail, 0 );
 			_Items.Sheath[ 0 ].HandR = SMirrorEquipment( CSheetId(), 0 );
 		}
 		else if( SlotEmpty == INVENTORIES::left )
 		{
 			SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.WeaponLeftHand, 0 );
-			SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.LTrail, 0 );
+			SET_STRUCT_MEMBER( _VisualPropertyB, PropertySubData.LTrail, 0 );
 			_Items.Sheath[ 0 ].HandL = SMirrorEquipment( CSheetId(), 0 );
 		}
 		else
@@ -4570,13 +4575,13 @@ void CCharacter::updateVisualInformation( uint16 InventoryEmpty, uint16 SlotEmpt
 			if( SlotFull == INVENTORIES::right )
 			{
 				SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.WeaponRightHand, srcForm->ItemIdSheetToModelNumber );
-				SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.RTrail, getRightTrailValue(refSkillLevel) );
+				SET_STRUCT_MEMBER( _VisualPropertyB, PropertySubData.RTrail, getRightTrailValue(refSkillLevel) );
 				_Items.Sheath[ 0 ].HandR = SMirrorEquipment( IdSheetItem, Item->quality() );
 			}
 			else if( SlotFull == INVENTORIES::left )
 			{
 				SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.WeaponLeftHand, srcForm->ItemIdSheetToModelNumberLeftHands );
-				SET_STRUCT_MEMBER( _VisualPropertyA, PropertySubData.LTrail, getLeftTrailValue(refSkillLevel) );
+				SET_STRUCT_MEMBER( _VisualPropertyB, PropertySubData.LTrail, getLeftTrailValue(refSkillLevel) );
 				_Items.Sheath[ 0 ].HandL = SMirrorEquipment( IdSheetItem, Item->quality() );
 			}
 			else
@@ -7587,6 +7592,7 @@ void CCharacter::setStartStatistics( const CCreateCharMsg& createCharMsg )
 	{
 		// at level 1 for formula dependency with regenerate value
 		_PhysCharacs._PhysicalCharacteristics[ i ].Base = 10;
+		//TODO _PhysCharacs._PhysicalCharacteristics[ i ].Base = StartCharacteristicsValue;
 		_PhysCharacs._PhysicalCharacteristics[ i ].Modifier = 0;
 
 		_PhysCharacs._PhysicalCharacteristics[ i ].RegenerateModifier = 0;
@@ -15761,7 +15767,7 @@ void CCharacter::checkScoresValues( SCORES::TScores score, CHARACTERISTICS::TCha
 	baseRegenerateAction += RegenOffset;
 	if(	fabs((_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos * 100.0f) - (100.0f * baseRegenerateRepos)) > 0.001)
 	{
-		nlwarning("<CCharacter::checkScoresValues> For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(), SCORES::toString(score).c_str(), baseRegenerateRepos, _PhysScores._PhysicalScores[ score ].BaseRegenerateRepos);
+		nlwarning("For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(), SCORES::toString(score).c_str(), baseRegenerateRepos, _PhysScores._PhysicalScores[ score ].BaseRegenerateRepos);
 		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
 		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
 	}
@@ -15819,8 +15825,9 @@ void CCharacter::checkCharacAndScoresValues()
 	sint32 tvalue;
 	for ( sint charac = 0 ; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS ; ++charac)
 	{
-		// compute theorical value
+		// compute theoretical value
 		tvalue = _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+		//TODO tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
 		// compare
 		if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
