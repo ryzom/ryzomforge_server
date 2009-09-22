@@ -3552,8 +3552,18 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 		if( programm & (1<<BOTCHATTYPE::WebPageFlag) )
 		{
 			// send the web page title
-			uint32 text = STRING_MANAGER::sendStringToClient(_EntityRowId, c->getWebPageName(), TVectorParamCheck() );
-//			_PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_TITLE" , text );
+			uint32 text;
+			if(c->getWebPageName().find("MENU_") == 0)
+			{
+				text = STRING_MANAGER::sendStringToClient(_EntityRowId, c->getWebPageName(), TVectorParamCheck() );
+			}
+			else
+			{
+				SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+				params[0].Literal= c->getWebPageName();
+				text = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", params );
+			}
+//          _PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_TITLE" , text );
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_TITLE(_PropertyDatabase, text );
 
 			// send the web page url

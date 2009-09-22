@@ -342,7 +342,9 @@ AdminCommandsInit[] =
 		"eventSetBotFaction",				true,
 		"eventSetBotFameByKill",			true,
 		"dssTarget",						true,	//ring stuff
-		"forceMissionProgress",				true
+		"forceMissionProgress",				true,
+		"eventSetBotURL",true,
+		"eventSetBotURLName",true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -5867,6 +5869,74 @@ NLMISC_COMMAND(quitDelay, "Inform the player that the shard will be stopped in N
 			CCharacter::sendDynamicSystemMessage(TheDataset.getDataSetRow(character->getId()), "SHUTDOWN_WARNING", params);
 		}
 	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(eventSetBotURL, "changes the url of a bot", "<bot eid> [<url>]")
+{
+	if (args.size() < 1) return false;
+
+	CEntityId eid(args[0]);
+	CCreature* creature = CreatureManager.getCreature(eid);
+	if (!creature)
+	{
+		log.displayNL("Not a creature");
+		return false;
+	}
+
+	uint32 program = creature->getBotChatProgram();
+	if(!(program & (1<<BOTCHATTYPE::WebPageFlag))) {
+		if(program != 0)
+		{
+			log.displayNL("This creature already had a program 0x%x, cannot add a web program", program);
+			return false;
+		}
+
+		log.displayNL("Add web program on this creature");
+		program |= 1 << BOTCHATTYPE::WebPageFlag;
+		creature->setBotChatProgram(program);
+	}
+
+	const string &wp = creature->getWebPage();
+	if(args.size() < 2) {
+		log.displayNL("Remove web program on this creature");
+		(string &)wp = "";
+		program &= ~(1 << BOTCHATTYPE::WebPageFlag);
+		creature->setBotChatProgram(program);
+	}
+	else
+		(string &)wp = args[1];
+
+	log.displayNL("Set url '%s'", creature->getWebPage().c_str());
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(eventSetBotURLName, "changes the url name of a bot", "<bot eid> <name>")
+{
+	if (args.size() < 2) return false;
+
+	CEntityId eid(args[0]);
+	CCreature* creature = CreatureManager.getCreature(eid);
+	if (!creature)
+	{
+		log.displayNL("Not a creature");
+		return false;
+	}
+
+	uint32 program = creature->getBotChatProgram();
+	if(!(program & (1<<BOTCHATTYPE::WebPageFlag))) {
+		log.displayNL("This creature is not flagged as chat in web 0x%x", program);
+		return false;
+	}
+
+	const string &wpn = creature->getWebPageName();
+	(string &)wpn = args[1];
+
+	log.displayNL("Set url name '%s'", creature->getWebPageName().c_str());
 
 	return true;
 }
