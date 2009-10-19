@@ -52,9 +52,9 @@ std::string CStringManager::_LanguageCode[NB_LANGUAGES] =
 	"en",		// english
 	"de",
 	"fr",
+	"ru",
 
-/* ace: actually, we only want english, i remove other language to remove warning during IOS launch
-
+/* ace: currently, we only want english, i remove other language to remove warning during IOS launch
 	"fr",		// french
 	"zh",		// traditionnal chinese
 	"zh-CN"		// simplified chinese
@@ -854,7 +854,7 @@ CStringManager::TLanguages		CStringManager::checkLanguageCode(const std::string 
 			return TLanguages(i);
 	}
 
-	nlwarning("Unreconized language code %s, default to english", languageCode.c_str());
+	nlwarning("Unrecognized language code %s, default to english", languageCode.c_str());
 	// default to english.
 	return english;
 }

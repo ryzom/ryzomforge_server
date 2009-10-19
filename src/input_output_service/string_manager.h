@@ -51,6 +51,7 @@ public:
 		english,
 		german,
 		french,
+		russian,
 		NB_LANGUAGES
 	};
 	
@@ -112,7 +113,7 @@ public:
 	 *	Replacement are described in the text string by a
 	 *	replacement tag between too '$' char.
 	 *	Replacement tag must contain the name of the parameter
-	 *	to fill in and optionnaly a format specifier.
+	 *	to fill in and optionally a format specifier.
 	 */
 	struct TReplacement
 	{
@@ -132,7 +133,7 @@ public:
 	{
 		TParamId			ParamId;
 
-		/// All this properties should have been in an unamed union
+		/// All this properties should have been in an unnamed union
 		/// but CEntityId has a copy constructor, so it can't be 
 		/// in an union.
 		/// So, I completely removed the union. :(
@@ -154,9 +155,9 @@ public:
 	/** This describe a condition.
 	 *	Condition are use to select the good clause in a phrase
 	 *	depending on parameter value.
-	 *	Condition can also be conbined in the condition string
+	 *	Condition can also be combined in the condition string
 	 *	with a '&' char.
-	 *	Conbination of condition is always AND (as '&' suggest).
+	 *	Combination of condition is always AND (as '&' suggest).
 	 */
 	struct TCondition
 	{
@@ -170,7 +171,7 @@ public:
 		TOperator	Operator;
 		/// This is the reference value as string
 		std::string	ReferenceStr;
-		/// This is the reference value as interger.
+		/// This is the reference value as integer.
 		sint32		ReferenceInt;
 	};
 
@@ -185,7 +186,7 @@ public:
 	 */
 	struct CClause
 	{
-		/** The liste of condition to validate this clause
+		/** The list of condition to validate this clause
 		 *	This is a double vector.
 		 *	First level is for ORed condition, second level is
 		 *	for the ANDed one.
@@ -197,7 +198,7 @@ public:
 		ucstring					ClientString;
 		/// The client string id.
 		uint32						ClientStringId;
-		/// The parameters and format in order of aparence in the client string
+		/// The parameters and format in order of apparency in the client string
 		std::vector<TReplacement>	Replacements;
 		
 		/// Evaluate this clause.
@@ -222,7 +223,7 @@ public:
 
 		static void init();
 
-		/// The name of the type, used to retreive words translation file.
+		/// The name of the type, used to retrieve words translation file.
 		const std::string	TypeName;
 
 		/** Factory like method.
@@ -245,7 +246,7 @@ public:
 		virtual const std::string &getParameterId() const =0;
 		/// Extract the parameter value from a message.
 		virtual bool extractFromMessage(NLNET::CMessage &message, bool debug) =0;
-		/// Fill a bitmem strean with the parameter value.
+		/// Fill a bitmemstrean with the parameter value.
 		virtual void fillBitMemStream( const CCharacterInfos *charInfo,TLanguages language, const TReplacement &rep, NLMISC::CBitMemStream &bms);
 		/// Eval a condition with this parameter.
 		virtual bool eval(TLanguages lang, const CCharacterInfos *charInfo, const TCondition &cond) const;
@@ -254,8 +255,8 @@ public:
 	};
 
 	/** This describe a phrase.
-	 *	Phrase are what we whant to say to the client.
-	 *	Phrase are uniquely named and specifie a list
+	 *	Phrase are what we want to say to the client.
+	 *	Phrase are uniquely named and specific a list
 	 *	of parameters and a list of clauses.
 	 *	The clauses are choose depending on the parameters value.
 	 */
@@ -289,21 +290,21 @@ public:
 	};
 
 	/** Container for entity words file.
-	 *	Entity words file are excell sheet that contains the different 
+	 *	Entity words file are excel sheet that contains the different 
 	 *	words associated to a type of entity. Columns are named, and 
 	 *	there must be a columns called 'name'.
-	 *	Each row contain the words for a specific entity of a geven type.
-	 *	The, you can retreive word by asking this class with the entity
+	 *	Each row contain the words for a specific entity of a given type.
+	 *	The, you can retrieve word by asking this class with the entity
 	 *	name and the column name.
 	 */
 	class CEntityWords
 	{
 		friend class CStringManager;
-		/// number of colone for this entity words
+		/// number of column for this entity words
 		uint32							_NbColums;
 		/// Row name/index.
 		std::map<std::string, uint32>	_RowInfo;
-		/// colone names/index
+		/// column names/index
 		std::map<std::string, uint32>	_ColumnInfo;
 		/** Raw data storage. Must be (NbColums * ColumnInfo.size()) * sizeof(uint32)
 		 *	Each entry store the id of the mapped string.
@@ -323,10 +324,10 @@ public:
 		// default constructor
 		CEntityWords() : _NbColums(0), _Data(NULL)	{}
 
-		/// Retreive a cell string id
+		/// Retrieve a cell string id
 		uint32	getStringId(const std::string &rowName, const std::string columnName) const;
 
-		/** Retreive the index for a given row name.
+		/** Retrieve the index for a given row name.
 		 *	Return 0xffffffff if the specified row cannot be found.
 		 */
 		uint32 getRowId(const std::string &rowName) const
@@ -337,7 +338,7 @@ public:
 			
 			return 0xffffffff;
 		}
-		/** Retreive the index for a given column name.
+		/** Retrieve the index for a given column name.
 		 *	Return 0xffffffff if the specified column cannot be found.
 		 */
 		uint32 getColumnId(const std::string &columnName) const
@@ -348,7 +349,7 @@ public:
 			
 			return 0xffffffff;
 		}
-		/// Retreive a cell string id. High speed version.
+		/// Retrieve a cell string id. High speed version.
 		uint32	getStringId(uint32 rowIndex, uint32 columnIndex) const
 		{
 			if (rowIndex >= _RowInfo.size())
@@ -394,7 +395,7 @@ public:
 			s.serial(ChatProfile);
 		}
 
-		// Event to implement any action when the sheet is no longeur existent.
+		// Event to implement any action when the sheet is no longer existent.
 		// This method is call when a sheet have been read from the packed sheet
 		// and the associated sheet file no more exist in the directories.
 		void removed()
@@ -502,7 +503,7 @@ public:
 
 	void	setTestOnly()		{ _TestOnly = true;}
 
-	/** Initialise the string manager.
+	/** Initialize the string manager.
 	 *	Calling init while load all the translation files and build the internal data structure.
 	 */
 	void					init(NLMISC::CLog *log = NLMISC::InfoLog);
@@ -537,7 +538,7 @@ public:
 	void					displayEntityWords(TLanguages language, STRING_MANAGER::TParamType wordType, const std::string& wc, NLMISC::CLog *log = NLMISC::InfoLog);
 
 	/**
-	 * resett entity word
+	 * reset entity word
 	 */
 	void					setEntityWord(const std::string& path, const ucstring& value);
 
@@ -702,7 +703,7 @@ private:
 	bool parseClauses(const CPhrase &phrase, ucstring::const_iterator &it, ucstring::const_iterator &last, std::vector<CClause> &clauses);
 	/// Parse a condition
 	bool parseCondition(const CPhrase &phrase, const ucstring &str, std::vector<TCondition> &result);
-	/// Parse a merked string, ie a string delimited by [ and ]
+	/// Parse a marked string, ie a string delimited by [ and ]
 //	bool parseMarkedString(ucchar openMark, ucchar closeMark, ucstring::const_iterator &it, ucstring::const_iterator &last, ucstring &result);
 	/// Parse the param list. Param list are delimited by ( and ), param are separated by ','
 	bool parseParamList(ucstring::const_iterator &it, ucstring::const_iterator &last, std::vector<CParameterTraits*> &result);
@@ -734,6 +735,4 @@ class CIosLocalSender : public STRING_MANAGER::ISender
 };
 extern	CIosLocalSender	IosLocalSender;
 
-
 #endif //STRING_MANAGER_H
-
