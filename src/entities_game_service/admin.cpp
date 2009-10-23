@@ -2806,7 +2806,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 			// check validity of Position command
 			if( onTarget )
 			{
-				if( !c->havePriv(":DEV:SGM:GM:") )
+				if( !c->havePriv(":DEV:SGM:GM:EM:") )
 				{
 					nlwarning ("ADMIN: Player %s doesn't have privilege to execute the client admin command /b '%s' ", eid.toString().c_str(), cmdName.c_str());
 					chatToPlayer (eid, "You don't have privilege to execute this command");
