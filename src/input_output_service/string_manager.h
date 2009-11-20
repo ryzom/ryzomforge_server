@@ -1,5 +1,5 @@
 /** \file string_manager.h
- * String manager 
+ * String manager
  *
  * $Id: string_manager.h,v 1.45 2007/05/30 14:25:30 boucher Exp $
  */
@@ -38,7 +38,7 @@ class CCharacterInfos;
 
 
 /** Manage string organized as conditional clause grouped into phrase.
- *	This class can choose at runtime one of the clause depending 
+ *	This class can choose at runtime one of the clause depending
  *	on passed parameters.
  */
 class CStringManager
@@ -54,12 +54,12 @@ public:
 		russian,
 		NB_LANGUAGES
 	};
-	
+
 	// entry used to store associations between user id , front end id and language codes
 	struct SUserLanguageEntry
 	{
 		inline SUserLanguageEntry( NLNET::TServiceId frontEndId, TLanguages language )
-			:	FrontEndId(frontEndId), 
+			:	FrontEndId(frontEndId),
 				Language(language)
 		{}
 		NLNET::TServiceId	FrontEndId;
@@ -134,7 +134,7 @@ public:
 		TParamId			ParamId;
 
 		/// All this properties should have been in an unnamed union
-		/// but CEntityId has a copy constructor, so it can't be 
+		/// but CEntityId has a copy constructor, so it can't be
 		/// in an union.
 		/// So, I completely removed the union. :(
 		NLMISC::CEntityId	EId;
@@ -151,7 +151,7 @@ public:
 		ucstring			Literal;
 
 	};
-	
+
 	/** This describe a condition.
 	 *	Condition are use to select the good clause in a phrase
 	 *	depending on parameter value.
@@ -200,7 +200,7 @@ public:
 		uint32						ClientStringId;
 		/// The parameters and format in order of apparency in the client string
 		std::vector<TReplacement>	Replacements;
-		
+
 		/// Evaluate this clause.
 		bool eval(TLanguages lang, const CCharacterInfos *charInfo, const CPhrase *phrase);
 	};
@@ -208,14 +208,14 @@ public:
 	/** Base class for parameter 'traits'.
 	 *	When adding new type of param, you must provide a new implementation
 	 *	of this class and then, update the createParameterTraits() static method
-	 *	to create 
+	 *	to create
 	*/
 	class CParameterTraits : public TStringParam
 	{
 		/** Static storage for parameter traits model*/
 //		static CParameterTraits	*_Models[];
 		static std::vector<CParameterTraits	*>	_Models;
-		
+
 		/// Create a copy of the class, used by factory method createParameterTraits()
 		virtual CParameterTraits	*clone() =0;
 
@@ -290,8 +290,8 @@ public:
 	};
 
 	/** Container for entity words file.
-	 *	Entity words file are excel sheet that contains the different 
-	 *	words associated to a type of entity. Columns are named, and 
+	 *	Entity words file are excell sheet that contains the different
+	 *	words associated to a type of entity. Columns are named, and
 	 *	there must be a columns called 'name'.
 	 *	Each row contain the words for a specific entity of a given type.
 	 *	The, you can retrieve word by asking this class with the entity
@@ -313,7 +313,7 @@ public:
 		 *	Only CStringManager is aware for when to alloc or release the Data memory.
 		 *	This give a little more reponsability to CStringManager but greatly improve
 		 *	copy operation.
-		 *	We just need to take care about Data memory when we destroy the last 
+		 *	We just need to take care about Data memory when we destroy the last
 		 *	of a CEntityWords copies. This should append rarely (perhaps when reloading
 		 *	entity translation files...)
 		 */
@@ -335,7 +335,7 @@ public:
 			std::map<std::string, uint32>::const_iterator it(_RowInfo.find(rowName));
 			if (it != _RowInfo.end())
 				return it->second;
-			
+
 			return 0xffffffff;
 		}
 		/** Retrieve the index for a given column name.
@@ -346,7 +346,7 @@ public:
 			std::map<std::string, uint32>::const_iterator it(_ColumnInfo.find(columnName));
 			if (it != _ColumnInfo.end())
 				return it->second;
-			
+
 			return 0xffffffff;
 		}
 		/// Retrieve a cell string id. High speed version.
@@ -375,7 +375,7 @@ public:
 //		std::string			DisplayName;
 		/// Creature profile (aka career)
 		std::string			Profile;
-		/// Creature chat profile 
+		/// Creature chat profile
 		std::string			ChatProfile;
 
 		TSheetInfo() : Gender(GSGENDER::unknown)
@@ -439,7 +439,7 @@ private:
 	NLMISC::CStringMapper			*_Mapper;
 	/// An array of phrase container, one for each supported language.
 	TPhrasesContainer				_AllPhrases[NB_LANGUAGES];
-	
+
 	/// A static array of language name.
 	static std::string				_LanguageCode[NB_LANGUAGES];
 	/// An array of entity words for each entity, each language.
@@ -461,20 +461,20 @@ private:
 	/// Associations between user ids and languages
 	TUserLanguagesContainer			_UsersLanguages;
 
-	/** Storage for bot name translation table. NB : this is not 
+	/** Storage for bot name translation table. NB : this is not
 	*	by client language translation but a shard wide translation.
 	*	The container only contains string id.
 	*/
 //	std::hash_map<uint32, uint32>	_BotNameTranslation;
 	std::map<uint32, uint32>	_BotNameTranslation;
 
-	/** Storage for event faction translation table. NB : this is not 
+	/** Storage for event faction translation table. NB : this is not
 	*	by client language translation but a shard wide translation.
 	*	The container only contains string id.
 	*/
 	std::map<uint32, uint32>	_EventFactionTranslation;
 
-	/** Storage for user defined ring item 
+	/** Storage for user defined ring item
 	 *	NB : the container key is on the item sheetId and NOT on the AI instanceId,
 	 *	this is to speedup lookup for renamed item in the phrase construction
 	 *	code (witch is the more intensive part of this feature).
@@ -608,7 +608,7 @@ public:
 	 * Helper used to fill a bitmemstream with all the parameters that define a string
 	 */
 	bool					buildPhraseStream( CCharacterInfos * charInfo, uint32 seqNum, NLNET::CMessage & message, bool debug, CStringManager::TLanguages lang, NLMISC::CBitMemStream & bmsOut);
-	
+
 	/// Build message stream for missing phrase.
 	void					buildMissingPhraseStream(CCharacterInfos * charInfo, uint32 seqNum, NLMISC::CBitMemStream & bmsOut, const std::string &phraseName);
 
@@ -657,7 +657,7 @@ public:
 
 	// remove a user language association
 	inline void removeUserLanguage( uint32 userId )
-	{ 
+	{
 		_UsersLanguages.erase( userId );
 	}
 
@@ -724,7 +724,7 @@ extern	CStringManager *SM;
 // Local sender
 class CIosLocalSender : public STRING_MANAGER::ISender
 {
-	void send(NLNET::CMessage &message, bool debug) 
+	void send(NLNET::CMessage &message, bool debug)
 	{
 		if (SM)
 		{
