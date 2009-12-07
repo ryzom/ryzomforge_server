@@ -1274,7 +1274,7 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			if(stepTxt!=0)
 			{
 				missionEntry.getHISTO().getArray(stepDoneIdx).setTEXT(user._PropertyDatabase, stepTxt);
-				stepDoneIdx++;
+				if(stepDoneIdx < NB_HISTO_PER_MISSION-1) stepDoneIdx++;
 				// roleplay text replaces all step text of step any
 				if( step->isAny() )
 					DontDisplayStepAnyInHisto = true;
@@ -1288,7 +1288,7 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 					// Send standard (or overriden) step texts
 					stepTxt = step->sendStepText(&user,states, giverId );
 					missionEntry.getHISTO().getArray(stepDoneIdx).setTEXT(user._PropertyDatabase, stepTxt);
-					stepDoneIdx++;
+					if(stepDoneIdx < NB_HISTO_PER_MISSION-1) stepDoneIdx++;
 				}
 			}
 		}
