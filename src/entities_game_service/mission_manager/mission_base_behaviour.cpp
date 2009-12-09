@@ -39,13 +39,13 @@ void CMissionBaseBehaviour::onCreation( TAIAlias giver)
 	_Mission->setDescIndex(0xFFFFFFFF);
 	_Mission->setGiver(giver);
 	_Mission->setSeason(EGSPD::CSeason::Invalid);
-	
+
 
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	nlassert(templ);
 
 	_ProcessingState = Normal;
-	
+
 	// if the mission has steps, init the active steps
 	if ( !templ->Steps.empty() )
 	{
@@ -97,7 +97,7 @@ void CMissionBaseBehaviour::putInGame()
 	{
 		CMissionManager::getInstance()->addPlayerReconnectHandlingMissions(*_Mission);
 	}
-	
+
 	// Call onActivation() on the mission template of each active step
 	CMissionTemplate *missionTemplate = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	for ( std::map<uint32, EGSPD::CActiveStepPD>::iterator itStep=_Mission->getStepsBegin(); itStep!=_Mission->getStepsEnd(); ++itStep )
@@ -155,7 +155,7 @@ void CMissionBaseBehaviour::sendContextTexts(const TDataSetRow& user, const TDat
 			if ( bot->getAlias() != _Mission->getGiver() )
 				continue;
 		}
-	
+
 		TVectorParamCheck params = tp->Params;
 		CMissionParser::solveEntitiesNames( params,user,giver );
 		uint32 txt = STRING_MANAGER::sendStringToClient(user,tp->PhraseId,params);
@@ -301,12 +301,12 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot )
 		sint32 x = 0;
 		sint32 y = 0;
 		string msg;
-		
+
 		if ( c )
 		{
 			x = c->getState().X();
 			y = c->getState().Y();
-					
+
 			// Send the bot name to the client if not already done (or if the name has changed)
 			//CMirrorPropValueRO<TYPE_NAME_STRING_ID> botNameId( TheDataset, c->getEntityRowId(), DSPropertyNAME_STRING_ID );
 			params[0].Type = STRING_MANAGER::bot;
@@ -379,7 +379,7 @@ void CMissionBaseBehaviour::removeCompassPlace( uint16 placeId )
 	CPlace *place = CZoneManager::getInstance().getPlaceFromId( placeId );
 	if (place == NULL)
 		return;
-		
+
 	for ( map<uint32,EGSPD::CMissionCompassPD>::const_iterator it = _Mission->getCompassBegin(); it != _Mission->getCompassEnd(); ++it )
 	{
 		if ( (*it).second.getPlace() == place->getAlias())
@@ -427,7 +427,7 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEventForStep( const TDataSe
 		{
 			CEntityId id = CAIAliasTranslator::getInstance()->getEntityId( _Mission->getGiver() );
 			uint resultInt = stepTempl->processEvent( userRow, event, stateIndex, TheDataset.getDataSetRow(id) );
-			
+
 			if ( event.Type == CMissionEvent::Debug )
 				resultInt = 1;
 			if ( resultInt )
@@ -506,8 +506,8 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 	if (user != NULL)
 		sDebugPrefix += "user:" + user->getId().toString() + " ";
 	sDebugPrefix += "miss:" + CPrimitivesParser::aliasToString(_Mission->getTemplateId());
-	sDebugPrefix += ",'" + templ->getMissionName() + "' processEvent :";	
-	
+	sDebugPrefix += ",'" + templ->getMissionName() + "' processEvent :";
+
 	if ( _Mission->getFinished() )
 		return CMissionEvent::Nothing;
 	//ignore events for empty missions
@@ -554,7 +554,7 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 	nlassert( currentStep );
 	uint32 currentStepIdx = currentStep->getIndexInTemplate() - 1;
 	nlassert(currentStepIdx < templ->Steps.size() );
-	
+
 	// if the step is an "any" step, we end all the other "any" active steps
 	if ( templ->Steps[ currentStepIdx ]->isAny() )
 	{
@@ -576,12 +576,12 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 		_Mission->addToStepsDone( currentStep->getIndexInTemplate() );
 		_Mission->deleteFromSteps( currentStep->getIndexInTemplate() );
 	}
-	
+
 	// as the step is ended, we can launch its end actions
 	const std::vector<IMissionAction*>&	actions = templ->Steps[ currentStepIdx ]->getActions();
 	for ( uint it = 0; _ProcessingState == Normal && it < actions.size(); ++it )
 		actions[it]->launch(_Mission, eventList);
-	
+
 	// if there is no more active steps, we can process out of order actions and get the next active steps
 	// if we encountered a jump/fail/end previously, we dont launch those actions
 	if ( _Mission->getStepsBegin() == _Mission->getStepsEnd() && _ProcessingState == Normal)
@@ -593,7 +593,7 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 			for ( uint it = 0; _ProcessingState == Normal && it < templ->OOOActions[oooIndex].size(); ++it )
 				templ->OOOActions[oooIndex][it]->launch(_Mission,eventList);
 		}
-		
+
 		// build the active steps ( only if we did not reach an end/fail/jump )
 		if ( _ProcessingState == Normal )
 		{
@@ -616,11 +616,11 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 			uint32 lastActiveStep = templ->getOutOfOrderSteps( firstActiveStep );
 			uint32 stepCount = ( lastActiveStep == 0xFFFFFFFF )? 1 : lastActiveStep -  firstActiveStep + 1;
 
-			for ( uint i = 0; i < stepCount; i++ )	
+			for ( uint i = 0; i < stepCount; i++ )
 			{
 				EGSPD::CActiveStepPD * step = _Mission->addToSteps(firstActiveStep +  i + 1);
 				EGS_PD_AST(step);
-				
+
 				std::vector<uint32> ret;
 				templ->Steps[step->getIndexInTemplate()-1]->getInitState( ret );
 				const uint32 stepSize = (uint32)ret.size();
@@ -633,8 +633,8 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 				templ->Steps[step->getIndexInTemplate()-1]->onActivation( _Mission,step->getIndexInTemplate() - 1 ,eventList );
 			}
 		}
-	}	
-	
+	}
+
 	// check if we reached the end of the mission
 	if ( _ProcessingState == Complete )
 	{
@@ -644,7 +644,7 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEvent( const TDataSetRow & 
 			user->endBotChat();
 		return CMissionEvent::MissionEnds;
 	}
-	
+
 	if ( _ProcessingState == Failed )
 	{
 		MISDBG("%s ok, step %u done -> mission failed", sDebugPrefix.c_str(), currentStep->getIndexInTemplate() );
@@ -696,7 +696,7 @@ void CMissionBaseBehaviour::jump( uint32 step, uint32 action,std::list< CMission
 			nlwarning("<CMissionInstance::jump> Serious error : jump step = %u >= step count (%u)",step, templ->Steps.size() );
 			return;
 		}
-		
+
 		// if we are in out of order actions, launch the appropriate ones
 		if ( action >= templ->Steps[step]->getActions().size() )
 		{
@@ -724,7 +724,7 @@ void CMissionBaseBehaviour::jump( uint32 step, uint32 action,std::list< CMission
 				return;
 		}
 	}
-	
+
 	// Here, event are launched and no nested jumps encountered, so we have to set the active steps
 	while( _Mission->getStepsBegin() != _Mission->getStepsEnd() )
 		_Mission->deleteFromSteps( ( *_Mission->getStepsBegin() ).first );
@@ -733,12 +733,12 @@ void CMissionBaseBehaviour::jump( uint32 step, uint32 action,std::list< CMission
 	nlassert( firstActiveStep < templ->Steps.size() );
 	uint32 lastActiveStep = templ->getOutOfOrderSteps( firstActiveStep );
 	uint32 stepCount = ( lastActiveStep == 0xFFFFFFFF )? 1 : lastActiveStep -  firstActiveStep + 1;
-		
-	for ( uint i = 0; i < stepCount; i++ )	
+
+	for ( uint i = 0; i < stepCount; i++ )
 	{
 		EGSPD::CActiveStepPD * step = _Mission->addToSteps(firstActiveStep + i + 1);
 		EGS_PD_AST(step);
-				
+
 		std::vector<uint32> ret;
 		templ->Steps[step->getIndexInTemplate()-1]->getInitState( ret );
 		const uint32 stepSize = (uint32)ret.size();
@@ -750,7 +750,7 @@ void CMissionBaseBehaviour::jump( uint32 step, uint32 action,std::list< CMission
 		}
 		if( _ProcessingState != Init )
 			templ->Steps[step->getIndexInTemplate()-1]->onActivation( _Mission,step->getIndexInTemplate() - 1 ,eventList);
-	}	
+	}
 
 	_ProcessingState = InJump;
 	_Mission->updateUsersJournalEntry();
@@ -767,7 +767,7 @@ void CMissionBaseBehaviour::setTimer( NLMISC::TGameCycle cycle )
 		_Mission->setBeginDate(0);
 	}
 	else
-	{		
+	{
 		_Mission->setEndDate ( cycle + CTickEventHandler::getGameCycle() );
 		_Mission->setBeginDate( CTickEventHandler::getGameCycle() );
 		CMissionManager::getInstance()->addTimedMission(_Mission);
@@ -797,12 +797,12 @@ void CMissionBaseBehaviour::setSuccessFlag()
 	_Mission->setMissionSuccess(true);
 	while( _Mission->getStepsBegin() != _Mission->getStepsEnd() )
 		_Mission->deleteFromSteps( ( *_Mission->getStepsBegin() ).first );
-	
+
 	templ->LastSuccessDate = CTickEventHandler::getGameCycle();
 	CMissionManager::getInstance()->deInstanciateMission(_Mission);
 	if (templ->Tags.NoList == false) // If the mission is in the journal, update it
 		_Mission->updateUsersJournalEntry();
-	
+
 	// update the encyclopedia if needed
 	updateEncyclopedia();
 }
@@ -817,7 +817,7 @@ void CMissionBaseBehaviour::setFailureFlag()
 	_Mission->setMissionSuccess(false);
 	while( _Mission->getStepsBegin() != _Mission->getStepsEnd() )
 		_Mission->deleteFromSteps( ( *_Mission->getStepsBegin() ).first );
-	
+
 	CMissionManager::getInstance()->deInstanciateMission(_Mission);
 	if (templ->Tags.NoList == false) // If the mission is in the journal, update it
 		_Mission->updateUsersJournalEntry();
@@ -829,7 +829,7 @@ void CMissionBaseBehaviour::onFailure(bool ignoreJumps,bool sendMessage)
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	nlassert(templ);
 
-	// if mission was in a waiting queue, removed player from queue manager 
+	// if mission was in a waiting queue, removed player from queue manager
 	if (_Mission->getWaitingQueueId() != 0)
 	{
 		CCharacter * user = getMainEntity();
@@ -879,7 +879,7 @@ void CMissionBaseBehaviour::onFailure(bool ignoreJumps,bool sendMessage)
 	vector<TAIAlias> groups;
 	MISDBG("miss:%s onFailure : mission failed", CPrimitivesParser::aliasToString(templ->Alias).c_str());
 	uint32 index = _Mission->getFailureIndex();
-	
+
 	std::list< CMissionEvent* > eventList;
 	if( index < templ->FailureActions.size() )
 	{
@@ -919,7 +919,7 @@ void CMissionBaseBehaviour::onFailure(bool ignoreJumps,bool sendMessage)
 			}
 		}
 	}
-	
+
 	_Mission->setFailureIndex( 0xFFFFFFFF );
 	// special cleanup before jumping
 	if ( getProcessingState() != CMissionBaseBehaviour::Normal )
@@ -934,7 +934,7 @@ void CMissionBaseBehaviour::onFailure(bool ignoreJumps,bool sendMessage)
 		CMissionManager::getInstance()->removeMonoMission(this);
 		}
 			*/
-		
+
 		templ->getEscortGroups(groups);
 		MISDBG("miss:%s onFailure : clean up escort group", CPrimitivesParser::aliasToString(templ->Alias).c_str());
 		if ( !groups.empty() )
@@ -947,19 +947,19 @@ void CMissionBaseBehaviour::onFailure(bool ignoreJumps,bool sendMessage)
 	{
 		// stop children missions
 		stopChildren();
-	}	
+	}
 }
 
 //----------------------------------------------------------------------------
 void CMissionBaseBehaviour::addTeleport( uint32 tpIdx )
 {
-	_Mission->addToTeleports( tpIdx );	
+	_Mission->addToTeleports( tpIdx );
 }
 
 //----------------------------------------------------------------------------
 void CMissionBaseBehaviour::removeTeleport( uint32 tpIdx )
 {
-	_Mission->deleteFromTeleports( tpIdx );	
+	_Mission->deleteFromTeleports( tpIdx );
 }
 
 //----------------------------------------------------------------------------
@@ -1027,7 +1027,7 @@ void CMissionBaseBehaviour::checkEscortFailure(bool groupWiped)
 }
 
 //----------------------------------------------------------------------------
-bool CMissionBaseBehaviour::itemGiftDone( CCharacter * user,const std::vector< CGameItemPtr > & itemsGiven,uint32 stepIndex, std::vector<uint32> & result ) 
+bool CMissionBaseBehaviour::itemGiftDone( CCharacter * user,const std::vector< CGameItemPtr > & itemsGiven,uint32 stepIndex, std::vector<uint32> & result )
 {
 	nlassert(user);
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
@@ -1074,7 +1074,7 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 	TDataSetRow giverRow = TheDataset.getDataSetRow( giverId );
 
 	typename DBType::TArray	&missionEntry = missionDb.getArray(_ClientIndex);
-	
+
 	missionEntry.setTYPE(user._PropertyDatabase, templ->Type);
 	missionEntry.setICON(user._PropertyDatabase, templ->Icon);
 
@@ -1103,12 +1103,12 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			missionEntry.setFINISHED(user._PropertyDatabase, 2);
 	}
 	missionEntry.setABANDONNABLE(user._PropertyDatabase, !templ->Tags.NonAbandonnable);
-				
+
 	if ( _Mission->getStepsBegin() == _Mission->getStepsEnd() )
 		missionEntry.setOR_STEPS(user._PropertyDatabase, 0);
 	else
 		missionEntry.setOR_STEPS(user._PropertyDatabase, templ->Steps[ (*_Mission->getStepsBegin()).second.getIndexInTemplate() - 1]->isAny());
-				
+
 	uint stepIdx = 0;
 	uint32 currentOOO = 0xFFFFFFFF;
 	bool RPTxtOOOWritten = false;
@@ -1121,15 +1121,15 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			return;
 		}
 		IMissionStepTemplate * step = templ->Steps[ (*it).second.getIndexInTemplate() - 1 ];
-		
+
 		if ( step == NULL )
 		{
 			nlwarning("<MISSIONS> '%s' Invalid step index %u count is %u. The step is NULL", user.getId().toString().c_str(), uint( (*it).second.getIndexInTemplate() - 1 ) , templ->Steps.size() );
 			return;
 		}
-		
+
 		bool display = step->isDisplayed();
-		// if we are in an overriden OOO, 
+		// if we are in an overriden OOO,
 		if ( step->isInOverridenOOO() )
 		{
 			// only display the first active step
@@ -1164,7 +1164,7 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 		}
 		else
 			currentOOO = 0xFFFFFFFF;
-		
+
 		// Send NPCs related to the goals (for icon)
 		TAIAlias involvedBot = CAIAliasTranslator::Invalid;
 		if ( display && step->isIconDisplayedOnStepNPC() )
@@ -1193,7 +1193,7 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			{
 				states.push_back( (*itState).second.getState() );
 			}
-			
+
 
 			// in case of OOO, RP text is displayed only one time
 			if( step->getOOOStepIndex() == 0xFFFFFFFF )
@@ -1222,12 +1222,12 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 		}
 		currentOOO = step->getOOOStepIndex();
 	}
-	
-	
+
+
 	// write done steps
 	bool DontDisplayStepAnyInHisto = false;
 	uint stepDoneIdx = 0;
-	uint32 doneOOO = 0xFFFFFFFF;	
+	uint32 doneOOO = 0xFFFFFFFF;
 	for ( map<uint32,EGSPD::CDoneStepPD>::iterator it = _Mission->getStepsDoneBegin(); it != _Mission->getStepsDoneEnd(); ++it )
 	{
 		if ( ( uint( (*it).second.getIndex() - 1) >=  templ->Steps.size() ) )
@@ -1263,8 +1263,8 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 		}
 		else
 			display = step->isDisplayed();
-		
-		if ( display )			
+
+		if ( display && stepDoneIdx < NB_HISTO_PER_MISSION )
 		{
 			vector<uint32> states;
 			step->getInitState( states );
@@ -1274,7 +1274,7 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 			if(stepTxt!=0)
 			{
 				missionEntry.getHISTO().getArray(stepDoneIdx).setTEXT(user._PropertyDatabase, stepTxt);
-				if(stepDoneIdx < NB_HISTO_PER_MISSION-1) stepDoneIdx++;
+				stepDoneIdx++;
 				// roleplay text replaces all step text of step any
 				if( step->isAny() )
 					DontDisplayStepAnyInHisto = true;
@@ -1288,12 +1288,12 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 					// Send standard (or overriden) step texts
 					stepTxt = step->sendStepText(&user,states, giverId );
 					missionEntry.getHISTO().getArray(stepDoneIdx).setTEXT(user._PropertyDatabase, stepTxt);
-					if(stepDoneIdx < NB_HISTO_PER_MISSION-1) stepDoneIdx++;
+					stepDoneIdx++;
 				}
 			}
 		}
 	}
-	
+
 	for ( uint i = stepIdx; i < NB_STEP_PER_MISSION; i++ )
 	{
 		missionEntry.getGOALS().getArray(i).setTEXT(user._PropertyDatabase, 0);
@@ -1303,7 +1303,7 @@ void CMissionBaseBehaviour::_updateUserJournalEntry( CCharacter & user, DBType &
 	{
 		missionEntry.getHISTO().getArray(i).setTEXT(user._PropertyDatabase, 0);
 	}
-	
+
 //	uint nbEntry = updateCompass(user,dbPrefix);
 	uint nbEntry = _updateCompass(user, missionDb);
 	for ( uint i = nbEntry ; i < NB_JOURNAL_COORDS; i++ )
@@ -1358,7 +1358,7 @@ uint CMissionBaseBehaviour::_updateCompass(CCharacter & user, DBType &missionDb)
 		sint32 y = 0;
 		bool updateTitle = false;
 		uint32 newTitleId;
-		
+
 		if ( (*it).second.getPlace() == CAIAliasTranslator::Invalid )
 		{
 			CCreature * c = CreatureManager.getCreature( CAIAliasTranslator::getInstance()->getEntityId( (*it).second.getBotId() ) );
@@ -1366,12 +1366,12 @@ uint CMissionBaseBehaviour::_updateCompass(CCharacter & user, DBType &missionDb)
 			{
 				x = c->getState().X();
 				y = c->getState().Y();
-				
+
 				// Send the bot name to the client if not already done (or if the name has changed)
 				CMirrorPropValueRO<TYPE_NAME_STRING_ID> botNameId( TheDataset, c->getEntityRowId(), DSPropertyNAME_STRING_ID );
 				if ( botNameId() != (*it).second.NameStringId )
 				{
-					params[0].Type = STRING_MANAGER::bot;					
+					params[0].Type = STRING_MANAGER::bot;
 					params[0].setEIdAIAlias( CAIAliasTranslator::getInstance()->getEntityId( (*it).second.getBotId() ),  (*it).second.getBotId()  );
 					updateTitle = true;
 					newTitleId = STRING_MANAGER::sendStringToClient( user.getEntityRowId(),"COMPASS_BOT",params );
@@ -1439,12 +1439,12 @@ void CMissionBaseBehaviour::applyPlayerReconnectHandler()
 		return;
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	nlassert(templ);
-	
+
 	uint32 index = _Mission->getPlayerReconnectHandlerIndex();
 	std::list< CMissionEvent* > eventList;
 	if( index < templ->PlayerReconnectHandlers.size() )
 	{
-		for (uint i = 0; getProcessingState() == CMissionBaseBehaviour::Normal && 
+		for (uint i = 0; getProcessingState() == CMissionBaseBehaviour::Normal &&
 						i < templ->PlayerReconnectHandlers[index].Actions.size(); i++ )
 			templ->PlayerReconnectHandlers[index].Actions[i]->launch(_Mission,eventList);
 	}
@@ -1478,7 +1478,7 @@ void CMissionBaseBehaviour::applyPlayerReconnectHandler()
 			}
 		}
 	}
-	
+
 	// set processing state to normal except if the state is complete
 	if (_ProcessingState == Complete)
 	{
@@ -1502,7 +1502,7 @@ void CMissionBaseBehaviour::applyCrashHandler(bool EGSCrash, const std::string &
 		return;
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	nlassert(templ);
-	
+
 	uint32 index = _Mission->getCrashHandlerIndex();
 	std::list< CMissionEvent* > eventList;
 	if( index < templ->CrashHandlers.size() )
@@ -1543,7 +1543,7 @@ void CMissionBaseBehaviour::applyCrashHandler(bool EGSCrash, const std::string &
 			}
 		}
 	}
-	
+
 	// set processing state to normal except if the state is complete
 	if ( _ProcessingState == Complete )
 	{
