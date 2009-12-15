@@ -1413,7 +1413,10 @@ uint CMissionBaseBehaviour::_updateCompass(CCharacter & user, DBType &missionDb)
 			if (compassIdx >= 8)
 			{
 				CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
-				nlwarning("In mission '%s': invalid access to CBD entry MISSIONS:%u:TARGET%u : TARGET is out of 8 range", templ->getMissionName().c_str(), _ClientIndex, compassIdx);
+				if(templ)
+					nlwarning("In mission '%s': invalid access to CBD entry MISSIONS:%u:TARGET%u : TARGET is out of 8 range", templ->getMissionName().c_str(), _ClientIndex, compassIdx);
+				else
+					nlwarning("In mission template id '%u': (template doesn't have name!) invalid access to CBD entry MISSIONS:%u:TARGET%u : TARGET is out of 8 range", _Mission->getTemplateId(), _ClientIndex, compassIdx);
 			}
 			else
 			{
