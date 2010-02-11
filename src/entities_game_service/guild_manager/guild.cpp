@@ -840,6 +840,13 @@ void CGuild::takeItem( CCharacter * user, uint32 slot, uint32 quantity, uint16 s
 void	CGuild::takeMoney( CCharacter * user, uint64 money, uint16 session )
 {
 	nlassert(user);
+	
+	if( canAccessToGuildInventory( user ) == false )
+	{
+		CCharacter::sendDynamicSystemMessage(user->getEntityRowId(), "CANT_ACCESS_GUILD_INVENTORY");
+		return;
+	}
+	
 	if ( money > _Money )
 	{
 		nlwarning( "takeMoney guild %u user %s : money = %"NL_I64"u, max = %"NL_I64"u",_Id,user->getId().toString().c_str(),money,_Money);
@@ -870,6 +877,13 @@ void	CGuild::takeMoney( CCharacter * user, uint64 money, uint16 session )
 void CGuild::putMoney( CCharacter * user, uint64 money, uint16 session )
 {
 	nlassert(user);
+	
+	if( canAccessToGuildInventory( user ) == false )
+	{
+		CCharacter::sendDynamicSystemMessage(user->getEntityRowId(), "CANT_ACCESS_GUILD_INVENTORY");
+		return;
+	}
+	
 	if ( money > user->getMoney() )
 	{
 		nlwarning( "putMoney guild %u user %s : money = %"NL_I64"u, max = %"NL_I64"u",_Id,user->getId().toString().c_str(),money,_Money);
