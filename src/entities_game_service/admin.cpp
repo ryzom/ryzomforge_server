@@ -179,6 +179,7 @@ AdminCommandsInit[] =
 		"learnAllRolemasterBricks",			true,
 		"learnAllPhrases",					true,
 		"learnBrick",						true,
+		"unlearnBrick",						true,
 		"learnPhrase",						true,
 		"learnAllForagePhrases",            true,
 		"learnAllFaberPlans",				true,
@@ -1824,6 +1825,20 @@ NLMISC_COMMAND(learnBrick, "Specified player learns given brick","<eid> <brickid
 	c->addKnownBrick(brickId);
 
 	log.displayNL ("%s learnt brick %s", eid.toString().c_str(), brickId.toString().c_str());
+	return true;
+}
+
+
+NLMISC_COMMAND(unlearnBrick, "Specified player unlearns given brick","<eid> <brickid>")
+{
+	if (args.size () != 2) return false;
+	GET_CHARACTER
+
+	CSheetId brickId(args[1]);
+
+	c->removeKnownBrick(brickId);
+
+	log.displayNL ("%s unlearnt brick %s", eid.toString().c_str(), brickId.toString().c_str());
 	return true;
 }
 
@@ -5572,7 +5587,7 @@ NLMISC_COMMAND(eventSetBotFaction, "changes the faction of a bot", "<bot eid> <f
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(eventSetBotFameByKill, "changes the faction of a bot", "<bot eid> <faction>|default")
+NLMISC_COMMAND(eventSetBotFameByKill, "set the fame a player win after killing a bot", "<bot eid> <fame>|default")
 {
 	if (args.size() < 2) return false;
 

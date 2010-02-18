@@ -605,3 +605,36 @@ void _log_Character_AddKnownBrick(const NLMISC::CSheetId &brickId, const char *_
 	if (LGS::ILoggerServiceClient::isInitialized())
 		LGS::ILoggerServiceClient::getInstance()->sendLog(logInfo);
 }
+
+void _log_Character_RemoveKnownBrick(const NLMISC::CSheetId &brickId, const char *_filename_, uint _lineNo_)
+{
+	static LGS::TLogInfo logInfo;
+	static bool init = false;
+	if (!init)
+	{
+		logInfo.setLogName("Character_RemoveKnownBrick");
+		logInfo.getParams().resize(2);
+		logInfo.getListParams().resize(0);
+	}
+
+	
+	// Context parameter
+		NLMISC::CEntityId	charId;
+	if (!CharacterDesc.getContextVar_charId(charId))
+	{
+		// If this bomb is thrown, you need to add a log context (or eventualy a 'noContext').
+		STOP_IF(CharacterDesc.getNoContextCount() == 0, _filename_<<"("<<_lineNo_<<") : Missing log context for log 'Character'");
+		return;
+	}
+
+			
+	logInfo.getParams()[0] = LGS::TParamValue(charId);
+			
+	logInfo.getParams()[1] = LGS::TParamValue(brickId);
+		
+
+	logInfo.setTimeStamp(NLMISC::CTime::getSecondsSince1970());
+
+	if (LGS::ILoggerServiceClient::isInitialized())
+		LGS::ILoggerServiceClient::getInstance()->sendLog(logInfo);
+}

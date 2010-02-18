@@ -691,8 +691,11 @@ public:
 	/// update the target properties
 	void updateTarget();
 
-	/// add a know brick
+	/// add a known brick
 	void addKnownBrick( const NLMISC::CSheetId& brickId );
+
+	/// remove a known brick
+	void removeKnownBrick( const NLMISC::CSheetId& brickId );
 
 	/// get known bricks
 	const std::set<NLMISC::CSheetId> &getKnownBricks() const;
@@ -2719,6 +2722,15 @@ private:
 
 	/// process a new received bonus brick
 	void processMiscBonusBrick( const CStaticBrick *brick );
+
+	/// unprocess a training brick (increase scores, charac...)
+	void unprocessTrainingBrick( const CStaticBrick *brick, bool sendChatMessage = true );
+
+	/// unprocess a new received bonus brick
+	void unprocessForageBonusBrick( const CStaticBrick *brick );
+
+	/// unprocess a new received bonus brick
+	void unprocessMiscBonusBrick( const CStaticBrick *brick );
 
 	/// process items in temp inventory
 	void logAndClearTempInventory();

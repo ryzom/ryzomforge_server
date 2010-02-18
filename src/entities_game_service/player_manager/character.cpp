@@ -3089,6 +3089,23 @@ void CCharacter::processForageBonusBrick( const CStaticBrick *brick )
 
 
 //---------------------------------------------------
+// unprocess a new received bonus brick
+//---------------------------------------------------
+void CCharacter::unprocessForageBonusBrick( const CStaticBrick *brick )
+{
+	if ( !brick )
+		return;
+
+	for ( std::vector<TBrickParam::IIdPtr>::const_iterator ip=brick->Params.begin(); ip!=brick->Params.end(); ++ip )
+	{
+		CSBrickParamBonusFgExtractionTimeGC *param = (CSBrickParamBonusFgExtractionTimeGC*)(TBrickParam::IId*)(*ip);
+
+		_ForageBonusExtractionTime -= (NLMISC::TGameCycle)param->AdditionalTimeGC;
+	}
+}
+
+
+//---------------------------------------------------
 // computeMiscBonus
 //---------------------------------------------------
 void CCharacter::computeMiscBonus()
@@ -3134,6 +3151,31 @@ void CCharacter::processMiscBonusBrick( const CStaticBrick *brick )
 //	BOMB_IF( !node, "Node NB_BONUS_LANDMARKS not found", return );
 //	_PropertyDatabase.setProp( node, _PropertyDatabase.getProp( node ) + (sint64)(sint)sumOfBonusLandmarkNumber );
 	CBankAccessor_PLR::getINTERFACES().setNB_BONUS_LANDMARKS(_PropertyDatabase, checkedCast<uint16>(CBankAccessor_PLR::getINTERFACES().getNB_BONUS_LANDMARKS(_PropertyDatabase) + sumOfBonusLandmarkNumber) );
+}
+
+
+//---------------------------------------------------
+// unprocess a new received bonus brick
+//---------------------------------------------------
+void CCharacter::unprocessMiscBonusBrick( const CStaticBrick *brick )
+{
+	if ( !brick )
+		return;
+
+	BOMB_IF( (brick->Family != BRICK_FAMILIES::BPBGLA), "Invalid bonus brick", return ); // currently, only 1 misc bonus brick
+
+	float sumOfBonusLandmarkNumber = 0;
+	for ( std::vector<TBrickParam::IIdPtr>::const_iterator ip=brick->Params.begin(); ip!=brick->Params.end(); ++ip )
+	{
+		CSBrickParamBonusLandmarkNumber *param = (CSBrickParamBonusLandmarkNumber*)(TBrickParam::IId*)(*ip);
+
+		sumOfBonusLandmarkNumber += (NLMISC::TGameCycle)param->Nb;
+	}
+
+//	ICDBStructNode *node = _PropertyDatabase.getICDBStructNodeFromName( "INTERFACES:NB_BONUS_LANDMARKS" );
+//	BOMB_IF( !node, "Node NB_BONUS_LANDMARKS not found", return );
+//	_PropertyDatabase.setProp( node, _PropertyDatabase.getProp( node ) + (sint64)(sint)sumOfBonusLandmarkNumber );
+	CBankAccessor_PLR::getINTERFACES().setNB_BONUS_LANDMARKS(_PropertyDatabase, checkedCast<uint16>(CBankAccessor_PLR::getINTERFACES().getNB_BONUS_LANDMARKS(_PropertyDatabase) - sumOfBonusLandmarkNumber) );
 }
 
 
@@ -4190,6 +4232,83 @@ void CCharacter::addKnownBrick( const CSheetId& brickId )
 	}
 } //addKnownBrick//
 
+//-----------------------------------------------
+// CCharacter::removeKnownBrick remove a known brick
+//-----------------------------------------------
+void CCharacter::removeKnownBrick( const CSheetId& brickId )
+{
+//	egs_chinfo("<CCharacter::removeKnownBrick> removing a known brick idSheet (%s)", brickId.toString().c_str() );
+	const CStaticBrick* brickForm = CSheets::getSBrickForm( brickId );
+	if( brickForm )
+	{
+		// if brick is not known, just return
+		if ( _KnownBricks.find( brickId ) == _KnownBricks.end())
+			return;
+
+		log_Character_RemoveKnownBrick(brickId);
+		_KnownBricks.erase( brickId );
+
+		// if the brick is a training brick, then apply charac increase
+		if ( BRICK_FAMILIES::brickType(brickForm->Family) == BRICK_TYPE::TRAINING)
+		{
+			unprocessTrainingBrick(brickForm, true);
+		}
+
+		// if the brick is a bonus that needs to be taken into account now, do it
+		switch ( brickForm->Family )
+		{
+		case BRICK_FAMILIES::BPBHFEA:
+			unprocessForageBonusBrick(brickForm);
+			break;
+		case BRICK_FAMILIES::BPBGLA:
+			unprocessMiscBonusBrick(brickForm);
+			break;
+		default:;
+		}
+
+		// update the database
+		uint8 pos = (uint8)brickForm->IndexInFamily;
+		if ( INVALID_POSITION_ID < pos)
+		{
+			--pos;
+		}
+		else if ( INVALID_POSITION_ID == pos)
+		{
+			nlwarning("brick id %s is invalid (index in family == INVALID_POSITION_ID", brickId.toString().c_str());
+			return;
+		}
+
+		_BrickFamilyBitField[brickForm->Family] |= ( (sint64)1 << (sint64)pos);
+//		_PropertyDatabase.setProp( _DataIndexReminder->KnownBricksFamilies[brickForm->Family], _BrickFamilyBitField[brickForm->Family]);
+		CBankAccessor_PLR::getBRICK_FAMILY().getArray(brickForm->Family).setBRICKS(_PropertyDatabase, _BrickFamilyBitField[brickForm->Family]);
+
+		// unlock the relative interface if it's the first brick of this type
+		INTERFACE_FLAGS::TInterfaceFlag flag = INTERFACE_FLAGS::Unknown;
+		switch( BRICK_FAMILIES::brickType(brickForm->Family))
+		{
+		case BRICK_TYPE::COMBAT:
+			flag = INTERFACE_FLAGS::Combat;
+			break;
+		case BRICK_TYPE::MAGIC:
+			flag = INTERFACE_FLAGS::Magic;
+			break;
+		case BRICK_TYPE::COMMERCE:
+			flag = INTERFACE_FLAGS::Commerce;
+			break;
+		default:
+			flag = INTERFACE_FLAGS::Special;
+			break;
+		};
+
+		_InterfacesFlagsBitField |= 1 << uint8(flag);
+//		_PropertyDatabase.setProp( "INTERFACES:FLAGS", _InterfacesFlagsBitField);
+		CBankAccessor_PLR::getINTERFACES().setFLAGS(_PropertyDatabase, _InterfacesFlagsBitField);
+	}
+	else
+	{
+		nlwarning("<CCharacter::removeKnownBrick> Can't remove known brick cause static form of idSheet (%s) missing", brickId.toString().c_str() );
+	}
+} //removeKnownBrick//
 
 //-----------------------------------------------
 // CCharacter::processTrainingBrick
@@ -4214,7 +4333,7 @@ void CCharacter::processTrainingBrick( const CStaticBrick *brick, bool sendChatM
 				}
 				else
 				{
-					sint16 modifier = (sint16) ((CSBrickParamCharacUpgrade *)param)->Modifier;
+					const sint16 modifier = (sint16) ((CSBrickParamCharacUpgrade *)param)->Modifier;
 					changeCharacteristic(charac, modifier);
 
 					if (sendChatMessage)
@@ -4242,6 +4361,68 @@ void CCharacter::processTrainingBrick( const CStaticBrick *brick, bool sendChatM
 					// change Score
 					_ScorePermanentModifiers[score] += modifier;
 					_PhysScores._PhysicalScores[ score ].Base += modifier;
+				}
+			}
+			break;
+
+		default:
+			;
+		};
+	}
+}
+
+
+//-----------------------------------------------
+// CCharacter::processTrainingBrick
+//-----------------------------------------------
+void CCharacter::unprocessTrainingBrick( const CStaticBrick *brick, bool sendChatMessage )
+{
+	if (!brick)
+		return;
+
+	const uint nbParams = brick->Params.size();
+	for ( uint i = 0 ; i < nbParams ; ++i )
+	{
+		const TBrickParam::IId* param = brick->Params[i];
+		switch(param->id())
+		{
+		case  TBrickParam::CHARAC_UPGRADE:
+			{
+				CHARACTERISTICS::TCharacteristics charac = CHARACTERISTICS::toCharacteristic((((CSBrickParamCharacUpgrade *)param)->Characteristic));
+				if (charac == CHARACTERISTICS::Unknown)
+				{
+					nlwarning("Training brick %s has bad charc parameter %s", brick->SheetId.toString().c_str(), ((CSBrickParamCharacUpgrade *)param)->Characteristic.c_str());
+				}
+				else
+				{
+					const sint16 modifier = (sint16) ((CSBrickParamCharacUpgrade *)param)->Modifier;
+					changeCharacteristic(charac, -modifier);
+
+					if (sendChatMessage)
+					{
+						SM_STATIC_PARAMS_3(params, STRING_MANAGER::characteristic, STRING_MANAGER::integer, STRING_MANAGER::integer);
+						params[0].Enum = charac;
+						params[1].Int = _PhysCharacs._PhysicalCharacteristics[charac].Base;
+						params[2].Int = brick->SkillPointPrice;
+						PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "PHRASE_CHARAC_BUY", params);
+					}
+				}
+			}
+			break;
+
+		case TBrickParam::SCORE_UPGRADE:
+			{
+				const SCORES::TScores score = SCORES::toScore((((CSBrickParamScoreUpgrade *)param)->Score));
+				if ( score < 0 || score >= SCORES::NUM_SCORES)
+				{
+					nlwarning("Training brick %s has bad score parameter %s", brick->SheetId.toString().c_str(), ((CSBrickParamScoreUpgrade *)param)->Score.c_str());
+				}
+				else
+				{
+					const sint32 modifier = ((CSBrickParamScoreUpgrade *)param)->Modifier;
+					// change Score
+					_ScorePermanentModifiers[score] -= modifier;
+					_PhysScores._PhysicalScores[ score ].Base -= modifier;
 				}
 			}
 			break;

@@ -108,6 +108,9 @@ void _log_Character_AddKnownBrick(const NLMISC::CSheetId &brickId, const char *_
 #define log_Character_AddKnownBrick(brickId) \
 	_log_Character_AddKnownBrick(brickId, __FILE__, __LINE__)
 
+void _log_Character_RemoveKnownBrick(const NLMISC::CSheetId &brickId, const char *_filename_, uint _lineNo_);
+#define log_Character_RemoveKnownBrick(brickId) \
+	_log_Character_RemoveKnownBrick(brickId, __FILE__, __LINE__)
 
 #endif
 
