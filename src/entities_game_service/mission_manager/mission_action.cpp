@@ -1326,7 +1326,7 @@ class CMissionActionLearnBrick : public IMissionAction
 			CSheetId sheetId = CSheetId( s );
 			if ( sheetId == CSheetId::Unknown )
 			{
-				MISLOGERROR2("%uth sheetId '%s' is unknon", i, s.c_str());
+				MISLOGERROR2("%uth sheetId '%s' is unknown", i, s.c_str());
 				return false;
 			}
 			_BrickSheets.push_back(sheetId);
@@ -1444,6 +1444,150 @@ class CMissionActionLearnBrick : public IMissionAction
 	MISSION_ACTION_GETNEWPTR(CMissionActionLearnBrick)
 };
 MISSION_REGISTER_ACTION(CMissionActionLearnBrick,"learn_brick");
+
+/// user forget a brick
+// ----------------------------------------------------------------------------
+class CMissionActionUnlearnBrick : public IMissionAction
+{
+	bool buildAction( uint32 line, const std::vector< std::string > & script, CMissionGlobalParsingData & globalData, CMissionSpecificParsingData & missionData)
+	{
+		_SourceLine = line;
+		if ( script.size() < 2 && script.size() > 4)
+		{
+			MISLOGSYNTAXERROR("<brick> *[;<brick>] [: npc_name] [: group]");
+			return false;
+		}
+		vector<string>	args;
+		explode(script[1], string(";"), args, true);
+		if (args.size() == 0)
+		{
+			MISLOGSYNTAXERROR("<brick> *[;<brick>] [: npc_name] [: group]");
+			return false;
+		}
+		for (uint i=0; i<args.size(); ++i)
+		{
+			string s = CMissionParser::getNoBlankString(args[i]) + ".sbrick";
+			CSheetId sheetId = CSheetId( s );
+			if ( sheetId == CSheetId::Unknown )
+			{
+				MISLOGERROR2("%uth sheetId '%s' is unknown", i, s.c_str());
+				return false;
+			}
+			_BrickSheets.push_back(sheetId);
+		}
+		uint idx = 2;
+		_Group = false;
+		_Npc = CAIAliasTranslator::Invalid;
+
+		while (idx < script.size())
+		{
+			if (CMissionParser::getNoBlankString(script[idx]) == "group")
+			{
+				// we found the group flag, must be last param
+				if (idx != script.size()-1)
+				{
+					MISLOGSYNTAXERROR("'group' must be last parameter if present");
+					return false;
+				}
+
+				_Group = true;
+			}
+			else
+			{
+				if (_Npc != CAIAliasTranslator::Invalid)
+				{
+					MISLOGERROR1("npc '%s' already present", script[idx].c_str());
+					return false;
+				}
+				// this must be a npc identifier
+				if (!CMissionParser::parseBotName(script[idx], _Npc, missionData))
+					return false;
+			}
+			idx++;
+		}
+		return true;
+	}
+	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
+	{
+		LOGMISSIONACTION("unlearn_brick");
+		std::vector<TDataSetRow> entities;
+		instance->getEntities(entities);
+		if ( entities.empty() )
+			return;
+		if ( dynamic_cast<CMissionSolo*>(instance) )
+		{
+			if ( _Group )
+			{
+				CCharacter * user = PlayerManager.getChar( entities[0] );
+				CTeam * team = TeamManager.getRealTeam(user->getTeamId());
+				if ( team )
+				{
+					entities.resize( team->getTeamMembers().size() );
+					list<CEntityId>::const_iterator it = team->getTeamMembers().begin();
+					for (uint i = 0; i < team->getTeamMembers().size(); i++)
+					{
+						entities[i] = TheDataset.getDataSetRow( *it );
+						++it;
+					}
+				}
+			}
+		}
+		else if ( !_Group )
+		{
+			CCharacter * user = PlayerManager.getChar( entities[0] );
+			CTeam * team = TeamManager.getRealTeam(user->getTeamId());
+			if ( team )
+			{
+				entities.resize(1);
+				entities[0] = TheDataset.getDataSetRow( team->getLeader() );
+			}
+		}
+		for ( uint i = 0; i < entities.size(); i++ )
+		{
+
+			CCharacter * user = PlayerManager.getChar( entities[i] );
+			if ( user )
+			{
+				TVectorParamCheck params(_BrickSheets.size());
+				for (uint j=0; j<_BrickSheets.size(); ++j)
+				{
+					if(_BrickSheets[j] != CSheetId::Unknown)
+					{
+						user->removeKnownBrick(_BrickSheets[j]);
+
+						params[j].Type = STRING_MANAGER::sbrick;
+						params[j].SheetId = _BrickSheets[j];
+					}
+					else
+					{
+						nlwarning("<CMissionActionUnlearnBrick> Can't unlearn brick, brick is Unknown, mission %d", instance->getTemplateId());
+					}
+				}
+
+				if (_Npc == CAIAliasTranslator::Invalid)
+				{
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
+						toString("MIS_REMV_BRICK_%u", _BrickSheets.size()), 
+						params);
+				}
+				else
+				{
+					STRING_MANAGER::TParam p(STRING_MANAGER::bot, _Npc);
+					params.push_back(p);
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
+						toString("MIS_REMV_BRICK_NPC_%u", _BrickSheets.size()), 
+						params);
+				}
+			}
+		}
+	}
+	vector<CSheetId> _BrickSheets; //_SheetId;
+	bool		_Group;
+	TAIAlias	_Npc;
+
+	MISSION_ACTION_GETNEWPTR(CMissionActionUnlearnBrick)
+};
+MISSION_REGISTER_ACTION(CMissionActionUnlearnBrick,"unlearn_brick");
 
 /// user receive money
 // ----------------------------------------------------------------------------
