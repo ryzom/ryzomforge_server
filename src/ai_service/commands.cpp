@@ -183,7 +183,7 @@ NLMISC_COMMAND(search, "search all the data tree for a name part","<name_part>")
 
 //----------------------------------------------------------------------------
 
-NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<aiInstanceId> <nbBots> <sheet> <x> <y> [<dispersionRadius=10m> [<spawnBots=true> [<orientation=random|-360..360>]]]")
+NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<aiInstanceId> <nbBots> <sheet> <x> <y> [<dispersionRadius=10m> [<spawnBots=true> [<orientation=random|-360..360> [<name>]]]]")
 {
 	if (args.size()<5)
 		return false;
@@ -249,7 +249,10 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<aiInstanceId>
 		orientation = orientation / 360.0 * (NLMISC::Pi * 2.0);
 	}
 
-	aiInstance->eventCreateNpcGroup(nbBots, sheetId, CAIVector(x, y), dispersionRadius, spawnBots, orientation);
+	std::string botsName;
+	if (args.size()>8) botsName = args[8];
+
+	aiInstance->eventCreateNpcGroup(nbBots, sheetId, CAIVector(x, y), dispersionRadius, spawnBots, orientation, botsName);
 	
 	return true;
 }

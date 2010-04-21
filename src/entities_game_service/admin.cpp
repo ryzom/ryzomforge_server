@@ -5221,7 +5221,7 @@ NLMISC_COMMAND(setFamePlayer, "set the fame value of a player in the given facti
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <nbBots> <sheet> [<dispersionRadius=10m> [<spawnBots=true> [<orientation=random|self|-360..360>]]]")
+NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <nbBots> <sheet> [<dispersionRadius=10m> [<spawnBots=true> [<orientation=random|self|-360..360> [<name>]]]]")
 {
 	if (args.size () < 3) return false;
 	GET_ENTITY
@@ -5277,6 +5277,9 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		}
 	}
 
+	std::string botsName;
+	if (args.size()>6) botsName = args[6];
+
 	CMessage msgout("EVENT_CREATE_NPC_GROUP");
 	uint32 messageVersion = 1;
 	msgout.serial(messageVersion);
@@ -5288,6 +5291,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	msgout.serial(sheetId);
 	msgout.serial(dispersionRadius);
 	msgout.serial(spawnBots);
+	msgout.serial(botsName);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
 
 	return true;
