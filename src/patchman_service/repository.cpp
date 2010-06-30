@@ -1,7 +1,18 @@
-/** \file repository.cpp
- *
- *
- */
+// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
+// Copyright (C) 2010  Winch Gate Property Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //-----------------------------------------------------------------------------
 // includes
@@ -25,10 +36,13 @@
 using namespace std;
 using namespace NLMISC;
 
-
 //-------------------------------------------------------------------------------------------------
 // constants & utilities
 //-------------------------------------------------------------------------------------------------
+
+// From spa_server_patch_applier.cpp
+extern void writeVersionFile(const NLMISC::CSString& fileName, uint32 version);
+extern uint32 readVersionFile(const NLMISC::CSString& fileName);
 
 NLMISC::CSString getRepositoryIndexFileName(const NLMISC::CSString& repositoryName)
 {
@@ -369,7 +383,7 @@ CRepository::const_iterator CRepository::end() const
 	return _Files.end();
 }
 
-void CRepository::fillShortList(TFileInfoVector	&files) const
+void CRepository::fillShortList(PATCHMAN::TFileInfoVector	&files) const
 {
 	// start by clearing out any previous contents in the files vector
 	files.clear();

@@ -1,11 +1,18 @@
-/** \file alias_tree_root.h
- *	Base class for alias node that are used as root for the
- *	alias tree. Keep a link with the primitive file that created
- *	it so we can delete it when the primitive file is explicitly
- *	unloaded or when it don't contains the node after a reload.
- *
- * $Id: alias_tree_root.h,v 1.11 2005/06/28 14:07:37 cado Exp $
- */
+// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
+// Copyright (C) 2010  Winch Gate Property Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef ALIAS_TREE_ROOT_H
 #define ALIAS_TREE_ROOT_H

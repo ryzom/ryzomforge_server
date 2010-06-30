@@ -1,63 +1,18 @@
-/** \file actor_manager.cpp
- * 
- * the actor manager for AgS_Test
- *
- * $Id: actor_manager.cpp,v 1.34 2004/06/14 12:34:17 brigand Exp $
- * $Log: actor_manager.cpp,v $
- * Revision 1.34  2004/06/14 12:34:17  brigand
- * CHANGED : updated to new PDS people enum
- *
- * Revision 1.33  2004/03/01 19:18:37  lecroart
- * REMOVED: bad headers
- *
- * Revision 1.32  2004/01/13 18:47:07  cado
- * ADDED: Mirror tests
- *
- * Revision 1.31  2003/10/21 08:48:19  legros
- * ADDED: multi target commands
- *
- * Revision 1.30  2003/10/02 16:13:15  legros
- * no message
- *
- * Revision 1.29  2003/10/01 14:29:32  legros
- * no message
- *
- * Revision 1.28  2003/09/30 16:03:15  legros
- * CHANGED: ags test is now up to date...
- *
- * Revision 1.27  2003/07/16 15:51:19  cado
- * CHANGED: First-pass to re-adapt to mirror system V1.4
- *
- * Revision 1.26  2003/07/16 14:34:06  boucher
- * no message
- *
- * Revision 1.25  2003/02/26 10:24:19  cado
- * CHANGED: changed all properties to new mirror, no more old mirror
- *
- * Revision 1.24  2003/02/24 10:44:44  cado
- * ADDED: Adapted for new mirror system
- *
- * Revision 1.23  2003/01/28 20:36:51  miller
- * Changed header comments from 'Nel Network Services' to Ryzom
- *
- * Revision 1.22  2002/11/29 10:17:50  portier
- * #ADDED: ia_player.id
- *
- * Revision 1.21.2.1  2003/01/03 18:18:02  cado
- * ADDED: Integration with new mirror system
- *
- * Revision 1.21  2002/11/15 16:22:42  fleury
- * CHANGED : the OPS has been replaced by the EGS
- *
- * Revision 1.20  2002/08/30 08:47:34  miller
- * another quick test (non destructive)
- *
- * Revision 1.19  2002/08/30 08:46:09  miller
- * quick test (non destructive)
- *
- */
-
-
+// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
+// Copyright (C) 2010  Winch Gate Property Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Nel
 //#include "nel/net/service.h"

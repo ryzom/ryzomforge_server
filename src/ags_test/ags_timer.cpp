@@ -1,28 +1,18 @@
-/** \file actor_manager.cpp
- * 
- * the actor manager for AgS_Test
- *
- * $Id: ags_timer.cpp,v 1.3 2004/03/01 19:18:37 lecroart Exp $
- * $Log: ags_timer.cpp,v $
- * Revision 1.3  2004/03/01 19:18:37  lecroart
- * REMOVED: bad headers
- *
- * Revision 1.2  2003/01/28 20:36:51  miller
- * Changed header comments from 'Nel Network Services' to Ryzom
- *
- * Revision 1.1  2002/11/28 14:57:17  portier
- * #ADDED: ia_player.id
- *
- * Revision 1.21  2002/11/15 16:22:42  fleury
- * CHANGED : the OPS has been replaced by the EGS
- *
- * Revision 1.20  2002/08/30 08:47:34  miller
- * another quick test (non destructive)
- *
- * Revision 1.19  2002/08/30 08:46:09  miller
- * quick test (non destructive)
- *
- */
+// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
+// Copyright (C) 2010  Winch Gate Property Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 

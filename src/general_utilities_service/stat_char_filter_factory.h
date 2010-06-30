@@ -1,9 +1,18 @@
-/** \file stats_char_filter_factory.h
- *
- * Part of STATS Module for GUS (general utilities service)
- *
- * $Id: stat_char_filter_factory.h,v 1.2 2005/01/21 17:13:35 distrib Exp $
- */
+// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
+// Copyright (C) 2010  Winch Gate Property Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef STATS_CHAR_FILTER_FACTORY_H
 #define STATS_CHAR_FILTER_FACTORY_H

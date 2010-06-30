@@ -1,10 +1,18 @@
-/** \file ai_bot_fauna.h
- *
- * $Id: ai_bot_fauna.h,v 1.134 2006/10/31 16:09:01 blanchard Exp $
- * 
- * This file defines the classes CFaunaActivity, CSpawnBotFauna,
- * CMovementMagnet, CBotFauna and CCorpseFaunaProfile
- */
+// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
+// Copyright (C) 2010  Winch Gate Property Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef RYAI_BOT_FAUNA_H
 #define RYAI_BOT_FAUNA_H

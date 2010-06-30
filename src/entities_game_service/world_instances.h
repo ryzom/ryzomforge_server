@@ -1,9 +1,18 @@
-/** \file world_instances.h
- * Management of continent instance across the world and information
- * about theire repective ai service (if any)
- *
- * $Id: world_instances.h,v 1.12 2007/03/09 09:56:47 boucher Exp $
- */
+// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
+// Copyright (C) 2010  Winch Gate Property Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #ifndef WORLD_INSTANCES
@@ -34,7 +43,7 @@ class CReportAIInstanceDespawnMsgImp : public CReportAIInstanceDespawnMsg
 };
 
 
-/* This class store instance informations as well as
+/* This class store instance information as well as
  * AIS list with available collision information.
  * The AIS collision information is used to select the
  * AIS for spawning a new dynamic instance.
