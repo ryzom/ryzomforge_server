@@ -339,9 +339,9 @@ inline
 CNpcZone* CCell::npcZone(size_t index)
 {
 	if (index<_NpcZonePlaces.size())
-		return _NpcZonePlaces[index];
+		return _NpcZonePlaces[(uint32)index];
 	else
-		return _NpcZoneShapes[index];
+		return _NpcZoneShapes[(uint32)index];
 }
 
 inline
@@ -455,7 +455,7 @@ bool CGroupDesc<FamilyT>::setSheet(std::string const& sheetName)
 		{
 			for (size_t i=0; i<_MultiLevelSheetCount; ++i)
 			{
-				char letter = (i/4) + 'b';
+				char letter = char(i/4) + 'b';
 				char number = (i%4) + '1';
 				std::string sheetNameLevel = sheetName+letter+number;
 				// Compute sheet id
@@ -899,6 +899,8 @@ CAliasTreeOwner	*CGroupDesc<FamilyT>::createChild(IAliasCont	*cont, CAIAliasDesc
 	case AITYPES::AITypeBotTemplateMultiLevel:
 		child = new CBotDesc<FamilyT>(this, aliasTree->getAlias(), aliasTree->getName());
 		break;
+	default:
+		break;
 	}
 	
 	if	(child)
@@ -1238,7 +1240,7 @@ void CBotDesc<FamilyT>::setSheet(std::string const& sheetName)
 		{
 			for (size_t i=0; i<_MultiLevelSheetCount; ++i)
 			{
-				char letter = (i/4) + 'b';
+				char letter = char(i/4) + 'b';
 				char number = (i%4) + '1';
 				std::string sheetNameLevel = sheetName+letter+number;
 				// Compute sheet id

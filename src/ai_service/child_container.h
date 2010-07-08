@@ -463,7 +463,7 @@ uint32 CCont<TChld>::getFirstFreeChild()
 		if (!_Childs[index])
 			break;
 	}
-	return index;
+	return (uint32)index;
 }
 
 template <class TChld>
@@ -492,7 +492,7 @@ uint32 CAliasCont<TChld>::getChildIndexByAlias(uint32 alias) const
 	{
 		TChld* child = this->_Childs[i];
 		if (child!=NULL && child->getAlias()==alias)
-			return i;
+			return (uint32)i;
 	}
 	return ~0;
 }

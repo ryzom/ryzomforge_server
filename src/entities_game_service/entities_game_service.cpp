@@ -245,7 +245,7 @@ float						SlowWeaponHit = 5.0f;
 CCharacterBotChatBeginEnd	CharacterBotChatBeginEnd;
 CCharacterDynChatBeginEnd	CharacterDynChatBeginEnd;
 //*** Removed by Sadge ***
-//// Transport class for EGS asking informations about creatures/Npc
+//// Transport class for EGS asking information about creatures/Npc
 //CCreatureAskInformationMsg	CreatureNpcInformations;
 //*** ***
 //	Transport class sent to AIS to set bot mode as death.
@@ -528,8 +528,8 @@ bool loadAndResaveCheckCharacters( const std::vector<string>& files, NLMISC::CLo
 			{
 				id.Chars[i].Backup = id.Chars[i].File + ".tmp";
 				CFile::copyFile(
-					id.Chars[i].Backup.c_str(),
-					id.Chars[i].File.c_str());
+					id.Chars[i].Backup,
+					id.Chars[i].File);
 			}
 		}
 
@@ -596,8 +596,8 @@ bool loadAndResaveCheckCharacters( const std::vector<string>& files, NLMISC::CLo
 			for (i=0; i<id.Chars.size(); ++i)
 			{
 				CFile::copyFile(
-					id.Chars[i].File.c_str(),
-					id.Chars[i].Backup.c_str());
+					id.Chars[i].File,
+					id.Chars[i].Backup);
 				CFile::deleteFile(id.Chars[i].Backup);
 			}
 		}
@@ -1624,7 +1624,7 @@ NLMISC_COMMAND(loadAndReSaveCharacters,"load and resave the complete set of play
 			playerIds.insert( account );
 	}
 
-	uint32 size= playerIds.size();
+	uint32 size= (uint32)playerIds.size();
 	uint32 i = 0;
 	for( set<uint32>::iterator it=playerIds.begin(); it != playerIds.end(); ++i, ++it )
 	{
@@ -1697,7 +1697,7 @@ NLMISC_COMMAND(loadCharacterNames,"load all character save games and extract nam
 	}
 
 	// iterate over files
-	uint32 numFiles= files.size();
+	uint32 numFiles= (uint32)files.size();
 	uint32 i=0;
 	for (TFilesMap::iterator it=files.begin(); it!=files.end(); ++it, ++i)
 	{
@@ -4879,8 +4879,8 @@ NLMISC_COMMAND(displayBricksInDb,"display the bricks in DB for given player","<p
 		set<CSheetId>::const_iterator it2 = bricksKnown.begin();
 		set<CSheetId>::const_iterator it2End = bricksKnown.end();
 
-		uint16 size1 = bricksInDb.size();
-		uint16 size2 = bricksKnown.size();
+		uint16 size1 = (uint16)bricksInDb.size();
+		uint16 size2 = (uint16)bricksKnown.size();
 
 		bool ok = true;
 
@@ -5612,7 +5612,7 @@ NLMISC_COMMAND(execScript, "Execute a script file (.cmd)","<FileName>")
 
 		string script;
 		script.resize(iFile.getFileSize());
-		iFile.serialBuffer((uint8 *)&script[0], script.size());
+		iFile.serialBuffer((uint8 *)&script[0], (uint)script.size());
 
 
 		vector<string> scriptLines;

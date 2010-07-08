@@ -833,7 +833,7 @@ public:
 				fb->setModifier	(_value, nrjIndex);
 			return;
 		}
-		fb->setModifier	(_value, _index);
+		fb->setModifier	(_value, (uint32)_index);
 	}
 	
 	virtual	void	doOnCellZone(CCellZone	*cz)	const
@@ -1938,7 +1938,7 @@ NLMISC_COMMAND(displayTarget,"display bot target status for given bot(s) or play
 
 		if	(!found)
 		{
-			log.displayNL("=> can't display informations for the target of: %s", args[i].c_str());		
+			log.displayNL("=> can't display information for the target of: %s", args[i].c_str());		
 		}
 		
 	}
@@ -2456,7 +2456,7 @@ NLMISC_COMMAND(addPetsToPlayer,"Add some pets specified with a sheet to the spec
 		return	false;	
 
 #ifdef NL_DEBUG
-	nlstop("Not Implemented");
+	nlstopex(("Not Implemented"));
 #endif
 	return	true;	
 }
@@ -2884,7 +2884,7 @@ static int const MULTI_LINE_FORMATER_maxn = 78;
 void MULTI_LINE_FORMATER::pushTitle(std::vector<std::string>& container, std::string const& text)
 {
 	int const maxn = MULTI_LINE_FORMATER_maxn;
-	int n = maxn - text.length() - 4;
+	int n = maxn - (int)text.length() - 4;
 	container.push_back(" _/");
 	container.back() += text;
 	container.back() += "\\" + std::string(n, '_');

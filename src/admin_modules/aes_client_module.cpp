@@ -117,9 +117,9 @@ namespace ADMIN
 
 		CAdminExecutorServiceClient()
 			:	_DontUseShardOrders(false),
-				_ProcessUsedMemory(0),
 				_LastStateReport(0),
-				_LastStatusStringReport(0)
+				_LastStatusStringReport(0),
+				_ProcessUsedMemory(0)
 		{
 			CAdminExecutorServiceClientSkel::init(this);
 
@@ -183,10 +183,10 @@ namespace ADMIN
 			// precompute the service name
 			_ServiceAlias = makeServiceAlias();
 
-			// loop for an optionnal 'dontUseShardOrders' flag in init params
+			// loop for an optional 'dontUseShardOrders' flag in init params
 			const TParsedCommandLine *duso = pcl.getParam("dontUseShardOrders");
 			if (duso != NULL)
-				_DontUseShardOrders = (duso->ParamValue == "true" | duso->ParamName == "1");
+				_DontUseShardOrders = (duso->ParamValue == "true" || duso->ParamName == "1");
 
 			return true;
 		}

@@ -54,7 +54,7 @@ NL_INSTANCE_COUNTER_IMPL(CPlayer);
 bool wipeAndRestore(const std::string &fileName);
 
 FILE	*LastLoad = NULL;
-char	*LastLoadFileName = "last_loaded_char.bin";
+const char	*LastLoadFileName = "last_loaded_char.bin";
 
 extern CVariable<uint32>	MonkeyLoadEnable;
 extern uint32 CharacterSaveCounter;
@@ -110,7 +110,7 @@ void CPlayer::checkCrashMarker()
 		
 		// check 
 		uint32	lastBad[2];
-		uint32 nbRead = fread(lastBad, 1, 4*2, LastLoad);
+		uint32 nbRead = (uint32)fread(lastBad, 1, 4*2, LastLoad);
 		if (nbRead == 8 && lastBad[0] != 0xffffffff)
 		{
 			// there is a char to to backup
@@ -133,9 +133,9 @@ void CPlayer::checkCrashMarker()
 			//			if (CFile::isExists(fileName+".last_good"))
 			//			{
 			//				nlwarning("  Restoring last good version...");
-			//				CFile::copyFile(fileName.c_str(), (fileName+".last_good").c_str());
+			//				CFile::copyFile(fileName, fileName+".last_good");
 			//				nlwarning("  And copying the backup for comparison with bad file...");
-			//				CFile::copyFile((fileName+".before_wipe").c_str(), (fileName+".last_good").c_str());
+			//				CFile::copyFile(fileName+".before_wipe", fileName+".last_good");
 			//			}
 			//			else
 			//			{
@@ -174,9 +174,9 @@ bool wipeAndRestore(const std::string &fileName)
 	//if (CFile::isExists(fileName+".last_good"))
 	//{
 	//	nlwarning("  Restoring last good version...");
-	//	CFile::copyFile(fileName.c_str(), (fileName+".last_good").c_str());
+	//	CFile::copyFile(fileName, fileName+".last_good");
 	//	nlwarning("  And copying the backup for comparison with bad file...");
-	//	CFile::copyFile((fileName+".before_wipe").c_str(), (fileName+".last_good").c_str());
+	//	CFile::copyFile(fileName+".before_wipe", fileName+".last_good");
 	//
 	//	// restore success
 	//	return true;

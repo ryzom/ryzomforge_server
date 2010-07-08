@@ -103,7 +103,7 @@ void CSpawnGroupNpc::resetSlowUpdateCycle()
 	// Find the lowest bucket
 	vector<uint32>::iterator it = std::min_element(_SlowUpdateBuckets.begin(), _SlowUpdateBuckets.end());
 	// Assign it to the group
-	_SlowUpdateCycle = it - _SlowUpdateBuckets.begin();
+	_SlowUpdateCycle = (uint32)(it - _SlowUpdateBuckets.begin());
 	// Fill the bucket with the group
 	*it += bots().size();
 }
@@ -1070,7 +1070,7 @@ std::string	CGroupNpc::buildDebugString(uint idx) const
 void CGroupNpc::display(CStringWriter	&stringWriter) const
 {
 #ifdef NL_DEBUG
-	nlstop("not implemented");
+	nlstopex(("not implemented"));
 #endif
 }
 

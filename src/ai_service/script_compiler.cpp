@@ -1117,7 +1117,7 @@ void CCompiler::dumpByteCode (const string &sourceCode, const string &fullName, 
 {
 	// Build a valid filename
 	string tmp = fullName;
-	int pos;
+	string::size_type pos;
 	while ((pos=tmp.find (':')) != string::npos)
 		tmp[pos] = '-';
 
@@ -1146,7 +1146,7 @@ void CCompiler::dumpByteCode (const string &sourceCode, const string &fullName, 
 		fclose (file);
 	}
 	else
-		nlstop ("can't open %s for writing", tmp.c_str ());
+		nlstopex(("can't open %s for writing", tmp.c_str ()));
 }
 	
 CSmartPtr<const AIVM::CByteCode> CCompiler::compileCodeOld (const string &sourceCode, const string &fullName, bool debug) const
@@ -2168,7 +2168,7 @@ bool compileExternalScript (const char *filename, const char *outputFilename)
 		string content;
 		char buffer[512];
 		int read;
-		while ((read = fread (buffer, 1, sizeof(buffer)-1, file)) == sizeof(buffer)-1)
+		while ((read = (int)fread (buffer, 1, sizeof(buffer)-1, file)) == sizeof(buffer)-1)
 		{
 			buffer[read] = 0;
 			content += buffer;

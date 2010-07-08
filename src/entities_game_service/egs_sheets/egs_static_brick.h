@@ -247,14 +247,14 @@ public:
 		}
 		else
 		{
-			uint8 size = NeededMps.size();
+			uint8 size = (uint8)NeededMps.size();
 			f.serial(size);
 			for (uint8 i = 0; i < size ; ++i)
 			{
 				f.serial( NeededMps[i] ); 
 			}
 
-			size = NeededMpsFormula.size();
+			size = (uint8)NeededMpsFormula.size();
 			f.serial(size);
 			for (uint8 i = 0; i < size ; ++i)
 			{
@@ -457,7 +457,7 @@ public:
 	// get brick from family/index
 	static const CStaticBrick *getBrickFromFamilyIndex(uint16 family, uint16 index);
 			
-	/// called to copy from an other sheet (operator= + care ptrs)
+	/// called to copy from another sheet (operator= + care ptrs)
 	void reloadSheet(const CStaticBrick &o);
 	
 private:

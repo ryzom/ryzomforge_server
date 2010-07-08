@@ -19,7 +19,7 @@
 #include "nel/net/module_builder_parts.h"
 #include "nel/net/callback_server.h"
 
-#include "../../nelns/welcome_service/welcome_service_itf.h"
+#include "game_share/welcome_service_itf.h"
 #include "game_share/r2_types.h"
 
 
@@ -3444,7 +3444,7 @@ endOfWelcomeUserResult:
 				CSecurityCheckForFastDisconnection securityCheck;
 				securityCheck.setSessionId(sessionId);
 				securityCheck.setCookie(cookie); // must not be changed by joinSession(), because the client sends the one he knows before Far TPing
-				pjs.OptSecurityCode.setSecurityCode(securityCheck.encode("QtXp1o1t?"));
+				pjs.OptSecurityCode.setSecurityCode(securityCheck.encode(""));
 			}
 			_PendingJoins.push_back(pjs);
 
@@ -3925,7 +3925,7 @@ endOfWelcomeUserResult:
 		{
 			nldebug("RSM : setScenarioInfo char %u set scenario info for session %u", charId, sessionId.asInt());
 
-			nlstop("Deprecated");
+			nlstopex(("Deprecated"));
 
 //			// load the user
 //			CCharacterPtr character = CCharacter::load(_RingDb, charId, __FILE__, __LINE__);
