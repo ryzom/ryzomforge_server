@@ -48,7 +48,7 @@ public:
 #ifdef NL_DEBUG
 		nlassert(find(id) == true);
 #endif
-		const uint size = (uint)QueueIds.size();
+		const uint size = QueueIds.size();
 		for ( uint i = 0 ; i < size ; ++i )
 		{
 			if (QueueIds[i] == id)
@@ -62,7 +62,7 @@ public:
 
 	bool find(uint32 id) const
 	{ 
-		const uint size = (uint)QueueIds.size();
+		const uint size = QueueIds.size();
 		for ( uint i = 0 ; i < size ; ++i )
 		{
 			if (QueueIds[i] == id)

@@ -58,7 +58,7 @@ void CAIInfosOnEntityMsgImp::callback (const std::string &name, NLNET::TServiceI
 	CEntityBase *entity = CEntityBaseManager::getEntityBasePtr(EntityRowId);
 	if (!entity)
 	{
-		nlwarning("<CAIInfosOnEntityMsgImp> received infos on unknown entity");
+		nlwarning("<CAIInfosOnEntityMsgImp> recieved infos on unknown entity");
 		return;
 	}
 
@@ -124,7 +124,7 @@ void CQueryEgsImp::callback (const std::string &name, NLNET::TServiceId id)
 	
 	CCharacter* character = 0;
 
-	// the third parameter is the entity id of the player from which we query information
+	// the third parameter is the entity id of the player from which we query informations
 	if (Params.size() < 3)
 	{
 		nlwarning("Error in CQueryEgsImpl playerId not defined for function '%s'", funName.c_str() );

@@ -1097,7 +1097,7 @@ inline const CColumn*	CTable::getColumn(CLocatePath &path, bool verbose) const
 					}
 				}
 
-				indexValue *= (TEnumValue)table->getColumns().size();
+				indexValue *= table->getColumns().size();
 
 				if (indexValue >= attr->getColumns())
 				{

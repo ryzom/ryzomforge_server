@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "stdpch.h"
-#include "spawn_zones_back_compat.h"
+//#include "spawn_zones_back_compat.h"
 
 // game_share
 #include "game_share/utils.h"
@@ -648,3 +648,4 @@ uint16 oldToNewSpawnZoneId(uint16 oldId)
 }
 
 } // namespace BACK_COMPAT
+

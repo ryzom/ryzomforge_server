@@ -262,7 +262,7 @@ void	cbGetSaveList(CMemStream &msgin, TSockId host)
 	{
 		std::sort(incrementalDirectories.begin(), incrementalDirectories.end());
 
-		for (i=(uint)incrementalDirectories.size()-1; (sint)i>=0; --i)
+		for (i=incrementalDirectories.size()-1; (sint)i>=0; --i)
 		{
 			string	p = CPath::standardizePath(incrementalDirectories[i], true);
 			// avoid double / inside path
@@ -338,7 +338,7 @@ void	cbRestoreSave(CMemStream &msgin, TSockId host)
 
 	bool	success;
 
-	success = CFile::copyFile(outputfile, file, false);
+	success = CFile::copyFile(outputfile.c_str(), file.c_str(), false);
 
 	CMemStream	msgout;
 	uint32		fake	= 0;
@@ -431,7 +431,7 @@ void	cbCopyOverSave(CMemStream &msgin, TSockId host)
 		strFindReplace(outputfile, string("$charid"), charid);
 		strFindReplace(outputfile, string("$ext"), extensions[i]);
 
-		success = CFile::copyFile(outputfile, file, false);
+		success = CFile::copyFile(outputfile.c_str(), file.c_str(), false);
 
 		if (!success)
 			result = "Failed to copy "+file+" over "+outputfile+".";

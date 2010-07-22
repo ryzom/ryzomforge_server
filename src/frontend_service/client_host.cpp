@@ -476,7 +476,7 @@ void				CClientHost::CGenericMultiPartTemp::set (CActionGenericMultiPart *agmp, 
 	BlockReceived[agmp->Part] = true;
 
 	NbCurrentBlock++;
-	TempSize += (uint32)agmp->PartCont.size();
+	TempSize += agmp->PartCont.size();
 
 	if (NbCurrentBlock == NbBlock)
 	{

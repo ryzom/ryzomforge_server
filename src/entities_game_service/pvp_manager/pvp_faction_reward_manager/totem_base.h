@@ -73,7 +73,7 @@ public :
 	inline void		addNeighbour( TAIAlias neighbour )	{ _Neighbours.push_back( neighbour ); }
 
 	/// Get the number of neighbours
-	inline uint		getNumNeighbours() const			{ return (uint)_Neighbours.size(); }
+	inline uint		getNumNeighbours() const			{ return _Neighbours.size(); }
 
 	/// Get the list of neighbours
 	inline TAIAlias	getNeighbour( uint index ) const	{ return _Neighbours[index]; }
@@ -150,7 +150,7 @@ private :
 	/// Tick when last time attack message for totem has sended
 	NLMISC::TGameCycle	_LastTickAttackMessageSended;
 
-	// these information must be kept or they will be lost
+	// these informations must be kept or they will be lost
 	// while changing the bot object sheetId
 	/// HP Gained during building
 	float	_BuildHpGain;

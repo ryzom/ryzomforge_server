@@ -671,7 +671,7 @@ static void addGroupDescriptionToEventAction(const CAIAliasDescriptionNode *tree
 			case AITypeFolder:
 			{
 				string cname = nodeClass(child);
-				// parse optional group descriptions			
+				// parse optionnal group descriptions			
 				if (cname == "group_descriptions")
 				{										
 					CAIActions::exec("SETACTN", treeNode?treeNode->getAlias():uniqueId);
@@ -3232,8 +3232,6 @@ static void parsePrimSquadTemplate(const IPrimitive *prim, const std::string &ma
 			case AITypeSquadTemplateVariant:
 				parsePrimSquadTemplateVariant(nextTreeNode(aliasNode,child), child, name);
 				break;
-			default:
-				break;
 			}
 		}
 	}
@@ -3263,7 +3261,7 @@ static void parsePrimOutpost(const IPrimitive *prim, const std::string &mapName,
 	CAIActions::exec("OUTPOST", aliasNode, continent, filename, familyName);
 
 	// link squads
-	const char* props[] = { "tribe_squads", "tribe_squads2", "default_squads", "buyable_squads" };
+	char* props[] = { "tribe_squads", "tribe_squads2", "default_squads", "buyable_squads" };
 	size_t nprops = sizeof(props)/sizeof(props[0]);
 	for (size_t i=0; i!=nprops; ++i)
 	{

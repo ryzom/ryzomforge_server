@@ -771,7 +771,7 @@ public:
 	void clearHarvestDB();
 	void openHarvest();
 
-	// get reference on deposit harvest information
+	// get reference on deposit harvest informations
 	HARVEST_INFOS::CHarvestInfos& getHarvestInfos();
 
 	// Process static actions (like harvest, faber...)
@@ -1005,7 +1005,7 @@ public:
      *
      * \param value is the value to parse.
      * \param result is the result to fill if the value has been succesfully parsed.
-     * \return UnknownValue if the value is not known, ValueError is the value evaluation failed or NoError 
+     * \return UnkownValue if the value is not known, ValueError is the value evaluation failed or NoError 
      * if it has been parsed.
      */
 	virtual TReturnState evalValue (const char *value, double &result, uint32 userData);
@@ -1058,7 +1058,7 @@ public:
 	/// clear bot gift
 	void clearBotGift();
 
-	/// accept the exchange (exchangeId is a counter informing the server of the information received by the client)
+	/// accept the exchange (exchangeId is a counter informing the server of the informations received by the client)
 	void acceptExchange(uint8 exchangeId);
 
 	///exchange money
@@ -1209,7 +1209,7 @@ public:
 	/// update scores infos in database
 	void updateScoresInDatabase();
 
-	/// Set database with all character information
+	/// Set database with all character informations
 	void setDatabase();
 
 	/// cancel any static action in progress (ie actions canceled if the player moves like casting, harvest, faber...)
@@ -1304,7 +1304,7 @@ public:
 	sint processMissionMultipleEvent( CMissionEvent & event, TAIAlias alias = CAIAliasTranslator::Invalid);
 	/// process a mission event for the missions took by this player
 	bool processMissionUserEvent(std::list< CMissionEvent* > & eventList,TAIAlias alias);
-	/// process a mission event for a specific mission and optionally for a specific step
+	/// process a mission event for a specific mission and optionnally for a specific step
 	bool processMissionStepUserEvent(std::list< CMissionEvent* > & eventList, uint missionAlias, uint32 stepIndex );
 	/// make a mission advance through bot chat
 	void botChatMissionAdvance( uint8 index );
@@ -3027,7 +3027,7 @@ private:
 	bool						_HarvestDeposit;
 	/// if harvesting a deposit, the skill used
 	SKILLS::ESkills				_DepositSearchSkill;
-	/// Harvest deposit information
+	/// Harvest deposit informations
 	HARVEST_INFOS::CHarvestInfos _DepositHarvestInformations;		
 	//@}
 

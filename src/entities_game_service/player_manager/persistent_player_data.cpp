@@ -321,8 +321,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	H_AUTO(CCharacterStore);\
 	CFameManager::getInstance().savePlayerFame(_Id, const_cast<EGSPD::CFameContainerPD &>(*_Fames));\
 	/* Update the current playing session duration */ \
-	if (_LastLogStats.size() > 0) _LastLogStats.begin()->Duration = CTime::getSecondsSince1970() - _LastLogStats.begin()->LoginTime; \
-	else nlwarning("Cannot update play session duration, _LastLogStats is empty, new character?"); \
+	_LastLogStats.begin()->Duration = CTime::getSecondsSince1970() - _LastLogStats.begin()->LoginTime;\
 	\
 	/* Unless the top of the position stack is locked, */ \
 	/* update the stored position stack with the current position */ \

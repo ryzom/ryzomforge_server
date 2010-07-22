@@ -54,7 +54,7 @@ public:
 	/// Num instances
 	uint				getNumInstance()
 	{
-		return (uint)_ShapeNames.size();
+		return _ShapeNames.size();
 	}
 
 	/// get shape name

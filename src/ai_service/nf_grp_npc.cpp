@@ -1518,7 +1518,7 @@ void receiveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 				}
 			}
 
-			// A npc give a mission to take an item given by another npc
+			// A npc give a mission to take an item given by an other npc
 			// but the item instead of being a r2_plot_item is a normal item like system_mp or big armor
 			if ( r2PlotItemSheetId.find(sheetId) ==  r2PlotItemSheetId.end())
 			{
@@ -1683,7 +1683,7 @@ void giveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 				}
 			}
 
-			// A npc give a mission to give a item to another npc
+			// A npc give a mission to give a item to an other npc
 			// but the item instead of being a r2_plot_item is a normal item like system_mp or big armor
 			if ( r2PlotItemSheetId.find(sheetId) ==  r2PlotItemSheetId.end())
 			{
@@ -2109,7 +2109,7 @@ void npcSay_css_(CStateInstance* entity, CScriptStack& stack)
 	if(prefix=="DSS_")
 	{
 		
-		NLMISC::CSString phrase = NLMISC::CSString (text).right((unsigned int)text.length()-4);
+		NLMISC::CSString phrase = NLMISC::CSString (text).right(text.length()-4);
 		NLMISC::CSString idStr = phrase.strtok(" ",false,false,false,false);
 		uint32 scenarioId = atoi(idStr.c_str());
 		forwardToDss(spawnBot->dataSetRow(), CChatGroup::say, phrase, scenarioId);
@@ -2118,7 +2118,7 @@ void npcSay_css_(CStateInstance* entity, CScriptStack& stack)
 	
 	if (prefix=="RAW ")
 	{
-		NLMISC::CSString phrase = NLMISC::CSString (text).right((unsigned int)text.length()-4);
+		NLMISC::CSString phrase = NLMISC::CSString (text).right(text.length()-4);
 		npcChatToChannelSentence(spawnBot->dataSetRow(),CChatGroup::say, phrase);
 		return;
 	}

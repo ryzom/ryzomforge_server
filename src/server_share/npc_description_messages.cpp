@@ -121,7 +121,7 @@ void CScriptData::serial(NLMISC::IStream &f)
 	}
 	else
 	{
-		size = (uint16)Scripts.size();
+		size = Scripts.size();
 		f.serial(size);	
 		for (TScripts::iterator it = Scripts.begin(); it != Scripts.end(); ++it)
 		{
@@ -161,7 +161,7 @@ void CCustomLootTableManager::serial(NLMISC::IStream &f)
 	}
 	else
 	{
-		size = (uint16)Tables.size();
+		size = Tables.size();
 		f.serial(size);	
 		for (TCustomLootTable::iterator it = Tables.begin(); it != Tables.end(); ++it)
 		{

@@ -282,7 +282,7 @@ public:
 	static uint size()
 	{
 		if (!initialised()) init();
-		return (uint)Stack.size();
+		return Stack.size();
 	}
 
 	static void pop()

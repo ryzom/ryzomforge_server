@@ -101,7 +101,7 @@ public:
 	{
 		if(!_Content)
 			return 0;
-		return (uint)_Content->SoldItems.size();
+		return _Content->SoldItems.size();
 	}
 
 	void getSoldItem(uint idx,NLMISC::CSheetId & sheet, uint16 & level, float & factor)

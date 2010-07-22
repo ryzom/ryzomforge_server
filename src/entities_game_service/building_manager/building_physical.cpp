@@ -357,7 +357,7 @@ bool CBuildingPhysicalGuild::isUserAllowed(CCharacter * user, uint16 ownerId, ui
 //----------------------------------------------------------------------------
 uint16 CBuildingPhysicalGuild::getOwnerCount()
 { 
-	return (uint16)_Guilds.size();
+	return _Guilds.size();
 }
 
 //----------------------------------------------------------------------------
@@ -523,7 +523,7 @@ bool CBuildingPhysicalPlayer::isUserAllowed(CCharacter * user, uint16 ownerId, u
 //----------------------------------------------------------------------------
 uint16 CBuildingPhysicalPlayer::getOwnerCount()
 { 
-	return (uint16)_Players.size();
+	return _Players.size();
 }
 
 //----------------------------------------------------------------------------

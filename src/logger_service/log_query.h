@@ -20,7 +20,9 @@
 
 #include "nel/misc/types_nl.h"
 
-#include <memory>
+#if defined(NL_COMP_VC8) || defined(NL_COMP_VC9)
+#	include <memory>
+#endif
 
 #include "nel/misc/common.h"
 
@@ -861,7 +863,7 @@ struct TPredicateNode : public TQueryNode
 				}
 			}
 			else
-				nlstop;
+				nlstop
 		}
 		else
 		{

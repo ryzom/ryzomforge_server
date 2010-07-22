@@ -1280,7 +1280,7 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 		_ContextTexts[i].second = description.getContextOptions()[i].getDetail();
 	}
 
-	// let's parse optional properties
+	// let's parse optionnal properties
 	for ( uint i = 0; i < description.getOptionalProperties().size(); i++ )
 	{
 		std::vector< std::string > result;
@@ -1414,7 +1414,7 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 		else if ( NLMISC::strlwr(result[0]) == "altar" )
 		{
 //			nlinfo("OPString: %s", optionalPropertiesString.c_str());
-			uint32 nbAltarParams = (uint32)result.size();
+			uint32 nbAltarParams = result.size();
 			for( uint32 i = 1; i < nbAltarParams; ++i )
 			{
 //				nlinfo("OPSResult: %s", result[i].c_str());
@@ -1619,7 +1619,7 @@ CGameItemPtr CCreature::getNpcItem( const NLMISC::CSheetId &sheet, uint16 qualit
 	{
 		const std::vector< CGameItemPtr > & item = CStaticItems::getStaticItems();
 		
-		const uint nbItems = (uint)item.size();
+		const uint nbItems = item.size();
 		for (uint i = 0 ; i < nbItems ; ++i)
 		{
 			if ( item[i] != NULL && item[i]->getSheetId() == sheet && item[i]->quality() == quality )
@@ -1633,7 +1633,7 @@ CGameItemPtr CCreature::getNpcItem( const NLMISC::CSheetId &sheet, uint16 qualit
 	{
 		const std::vector< CGameItemPtr > & items = CGameItemManager::getNpcSpecificItems();
 		
-		const uint nbItems = (uint)items.size();
+		const uint nbItems = items.size();
 		for (uint i = 0 ; i < nbItems ; ++i)
 		{
 			if ( items[i] != NULL && items[i]->getSheetId() == sheet )
@@ -2223,7 +2223,7 @@ void CCreature::displayShopSelectors( NLMISC::CLog& log )
 //------------------------------------------------------------------------------
 bool CCreature::checkFactionAttackable(const CEntityId &playerId) const
 {
-	const uint size = (uint)_FactionAttackableAbove.size();
+	const uint size = _FactionAttackableAbove.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		// if player has one of specified fame above 0 he can attack this creature
@@ -2232,7 +2232,7 @@ bool CCreature::checkFactionAttackable(const CEntityId &playerId) const
 			return true;
 	}
 
-	const uint size2 = (uint)_FactionAttackableBelow.size();
+	const uint size2 = _FactionAttackableBelow.size();
 	for (uint i = 0 ; i < size2 ; ++i)
 	{
 		// if player has one of specified fame above 0 he can attack this creature

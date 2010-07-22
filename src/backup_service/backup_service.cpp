@@ -377,7 +377,7 @@ static void	cbSaveCheckFile( CMessage& msgin, const std::string &serviceName, NL
 
 	try
 	{
-		NLMISC::CFile::copyFile( msg.FileName + string(".backup"), msg.FileName );
+		NLMISC::CFile::copyFile( ( msg.FileName + string(".backup") ).c_str(), msg.FileName.c_str() );
 	}
 	catch( Exception &e )
 	{
@@ -578,7 +578,7 @@ static void cbAppend( CMessage& msgin, const std::string &serviceName, NLNET::TS
 
 		std::string	append = inMsg.Append+'\n';
 		uint8*		data = (uint8*)(const_cast<char*>(append.c_str()));
-		uint		dataSize = (uint)append.size();
+		uint		dataSize = append.size();
 
 		CWriteFile*	access = new CWriteFile(inMsg.FileName, serviceId, 0, data, dataSize);
 
@@ -832,7 +832,7 @@ void	CDirectoryRateStat::display(NLMISC::CLog& log)
 	TDirectoryMap::iterator	first = _DirectoryMap.begin(), last = _DirectoryMap.end();
 	for (; first != last; ++first)
 		if ((*first).first.size() > pathsize)
-			pathsize = (uint)(*first).first.size();
+			pathsize = (*first).first.size();
 
 	NLMISC::TTime	limit = NLMISC::CTime::getLocalTime()-60*1000;
 

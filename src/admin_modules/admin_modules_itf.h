@@ -21,7 +21,9 @@
 #ifndef ADMIN_MODULES_ITF
 #define ADMIN_MODULES_ITF
 #include "nel/misc/types_nl.h"
-#include <memory>
+#if defined(NL_COMP_VC8) || defined(NL_COMP_VC9)
+#	include <memory>
+#endif
 #include "nel/misc/hierarchical_timer.h"
 #include "nel/misc/string_conversion.h"
 #include "nel/net/message.h"

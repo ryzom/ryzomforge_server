@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #include "stdpch.h"
 #include "game_share/power_types.h"
 #include "game_share/brick_flags.h"
@@ -56,7 +55,7 @@ void CPowerActivationDateVector::clear()
 //-----------------------------------------------------------------------------
 void CPowerActivationDateVector::clearConsumable()
 {
-	for(sint32 i = (sint32)PowerActivationDates.size()-1; i >= 0; --i )
+	for(sint32 i = PowerActivationDates.size()-1; i >= 0; --i )
 	{
 		if (PowerActivationDates[i].ConsumableFamilyId != (uint16)~0)
 		{

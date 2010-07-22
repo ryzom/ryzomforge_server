@@ -146,7 +146,7 @@ namespace MSW
 			nlassert(_CurrentRow != NULL);
 			nlassert(fieldIndex < getNumFields());
 
-			static const char *emptyString = "";
+			static char *emptyString = "";
 
 			char *ret = _CurrentRow[fieldIndex];
 

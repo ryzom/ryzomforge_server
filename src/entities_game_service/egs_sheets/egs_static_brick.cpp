@@ -130,7 +130,7 @@ void CStaticBrick::serial(class NLMISC::IStream &f)
 
 	// Params
 		Params.clear();
-		size = (uint16)StringParams.size();
+		size = StringParams.size();
 		for (uint i = 0 ; i < size ; ++i)
 		{
 			addParam(StringParams[i], Params);
@@ -232,7 +232,7 @@ void CStaticBrick::serial(class NLMISC::IStream &f)
 		// mandatory
 		set<BRICK_FAMILIES::TBrickFamily>::const_iterator it = MandatoryFamilies.begin();
 		set<BRICK_FAMILIES::TBrickFamily>::const_iterator itEnd = MandatoryFamilies.end();
-		uint16 size = (uint16)MandatoryFamilies.size();
+		uint16 size = MandatoryFamilies.size();
 		f.serial(size);
 		for ( ; it != itEnd ; ++it)
 		{
@@ -243,7 +243,7 @@ void CStaticBrick::serial(class NLMISC::IStream &f)
 		// optional
 		it = OptionalFamilies.begin();
 		itEnd = OptionalFamilies.end();
-		size = (uint16)OptionalFamilies.size();
+		size = OptionalFamilies.size();
 
 		f.serial(size);
 		for ( ; it != itEnd ; ++it)
@@ -255,7 +255,7 @@ void CStaticBrick::serial(class NLMISC::IStream &f)
 		// credit
 		it = CreditFamilies.begin();
 		itEnd = CreditFamilies.end();
-		size = (uint16)CreditFamilies.size();
+		size = CreditFamilies.size();
 
 		f.serial(size);
 		for ( ; it != itEnd ; ++it)
@@ -271,7 +271,7 @@ void CStaticBrick::serial(class NLMISC::IStream &f)
 		}
 
 		// skills
-		size = (uint16)Skills.size();
+		size = Skills.size();
 		f.serial(size);
 		for (uint i = 0 ; i < size ; ++i )
 		{
@@ -335,7 +335,7 @@ void CStaticBrick::readStaticBrick( const NLGEORGES::UFormElm &root, const NLMIS
 		if(Family==BRICK_FAMILIES::Unknown)
 		{
 			string	sheetName= sheetId.toString();
-			string::size_type	end= sheetName.find(".sbrick")-NB_LETTERS_AFTER_FAMILY;
+			sint	end= sheetName.find(".sbrick")-NB_LETTERS_AFTER_FAMILY;
 			string sub = sheetName.substr(0,end);
 			sub = strupr(sub);
 			Family = BRICK_FAMILIES::toSBrickFamily ( sub );
@@ -490,7 +490,7 @@ void CStaticBrick::readStaticBrick( const NLGEORGES::UFormElm &root, const NLMIS
 	}
 	// Parse Params
 	Params.clear();
-	const uint size = (uint)StringParams.size();
+	const uint size = StringParams.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		addParam(StringParams[i], Params);
@@ -559,7 +559,7 @@ void CStaticBrick::readStaticBrick( const NLGEORGES::UFormElm &root, const NLMIS
 			if(bf != BRICK_FAMILIES::Unknown)
 				OptionalFamilies.insert( bf );
 			else
-				nlwarning("Unknown optional family %s",value.c_str());
+				nlwarning("Unknown optionnal family %s",value.c_str());
 		}
 	}
 	

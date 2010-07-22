@@ -1179,7 +1179,7 @@ CDatabase*	CDatabase::adapt(const string& description)
 	// get 'From' HashKey
 	CHashKey	hash1 = _Description.getHashKey();
 	// get 'Into' HashKey
-	CHashKey	hash2 = getSHA1((const uint8*)(description.c_str()), (uint32)description.size());
+	CHashKey	hash2 = getSHA1((const uint8*)(description.c_str()), description.size());
 
 	// same hash, ok go on
 	if (hash1 == hash2)
@@ -1596,7 +1596,7 @@ bool	CDatabase::buildDelta(const CTimestamp& starttime, const CTimestamp& endtim
 	std::string	statePath = _Reference.getRootPath();
 	std::string	stateName = CDatabaseState::fileName();
 	if (CFile::fileExists(statePath+stateName) &&
-		!CFile::copyFile(statePath+"previous_"+stateName, statePath+stateName, false))
+		!CFile::copyFile((statePath+"previous_"+stateName).c_str(), (statePath+stateName).c_str(), false))
 	{
 		PDS_WARNING("buildDelta(): failed copy state file to backup previous_state");
 	}

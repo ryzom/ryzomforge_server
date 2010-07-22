@@ -14,8 +14,6 @@ CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 LDFLAGS      = $(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
 		-L../admin_modules \
-		-L$(RYZOM_COMMON_SRC)/game_share \
-		-lgame_share \
 		-lnelnet \
 		-lnelmisc \
 		-ladmin_modules \
