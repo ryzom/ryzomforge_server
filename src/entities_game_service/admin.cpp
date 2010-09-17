@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 //
 // User Privilege set in the mysql database must be like that ":GM:" or "" or ":GM:ADMIN:" ....
 //
