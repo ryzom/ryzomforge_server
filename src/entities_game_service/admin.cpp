@@ -5281,7 +5281,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		{
 			orientation = (sint32)(e->getHeading() * 1000.0);
 		}
-		else (args[5] != "random")
+		else if (args[5] != "random")
 		{
 			NLMISC::fromString(args[5], orientation);
 			orientation = (sint32)((double)orientation / 360.0 * (NLMISC::Pi * 2.0) * 1000.0);
