@@ -2252,6 +2252,10 @@ public:
 	void setPvPSafeZoneActive();
 	/// clear pvp zone safe flag
 	void clearSafeInPvPSafeZone();
+	/// get pvp fames allies
+	TYPE_PVP_CLAN getPVPFamesAllies();
+	/// get pvp fames ennemys
+	TYPE_PVP_CLAN getPVPFamesEnemies();
 	/// update the clan in visuale property
 	void updatePVPClanVP() const;
 	//@}
@@ -2298,13 +2302,17 @@ public:
 	void channelAdded( bool b );
 	bool isChannelAdded();
 
+	uint8 getNbUserChannels() { return _NbUserChannels; };
+	void addUserChannel() { _NbUserChannels++; };
+	void removeUserChannel() { _NbUserChannels--; };
+
 	std::vector<SItemSpecialEffect> lookForSpecialItemEffects(ITEM_SPECIAL_EFFECT::TItemSpecialEffect effectType) const;
 
 	/// return true if the given item is an xp catalyser which has been activated
 	bool isAnActiveXpCatalyser( CGameItemPtr item );
 	
-	void setShowFactionChannelsMode(bool s);
-	bool showFactionChannelsMode();
+	void setShowFactionChannelsMode(TChanID channel, bool s);
+	bool showFactionChannelsMode(TChanID channel);
 
 	// from offline command
 	void contactListRefChangeFromCommand(const NLMISC::CEntityId &id, const std::string &operation);
@@ -3136,7 +3144,10 @@ private:
 
 	/// nb of auras affecting this player
 	uint8						_NbAuras;
-	
+
+	/// nb of users channels
+	uint8						_NbUserChannels;
+
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange {
 
@@ -3365,7 +3376,7 @@ private:
 	bool							_ChannelAdded;
 
 	/// if true, enable display of channel faction for users with priviledge
-	bool							_FactionChannelMode;
+	std::map<TChanID, bool>	_FactionChannelsMode;
 
 	/// time when user left outpost zone (0 means not valid)
 	NLMISC::TGameCycle				_OutpostLeavingTime;

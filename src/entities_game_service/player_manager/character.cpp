@@ -364,6 +364,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_NbStaticActiveEffects  = 0;
 	_StaticActionInProgress = false;
 
+	_NbUserChannels = 0;
+
 	// init faber plans
 //	_KnownFaberPlans.resize(64,(uint64)0); //64*64 bits
 
@@ -630,7 +632,6 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_HaveToUpdatePVPMode = false;
 	_SessionId = TSessionId(0);
 	_CurrentSessionId = _SessionId;
-	_FactionChannelMode = true;
 	_PvPSafeZoneActive = false;
 
 	// For client/server contact list communication
@@ -762,18 +763,64 @@ void	CCharacter::initPDStructs()
 //-----------------------------------------------
 void CCharacter::updatePVPClanVP() const
 {
+	TYPE_PVP_CLAN propPvpClanTemp = 0;
+	uint32 maxFameCiv = 0;
+	uint8 civOfMaxFame = 255;
+	uint32 maxFameCult = 0;
+	uint8 cultOfMaxFame = 255;
+
+	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+	{
+		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
+		if (fameIdx < 4)
+		{
+			if (abs(fame) > maxFameCiv)
+			{
+				civOfMaxFame = fameIdx;
+				maxFameCiv = abs(fame);
+			}
+		}
+		else
+		{
+			if (abs(fame) > maxFameCult)
+			{
+				cultOfMaxFame = fameIdx - 4;
+				maxFameCult = abs(fame);
+			}
+
+		}
+
+		if (fame >= 30*6000) {
+			propPvpClanTemp |= TYPE_PVP_CLAN(1) << 2*TYPE_PVP_CLAN(fameIdx);
+		} else if (fame <= -30*6000) {
+			propPvpClanTemp |= TYPE_PVP_CLAN(1) << (2*TYPE_PVP_CLAN(fameIdx))+1;
+		} else {
+		}
+	}
+	propPvpClanTemp |= TYPE_PVP_CLAN(civOfMaxFame) << (2*TYPE_PVP_CLAN(7));
+	propPvpClanTemp |= TYPE_PVP_CLAN(cultOfMaxFame) << (2*TYPE_PVP_CLAN(8));
 	CMirrorPropValue<TYPE_PVP_CLAN> propPvpClan( TheDataset, TheDataset.getDataSetRow(_Id), DSPropertyPVP_CLAN );
-	if( getAllegiance().first >= PVP_CLAN::BeginCults && getAllegiance().first <= PVP_CLAN::EndCults )
-	{
-		propPvpClan = (uint8) getAllegiance().first;
-	}
-	else
-	{
-		propPvpClan = (uint8) getAllegiance().second;
-	}
+
+	propPvpClan = (uint32)propPvpClanTemp;
 }
 
+TYPE_PVP_CLAN CCharacter::getPVPFamesAllies()
+{
+	TYPE_PVP_CLAN propPvpClanTemp = 0;
+	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) >= 30*6000)
+			propPvpClanTemp |= TYPE_PVP_CLAN(1) << TYPE_PVP_CLAN(fameIdx);
+	return propPvpClanTemp;
+}
 
+TYPE_PVP_CLAN CCharacter::getPVPFamesEnemies()
+{
+	TYPE_PVP_CLAN propPvpClanTemp = 0;
+	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) <= -30*6000)
+			propPvpClanTemp |= TYPE_PVP_CLAN(1) << TYPE_PVP_CLAN(fameIdx);
+	return propPvpClanTemp;
+}
 
 //-----------------------------------------------
 // addPropertiesToMirror :
@@ -1382,7 +1429,7 @@ uint32 CCharacter::tickUpdate()
 			if (_PVPFlagLastTimeChange + waitTime < CTickEventHandler::getGameCycle())
 			{
 				CPVPManager2::getInstance()->setPVPModeInMirror(this);
-				CPVPManager2::getInstance()->addOrRemoveFactionChannel(this);
+				CPVPManager2::getInstance()->updateFactionChannel(this);
 				_HaveToUpdatePVPMode = false;
 			}
 		}
@@ -13665,6 +13712,33 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 //		_PropertyDatabase.setProp( toString("FAME:PLAYER%d:THRESHOLD", fameIndexInDatabase), sint64(float(fameMax)/FameAbsoluteMax*100) );
 		CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setTHRESHOLD(_PropertyDatabase, checkedCast<sint8>(float(fameMax)/FameAbsoluteMax*100) );
 	}
+
+	bool canPvp = false;
+	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+	{
+		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
+
+		if (fame >= 30*6000) {
+			canPvp = true;
+		} else if (fame <= -30*6000) {
+			canPvp = true;
+		}
+	}
+
+	if(!canPvp && (_PVPFlag || getPvPRecentActionFlag()) )
+	{
+		_PVPFlag = false;
+		_PVPFlagLastTimeChange = 0;
+		_PVPFlagTimeSettedOn = 0;
+		_PVPRecentActionTime = 0;
+		setPVPFlagDatabase();
+		_HaveToUpdatePVPMode = true;
+	}
+
+	updatePVPClanVP();
+	
+	// handle with faction channel
+	CPVPManager2::getInstance()->updateFactionChannel(this);
 }
 
 //-----------------------------------------------
@@ -16570,20 +16644,17 @@ void CCharacter::setPVPFlag( bool pvpFlag )
 
 	if( pvpFlag == true )
 	{
-		if( (_DeclaredCult == PVP_CLAN::Neutral || _DeclaredCult == PVP_CLAN::None ) && (_DeclaredCiv == PVP_CLAN::Neutral || _DeclaredCiv == PVP_CLAN::None ) )
+		bool havePvpFame = false;
+		for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
 		{
-			// character can set it's tag pvp on if he have no allegiance.
-			SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
-			sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
-//			_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:COUNTER", ++_PvPDatabaseCounter );
-			CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase, uint8(++_PvPDatabaseCounter));
-			return;
+			sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
+			if ((fame >= 30*6000) || (fame <= -30*6000))
+				havePvpFame = true;
 		}
 
-		if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false &&
-			CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
+		if (!havePvpFame)
 		{
-			// character can set it's tag pvp on if none of his clan is in war
+			// character can set it's tag pvp on if he have no allegiance.
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
 			sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
 //			_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:COUNTER", ++_PvPDatabaseCounter );
@@ -16752,7 +16823,7 @@ bool CCharacter::setDeclaredCult(PVP_CLAN::TPVPClan newClan)
 			CFameManager::getInstance().setAndEnforceTribeFameCap(this->getId(), this->getAllegiance());
 
 			// handle with faction channel
-			CPVPManager2::getInstance()->addOrRemoveFactionChannel(this);
+			CPVPManager2::getInstance()->updateFactionChannel(this);
 
 			// write new allegiance in database
 //			_PropertyDatabase.setProp("FAME:CULT_ALLEGIANCE", newClan);
@@ -16760,20 +16831,15 @@ bool CCharacter::setDeclaredCult(PVP_CLAN::TPVPClan newClan)
 
 			_LastCultPointWriteDB = ~0;
 
-			if( _DeclaredCult == PVP_CLAN::Neutral || _DeclaredCult == PVP_CLAN::None )
+			if( _PVPFlag || getPvPRecentActionFlag() )
 			{
-				if( _PVPFlag )
-				{
-					// if no cult declared and civ is not in war we remove pvp tag
-					if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false )
-					{
-						_PVPFlag = false;
-						_PVPFlagLastTimeChange = 0;
-						_PVPFlagTimeSettedOn = 0;
-						setPVPFlagDatabase();
-						_HaveToUpdatePVPMode = true;
-					}
-				}
+				_PVPFlag = false;
+				_PVPFlagLastTimeChange = 0;
+				_PVPFlagTimeSettedOn = 0;
+				_PVPRecentActionTime = 0;
+				setPVPFlagDatabase();
+				_HaveToUpdatePVPMode = true;
+
 			}
 
 			// Update PvP clan in mirror for faction PvP
@@ -16813,26 +16879,23 @@ bool CCharacter::setDeclaredCiv(PVP_CLAN::TPVPClan newClan)
 			// set tribe fame threshold and clamp fame if necessary
 			CFameManager::getInstance().setAndEnforceTribeFameCap(this->getId(), this->getAllegiance());
 
+			// handle with faction channel
+			CPVPManager2::getInstance()->updateFactionChannel(this);
+
 			// write new allegiance in database
 //			_PropertyDatabase.setProp("FAME:CIV_ALLEGIANCE", newClan);
 			CBankAccessor_PLR::getFAME().setCIV_ALLEGIANCE(_PropertyDatabase, newClan);
 
 			_LastCivPointWriteDB = ~0;
 
-			if( _DeclaredCiv == PVP_CLAN::Neutral || _DeclaredCiv == PVP_CLAN::None )
+			if( _PVPFlag || getPvPRecentActionFlag() )
 			{
-				if( _PVPFlag )
-				{
-					// if no civ declared and cult is not in war we remove pvp tag
-					if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false )
-					{
-						_PVPFlag = false;
-						_PVPFlagLastTimeChange = 0;
-						_PVPFlagTimeSettedOn = 0;
-						setPVPFlagDatabase();
-						_HaveToUpdatePVPMode = true;
-					}
-				}
+				_PVPFlag = false;
+				_PVPFlagLastTimeChange = 0;
+				_PVPFlagTimeSettedOn = 0;
+				_PVPRecentActionTime = 0;
+				setPVPFlagDatabase();
+				_HaveToUpdatePVPMode = true;
 			}
 
 			// Update PvP clan in mirror for faction PvP
@@ -19507,9 +19570,10 @@ void CCharacter::channelAdded( bool b )
 
 //------------------------------------------------------------------------------
 
-void CCharacter::setShowFactionChannelsMode(bool s)
+void CCharacter::setShowFactionChannelsMode(TChanID channel, bool s)
 {
-	_FactionChannelMode = s; CPVPManager2::getInstance()->addRemoveFactionChannelToUserWithPriviledge(this);
+	_FactionChannelsMode[channel] = s;
+	CPVPManager2::getInstance()->addRemoveFactionChannelToUserWithPriviledge(channel, this, s);
 }
 
 

@@ -88,6 +88,7 @@
 #include "dyn_chat_egs.h"
 
 #include "pvp_manager/pvp.h"
+#include "pvp_manager/pvp_manager_2.h"
 #include "player_manager/admin_properties.h"
 #include "shop_type/offline_character_command.h"
 #include "player_manager/item_service_manager.h"
@@ -106,6 +107,10 @@
 //
 // Externs
 //
+
+
+// Max number of user channel character can be have
+#define NB_MAX_USER_CHANNELS				2
 
 extern CPlayerManager			PlayerManager;
 extern CCreatureManager			CreatureManager;
@@ -166,6 +171,8 @@ AdminCommandsInit[] =
 		"resurrected",						true,
 		"validateRespawnPoint",				true,
 		"summonPet",						true,
+		"connectUserChannel",				true,
+
 
 		"addPetAnimal",						true,
 		"addSkillPoints",					true,
@@ -4161,22 +4168,67 @@ ENTITY_VARIABLE (Invulnerable, "Invulnerable mode, invulnerability too all")
 }
 
 //----------------------------------------------------------------------------
-ENTITY_VARIABLE (ShowFactionChannels, "Show faction channels")
+NLMISC_COMMAND (ShowFactionChannels, "Show faction channels", "<csr id> <channel> <0|1>")
 {
-	ENTITY_GET_CHARACTER
+	if (args.size() != 3)
+		return false;
+	GET_CHARACTER
 
-	if (get)
+//  PVP_CLAN::TPVPClan channelClan = PVP_CLAN::fromString( args[1] );
+
+	bool display = (args[2]=="1" || strlwr(args[2])=="on" || strlwr(args[2])=="true" );
+
+	TChanID channel = CPVPManager2::getInstance()->getFactionDynChannel(args[1]);
+	if (channel == DYN_CHAT_INVALID_CHAN)
 	{
-		value = c->showFactionChannelsMode()?"1":"0";
+		log.displayNL("Invalid Faction name: '%s'", args[1].c_str());
+		return false;
 	}
-	else
+	CPVPManager2::getInstance()->addRemoveFactionChannelToUserWithPriviledge(channel, c, display);
+	nlinfo ("%s %s now in show %s channel mode", eid.toString().c_str(), display?"is":"isn't", channel.toString().c_str());
+
+	return true;
+
+}
+
+//----------------------------------------------------------------------------
+// If channel not exists create it
+NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <channel_name> <pass>")
+{ 
+	if (args.size() != 3)
+		return false;
+	GET_CHARACTER
+
+	CPVPManager2 *inst = CPVPManager2::getInstance();
+
+	TChanID channel = CPVPManager2::getInstance()->getUserDynChannel(args[1]);
+	if ( (channel == DYN_CHAT_INVALID_CHAN) && (args[2] != string("*")) )
+		channel = inst->createUserChannel(args[1], args[2]);
+
+	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
-		if (value=="1" || value=="on" || strlwr(value)=="true" )
-			c->setShowFactionChannelsMode(true);
-		else if (value=="0" || value=="off" || strlwr(value)=="false" )
-			c->setShowFactionChannelsMode(false);
-		nlinfo ("%s %s now in show faction channel mode", entity.toString().c_str(), c->showFactionChannelsMode()?"is":"isn't");
+		string channelPass = inst->getPassUserChannel(channel);
+		if (channelPass == args[2])
+			if (c->getNbUserChannels() < NB_MAX_USER_CHANNELS)
+			{
+				inst->addFactionChannelToCharacter(channel, c, true);
+				c->addUserChannel();
+			}
+			else
+				log.displayNL("You have the max of user channels");
+		else if (args[2] == string("*"))
+		{
+				inst->removeFactionChannelForCharacter(channel, c);
+				c->removeUserChannel();
+		}
+		else
+			log.displayNL("You don't have rights to connect to channel %s", args[1].c_str());
+
+		return true;
 	}
+
+	return false;
+
 }
 
 //----------------------------------------------------------------------------

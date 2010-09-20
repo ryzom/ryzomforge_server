@@ -533,8 +533,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 	}
 	c->onConnection();
 
-	CPVPManager2::getInstance()->sendFactionWarsToClient( c );
-	CPVPManager2::getInstance()->addOrRemoveFactionChannel( c );
+	CPVPManager2::getInstance()->updateFactionChannel( c );
 
 } // cbClientReady //
 

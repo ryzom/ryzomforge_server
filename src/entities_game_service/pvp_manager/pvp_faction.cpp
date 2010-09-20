@@ -65,10 +65,6 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 		}
 	}
 
-	// get Faction allegiance
-	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> actorAllegiance = actor->getAllegiance();
-	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> targetAllegiance = pTarget->getAllegiance();
-
 	if( CPVPManager2::getInstance()->inSafeZone( actor->getPosition() ) )
 	{
 		if( actor->getSafeInPvPSafeZone() )
@@ -77,43 +73,51 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 		}
 	}
 
-	if( actor->getPVPFlag() || actor->getPvPRecentActionFlag() )
+	// In same Team
+	nlinfo("Actor vs target teams = %d,%d", actor->getTeamId(), pTarget->getTeamId());
+	if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
 	{
-		// check if he's an enemy (or neutral pvp)
-		if( actorAllegiance != targetAllegiance )
-		{
-			if( CPVPManager2::getInstance()->factionWarOccurs( actorAllegiance, targetAllegiance ) )
-			{
-				if( !curative || (curative && pTarget->getPvPRecentActionFlag()) )
-				{
-					CPVPManager2::getInstance()->setPVPFactionEnemyReminder( true );
-					return PVP_RELATION::Ennemy;
-				}
-				else
-					return PVP_RELATION::Neutral;
-			}
-			else if( actorAllegiance.first != targetAllegiance.first && actorAllegiance.second != actorAllegiance.second )
-			{
-				if( pTarget->getPvPRecentActionFlag() )
-				{
-					// here target is engaged in another faction war
-					return PVP_RELATION::NeutralPVP;
-				}
-			}
-		}
-		// they are ally
+		nlinfo("Actor vs target : same team");
 		CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
 		return PVP_RELATION::Ally;
 	}
-	else
+
+	// In same Guild
+	nlinfo("Actor vs target guilds = %d,%d", actor->getGuildId(), pTarget->getGuildId());
+	if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()))
 	{
-		if( pTarget->getPvPRecentActionFlag() )
-		{
-			// here target is engaged in a faction war, but player is not tagged
-			return PVP_RELATION::NeutralPVP;
-		}
+		nlinfo("Actor vs target : same guild");
+		CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
+		return PVP_RELATION::Ally;
 	}
 
+	if( actor->getPVPFlag() || actor->getPvPRecentActionFlag() )
+	{
+		// check if he's an enemy
+		if ((actor->getPVPFamesAllies() & pTarget->getPVPFamesEnemies()) || (actor->getPVPFamesEnemies() & pTarget->getPVPFamesAllies()))
+		{
+			nlinfo("Actor vs target : fame opposition");
+			if( !curative || (curative && pTarget->getPvPRecentActionFlag()) )
+			{
+				CPVPManager2::getInstance()->setPVPFactionEnemyReminder( true );
+				nlinfo("Actor vs target : ennemy");
+				return PVP_RELATION::Ennemy;
+			}
+			else
+			{
+				nlinfo("Actor vs target : neutral");
+				return PVP_RELATION::Neutral;
+			}
+		}
+		// check if he's an ally
+		else if ((actor->getPVPFamesAllies() & pTarget->getPVPFamesAllies()) || (actor->getPVPFamesEnemies() & pTarget->getPVPFamesEnemies()))
+		{
+			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
+			nlinfo("Actor vs target : ally");
+			return PVP_RELATION::Ally;
+		}
+	}
+	// default is neutral
 	return PVP_RELATION::Neutral;
 }
 
