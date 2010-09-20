@@ -59,7 +59,7 @@ void CRoomInstanceCommon::removeUser( CCharacter* user )
 }
 
 //----------------------------------------------------------------------------
-void CRoomInstanceCommon::addUser( CCharacter* user )
+void CRoomInstanceCommon::addUser( CCharacter* user, CCharacter* owner )
 {
 	BOMB_IF( !user, "<BUILDING> null character!", return );
 
@@ -100,7 +100,7 @@ void CRoomInstanceGuild::removeUser( CCharacter* user )
 }
 
 //----------------------------------------------------------------------------
-void CRoomInstanceGuild::addUser( CCharacter* user )
+void CRoomInstanceGuild::addUser( CCharacter* user, CCharacter* owner )
 {
 	BOMB_IF( !user, "<BUILDING> null character!", return );
 
@@ -150,12 +150,31 @@ void CRoomInstancePlayer::removeUser( CCharacter* user )
 }
 
 //----------------------------------------------------------------------------
-void CRoomInstancePlayer::addUser( CCharacter* user )
+void CRoomInstancePlayer::addUser( CCharacter* user, CCharacter* owner )
 {
 	BOMB_IF( !user, "<BUILDING> null character!", return );
 
 	// open room inventory window
 	PlayerManager.sendImpulseToClient(user->getId(), "ITEM:OPEN_ROOM_INVENTORY");
+
+
+	// solve bot names for title and text
+	TVectorParamCheck titleParams;
+	TVectorParamCheck textParams;
+	// send the popup message
+	uint32 userId = PlayerManager.getPlayerId( user->getId() );
+	
+	std::string name = "RYZHOME_URL";
+	ucstring phrase = "RYZHOME_URL(){[WEB : app_ryzhome user=" + user->getName().toString() + "]}";
+	NLNET::CMessage	msgout("SET_PHRASE");
+	msgout.serial(name);
+	msgout.serial(phrase);
+	sendMessageViaMirror("IOS", msgout);
+
+	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "ANSWER_OK", titleParams);
+	uint32 textId = STRING_MANAGER::sendStringToUser(userId, "RYZHOME_URL", textParams);
+	PlayerManager.sendImpulseToClient(user->getId(), "USER:POPUP", titleId, textId);
+
 
 	++_RefCount;
 }
