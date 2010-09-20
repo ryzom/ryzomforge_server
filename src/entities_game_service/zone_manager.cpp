@@ -90,6 +90,14 @@ void cbSetZoneState( NLNET::CMessage& msgin, const std::string &serviceName, NLN
 	
 	CZoneManager *pZM = &CZoneManager::getInstance();
 
+	// get the places
+	CPlace *place = pZM->getPlaceFromName(sZoneName);
+	if (place != NULL)
+		if (place->isGooPath())
+			place->setGooActive(nState != 0);
+
+
+
 	// get the deposit zone (linear search)
 	const vector<CDeposit*> &rDeps = pZM->getDeposits();
 	for (uint32 i = 0; i < rDeps.size(); ++i)
@@ -267,6 +275,7 @@ bool CPlace::build(const NLLIGO::CPrimPath * path, uint16 id)
 	_CenterX = sint32 ( ( minX + maxX ) *1000.0f / 2.0f );
 	_CenterY = sint32 ( ( minY + maxY ) *1000.0f / 2.0f );
 	_GooPath = true;
+	_GooActive = true;
 	_Reported = false;
 
 	return true;
@@ -331,6 +340,7 @@ bool CPlace::build(const NLLIGO::CPrimZone * zone,uint16 id, bool reportAutorise
 	_CenterX = sint32 ( ( minX + maxX ) *1000.0f / 2.0f );
 	_CenterY = sint32 ( ( minY + maxY ) *1000.0f / 2.0f );
 	_GooPath = false;
+	_GooActive = false;
 
 	// get place_type of re-spawn point
 	PLACE_TYPE::TPlaceType placeType;
@@ -636,7 +646,7 @@ void CZoneManager::initInstance()
 	CPVPManager::getInstance()->applyConfigToPVPZones();
 
 	// for backward compatibility
-	BACK_COMPAT::initSpawnZonesCompat();
+	//BACK_COMPAT::initSpawnZonesCompat();
 	BACK_COMPAT::initPlacesCompat();
 
 
@@ -1498,7 +1508,7 @@ bool CZoneManager::getPlace( sint32 x, sint32 y, float& gooDistance, const CPlac
 					}
 					for (uint k = 0; k < _Continents[i].getRegions()[j]->getPlaces().size(); k++ )
 					{
-						if( _Continents[i].getRegions()[j]->getPlaces()[k]->isGooPath() == false )
+						if( _Continents[i].getRegions()[j]->getPlaces()[k]->isGooActive() == false )
 						{
 							if ( _Continents[i].getRegions()[j]->getPlaces()[k]->contains( vect ) )
 							{
