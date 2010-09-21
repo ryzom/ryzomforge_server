@@ -2312,8 +2312,22 @@ ucstring CChatManager::filterClientInput(ucstring &text)
 			// any double white skipped
 			if (text[pos] == '&')
 			{
-				// filter out '&' to remove system color code (like '&SYS&' )
-				result += '.';
+				// Special case if there is <NEW> or <CHG> at the beginning
+				bool hasBrackets = false;
+				if (pos >= 5) {
+					hasBrackets = (text[pos-1] == '>') &&
+						(text[pos-5] == '<');
+				}
+				// Filter out '&' at the first non-whitespace position to remove 
+				// system color code (like '&SYS&' )
+				bool disallowAmpersand = (result.size() == 0) || hasBrackets;
+				if (disallowAmpersand) {
+					result += '.';
+				}
+				else {
+					// authorized ampersand
+					result += '&';
+				}
 			}
 			else if (text[pos] == '@' && pos < text.size()-1 && text[pos+1] == '{')
 			{
