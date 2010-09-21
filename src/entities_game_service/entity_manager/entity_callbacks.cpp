@@ -532,9 +532,6 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 		}
 	}
 	c->onConnection();
-
-	CPVPManager2::getInstance()->updateFactionChannel( c );
-
 } // cbClientReady //
 
 
@@ -682,6 +679,8 @@ void finalizeClientReady( uint32 userId, uint32 index )
 			ICharacterControl::getInstance()->characterReady(c->getId());
 		}
 	}
+
+	CPVPManager2::getInstance()->updateFactionChannel( c );
 
 	
 	// for GM player, trigger a 'infos' command to remember their persistent state

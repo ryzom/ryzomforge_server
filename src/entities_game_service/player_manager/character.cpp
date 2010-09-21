@@ -822,6 +822,7 @@ TYPE_PVP_CLAN CCharacter::getPVPFamesEnemies()
 	return propPvpClanTemp;
 }
 
+
 //-----------------------------------------------
 // addPropertiesToMirror :
 //
@@ -2956,7 +2957,7 @@ void CCharacter::postLoadTreatment()
 
 	{
 	H_AUTO(CheckPvPTagValidity);
-	if( _DeclaredCult == PVP_CLAN::Neutral || _DeclaredCult == PVP_CLAN::None )
+	/*if( _DeclaredCult == PVP_CLAN::Neutral || _DeclaredCult == PVP_CLAN::None )
 	{
 		if( _PVPFlag )
 		{
@@ -2986,7 +2987,7 @@ void CCharacter::postLoadTreatment()
 				_HaveToUpdatePVPMode = true;
 			}
 		}
-	}
+	}*/
 	}
 
 }
@@ -13672,7 +13673,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	uint32 firstTribeFameIndex = CStaticFames::getInstance().getFirstTribeFameIndex();
 	uint32 firstTribeDbIndex = CStaticFames::getInstance().getDatabaseIndex( firstTribeFameIndex );
 	uint32 fameIndexInDatabase = CStaticFames::getInstance().getDatabaseIndex( factionIndex );
-
+	
 	if( factionIndex >= firstTribeFameIndex )
 	{
 		if (playerFame != NO_FAME)
@@ -16644,6 +16645,9 @@ void CCharacter::setPVPFlag( bool pvpFlag )
 
 	if( pvpFlag == true )
 	{
+
+
+// NEW PVP : Check fames
 		bool havePvpFame = false;
 		for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
 		{
@@ -16651,6 +16655,9 @@ void CCharacter::setPVPFlag( bool pvpFlag )
 			if ((fame >= 30*6000) || (fame <= -30*6000))
 				havePvpFame = true;
 		}
+
+
+//-		if( (_DeclaredCult == PVP_CLAN::Neutral || _DeclaredCult == PVP_CLAN::None ) && (_DeclaredCiv == PVP_CLAN::Neutral || _DeclaredCiv == PVP_CLAN::None ) )
 
 		if (!havePvpFame)
 		{
@@ -16661,7 +16668,21 @@ void CCharacter::setPVPFlag( bool pvpFlag )
 			CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase, uint8(++_PvPDatabaseCounter));
 			return;
 		}
+
+// OLD PVP
+/*		if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false &&
+			CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
+		{
+			// character can set it's tag pvp on if none of his clan is in war
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
+			sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
+//			_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:COUNTER", ++_PvPDatabaseCounter );
+			CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase, uint8(++_PvPDatabaseCounter));
+			return;
+		}
+		*/	
 	}
+
 
 	// if player changed it's decision before timer if finished
 	if( pvpFlag != _PVPFlag && actualPvpFlag == pvpFlag )
@@ -16831,16 +16852,22 @@ bool CCharacter::setDeclaredCult(PVP_CLAN::TPVPClan newClan)
 
 			_LastCultPointWriteDB = ~0;
 
-			if( _PVPFlag || getPvPRecentActionFlag() )
-			{
-				_PVPFlag = false;
-				_PVPFlagLastTimeChange = 0;
-				_PVPFlagTimeSettedOn = 0;
-				_PVPRecentActionTime = 0;
-				setPVPFlagDatabase();
-				_HaveToUpdatePVPMode = true;
-
-			}
+//			if( _DeclaredCult == PVP_CLAN::Neutral || _DeclaredCult == PVP_CLAN::None )
+//			{
+				if( _PVPFlag || getPvPRecentActionFlag() )
+				{
+					// if no cult declared and civ is not in war we remove pvp tag
+//					if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false )
+//					{
+						_PVPFlag = false;
+						_PVPFlagLastTimeChange = 0;
+						_PVPFlagTimeSettedOn = 0;
+						_PVPRecentActionTime = 0;
+						setPVPFlagDatabase();
+						_HaveToUpdatePVPMode = true;
+//					}
+				}
+//			}
 
 			// Update PvP clan in mirror for faction PvP
 			updatePVPClanVP();
@@ -16888,15 +16915,22 @@ bool CCharacter::setDeclaredCiv(PVP_CLAN::TPVPClan newClan)
 
 			_LastCivPointWriteDB = ~0;
 
-			if( _PVPFlag || getPvPRecentActionFlag() )
-			{
-				_PVPFlag = false;
-				_PVPFlagLastTimeChange = 0;
-				_PVPFlagTimeSettedOn = 0;
-				_PVPRecentActionTime = 0;
-				setPVPFlagDatabase();
-				_HaveToUpdatePVPMode = true;
-			}
+//			if( _DeclaredCiv == PVP_CLAN::Neutral || _DeclaredCiv == PVP_CLAN::None )
+//			{
+				if( _PVPFlag || getPvPRecentActionFlag() )
+				{
+					// if no civ declared and cult is not in war we remove pvp tag
+//					if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false )
+//					{
+						_PVPFlag = false;
+						_PVPFlagLastTimeChange = 0;
+						_PVPFlagTimeSettedOn = 0;
+						_PVPRecentActionTime = 0;
+						setPVPFlagDatabase();
+						_HaveToUpdatePVPMode = true;
+//					}
+				}
+//			}
 
 			// Update PvP clan in mirror for faction PvP
 			updatePVPClanVP();

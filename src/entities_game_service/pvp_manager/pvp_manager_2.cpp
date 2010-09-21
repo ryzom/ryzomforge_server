@@ -852,9 +852,10 @@ void CPVPManager2::onIOSMirrorUp()
 	createExtraFactionChannel("marauders");
 	createExtraFactionChannel("agnos");
 
-	for (uint i = 0; i < PVP_CLAN::NbClans; i++)
+	for (uint i = PVP_CLAN::BeginClans; i <= PVP_CLAN::EndClans; i++)
 	{
-		createFactionChannel(PVP_CLAN::getClanFromIndex(i));
+		//createFactionChannel(PVP_CLAN::getClanFromIndex(i));
+		createFactionChannel((PVP_CLAN::TPVPClan)i);
 	}
 	
 	for( CPlayerManager::TMapPlayers::const_iterator it = PlayerManager.getPlayers().begin(); it != PlayerManager.getPlayers().end(); ++it )
@@ -936,12 +937,6 @@ TChanID CPVPManager2::createUserChannel(const std::string & channelName, const s
 //----------------------------------------------------------------------------
 void CPVPManager2::removeFactionChannel(PVP_CLAN::TPVPClan clan)
 {
-	for( uint32 i = 0; i < _FactionWarOccurs.size(); ++i )
-	{
-		if( _FactionWarOccurs[ i ].Clan1 == clan || _FactionWarOccurs[ i ].Clan2 == clan)
-			return;
-	}
-
 	TMAPFactionChannel::iterator it = _FactionChannel.find( clan );
 	if( it != _FactionChannel.end() )
 	{
@@ -953,48 +948,18 @@ void CPVPManager2::removeFactionChannel(PVP_CLAN::TPVPClan clan)
 //----------------------------------------------------------------------------
 bool CPVPManager2::factionWarOccurs( PVP_CLAN::TPVPClan clan1, PVP_CLAN::TPVPClan clan2 ) const
 {
-	if( clan1 != PVP_CLAN::Neutral && clan2 != PVP_CLAN::Neutral )
-	{
-		uint32 factionWarOccursSize = _FactionWarOccurs.size();
-		for( uint32 i = 0; i < factionWarOccursSize; ++i )
-		{
-			if( _FactionWarOccurs[ i ].inPvPFaction( clan1, clan2 ) )
-				return true;
-		}
-	}
 	return false;
 }
 
 //----------------------------------------------------------------------------
 bool CPVPManager2::factionWarOccurs( pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance1, pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance2 ) const
 {
-	bool warOccurs = false;
-	if( allegiance1.first != PVP_CLAN::Neutral )
-	{
-		if( allegiance2.first != PVP_CLAN::Neutral && allegiance1.first != allegiance2. first )
-			warOccurs |= factionWarOccurs( allegiance1.first, allegiance2.first );
-		if( allegiance2.second != PVP_CLAN::Neutral && allegiance1.first != allegiance2.second )
-			warOccurs |= factionWarOccurs( allegiance1.first, allegiance2.second );
-	}
-	if( allegiance1.second != PVP_CLAN::Neutral )
-	{
-		if( allegiance2.first != PVP_CLAN::Neutral && allegiance1.second != allegiance2.first )
-			warOccurs |= factionWarOccurs( allegiance1.second, allegiance2.first );
-		if( allegiance2.second != PVP_CLAN::Neutral && allegiance1.second != allegiance2.second )
-			warOccurs |= factionWarOccurs( allegiance1.second, allegiance2.second );
-	}
-	return warOccurs;
+	return false;
 }
 
 //----------------------------------------------------------------------------
 bool CPVPManager2::isFactionInWar( PVP_CLAN::TPVPClan clan )
 {
-	uint32 factionWarOccursSize = _FactionWarOccurs.size();
-	for( uint32 i = 0; i < factionWarOccursSize; ++i )
-	{
-		if( _FactionWarOccurs[ i ].Clan1 == clan || _FactionWarOccurs[ i ].Clan2 == clan )
-			return true;
-	}
 	return false;
 }
 
@@ -1004,8 +969,8 @@ bool CPVPManager2::isFactionInWar( PVP_CLAN::TPVPClan clan )
 //-----------------------------------------------
 void CPVPManager2::sendFactionWarsToClient( CCharacter * user )
 {
+/** Old Pvp
 	nlassert(user);
-
 	CMessage msgout( "IMPULSION_ID" );
 	CEntityId id = user->getId();
 	msgout.serial( id );
@@ -1026,6 +991,7 @@ void CPVPManager2::sendFactionWarsToClient( CCharacter * user )
 
 	msgout.serialBufferWithSize( (uint8*)bms.buffer(), bms.length() );
 	CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(id.getDynamicId()), msgout );
+	*/
 }
 
 
