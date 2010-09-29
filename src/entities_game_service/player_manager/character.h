@@ -3587,7 +3587,10 @@ private:
 public:
 	bool			getInvisibility() const	{ return _Invisibility;}
 	/// Set the invisibility flag, NB : just for persistence, do not change nothing.
-	void			setInvisibility(bool invisible)		{ _Invisibility = invisible;}
+	void			setInvisibility(bool invisible)	{ 
+						_Invisibility = invisible;
+						CBankAccessor_PLR::getUSER().setIS_INVISIBLE(_PropertyDatabase, _Invisibility);
+					}
 
 	sint8			getAggroableSave() const	{ return _AggroableSave;}
 	/// Set the aggroable save flag, NB : just for persistence, do not change nothing.
