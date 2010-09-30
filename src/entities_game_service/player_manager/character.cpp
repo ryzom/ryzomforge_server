@@ -794,9 +794,9 @@ void CCharacter::updatePVPClanVP() const
 
 		}
 
-		if (fame >= 30*6000) {
+		if (fame >= PVPFameRequired*6000) {
 			propPvpClanTemp |= (TYPE_PVP_CLAN(1) << (2*TYPE_PVP_CLAN(fameIdx)));
-		} else if (fame <= -30*6000) {
+		} else if (fame <= -PVPFameRequired*6000) {
 			propPvpClanTemp |= (TYPE_PVP_CLAN(1) << ((2*TYPE_PVP_CLAN(fameIdx))+1));
 		} else {
 		}
@@ -812,7 +812,7 @@ TYPE_PVP_CLAN CCharacter::getPVPFamesAllies()
 {
 	TYPE_PVP_CLAN propPvpClanTemp = 0;
 	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
-		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) >= 30*6000)
+		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) >= PVPFameRequired*6000)
 			propPvpClanTemp |= TYPE_PVP_CLAN(1) << TYPE_PVP_CLAN(fameIdx);
 	return propPvpClanTemp;
 }
@@ -821,7 +821,7 @@ TYPE_PVP_CLAN CCharacter::getPVPFamesEnemies()
 {
 	TYPE_PVP_CLAN propPvpClanTemp = 0;
 	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
-		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) <= -30*6000)
+		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) <= -PVPFameRequired*6000)
 			propPvpClanTemp |= TYPE_PVP_CLAN(1) << TYPE_PVP_CLAN(fameIdx);
 	return propPvpClanTemp;
 }
@@ -13695,9 +13695,9 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	{
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
 
-		if (fame >= 30*6000) {
+		if (fame >= PVPFameRequired*6000) {
 			canPvp = true;
-		} else if (fame <= -30*6000) {
+		} else if (fame <= -PVPFameRequired*6000) {
 			canPvp = true;
 		}
 	}
@@ -16722,7 +16722,7 @@ void CCharacter::setPVPFlag( bool pvpFlag )
 		for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
 		{
 			sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
-			if ((fame >= 30*6000) || (fame <= -30*6000))
+			if ((fame >= PVPFameRequired*6000) || (fame <= -PVPFameRequired*6000))
 				havePvpFame = true;
 		}
 

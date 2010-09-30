@@ -214,19 +214,19 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 		}
 	}
 
-	bool matis = CFameInterface::getInstance().getFameIndexed(user->getId(), 0) >= 30*6000;
-	bool fyros = CFameInterface::getInstance().getFameIndexed(user->getId(), 1) >= 30*6000;
-	bool tryker = CFameInterface::getInstance().getFameIndexed(user->getId(), 2) >= 30*6000;
-	bool zorai = CFameInterface::getInstance().getFameIndexed(user->getId(), 3) >= 30*6000;
-	bool kami = CFameInterface::getInstance().getFameIndexed(user->getId(), 4) >= 30*6000;
-	bool kara = CFameInterface::getInstance().getFameIndexed(user->getId(), 6) >= 30*6000;
+	bool matis = CFameInterface::getInstance().getFameIndexed(user->getId(), 0) >= PVPFameRequired*6000;
+	bool fyros = CFameInterface::getInstance().getFameIndexed(user->getId(), 1) >= PVPFameRequired*6000;
+	bool tryker = CFameInterface::getInstance().getFameIndexed(user->getId(), 2) >= PVPFameRequired*6000;
+	bool zorai = CFameInterface::getInstance().getFameIndexed(user->getId(), 3) >= PVPFameRequired*6000;
+	bool kami = CFameInterface::getInstance().getFameIndexed(user->getId(), 4) >= PVPFameRequired*6000;
+	bool kara = CFameInterface::getInstance().getFameIndexed(user->getId(), 6) >= PVPFameRequired*6000;
 
-	bool amatis = CFameInterface::getInstance().getFameIndexed(user->getId(), 0) <= -30*6000;
-	bool afyros = CFameInterface::getInstance().getFameIndexed(user->getId(), 1) <= -30*6000;
-	bool atryker = CFameInterface::getInstance().getFameIndexed(user->getId(), 2) <= -30*6000;
-	bool azorai = CFameInterface::getInstance().getFameIndexed(user->getId(), 3) <= -30*6000;
-	bool akami = CFameInterface::getInstance().getFameIndexed(user->getId(), 4) <= -30*6000;
-	bool akara = CFameInterface::getInstance().getFameIndexed(user->getId(), 6) <= -30*6000;
+	bool amatis = CFameInterface::getInstance().getFameIndexed(user->getId(), 0) <= -PVPFameRequired*6000;
+	bool afyros = CFameInterface::getInstance().getFameIndexed(user->getId(), 1) <= -PVPFameRequired*6000;
+	bool atryker = CFameInterface::getInstance().getFameIndexed(user->getId(), 2) <= -PVPFameRequired*6000;
+	bool azorai = CFameInterface::getInstance().getFameIndexed(user->getId(), 3) <= -PVPFameRequired*6000;
+	bool akami = CFameInterface::getInstance().getFameIndexed(user->getId(), 4) <= -PVPFameRequired*6000;
+	bool akara = CFameInterface::getInstance().getFameIndexed(user->getId(), 6) <= -PVPFameRequired*6000;
 
 	if (matis && fyros && tryker && zorai)
 	{
