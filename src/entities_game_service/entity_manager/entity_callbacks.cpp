@@ -681,11 +681,13 @@ void finalizeClientReady( uint32 userId, uint32 index )
 	}
 
 	CPVPManager2::getInstance()->updateFactionChannel( c );
-
+	c->updatePVPClanVP();
 	
 	// for GM player, trigger a 'infos' command to remember their persistent state
 	if (!PlayerManager.getPlayer(uint32(c->getId().getShortId())>>4)->getUserPriv().empty())
 		CCommandRegistry::getInstance().execute(toString("infos %s", c->getId().toString().c_str()).c_str(), InfoLog(), true);
+	
+	c->setFinalized(true);
 
 } // finalizeClientReady //
 	

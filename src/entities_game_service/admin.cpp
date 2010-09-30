@@ -163,6 +163,8 @@ AdminCommandsInit[] =
 		// player character accessible commands
 		"teamInvite",						true,
 		"guildInvite",						true,
+		"roomInvite",						true,
+		"roomKick",							true,
 		"setGuildMessage",					true,
 		"clearGuildMessage",				true,
 		"dodge",							true,
@@ -351,12 +353,14 @@ AdminCommandsInit[] =
 		"eventSetBotName",					true,
 		"eventSetBotScale",					true,
 		"eventSetNpcGroupAggroRange",		true,
+		"eventSetNpcGroupEmote",			true,
 		"eventSetFaunaBotAggroRange",		true,
 		"eventResetFaunaBotAggroRange",		true,
 		"eventSetBotCanAggro",				true,
 		"eventSetItemCustomText",			true,
 		"eventResetItemCustomText",			true,
 		"eventSetBotSheet",					true,
+//		"eventSetBotVPx",					true,
 		"eventSetBotFaction",				true,
 		"eventSetBotFameByKill",			true,
 		"dssTarget",						true,	//ring stuff
@@ -2771,6 +2775,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 
 
 	CEntityId eid;
+	CEntityId targetEid;
 	msgin.serial (eid);
 
 	bool onTarget;
@@ -2856,12 +2861,14 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 			{
 				log_Command_ExecOnTarget(c->getTarget(), cmdName, arg);
 				res += c->getTarget().toString();
+				targetEid = c->getTarget();
 				targetName = NLMISC::toString("(%s,%s)", c->getTarget().toString().c_str(), CEntityIdTranslator::getInstance()->getByEntity(c->getTarget()).toString().c_str());
 			}
 			else
 			{
 				log_Command_Exec(cmdName, arg);
 				res += eid.toString();
+				targetEid = eid;
 				targetName = string("Himself");
 			}
 			res += " ";
@@ -2872,7 +2879,11 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		TLogContext_Item_Command itemCtx(onTarget ? c->getTarget() : eid);
 		TLogContext_Character_BuyRolemasterPhrase characterCtx(onTarget ? c->getTarget() : eid);
 		std::string csName = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
-
+		
+		NLMISC::CSString cs_res = CSString(res);
+		cs_res = cs_res.replace("#player", eid.toString().c_str());
+		cs_res = cs_res.replace("#target", targetEid.toString().c_str());
+		res = (string)cs_res;
 		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
 
 		CLightMemDisplayer *CmdDisplayer = new CLightMemDisplayer("CmdDisplayer");
@@ -4205,10 +4216,17 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 	if ( (channel == DYN_CHAT_INVALID_CHAN) && (args[2] != string("*")) )
 		channel = inst->createUserChannel(args[1], args[2]);
 
+	if ( (channel == DYN_CHAT_INVALID_CHAN) && (args[2] != string("***")) && (c->havePriv(":DEV:") || c->havePriv(":SGM:") || c->havePriv(":GM:") || c->havePriv(":EM:")))
+	{
+		inst->deleteUserChannel(args[1]);
+		return true;
+	}
+
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
 		string channelPass = inst->getPassUserChannel(channel);
 		if (channelPass == args[2])
+		{
 			if (c->getNbUserChannels() < NB_MAX_USER_CHANNELS)
 			{
 				inst->addFactionChannelToCharacter(channel, c, true);
@@ -4216,6 +4234,7 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 			}
 			else
 				log.displayNL("You have the max of user channels");
+		}
 		else if (args[2] == string("*"))
 		{
 				inst->removeFactionChannelForCharacter(channel, c);
@@ -4246,6 +4265,8 @@ ENTITY_VARIABLE (PriviledgePVP, "Priviledge Pvp Mode")
 			c->setPriviledgePVP(true);
 		else if (value=="0" || value=="off" || strlwr(value)=="false" )
 			c->setPriviledgePVP(false);
+//		c->setPVPRecentActionFlag();
+		CPVPManager2::getInstance()->setPVPModeInMirror(c);
 		nlinfo ("%s %s now in pvp mode", entity.toString().c_str(), c->priviledgePVP()?"is":"isn't");
 	}
 }
@@ -4430,6 +4451,80 @@ NLMISC_COMMAND(listGuildMembers, "display guild members list", "<csr eid> <guild
 		params[1].Literal = EGSPD::CGuildGrade::toString( member->getGrade() );
 		CCharacter::sendDynamicSystemMessage(eid, "CSR_GUILD_MEMBER_LIST", params);
 	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(roomInvite, "send a room invite to a player character", "<eid> <member name>")
+{
+	if(args.size() != 2 )
+		return false;
+
+	CEntityId eId;
+	eId.fromString(args[0].c_str());
+
+	CCharacter * user = PlayerManager.getChar( eId );
+	if (!user)
+	{
+		log.displayNL("<ROOMINVITE>'%s' is not a valid char. Cant process command",eId.toString().c_str());
+		return true;
+	}
+	if (!user->getEnterFlag())
+	{
+		log.displayNL("'%s' is not entered", eId.toString().c_str());
+		return true;
+	}
+	if (!TheDataset.isAccessible(user->getEntityRowId()))
+	{
+		log.displayNL("'%s' is not valid in mirror", eId.toString().c_str());
+		return true;
+	}
+
+	CCharacter * target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
+
+	if(target == 0 || target->getEnterFlag() == false )
+	{
+		CCharacter::sendDynamicSystemMessage( user->getId(), "TEAM_INVITED_CHARACTER_MUST_BE_ONLINE" );
+		return true;
+	}
+
+	user->addRoomAccessToPlayer(target->getId());
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(roomKick, "kick player from room", "<eid> <member name>")
+{
+	if(args.size() != 2 )
+		return false;
+
+	CEntityId eId;
+	eId.fromString(args[0].c_str());
+
+	CCharacter * user = PlayerManager.getChar( eId );
+	if (!user)
+	{
+		log.displayNL("<ROOMKICK>'%s' is not a valid char. Cant process command",eId.toString().c_str());
+		return true;
+	}
+	if (!user->getEnterFlag())
+	{
+		log.displayNL("'%s' is not entered", eId.toString().c_str());
+		return true;
+	}
+	if (!TheDataset.isAccessible(user->getEntityRowId()))
+	{
+		log.displayNL("'%s' is not valid in mirror", eId.toString().c_str());
+		return true;
+	}
+	CCharacter * target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
+
+	if(target == 0 || target->getEnterFlag() == false )
+		return true;
+
+	user->removeRoomAccesToPlayer(target->getId(), true);
 
 	return true;
 }
@@ -5446,6 +5541,36 @@ NLMISC_COMMAND(eventSetNpcGroupAggroRange, "changes the aggro range of a npc gro
 }
 
 //----------------------------------------------------------------------------
+NLMISC_COMMAND(eventSetNpcGroupEmote, "Set emote animation to a npc group", "<bot eid> <emote>")
+{
+	if (args.size() < 2) return false;
+	GET_ENTITY
+
+	CEntityId entityId(args[0]);
+
+	uint32 instanceNumber = e->getInstanceNumber();
+
+	std::vector<std::string> args2;
+
+	args2.push_back(args[0]);
+	args2.push_back(NLMISC::toString("()emote(\"%s\",\"%s\");", entityId.toString().c_str(), args[1].c_str()));
+
+	uint32 nbString = args2.size();
+
+	CMessage msgout("EVENT_NPC_GROUP_SCRIPT");
+	uint32 messageVersion = 1;
+	msgout.serial(messageVersion);
+	msgout.serial(nbString);
+	for (uint32 i=0; i<nbString; ++i)
+	{
+		string arg = args2[i];
+		msgout.serial(arg);
+	}
+	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
+
+	return true;
+}
+//----------------------------------------------------------------------------
 NLMISC_COMMAND(eventSetFaunaBotAggroRange, "changes the aggro range of a fauna bot", "<bot eid> <not hungry range> [<hungry range> [<hunting range>]]")
 {
 	if (args.size() < 2) return false;
@@ -5547,6 +5672,27 @@ NLMISC_COMMAND(eventSetBotSheet, "Change the sheet of a bot", "<bot eid> <sheet 
 	return true;
 }
 
+//----------------------------------------------------------------------------
+/*NLMISC_COMMAND(eventSetBotVPx, "Change the VPx of a bot", "<bot eid> <vpx>")
+{
+	if (args.size() < 2) return false;
+	GET_ENTITY
+
+	uint32 instanceNumber = e->getInstanceNumber();
+
+	uint32 messageVersion = 3;
+	string botName = args[0];
+	string vpx = args[1];
+
+	CMessage msgout("EVENT_BOT_VPX");
+	msgout.serial(messageVersion);
+	msgout.serial(botName);
+	msgout.serial(vpx);
+	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
+
+	return true;
+}
+*/
 //----------------------------------------------------------------------------
 extern sint32 clientEventSetItemCustomText(CCharacter* character, INVENTORIES::TInventory inventory, uint32 slot, ucstring const& text);
 

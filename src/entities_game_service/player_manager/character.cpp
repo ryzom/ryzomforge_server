@@ -366,6 +366,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 
 	_NbUserChannels = 0;
 
+	_LoadingFinish = false;
+
 	// init faber plans
 //	_KnownFaberPlans.resize(64,(uint64)0); //64*64 bits
 
@@ -637,6 +639,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 	// For client/server contact list communication
 	_ContactIdPool= 0;
 
+	_inRoomOfPlayer = CEntityId::Unknown;
+
 	for(uint i = 0; i < BRICK_FAMILIES::NbFamilies; ++i )
 		_BrickFamilyBitField[i] = 0;
 	_InterfacesFlagsBitField = 0;
@@ -774,7 +778,7 @@ void CCharacter::updatePVPClanVP() const
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
 		if (fameIdx < 4)
 		{
-			if (abs(fame) > maxFameCiv)
+			if ((uint32)abs(fame) > maxFameCiv)
 			{
 				civOfMaxFame = fameIdx;
 				maxFameCiv = abs(fame);
@@ -782,7 +786,7 @@ void CCharacter::updatePVPClanVP() const
 		}
 		else
 		{
-			if (abs(fame) > maxFameCult)
+			if ((uint32)abs(fame) > maxFameCult)
 			{
 				cultOfMaxFame = fameIdx - 4;
 				maxFameCult = abs(fame);
@@ -791,9 +795,9 @@ void CCharacter::updatePVPClanVP() const
 		}
 
 		if (fame >= 30*6000) {
-			propPvpClanTemp |= TYPE_PVP_CLAN(1) << 2*TYPE_PVP_CLAN(fameIdx);
+			propPvpClanTemp |= (TYPE_PVP_CLAN(1) << (2*TYPE_PVP_CLAN(fameIdx)));
 		} else if (fame <= -30*6000) {
-			propPvpClanTemp |= TYPE_PVP_CLAN(1) << (2*TYPE_PVP_CLAN(fameIdx))+1;
+			propPvpClanTemp |= (TYPE_PVP_CLAN(1) << ((2*TYPE_PVP_CLAN(fameIdx))+1));
 		} else {
 		}
 	}
@@ -2957,37 +2961,9 @@ void CCharacter::postLoadTreatment()
 
 	{
 	H_AUTO(CheckPvPTagValidity);
-	/*if( _DeclaredCult == PVP_CLAN::Neutral || _DeclaredCult == PVP_CLAN::None )
-	{
-		if( _PVPFlag )
-		{
-			// if no cult declared and civ is not in war we remove pvp tag
-			if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false )
-			{
-				_PVPFlag = false;
-				_PVPFlagLastTimeChange = 0;
-				_PVPFlagTimeSettedOn = 0;
-				setPVPFlagDatabase();
-				_HaveToUpdatePVPMode = true;
-			}
-		}
-	}
 
-	if( _DeclaredCiv == PVP_CLAN::Neutral || _DeclaredCiv == PVP_CLAN::None )
-	{
-		if( _PVPFlag )
-		{
-			// if no civ declared and cult is not in war we remove pvp tag
-			if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false )
-			{
-				_PVPFlag = false;
-				_PVPFlagLastTimeChange = 0;
-				_PVPFlagTimeSettedOn = 0;
-				setPVPFlagDatabase();
-				_HaveToUpdatePVPMode = true;
-			}
-		}
-	}*/
+	_HaveToUpdatePVPMode = true;
+
 	}
 
 }
@@ -4280,7 +4256,7 @@ void CCharacter::addKnownBrick( const CSheetId& brickId )
 			break;
 		};
 
-		_InterfacesFlagsBitField |= 1 << uint8(flag);
+		_InterfacesFlagsBitField |= (sint64)(1 << uint8(flag));
 //		_PropertyDatabase.setProp( "INTERFACES:FLAGS", _InterfacesFlagsBitField);
 		CBankAccessor_PLR::getINTERFACES().setFLAGS(_PropertyDatabase, _InterfacesFlagsBitField);
 	}
@@ -4358,7 +4334,7 @@ void CCharacter::removeKnownBrick( const CSheetId& brickId )
 			break;
 		};
 
-		_InterfacesFlagsBitField |= 1 << uint8(flag);
+		_InterfacesFlagsBitField |= (sint64)(1 << uint8(flag));
 //		_PropertyDatabase.setProp( "INTERFACES:FLAGS", _InterfacesFlagsBitField);
 		CBankAccessor_PLR::getINTERFACES().setFLAGS(_PropertyDatabase, _InterfacesFlagsBitField);
 	}
@@ -8692,7 +8668,7 @@ void CCharacter::setDatabase()
 				break;
 			};
 
-			_InterfacesFlagsBitField |= 1 << uint8(flag);
+			_InterfacesFlagsBitField |= (sint64)(1 << uint8(flag));
 		}
 		else
 		{
@@ -13726,20 +13702,23 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 		}
 	}
 
-	if(!canPvp && (_PVPFlag || getPvPRecentActionFlag()) )
+	if (_LoadingFinish)
 	{
-		_PVPFlag = false;
-		_PVPFlagLastTimeChange = 0;
-		_PVPFlagTimeSettedOn = 0;
-		_PVPRecentActionTime = 0;
-		setPVPFlagDatabase();
-		_HaveToUpdatePVPMode = true;
+		if(!canPvp && (_PVPFlag || getPvPRecentActionFlag()) )
+		{
+			_PVPFlag = false;
+			_PVPFlagLastTimeChange = 0;
+			_PVPFlagTimeSettedOn = 0;
+			_PVPRecentActionTime = 0;
+			setPVPFlagDatabase();
+			_HaveToUpdatePVPMode = true;
+		}
+		updatePVPClanVP();
+		
+		// handle with faction channel
+		CPVPManager2::getInstance()->updateFactionChannel(this);
 	}
 
-	updatePVPClanVP();
-	
-	// handle with faction channel
-	CPVPManager2::getInstance()->updateFactionChannel(this);
 }
 
 //-----------------------------------------------
@@ -14362,6 +14341,63 @@ void CCharacter::syncContactListWithCharNameChanges(const std::vector<NLMISC::CE
 		sendContactListInit();
 }
 
+
+void CCharacter::setInRoomOfPlayer(const NLMISC::CEntityId &id)
+{
+	_inRoomOfPlayer = id;
+}
+
+const NLMISC::CEntityId& CCharacter::getInRoomOfPlayer()
+{
+	return _inRoomOfPlayer;
+}
+
+//--------------------------------------------------------------
+// CCharacter::havePlayerRoomAccess
+//--------------------------------------------------------------
+
+bool CCharacter::playerHaveRoomAccess(const NLMISC::CEntityId &id)
+{	
+	const uint size = _RoomersList.size();
+	for ( uint i =0 ; i < size ; ++i)
+	{
+		if ( _RoomersList[i].getShortId() == id.getShortId())
+			return true;
+	}
+	return false;
+}
+
+//--------------------------------------------------------------
+// CCharacter::addRoomAccessToPlayer
+//--------------------------------------------------------------
+
+void CCharacter::addRoomAccessToPlayer(const NLMISC::CEntityId &id)
+{
+	// if player not found
+	if (id == CEntityId::Unknown || PlayerManager.getChar(id)==NULL)
+	{
+		if ( ! (IShardUnifierEvent::getInstance() && IShardUnifierEvent::getInstance()->isCharacterOnlineAbroad(id)))
+		{
+			// player not found => message
+			PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
+			return;
+		}
+	}
+
+	// check not already in list
+	const uint size = _RoomersList.size();
+	for ( uint i =0 ; i < size ; ++i)
+	{
+		if ( _RoomersList[i].getShortId() == id.getShortId())
+		{
+			return;
+		}
+	}
+
+	uint32 playerId = PlayerManager.getPlayerId(id);
+	_RoomersList.push_back(id);
+}
+
 //--------------------------------------------------------------
 //	CCharacter::addPlayerToFriendList()
 //--------------------------------------------------------------
@@ -14562,6 +14598,40 @@ void CCharacter::removePlayerFromIgnoreListByIndex(uint16 index)
 	msgName.serial(senderId);
 	msgName.serial(ignoredId);
 	sendMessageViaMirror ("IOS", msgName);
+}
+
+//--------------------------------------------------------------
+//	CCharacter::removeRoomAccesToPlayer()
+//--------------------------------------------------------------
+void CCharacter::removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick)
+{
+	if (id == NLMISC::CEntityId::Unknown)
+		return;
+
+	CCharacter *target = PlayerManager.getChar(id);
+
+	for ( uint i = 0 ; i < _RoomersList.size() ; ++i)
+	{
+		if ( _RoomersList[i].getShortId() == id.getShortId() )
+		{
+			_RoomersList.erase(_RoomersList.begin() + i);
+			return;
+		}
+	}
+
+	if (kick & (target->getInRoomOfPlayer().getShortId() == getId().getShortId()))
+	{
+		target->setInRoomOfPlayer(CEntityId::Unknown);
+		if (!TheDataset.isAccessible(getEntityRowId()))
+			return;
+
+		const CTpSpawnZone * zone = CZoneManager::getInstance().getTpSpawnZone(getBuildingExitZone());
+		nlassert(zone);
+		sint32 x,y,z;
+		float heading;
+		zone->getRandomPoint(x,y,z,heading);
+		target->tpWanted(x,y,z,true,heading);
+	}
 }
 
 //--------------------------------------------------------------

@@ -1861,6 +1861,19 @@ public:
 		void removePlayerFromFriendListByContactId(uint32 contactId);
 		void removePlayerFromFriendListByEntityId(const NLMISC::CEntityId &id);
 
+		void setInRoomOfPlayer(const NLMISC::CEntityId &id);
+		const NLMISC::CEntityId& getInRoomOfPlayer();
+
+		/// get if player have acces to room
+		bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
+
+		/// add room acces to player
+		void addRoomAccessToPlayer(const NLMISC::CEntityId &id);
+		
+		/// remove room acces to player
+		void removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick);
+
+
 		/// remove player from ignore list
 		void removePlayerFromIgnoreListByContactId(uint32 contactId);
 		void removePlayerFromIgnoreListByEntityId(const NLMISC::CEntityId &id);
@@ -2219,6 +2232,8 @@ public:
 	void enterPVPZone(uint32 pvpZoneType) const;
 	/// character enter in versus pvp zone, player must choose a clan
 	void openPVPVersusDialog() const;
+	/// get priviledgePvp
+	bool getPriviledgePVP() const {return _PriviledgePvp;};
 	/// get character pvp flag
 	bool getPVPFlag( bool updatePVPModeInMirror = true ) const;
 	/// change pvp flag
@@ -2850,7 +2865,10 @@ public:
 
 	bool TestProgression;
 
-	bool isShopingListInProgress() const { return _ShoppingList != 0; }
+	bool isShopingListInProgress() const { return _ShoppingList != 0; };
+
+	void setFinalized(bool isFinalized) { _LoadingFinish = isFinalized; };
+	bool isFinalized() const { return _LoadingFinish; };
 
 	//////////////////
 	// Private members
@@ -3206,8 +3224,11 @@ private:
 		NLMISC::CEntityId			EntityId;		// Id used for server/storage
 		uint32						ContactId;		// Id used for client/server communication
 	};
-	uint32					_ContactIdPool;
-		
+	uint32							_ContactIdPool;
+
+	std::vector<NLMISC::CEntityId>	_RoomersList; // Players who have acces to player's room
+	NLMISC::CEntityId				_inRoomOfPlayer;
+
 	// friends list
 	std::vector<CContactId>	_FriendsList;
 	// ignore list
@@ -3374,6 +3395,8 @@ private:
 	//@}
 
 	bool							_ChannelAdded;
+
+	bool							_LoadingFinish;
 
 	/// if true, enable display of channel faction for users with priviledge
 	std::map<TChanID, bool>	_FactionChannelsMode;

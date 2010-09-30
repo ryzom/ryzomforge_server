@@ -91,9 +91,13 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 
 	CCharacter *owner;
 	if (ownerIdx < _Players.size())
-		CCharacter * owner = PlayerManager.getChar(_Players[ownerIdx] );
+	{
+		owner = PlayerManager.getChar(_Players[ownerIdx] );
+	}
 	else
+	{
 		owner = user;
+	}
 
 
 	// if the room is not already instanciated, we have to do it
@@ -528,7 +532,7 @@ bool CBuildingPhysicalPlayer::isUserAllowed(CCharacter * user, uint16 ownerId, u
 
 	CCharacter * owner = PlayerManager.getChar( _Players[ownerId] );
 	if (owner)
-		return ( (user->getId() == _Players[ownerId]) || (user->getTeamId() == owner->getTeamId()) );
+		return ( (user->getId() == _Players[ownerId]) || owner->playerHaveRoomAccess(user->getId()) );
 	else
 		return false;
 }

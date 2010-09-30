@@ -405,6 +405,12 @@ void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 	nlassert(user);
 	uint8 pvpMode = 0;
 	
+	// Full pvp
+	if ( user->getPriviledgePVP() )
+	{
+		pvpMode |= PVP_MODE::PvpChallenge;
+	}
+
 	// faction
 	{
 		if( user->getPVPFlag(false) )
@@ -483,6 +489,20 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
 	if( pTarget )
 	{
+		/// Team members are allways Allies
+		if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
+		{
+			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
+			return PVP_RELATION::Ally;
+		}
+	
+		// Guild members are allways Allies
+		if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()))
+		{
+			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
+			return PVP_RELATION::Ally;
+		}
+
 		if (pTarget->priviledgePVP() || actor->priviledgePVP())
 			return PVP_RELATION::Ennemy;
 
@@ -601,6 +621,10 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 		{
 			actor->refreshOutpostLeavingTimer();
 		}
+		
+		// propagate full pvp
+		if( pTarget->priviledgePVP() )
+			actor->setPriviledgePVP(true);
 	}
 
 	}
@@ -932,6 +956,22 @@ TChanID CPVPManager2::createUserChannel(const std::string & channelName, const s
 	}
 
 	return DYN_CHAT_INVALID_CHAN;
+}
+
+void CPVPManager2::deleteUserChannel(const std::string & channelName)
+{
+
+	TMAPExtraFactionChannel::iterator it = _UserChannel.find(channelName);
+	if( it != _UserChannel.end() )
+	{
+		DynChatEGS.removeChan( (*it).second );
+		TMAPPassChannel::iterator it2 = _PassChannels.find((*it).second);
+		if( it2 != _PassChannels.end() )
+			_PassChannels.erase(it2);
+		_UserChannel.erase(it);
+
+		nlinfo("Delete channel %s", channelName.c_str());
+	}
 }
 
 //----------------------------------------------------------------------------

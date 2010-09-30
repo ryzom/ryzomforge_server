@@ -123,6 +123,8 @@ public:
 	void createExtraFactionChannel(const std::string & channelName);
 	// create an user channel if not already exist
 	TChanID createUserChannel(const std::string & channelName, const std::string & pass);
+	// remove a user channel
+	void deleteUserChannel(const std::string & channelName);
 	// remove a fation channel if faction is no more involved in a war
 	void removeFactionChannel(PVP_CLAN::TPVPClan clan);
 	// return true if faction war occurs between the 2 factions

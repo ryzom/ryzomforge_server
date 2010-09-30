@@ -147,6 +147,7 @@ void CRoomInstancePlayer::removeUser( CCharacter* user )
 		playerBuilding->resetRoomCell( _RoomIdx , user->getId() );
 		release();
 	}
+	user->setInRoomOfPlayer(CEntityId::Unknown);
 }
 
 //----------------------------------------------------------------------------
@@ -156,8 +157,17 @@ void CRoomInstancePlayer::addUser( CCharacter* user, CCharacter* owner )
 
 	// open room inventory window
 	PlayerManager.sendImpulseToClient(user->getId(), "ITEM:OPEN_ROOM_INVENTORY");
-
-
+	if (owner)
+	{
+		if (user->getInRoomOfPlayer() != NLMISC::CEntityId::Unknown)
+			owner->removeRoomAccesToPlayer(user->getId(),false);
+		user->setInRoomOfPlayer(owner->getId());
+	}
+	else
+	{
+		// Very rare case
+		owner = user;
+	}
 	// solve bot names for title and text
 	TVectorParamCheck titleParams;
 	TVectorParamCheck textParams;
@@ -165,7 +175,7 @@ void CRoomInstancePlayer::addUser( CCharacter* user, CCharacter* owner )
 	uint32 userId = PlayerManager.getPlayerId( user->getId() );
 	
 	std::string name = "RYZHOME_URL";
-	ucstring phrase = "RYZHOME_URL(){[WEB : app_ryzhome user=" + user->getName().toString() + "]}";
+	ucstring phrase = "RYZHOME_URL(){[WEB : app_ryzhome user=" + owner->getName().toString() + "]}";
 	NLNET::CMessage	msgout("SET_PHRASE");
 	msgout.serial(name);
 	msgout.serial(phrase);
