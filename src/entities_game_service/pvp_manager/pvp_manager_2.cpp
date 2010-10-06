@@ -473,8 +473,11 @@ bool CPVPManager2::inSafeZone(const NLMISC::CVector & v) const
 }
 
 //----------------------------------------------------------------------------
+// Main method for get Pvp Relation
+//----------------------------------------------------------------------------
 PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEntityBase * target, bool curative ) const
 {
+	// Default relation
 	PVP_RELATION::TPVPRelation relation = PVP_RELATION::Neutral;
 
 	// init reminders, these help to know if faction pvp recent action flag need to be set
@@ -485,30 +488,27 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 	_Instance->_PVPOutpostAllyReminder = false;
 	_Instance->_PVPOutpostEnemyReminder = false;
 	
-	/// temp : until new manager is finished we have to check the char pvp session too
+
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
 	if( pTarget )
 	{
-		/// Team members are allways Allies
-		if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
-		{
-			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
-			return PVP_RELATION::Ally;
-		}
-	
-		// Guild members are allways Allies
-		if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()))
-		{
-			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
-			return PVP_RELATION::Ally;
-		}
-
+		// priviledgePVP is Full PVP, only ally of teammates anf guildmates
 		if (pTarget->priviledgePVP() || actor->priviledgePVP())
+		{
+			if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
+				return PVP_RELATION::Ally;
+		
+			if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()))
+				return PVP_RELATION::Ally;
+
 			return PVP_RELATION::Ennemy;
+		}
 
 		if( IsRingShard )
 			return relation; // disable PVP on Ring shards (only if target is a CCharacter, because we must let attack NPCs)
 
+		////////////////////////////////////////////////////////
+		// temp : until new manager is finished we have to check the char pvp session too
 		IPVP * pvpSession = pTarget->getPVPInterface().getPVPSession();
 		if( pvpSession )
 		{
@@ -536,24 +536,28 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 				}
 			}
 		}
+		////////////////////////////////////////////////////////
 	}
 
 	PVP_RELATION::TPVPRelation relationTmp = PVP_RELATION::Neutral;
 	uint i;
 	for( i=0; i<_PVPInterface.size(); ++i )
 	{
+		// Get relation for this Pvp Interface (faction, zone, outpost, ...)
 		relationTmp = _PVPInterface[i]->getPVPRelation( actor, target, curative );
 		
 		if( relationTmp == PVP_RELATION::Unknown )
 			return PVP_RELATION::Unknown;
 
-		// ennemy has the highest priority
+		// Ennemy has the highest priority
 		if( relationTmp == PVP_RELATION::Ennemy )
 			return PVP_RELATION::Ennemy;
-		// neutral pvp
+
+		// Neutral pvp
 		if( relationTmp == PVP_RELATION::NeutralPVP )
 			relation = PVP_RELATION::NeutralPVP;
-		// check if ally (neutralpvp has priority over ally)
+
+		// Check if ally (neutralpvp has priority over ally)
 		if( relationTmp == PVP_RELATION::Ally && relation != PVP_RELATION::NeutralPVP )
 			relation = PVP_RELATION::Ally;
 	}

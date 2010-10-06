@@ -34,89 +34,82 @@ CVariable<bool> ResPawnPVPInSameRegionForbiden("egs","ResPawnPVPInSameRegionForb
 //----------------------------------------------------------------------------
 PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEntityBase * target, bool curative ) const
 {
-	// init relation reminders
+	// Init relation reminders
 	CPVPManager2::getInstance()->setPVPFactionAllyReminder( false );
 	CPVPManager2::getInstance()->setPVPFactionEnemyReminder( false );
 
-	// check actor and target validity
-	if( actor == 0 || target == 0 )
+	// Check actor and target validity
+	if (actor == 0 || target == 0)
 	{
-		nlwarning("<CPVPFaction::getPVPRelation> actor: %p  target: %p",actor,target);
+		nlwarning("<CPVPFaction::getPVPRelation> actor: %p  target: %p", actor, target);
 		return PVP_RELATION::Unknown;
 	}
 
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
-	if( pTarget == 0 )
-	{
+	if (pTarget == 0)
 		return PVP_RELATION::Unknown;
-	}
 
 	// if target is not tagged then he's neutral
-	if( pTarget->getPVPFlag() == false && pTarget->getPvPRecentActionFlag() == false )
-	{
+	if (!pTarget->getPVPFlag() && !pTarget->getPvPRecentActionFlag())
 		return PVP_RELATION::Neutral;
-	}
 
-	if( CPVPManager2::getInstance()->inSafeZone( pTarget->getPosition() ) )
+	// Check safe zones
+	if (CPVPManager2::getInstance()->inSafeZone(pTarget->getPosition()))
 	{
-		if( pTarget->getSafeInPvPSafeZone() )
-		{
+		if (pTarget->getSafeInPvPSafeZone())
 			return PVP_RELATION::NeutralPVP;
-		}
 	}
-
-	if( CPVPManager2::getInstance()->inSafeZone( actor->getPosition() ) )
+	if( CPVPManager2::getInstance()->inSafeZone(actor->getPosition()))
 	{
-		if( actor->getSafeInPvPSafeZone() )
-		{
+		if( actor->getSafeInPvPSafeZone())
 			return PVP_RELATION::NeutralPVP;
-		}
 	}
 
-	// In same Team
-	nlinfo("Actor vs target teams = %d,%d", actor->getTeamId(), pTarget->getTeamId());
-	if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
-	{
-		nlinfo("Actor vs target : same team");
-		CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
-		return PVP_RELATION::Ally;
-	}
-
-	// In same Guild
-	nlinfo("Actor vs target guilds = %d,%d", actor->getGuildId(), pTarget->getGuildId());
-	if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()))
-	{
-		nlinfo("Actor vs target : same guild");
-		CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
-		return PVP_RELATION::Ally;
-	}
-
+	// Check fames
 	if( actor->getPVPFlag() || actor->getPvPRecentActionFlag() )
 	{
-		// check if he's an enemy
+		// In same Team
+		if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
+		{
+			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
+			return PVP_RELATION::Ally;
+		}
+
+		// In same Guild
+		if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()))
+		{
+			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
+			return PVP_RELATION::Ally;
+		}
+
+		// check if he's an ennemy
 		if ((actor->getPVPFamesAllies() & pTarget->getPVPFamesEnemies()) || (actor->getPVPFamesEnemies() & pTarget->getPVPFamesAllies()))
 		{
-			nlinfo("Actor vs target : fame opposition");
-			if( !curative || (curative && pTarget->getPvPRecentActionFlag()) )
+			// Actor can heal an ennemi if not PvPRecentActionFlaged
+			if (curative && !pTarget->getPvPRecentActionFlag())
 			{
-				CPVPManager2::getInstance()->setPVPFactionEnemyReminder( true );
-				nlinfo("Actor vs target : ennemy");
-				return PVP_RELATION::Ennemy;
+				return PVP_RELATION::Neutral;
 			}
 			else
 			{
-				nlinfo("Actor vs target : neutral");
-				return PVP_RELATION::Neutral;
+				CPVPManager2::getInstance()->setPVPFactionEnemyReminder(true);
+				return PVP_RELATION::Ennemy;
 			}
 		}
 		// check if he's an ally
 		else if ((actor->getPVPFamesAllies() & pTarget->getPVPFamesAllies()) || (actor->getPVPFamesEnemies() & pTarget->getPVPFamesEnemies()))
 		{
-			CPVPManager2::getInstance()->setPVPFactionAllyReminder( true );
-			nlinfo("Actor vs target : ally");
+			CPVPManager2::getInstance()->setPVPFactionAllyReminder(true);
 			return PVP_RELATION::Ally;
 		}
 	}
+	else
+	{
+		// Check if actor is not PvPFlag and try to heal a PvPRecentActionFlag
+		if (curative && pTarget->getPvPRecentActionFlag())
+			return PVP_RELATION::NeutralPVP;
+	}
+
 	// default is neutral
 	return PVP_RELATION::Neutral;
 }
