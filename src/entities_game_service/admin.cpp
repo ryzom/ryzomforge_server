@@ -4489,6 +4489,13 @@ NLMISC_COMMAND(roomInvite, "send a room invite to a player character", "<eid> <m
 		return true;
 	}
 
+
+	SM_STATIC_PARAMS_1(params, STRING_MANAGER::player);
+	params[0].setEIdAIAlias( user->getId(), CAIAliasTranslator::getInstance()->getAIAlias(user->getId()) );
+	CCharacter::sendDynamicSystemMessage(target->getId(), "ROOM_INVITED_BY", params);
+	params[0].setEIdAIAlias( target->getId(), CAIAliasTranslator::getInstance()->getAIAlias(target->getId()) );
+	CCharacter::sendDynamicSystemMessage(user->getId(), "ROOM_YOU_INVITE", params);
+
 	user->addRoomAccessToPlayer(target->getId());
 
 	return true;
@@ -4522,7 +4529,10 @@ NLMISC_COMMAND(roomKick, "kick player from room", "<eid> <member name>")
 	CCharacter * target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
 
 	if(target == 0 || target->getEnterFlag() == false )
+	{
+		CCharacter::sendDynamicSystemMessage( user->getId(), "TEAM_KICKED_CHARACTER_MUST_BE_ONLINE" );
 		return true;
+	}
 
 	user->removeRoomAccesToPlayer(target->getId(), true);
 

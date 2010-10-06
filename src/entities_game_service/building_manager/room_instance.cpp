@@ -141,10 +141,25 @@ void CRoomInstancePlayer::removeUser( CCharacter* user )
 		return;
 	}
 
+	TVectorParamCheck titleParams;
+	TVectorParamCheck textParams;
+	uint32 userId = PlayerManager.getPlayerId( user->getId() );
+	std::string name = "CLOSE_URL";
+	//send command to close webig
+	ucstring phrase = ucstring("CLOSE_URL(){[WEB : ]}");
+	NLNET::CMessage	msgout("SET_PHRASE");
+	msgout.serial(name);
+	msgout.serial(phrase);
+	sendMessageViaMirror("IOS", msgout);
+
+	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "ANSWER_OK", titleParams);
+	uint32 textId = STRING_MANAGER::sendStringToUser(userId, "CLOSE_URL", textParams);
+	PlayerManager.sendImpulseToClient(user->getId(), "USER:POPUP", titleId, textId);
+
 	--_RefCount;
 	if ( _RefCount == 0 )
 	{
-		playerBuilding->resetRoomCell( _RoomIdx , user->getId() );
+		playerBuilding->resetRoomCell( _RoomIdx , user->getInRoomOfPlayer());
 		release();
 	}
 	user->setInRoomOfPlayer(CEntityId::Unknown);
@@ -159,8 +174,7 @@ void CRoomInstancePlayer::addUser( CCharacter* user, CCharacter* owner )
 	PlayerManager.sendImpulseToClient(user->getId(), "ITEM:OPEN_ROOM_INVENTORY");
 	if (owner)
 	{
-		if (user->getInRoomOfPlayer() != NLMISC::CEntityId::Unknown)
-			owner->removeRoomAccesToPlayer(user->getId(),false);
+		owner->removeRoomAccesToPlayer(user->getId(),false);
 		user->setInRoomOfPlayer(owner->getId());
 	}
 	else
