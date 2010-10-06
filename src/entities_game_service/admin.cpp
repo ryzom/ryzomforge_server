@@ -2824,6 +2824,13 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		return;
 	}
 
+	if (onTarget && !c->haveAnyPrivilege())
+	{
+		nlinfo("ADMIN: Player %s doesn't have privilege to execute /b command onTarget '%s' ", eid.toString().c_str(), cmdName.c_str());
+		chatToPlayer (eid, "You don't have privilege to execute this command");
+		return;
+	}
+
 	if (!cmd->ForwardToservice.empty())
 	{
 		// we need to forward the command to another service
@@ -2955,6 +2962,13 @@ void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceNam
 	if (!c->havePriv(cmd->Priv))
 	{
 		nlwarning ("ADMIN: Player %s doesn't have privilege to execute the client admin command '%s' ", eid.toString().c_str(), cmdName.c_str());
+		chatToPlayer (eid, "You don't have privilege to execute this command");
+		return;
+	}
+
+	if (!c->haveAnyPrivilege())
+	{
+		nlinfo("ADMIN: Player %s doesn't have privilege to execute /c command '%s' ", eid.toString().c_str(), cmdName.c_str());
 		chatToPlayer (eid, "You don't have privilege to execute this command");
 		return;
 	}
