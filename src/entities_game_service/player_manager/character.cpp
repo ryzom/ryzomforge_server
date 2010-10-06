@@ -11189,7 +11189,7 @@ void CCharacter::setBerserkFlag(bool isBerserk)
 				}
 				else
 				{
-					sint8 percentTmp = sint8( (100.0 * ( target->getPhysScores()._PhysicalScores[ SCORES::hit_points ].Current ) ) / ( target->getPhysScores()._PhysicalScores[ SCORES::hit_points ].Max ) );
+					sint8 percentTmp = sint8( (127.0 * ( target->getPhysScores()._PhysicalScores[ SCORES::hit_points ].Current ) ) / ( target->getPhysScores()._PhysicalScores[ SCORES::hit_points ].Max ) );
 					if( percentTmp < 0 )
 						percent = 0;
 					else

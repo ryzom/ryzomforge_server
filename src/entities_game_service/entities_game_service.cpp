@@ -4737,7 +4737,7 @@ NLMISC_COMMAND(setHPBar,"set the value of an entity HP bar (0..100)","<entity id
 
 		sint32 barValue = atoi( args[1].c_str() );
 
-		entity->setScoreBar( SCORES::hit_points, (uint32)(barValue * 1023 / 100) );
+		entity->setScoreBar( SCORES::hit_points, (uint32)(barValue * 1023 / 127) );
 		log.displayNL("for entity id %s, new hpBar value : %d", id.toString().c_str(), barValue );
 
 		return true;
