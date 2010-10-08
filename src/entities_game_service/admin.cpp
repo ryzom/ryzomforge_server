@@ -4218,28 +4218,34 @@ NLMISC_COMMAND (ShowFactionChannels, "Show faction channels", "<csr id> <channel
 
 //----------------------------------------------------------------------------
 // If channel not exists create it
-NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <channel_name> <pass>")
+NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <channel_name> [<pass>]")
 { 
-	if (args.size() != 3)
+	if ((args.size() < 2) || (args.size() > 3))
 		return false;
 	GET_CHARACTER
 
 	CPVPManager2 *inst = CPVPManager2::getInstance();
 
 	TChanID channel = CPVPManager2::getInstance()->getUserDynChannel(args[1]);
-	if ( (channel == DYN_CHAT_INVALID_CHAN) && (args[2] != string("*")) )
-		channel = inst->createUserChannel(args[1], args[2]);
 
-	if ( (channel == DYN_CHAT_INVALID_CHAN) && (args[2] != string("***")) && (c->havePriv(":DEV:") || c->havePriv(":SGM:") || c->havePriv(":GM:") || c->havePriv(":EM:")))
-	{
-		inst->deleteUserChannel(args[1]);
-		return true;
-	}
+	string pass;
+	if (args.size() < 3)
+		pass = args[1];
+	else
+		pass = args[2];
+
+	if ( (channel == DYN_CHAT_INVALID_CHAN) && (pass != string("*")) && (pass != string("***")) )
+		channel = inst->createUserChannel(args[1], pass);
 
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
 		string channelPass = inst->getPassUserChannel(channel);
-		if (channelPass == args[2])
+
+		if ( (channel != DYN_CHAT_INVALID_CHAN) && (pass == string("***")) && (c->havePriv(":DEV:") || c->havePriv(":SGM:") || c->havePriv(":GM:") || c->havePriv(":EM:")))
+		{
+			inst->deleteUserChannel(args[1]);
+		}
+		else if (channelPass == pass)
 		{
 			if (c->getNbUserChannels() < NB_MAX_USER_CHANNELS)
 			{
@@ -4249,7 +4255,7 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 			else
 				log.displayNL("You have the max of user channels");
 		}
-		else if (args[2] == string("*"))
+		else if (pass == string("*"))
 		{
 				inst->removeFactionChannelForCharacter(channel, c);
 				c->removeUserChannel();

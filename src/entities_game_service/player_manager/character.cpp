@@ -14625,12 +14625,14 @@ void CCharacter::removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick)
 		if (!TheDataset.isAccessible(getEntityRowId()))
 			return;
 
-		const CTpSpawnZone * zone = CZoneManager::getInstance().getTpSpawnZone(getBuildingExitZone());
-		nlassert(zone);
-		sint32 x,y,z;
-		float heading;
-		zone->getRandomPoint(x,y,z,heading);
-		target->tpWanted(x,y,z,true,heading);
+		const CTpSpawnZone * zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
+		if (zone)
+		{
+			sint32 x,y,z;
+			float heading;
+			zone->getRandomPoint(x,y,z,heading);
+			target->tpWanted(x,y,z,true,heading);
+		}
 	}
 }
 
