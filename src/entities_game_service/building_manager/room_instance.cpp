@@ -146,7 +146,7 @@ void CRoomInstancePlayer::removeUser( CCharacter* user )
 	uint32 userId = PlayerManager.getPlayerId( user->getId() );
 	std::string name = "CLOSE_URL";
 	//send command to close webig
-	ucstring phrase = ucstring("CLOSE_URL(){[WEB : ]}");
+	ucstring phrase = ucstring("CLOSE_URL(){[WEB : app_ryzhome action=quit_room]}");
 	NLNET::CMessage	msgout("SET_PHRASE");
 	msgout.serial(name);
 	msgout.serial(phrase);
