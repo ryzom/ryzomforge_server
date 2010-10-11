@@ -322,7 +322,6 @@ void CPVPManager2::addFactionChannelToCharacter(TChanID channel, CCharacter * us
 	{
 		if (DynChatEGS.addSession(channel, user->getEntityRowId(), writeRight))
 		{
-			nlinfo("Added to channel %s", channel.toString().c_str());
 			std::vector<TChanID> currentChannels = getCharacterRegisteredChannels(user);
 			currentChannels.push_back(channel);
 			_CharacterChannels.erase(user->getId());
@@ -338,16 +337,16 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 	for (uint i = 0; i < currentChannels.size(); i++)
 		if ((channel == DYN_CHAT_INVALID_CHAN) || (currentChannels[i] == channel))
 		{
-			nlinfo("Remove from channel %s", channel.toString().c_str());
+			if (channel != DYN_CHAT_INVALID_CHAN)
+				DynChatEGS.removeSession(channel, user->getEntityRowId());
+
+			// Update channel list for player
 			currentChannels.erase(currentChannels.begin() + i);
-			if (DynChatEGS.removeSession(channel, user->getEntityRowId()))
+			std::map< NLMISC::CEntityId, std::vector<TChanID> >::iterator it = _CharacterChannels.find(user->getId());
+			if( it != _CharacterChannels.end() )
 			{
-				std::map< NLMISC::CEntityId, std::vector<TChanID> >::iterator it = _CharacterChannels.find(user->getId());
-				if( it != _CharacterChannels.end() )
-				{
-					_CharacterChannels.erase(user->getId());
-					_CharacterChannels.insert( make_pair(user->getId(), currentChannels) );
-				}
+				_CharacterChannels.erase(user->getId());
+				_CharacterChannels.insert(make_pair(user->getId(), currentChannels));
 			}
 		}
 }
@@ -355,15 +354,12 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 //----------------------------------------------------------------------------
 void CPVPManager2::addRemoveFactionChannelToUserWithPriviledge(TChanID channel, CCharacter * user, bool s)
 {
-	nlinfo("addRemoveFactionChannelToUserWithPriviledge");
 	const CAdminCommand * cmd = findAdminCommand("ShowFactionChannels");
 	if (!cmd)
 		return;
-	nlinfo("addRemoveFactionChannelToUserWithPriviledge");
 	
 	if (!user->havePriv(cmd->Priv))
 		return;
-	nlinfo("addRemoveFactionChannelToUserWithPriviledge");
 
 	if (s)
 		addFactionChannelToCharacter(channel, user, user->havePriv(FactionChannelModeratorWriteRight));
@@ -895,7 +891,6 @@ void CPVPManager2::onIOSMirrorUp()
 			CCharacter	*activePlayer=scPlayer.Player->getActiveCharacter();
 			if (activePlayer)
 			{
-				nlinfo("add Faction channel for player %s", activePlayer->getName().c_str());
 				updateFactionChannel(activePlayer);
 			}
 		}
@@ -916,7 +911,6 @@ void CPVPManager2::createFactionChannel(PVP_CLAN::TPVPClan clan)
 	TMAPFactionChannel::iterator it = _FactionChannel.find(clan);
 	if( it == _FactionChannel.end() )
 	{
-		nlinfo("Create channel %s", PVP_CLAN::toString(clan).c_str());
 		string name = NLMISC::strupr( string("Faction_") + PVP_CLAN::toString(clan) );
 		TChanID factionChannelId = DynChatEGS.addLocalizedChan(name);
 		// set historic size of the newly created channel
@@ -932,8 +926,6 @@ void CPVPManager2::createExtraFactionChannel(const std::string & channelName)
 	TMAPExtraFactionChannel::iterator it = _ExtraFactionChannel.find(channelName);
 	if( it == _ExtraFactionChannel.end() )
 	{
-		nlinfo("Create channel %s", channelName.c_str());
-
 		string name = NLMISC::strupr( string("Faction_") + channelName );
 		TChanID factionChannelId = DynChatEGS.addLocalizedChan(name);
 		// set historic size of the newly created channel
@@ -949,9 +941,13 @@ TChanID CPVPManager2::createUserChannel(const std::string & channelName, const s
 	TMAPExtraFactionChannel::iterator it = _UserChannel.find(channelName);
 	if( it == _UserChannel.end() )
 	{
-		nlinfo("Create channel %s", channelName.c_str());
+		string channelTitle;
+		if (channelName.substr(0, 1) == "#")
+			channelTitle = channelName.substr(5);
+		else
+			channelTitle = channelName;
 
-		TChanID factionChannelId = DynChatEGS.addChan(channelName, channelName);
+		TChanID factionChannelId = DynChatEGS.addChan(channelName, channelTitle);
 		DynChatEGS.setHistoricSize( factionChannelId, FactionChannelHistoricSize );
 
 		_UserChannel.insert( make_pair(channelName, factionChannelId) );
@@ -973,8 +969,6 @@ void CPVPManager2::deleteUserChannel(const std::string & channelName)
 		if( it2 != _PassChannels.end() )
 			_PassChannels.erase(it2);
 		_UserChannel.erase(it);
-
-		nlinfo("Delete channel %s", channelName.c_str());
 	}
 }
 
