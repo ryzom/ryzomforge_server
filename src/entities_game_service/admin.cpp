@@ -4554,7 +4554,7 @@ NLMISC_COMMAND(roomKick, "kick player from room", "<eid> <member name>")
 		return true;
 	}
 
-	user->removeRoomAccesToPlayer(target->getId(), true);
+	user->removeRoomAccesToPlayer(target->getId(), false);
 
 	return true;
 }
