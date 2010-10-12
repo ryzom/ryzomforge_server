@@ -335,10 +335,9 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 {
 	std::vector<TChanID> currentChannels = getCharacterRegisteredChannels(user);
 	for (uint i = 0; i < currentChannels.size(); i++)
-		if ((channel == DYN_CHAT_INVALID_CHAN) || (currentChannels[i] == channel))
+		if (currentChannels[i] == channel)
 		{
-			if (channel != DYN_CHAT_INVALID_CHAN)
-				DynChatEGS.removeSession(channel, user->getEntityRowId());
+			DynChatEGS.removeSession(channel, user->getEntityRowId());
 
 			// Update channel list for player
 			currentChannels.erase(currentChannels.begin() + i);
@@ -379,6 +378,7 @@ void CPVPManager2::playerDisconnects(CCharacter * user)
 
 	// Remove all channels
 	removeFactionChannelForCharacter(DYN_CHAT_INVALID_CHAN, user);
+	_CharacterChannels.erase(user->getId());
 }
 
 //----------------------------------------------------------------------------
