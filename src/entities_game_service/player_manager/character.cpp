@@ -778,20 +778,19 @@ void CCharacter::updatePVPClanVP() const
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
 		if (fameIdx < 4)
 		{
-			if ((uint32)abs(fame) > maxFameCiv)
+			if ((uint32)abs(fame) >= maxFameCiv)
 			{
 				civOfMaxFame = fameIdx;
 				maxFameCiv = abs(fame);
 			}
 		}
 		else
-		{
-			if ((uint32)abs(fame) > maxFameCult)
+		{ 
+			if ((uint32)abs(fame) >= maxFameCult)
 			{
 				cultOfMaxFame = fameIdx - 4;
 				maxFameCult = abs(fame);
 			}
-
 		}
 
 		if (fame >= PVPFameRequired*6000) {
