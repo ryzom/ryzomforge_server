@@ -281,10 +281,24 @@ std::vector<TChanID> CPVPManager2::getCharacterRegisteredChannels(CCharacter * u
 }
 
 //----------------------------------------------------------------------------
+std::vector<TChanID> CPVPManager2::getCharacterUserChannels(CCharacter * user)
+{
+	std::vector<TChanID> result;
+	result.clear();
+
+	TCharacterChannels::iterator it = _CharacterUserChannels.find(user->getId());
+	if( it != _CharacterUserChannels.end() )
+		return (*it).second; // return a vector<TChanID>
+
+	return result;
+}
+
+//----------------------------------------------------------------------------
 void CPVPManager2::updateFactionChannel(CCharacter * user, bool b )
 {
 	std::vector<TChanID> channelsHave = getCharacterRegisteredChannels(user);
 	std::vector<TChanID> channelsMustHave = getCharacterChannels(user);
+	std::vector<TChanID> userChannelsMustHave = getCharacterUserChannels(user);
 
 	// Remove unwanted channels
 
@@ -292,7 +306,10 @@ void CPVPManager2::updateFactionChannel(CCharacter * user, bool b )
 	{
 		bool have = false;
 		for (uint j = 0; j < channelsMustHave.size(); j++)
-			if( channelsHave[i] == channelsMustHave[j])
+			if (channelsHave[i] == channelsMustHave[j])
+				have = true;
+		for (uint j = 0; j < userChannelsMustHave.size(); j++)
+			if (channelsHave[i] == userChannelsMustHave[j])
 				have = true;
 		if (!have)
 			removeFactionChannelForCharacter(channelsHave[i], user);
@@ -309,6 +326,18 @@ void CPVPManager2::updateFactionChannel(CCharacter * user, bool b )
 			addFactionChannelToCharacter(channelsMustHave[i], user);
 	}
 	
+	// Add wanted user channels
+	for (uint i = 0; i < userChannelsMustHave.size(); i++)
+	{
+		bool have = false;
+		for (uint j = 0; j < channelsHave.size(); j++)
+			if (userChannelsMustHave[i] == channelsHave[j])
+				have = true;
+		if (!have)
+			addFactionChannelToCharacter(userChannelsMustHave[i], user);
+	}
+	
+
 
 	/*if( b )
 		addRemoveFactionChannelToUserWithPriviledge(user);
@@ -316,7 +345,7 @@ void CPVPManager2::updateFactionChannel(CCharacter * user, bool b )
 }
 
 //----------------------------------------------------------------------------
-void CPVPManager2::addFactionChannelToCharacter(TChanID channel, CCharacter * user, bool writeRight)
+void CPVPManager2::addFactionChannelToCharacter(TChanID channel, CCharacter * user, bool writeRight, bool userChannel)
 {
 	if( channel != DYN_CHAT_INVALID_CHAN )
 	{
@@ -326,18 +355,30 @@ void CPVPManager2::addFactionChannelToCharacter(TChanID channel, CCharacter * us
 			currentChannels.push_back(channel);
 			_CharacterChannels.erase(user->getId());
 			_CharacterChannels.insert( make_pair(user->getId(), currentChannels) );
+			if (userChannel)
+			{
+				currentChannels = getCharacterUserChannels(user);
+				currentChannels.push_back(channel);
+				_CharacterUserChannels.erase(user->getId());
+				_CharacterUserChannels.insert( make_pair(user->getId(), currentChannels) );
+			}
 		}
 	}
 }
 
 //----------------------------------------------------------------------------
-void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter * user)
+void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter * user, bool userChannel)
 {
 	std::vector<TChanID> currentChannels = getCharacterRegisteredChannels(user);
 	for (uint i = 0; i < currentChannels.size(); i++)
+	{
 		if (currentChannels[i] == channel)
 		{
 			DynChatEGS.removeSession(channel, user->getEntityRowId());
+			if (DynChatEGS.getSessionCount(channel) == 0)
+			{
+				DynChatEGS.removeChan(channel);
+			}
 
 			// Update channel list for player
 			currentChannels.erase(currentChannels.begin() + i);
@@ -348,6 +389,26 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 				_CharacterChannels.insert(make_pair(user->getId(), currentChannels));
 			}
 		}
+	}
+
+	if (userChannel)
+	{
+		currentChannels = getCharacterUserChannels(user);
+		for (uint i = 0; i < currentChannels.size(); i++)
+		{
+			if (currentChannels[i] == channel)
+			{
+				// Update channel list for player
+				currentChannels.erase(currentChannels.begin() + i);
+				std::map< NLMISC::CEntityId, std::vector<TChanID> >::iterator it = _CharacterUserChannels.find(user->getId());
+				if( it != _CharacterUserChannels.end() )
+				{
+					_CharacterUserChannels.erase(user->getId());
+					_CharacterUserChannels.insert(make_pair(user->getId(), currentChannels));
+				}
+			}
+		}
+	}
 }
 
 //----------------------------------------------------------------------------

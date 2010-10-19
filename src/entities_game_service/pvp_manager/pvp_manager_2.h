@@ -66,10 +66,12 @@ public:
 	std::vector<TChanID> getCharacterChannels(CCharacter * user);
 	/// return dynamic channel TChanId subscribed by character, DYN_CHAT_INVALID_CHAN if character have no faction channel
 	std::vector<TChanID> getCharacterRegisteredChannels(CCharacter * user);
+	/// return dynamic user channel TChanId subscribed by character, DYN_CHAT_INVALID_CHAN if character have no user channel
+	std::vector<TChanID> getCharacterUserChannels(CCharacter * user);
 	// add faction channel to character if needed
-	void addFactionChannelToCharacter(TChanID channel, CCharacter * user, bool writeRight = true);
+	void addFactionChannelToCharacter(TChanID channel, CCharacter * user, bool writeRight = true, bool userChannel = false);
 	// remove faction channel for character
-	void removeFactionChannelForCharacter(TChanID channel, CCharacter * user);
+	void removeFactionChannelForCharacter(TChanID channel, CCharacter * user, bool userChannel = false);
 	// add/remove faction channel to this character with privilege
 	void addRemoveFactionChannelToUserWithPriviledge(TChanID channel, CCharacter * user, bool s = true );
 	/// handle player disconnection
@@ -183,6 +185,7 @@ private:
 	/// character registered channel
 	typedef std::map< NLMISC::CEntityId, std::vector<TChanID> > TCharacterChannels;
 	TCharacterChannels	_CharacterChannels;
+	TCharacterChannels	_CharacterUserChannels;
 	/// if a player does an offensive(curative) action on a faction pvp enemy(ally) we must update flag
 	bool _PVPFactionAllyReminder;
 	bool _PVPFactionEnemyReminder;
