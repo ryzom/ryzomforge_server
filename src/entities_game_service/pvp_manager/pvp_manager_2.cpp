@@ -375,9 +375,18 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 		if (currentChannels[i] == channel)
 		{
 			DynChatEGS.removeSession(channel, user->getEntityRowId());
-			if (DynChatEGS.getSessionCount(channel) == 0)
+			if (userChannel && (DynChatEGS.getSessionCount(channel) == 0))
 			{
 				DynChatEGS.removeChan(channel);
+				TMAPPassChannel::iterator it = _PassChannels.find(channel);
+				if (it != _PassChannels.end())
+					_PassChannels.erase(it);
+
+				for (TMAPExtraFactionChannel::iterator it2 = _UserChannel.begin(); it2 != _UserChannel.end(); ++it2)
+				{
+					if ((*it2).second == channel)
+						_UserChannel.erase(it2);
+				}
 			}
 
 			// Update channel list for player
