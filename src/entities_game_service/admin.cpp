@@ -4215,7 +4215,7 @@ NLMISC_COMMAND (ShowFactionChannels, "Show faction channels", "<csr id> <channel
 	return true;
 
 }
-
+ 
 //----------------------------------------------------------------------------
 // If channel not exists create it
 NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <channel_name> [<pass>]")
@@ -4226,16 +4226,17 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 
 	CPVPManager2 *inst = CPVPManager2::getInstance();
 
-	TChanID channel = CPVPManager2::getInstance()->getUserDynChannel(args[1]);
-
 	string pass;
+	string name = NLMISC::strlwr(args[1]);
+	TChanID channel = CPVPManager2::getInstance()->getUserDynChannel(name);
+
 	if (args.size() < 3)
-		pass = args[1];
+		pass = name;
 	else
 		pass = args[2];
 
 	if ( (channel == DYN_CHAT_INVALID_CHAN) && (pass != string("*")) && (pass != string("***")) )
-		channel = inst->createUserChannel(args[1], pass);
+		channel = inst->createUserChannel(name, pass);
 
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
@@ -4243,25 +4244,23 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 
 		if ( (channel != DYN_CHAT_INVALID_CHAN) && (pass == string("***")) && (c->havePriv(":DEV:") || c->havePriv(":SGM:") || c->havePriv(":GM:") || c->havePriv(":EM:")))
 		{
-			inst->deleteUserChannel(args[1]);
+			inst->deleteUserChannel(name);
 		}
 		else if (channelPass == pass)
 		{
-			if (c->getNbUserChannels() < NB_MAX_USER_CHANNELS)
+			std::vector<TChanID> userChannels = inst->getCharacterUserChannels(c);
+			if (userChannels.size() >= NB_MAX_USER_CHANNELS)
 			{
-				inst->addFactionChannelToCharacter(channel, c, true);
-				c->addUserChannel();
+				inst->removeFactionChannelForCharacter(userChannels[0], c, true);
 			}
-			else
-				log.displayNL("You have the max of user channels");
+			inst->addFactionChannelToCharacter(channel, c, true, true);
 		}
 		else if (pass == string("*"))
 		{
-				inst->removeFactionChannelForCharacter(channel, c);
-				c->removeUserChannel();
+				inst->removeFactionChannelForCharacter(channel, c, true);
 		}
 		else
-			log.displayNL("You don't have rights to connect to channel %s", args[1].c_str());
+			log.displayNL("You don't have rights to connect to channel %s", name.c_str());
 
 		return true;
 	}
