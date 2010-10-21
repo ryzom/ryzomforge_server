@@ -2245,7 +2245,7 @@ public:
 	/// set database pvp flag
 	void setPVPFlagDatabase();
 	/// set PVP recent action flag
-	void setPVPRecentActionFlag();
+	void setPVPRecentActionFlag(CCharacter *target = NULL);
 	/// get PvP recent action flag (true if player involved in PVP action recently)
 	bool getPvPRecentActionFlag() const;
 	/// character are killed in PvP situation
@@ -3376,6 +3376,9 @@ private:
 	NLMISC::TGameCycle				_PVPFlagTimeSettedOn;
 	// time of the last PVP action made (for prevent PVE / PVP exploits)
 	NLMISC::TGameCycle				_PVPRecentActionTime;
+	// all pvp flags (ally and enemy) when players do a pvp curative action
+	uint32							_PVPFlagAlly;
+	uint32							_PVPFlagEnemy;
 	// character safe if is in pvp safe zone
 	bool							_PvPSafeZoneActive;
 	// player changed his faction tag, we have to update pvp mode

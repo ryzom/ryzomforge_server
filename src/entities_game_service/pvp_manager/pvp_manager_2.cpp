@@ -678,7 +678,7 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 				{
 					if( pTarget->getPvPRecentActionFlag() )
 					{
-						actor->setPVPRecentActionFlag();
+						actor->setPVPRecentActionFlag(pTarget);
 						TeamManager.pvpHelpOccursInTeam( actor, pTarget );
 						actor->pvpActionMade();
 						pTarget->pvpActionMade();
@@ -817,7 +817,7 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 				{
 					if( pTarget->getPvPRecentActionFlag() )
 					{
-						actor->setPVPRecentActionFlag();
+						actor->setPVPRecentActionFlag(pTarget);
 						TeamManager.pvpHelpOccursInTeam( actor, pTarget );
 					}
 				}

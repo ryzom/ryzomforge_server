@@ -368,6 +368,9 @@ CCharacter::CCharacter():	CEntityBase(false),
 
 	_LoadingFinish = false;
 
+	_PVPFlagAlly = 0;
+	_PVPFlagEnemy = 0;
+
 	// init faber plans
 //	_KnownFaberPlans.resize(64,(uint64)0); //64*64 bits
 
@@ -794,11 +797,18 @@ void CCharacter::updatePVPClanVP() const
 		}
 
 		if (fame >= PVPFameRequired*6000) {
-			propPvpClanTemp |= (TYPE_PVP_CLAN(1) << (2*TYPE_PVP_CLAN(fameIdx)));
+			propPvpClanTemp |= TYPE_PVP_CLAN(1) << (2*TYPE_PVP_CLAN(fameIdx));
 		} else if (fame <= -PVPFameRequired*6000) {
-			propPvpClanTemp |= (TYPE_PVP_CLAN(1) << ((2*TYPE_PVP_CLAN(fameIdx))+1));
-		} else {
+			propPvpClanTemp |= TYPE_PVP_CLAN(1) << ((2*TYPE_PVP_CLAN(fameIdx))+1);
 		}
+		if (getPvPRecentActionFlag())
+		{
+			uint8 flagAlly = (_PVPFlagAlly & (1 << TYPE_PVP_CLAN(fameIdx))) >> TYPE_PVP_CLAN(fameIdx);
+			uint8 flagEnemy = (_PVPFlagEnemy & (1 << TYPE_PVP_CLAN(fameIdx))) >> TYPE_PVP_CLAN(fameIdx);
+			propPvpClanTemp |= flagAlly << (2*TYPE_PVP_CLAN(fameIdx));
+			propPvpClanTemp |= flagEnemy << ((2*TYPE_PVP_CLAN(fameIdx))+1);
+		}
+
 	}
 	propPvpClanTemp |= TYPE_PVP_CLAN(civOfMaxFame) << (2*TYPE_PVP_CLAN(7));
 	propPvpClanTemp |= TYPE_PVP_CLAN(cultOfMaxFame) << (2*TYPE_PVP_CLAN(8));
@@ -813,6 +823,8 @@ TYPE_PVP_CLAN CCharacter::getPVPFamesAllies()
 	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
 		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) >= PVPFameRequired*6000)
 			propPvpClanTemp |= TYPE_PVP_CLAN(1) << TYPE_PVP_CLAN(fameIdx);
+	if (getPvPRecentActionFlag())
+		return propPvpClanTemp | _PVPFlagAlly;
 	return propPvpClanTemp;
 }
 
@@ -822,6 +834,8 @@ TYPE_PVP_CLAN CCharacter::getPVPFamesEnemies()
 	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
 		if (CFameInterface::getInstance().getFameIndexed(_Id, fameIdx) <= -PVPFameRequired*6000)
 			propPvpClanTemp |= TYPE_PVP_CLAN(1) << TYPE_PVP_CLAN(fameIdx);
+	if (getPvPRecentActionFlag())
+		return propPvpClanTemp | _PVPFlagEnemy;
 	return propPvpClanTemp;
 }
 
@@ -1434,6 +1448,7 @@ uint32 CCharacter::tickUpdate()
 			{
 				CPVPManager2::getInstance()->setPVPModeInMirror(this);
 				CPVPManager2::getInstance()->updateFactionChannel(this);
+				updatePVPClanVP();
 				_HaveToUpdatePVPMode = false;
 			}
 		}
@@ -1444,6 +1459,7 @@ uint32 CCharacter::tickUpdate()
 			if( propPvpMode.getValue()&PVP_MODE::PvpFactionFlagged )
 			{
 				CPVPManager2::getInstance()->setPVPModeInMirror(this);
+				updatePVPClanVP();
 			}
 		}
 	}
@@ -13709,10 +13725,10 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 			_PVPFlagLastTimeChange = 0;
 			_PVPFlagTimeSettedOn = 0;
 			_PVPRecentActionTime = 0;
-			setPVPFlagDatabase();
 			_HaveToUpdatePVPMode = true;
 		}
 		updatePVPClanVP();
+		setPVPFlagDatabase();
 		
 		// handle with faction channel
 		CPVPManager2::getInstance()->updateFactionChannel(this);
@@ -16876,12 +16892,28 @@ void CCharacter::setPVPFlagDatabase()
 	CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setACTIVATION_TIME(_PropertyDatabase, activationTime );
 //	_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:COUNTER", ++_PvPDatabaseCounter );
 	CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase, uint8(++_PvPDatabaseCounter) );
+
+	CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setFLAG_PVP_TIME_LEFT(_PropertyDatabase, _PVPRecentActionTime + PVPActionTimer );
 }
 
 //-----------------------------------------------------------------------------
-void CCharacter::setPVPRecentActionFlag()
+void CCharacter::setPVPRecentActionFlag(CCharacter *target)
 {
+	if (!getPvPRecentActionFlag())
+	{
+		_PVPFlagAlly = 0;
+		_PVPFlagEnemy = 0;
+	}
+
 	_PVPRecentActionTime = CTickEventHandler::getGameCycle();
+
+	if (target != NULL)
+	{
+		_PVPFlagAlly |= target->getPVPFamesAllies();
+		_PVPFlagEnemy |= target->getPVPFamesEnemies();
+		updatePVPClanVP();
+	}
+
 //	_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:FLAG_PVP_TIME_LEFT", _PVPRecentActionTime + PVPActionTimer );
 	CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setFLAG_PVP_TIME_LEFT(_PropertyDatabase, _PVPRecentActionTime + PVPActionTimer );
 
