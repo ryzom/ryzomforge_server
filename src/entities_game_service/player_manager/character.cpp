@@ -15682,10 +15682,15 @@ void CCharacter::sendCustomEmote( const NLMISC::CEntityId& id, MBEHAV::EBehaviou
 	if( behaviour != MBEHAV::IDLE )
 	{
 		setEmote( behaviour );
-		setAfkState(false);
 	}
 
 	string sEmoteCustomText = emoteCustomText.toUtf8();
+
+	if ((behaviour != MBEHAV::IDLE) || (sEmoteCustomText == "none"))
+	{
+		setAfkState(false);
+	}
+
 	if( sEmoteCustomText == "none" )
 	{
 		return;
