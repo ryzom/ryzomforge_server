@@ -68,6 +68,7 @@ std::string CStringManager::_LanguageCode[NB_LANGUAGES] =
 	"de",
 	"fr",
 	"ru",
+	"es",
 
 /* ace: currently, we only want english, i remove other language to remove warning during IOS launch
 	"fr",		// french
@@ -1031,7 +1032,7 @@ void	CStringManager::retrieveEntityNames( TServiceId serviceId )
 		}
 	}
 	NLNET::CMessage msgout( "ENTITY_NAMES" );
-	uint32 len = names.size();
+	uint32 len = (uint32)names.size();
 	msgout.serial( len );
 	vector< pair<TDataSetRow,string> >::const_iterator itn;
 	for ( itn=names.begin(); itn!=names.end(); ++itn )
