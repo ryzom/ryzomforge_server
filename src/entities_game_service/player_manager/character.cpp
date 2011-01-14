@@ -4046,6 +4046,7 @@ void CCharacter::initDatabase()
 	// combat flags
 	//_ForbidPowerDates.writeUsablePowerFlags(_UsablePowerFlags);
 	setPowerFlagDates();
+	setAuraFlagDates();
 	updateBrickFlagsDBEntry();
 
 	// defense interface
@@ -13880,7 +13881,7 @@ void CCharacter::setAuraFlagDates()
 	const NLMISC::TGameCycle time = CTickEventHandler::getGameCycle();
 
 	uint32 flag = BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags;
-	if ( _ForbidAuraUseEndDate > time )
+	if ( (_ForbidAuraUseEndDate > time) && (_ForbidAuraUseEndDate - time < 72000) )
 	{
 		_PowerFlagTicks[flag].StartTick = _ForbidAuraUseStartDate;
 		_PowerFlagTicks[flag].EndTick = _ForbidAuraUseEndDate;
@@ -13890,7 +13891,6 @@ void CCharacter::setAuraFlagDates()
 		_PowerFlagTicks[flag].StartTick = 0;
 		_PowerFlagTicks[flag].EndTick = 0;
 	}
-
 } // setAuraFlagDates //
 
 
