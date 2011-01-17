@@ -603,10 +603,13 @@ void CInputOutputService::addCharacterName( const TDataSetRow& chId, const ucstr
 			TSessionId sessionid;
 			string name = charInfos->ShortName.toUtf8();
 			// Make sure that the short name contains the home session name, but only if the new name does not exist yet
-			// otherwise we will have problems
-			TSessionId throwawayId;
-			CShardNames::getInstance().parseRelativeName(charInfos->HomeSessionId, name, name, throwawayId);
-			name = CShardNames::getInstance().makeFullName(name, charInfos->HomeSessionId);
+			// otherwise we will have problems. If the new name contains opening parentheses then don't add it because
+			// it will try to match it as a homeland name
+			string::size_type pos = name.find('(');
+			if (pos == string::npos)
+			{
+				name = CShardNames::getInstance().makeFullName(name, charInfos->HomeSessionId);
+			}
 
 			TCharInfoCont::iterator itInfos = _NameToInfos.find( name );
 			if( itInfos == _NameToInfos.end() )
