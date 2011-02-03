@@ -5266,7 +5266,7 @@ bool CCharacter::checkAnimalCount( const CSheetId& PetTicket, bool sendMessage, 
 		{
 			if( sendMessage )
 			{
-				sendDynamicSystemMessage( _Id, "EGS_CANT_BUY_PACKER_IS_TRIA" );
+				sendDynamicSystemMessage( _Id, "EGS_CANT_BUY_PACKER_IS_TRIAL_PLAYER" );
 			}
 			return false;
 		}
