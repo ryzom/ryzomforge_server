@@ -51,14 +51,6 @@ void CGuildLeaderModule::setLeader( uint16 index,uint8 session)
 		return;
 	}
 	
-	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( memberPD->getIngameEId() ));
-	BOMB_IF(p == NULL,"Failed to find player record for character: "<<memberPD->getIngameEId().toString(),return);
-	if ( p->isTrialPlayer() )
-	{
-		proxy.sendSystemMessage("GUILD_GRADE_IS_TRIAL_PLAYER");
-		return;
-	}
-
 	_GuildMemberCore->setMemberGrade(memberPD->getGrade());
 	memberPD->setMemberGrade(EGSPD::CGuildGrade::Leader);
 
@@ -109,12 +101,6 @@ void CGuildLeaderModule::quitGuild()
 		EGS_PD_AST( member );
 		// ignore current leader
 		if ( member->getGrade() == EGSPD::CGuildGrade::Leader )
-			continue;
-
-		// ignore trial members
-		CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( member->getIngameEId() ));
-		BOMB_IF(p == NULL,"Failed to find player record for character: "<<member->getIngameEId().toString(),return);
-		if ( p->isTrialPlayer() )
 			continue;
 
 		// check if the current member is the successor

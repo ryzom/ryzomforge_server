@@ -708,12 +708,6 @@ void CGuildManager::createGuild(CGuildCharProxy & proxy,const ucstring & guildNa
 		return;
 	}
 
-	if ( proxy.isTrialPlayer() )
-	{
-		proxy.sendSystemMessage("GUILD_CREATION_IS_TRIAL_PLAYER");
-		return;
-	}
-
 	// player must not have a guild
 	CGuildMemberModule * module = NULL;
 	if ( proxy.getModule( module ) )
