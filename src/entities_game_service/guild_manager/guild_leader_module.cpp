@@ -16,6 +16,8 @@
 
 #include "stdpch.h"
 #include "player_manager/character.h"
+#include "player_manager/player_manager.h"
+#include "player_manager/player.h"
 #include "guild_leader_module.h"
 #include "guild_member.h"
 #include "guild.h"
@@ -48,6 +50,15 @@ void CGuildLeaderModule::setLeader( uint16 index,uint8 session)
 		nlwarning("<GUILD>%s set invalid member idx %u as leader",proxy.getId().toString().c_str(),index );
 		return;
 	}
+	
+	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( memberPD->getIngameEId() ));
+	BOMB_IF(p == NULL,"Failed to find player record for character: "<<memberPD->getIngameEId().toString(),return);
+	if ( p->isTrialPlayer() )
+	{
+		proxy.sendSystemMessage("GUILD_GRADE_IS_TRIAL_PLAYER");
+		return;
+	}
+
 	_GuildMemberCore->setMemberGrade(memberPD->getGrade());
 	memberPD->setMemberGrade(EGSPD::CGuildGrade::Leader);
 
@@ -99,6 +110,13 @@ void CGuildLeaderModule::quitGuild()
 		// ignore current leader
 		if ( member->getGrade() == EGSPD::CGuildGrade::Leader )
 			continue;
+
+		// ignore trial members
+		CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( member->getIngameEId() ));
+		BOMB_IF(p == NULL,"Failed to find player record for character: "<<member->getIngameEId().toString(),return);
+		if ( p->isTrialPlayer() )
+			continue;
+
 		// check if the current member is the successor
 		if ( successor == NULL ||
 			 member->getGrade() < successor->getGrade() ||

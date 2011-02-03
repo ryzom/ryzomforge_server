@@ -707,6 +707,13 @@ void CGuildManager::createGuild(CGuildCharProxy & proxy,const ucstring & guildNa
 		nlwarning("<GUILD>%s bot %s is not a guild creator",proxy.getId().toString().c_str(),bot->getId().toString().c_str());
 		return;
 	}
+
+	if ( proxy.isTrialPlayer() )
+	{
+		proxy.sendSystemMessage("GUILD_CREATION_IS_TRIAL_PLAYER");
+		return;
+	}
+
 	// player must not have a guild
 	CGuildMemberModule * module = NULL;
 	if ( proxy.getModule( module ) )
