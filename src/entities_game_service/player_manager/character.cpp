@@ -207,7 +207,7 @@ extern vector<CMainlandSummary>		Mainlands;
 CVariable<uint32>			SpawnedDeadMektoubDelay("egs","SpawnedDeadMektoubDelay", "nb tick before a dead mektoub despawn)", 2592000, 0, true );
 CVariable<bool>				ForceQuarteringRight("egs","ForceQuarteringRight", "Allow anyone to quarter a dead creature", false, 0, true );
 CVariable<bool>				AllowAnimalInventoryAccessFromAnyStable("egs", "AllowAnimalInventoryAccessFromAnyStable", "If true a player can access to his animal inventory (if the animal is inside a stable) from any stable over the world", true, 0, true );
-CVariable<uint32>			FreeTrialSkillLimit("egs", "FreeTrialSkillLimit", "Level limit for characters belonging to free trial accounts", 19,0,true);
+CVariable<uint32>			FreeTrialSkillLimit("egs", "FreeTrialSkillLimit", "Level limit for characters belonging to free trial accounts", 125,0,true);
 CVariable<uint32>			CraftFailureProbaMpLost("egs", "CraftFailureProbaMpLost", "Probabilité de destruction de chaque MP en cas d'echec du craft", 50,0,true);
 
 
