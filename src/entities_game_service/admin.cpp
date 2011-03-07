@@ -5465,8 +5465,16 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 
 	std::string botsName;
 	if (args.size()>6) botsName = args[6];
-	if (args.size()>7) NLMISC::fromString(args[7], x);
-	if (args.size()>8) NLMISC::fromString(args[8], y);
+	if (args.size()>7)
+	{
+		NLMISC::fromString(args[7], x);
+		x = x * 1000;
+	}
+	if (args.size()>8)
+	{
+		NLMISC::fromString(args[8], y);
+		y = y * 1000;
+	}
 
 	CMessage msgout("EVENT_CREATE_NPC_GROUP");
 	uint32 messageVersion = 1;
