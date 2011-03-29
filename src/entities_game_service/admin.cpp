@@ -2886,7 +2886,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		TLogContext_Item_Command itemCtx(onTarget ? c->getTarget() : eid);
 		TLogContext_Character_BuyRolemasterPhrase characterCtx(onTarget ? c->getTarget() : eid);
 		std::string csName = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
-		
+
 		NLMISC::CSString cs_res = CSString(res);
 		cs_res = cs_res.replace("#player", eid.toString().c_str());
 		cs_res = cs_res.replace("#target", targetEid.toString().c_str());
@@ -2900,7 +2900,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		const std::deque<std::string>	&strs = CmdDisplayer->lockStrings ();
 		for (uint i = 0; i < strs.size(); i++)
 		{
-			InfoLog->displayNL(trim(strs[i]).c_str());
+			InfoLog->displayNL("%s", trim(strs[i]).c_str());
 
 			SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
 			params[0].Literal = trim(strs[i]);
@@ -4215,11 +4215,11 @@ NLMISC_COMMAND (ShowFactionChannels, "Show faction channels", "<csr id> <channel
 	return true;
 
 }
- 
+
 //----------------------------------------------------------------------------
 // If channel not exists create it
 NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <channel_name> [<pass>]")
-{ 
+{
 	if ((args.size() < 2) || (args.size() > 3))
 		return false;
 	GET_CHARACTER
