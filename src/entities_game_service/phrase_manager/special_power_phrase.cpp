@@ -195,7 +195,27 @@ void CSpecialPowerPhrase::processParams(const vector<TBrickParam::IIdPtr> &param
 				}
 			}
 			break;
-		
+
+		case TBrickParam::SP_LIFE_AURA2:
+			{
+			// $*STRUCT CSBrickParamLifeAura: public TBrickParam::CId <TBrickParam::SP_LIFE_AURA2>
+			// $*-i uint16	RegenMod			// regen modifier proportionally to item level
+			// $*-f float	Duration			// duration in seconds
+			// $*-f float	Radius				// aura radius in meters
+			// $*-f float	TargetDisableTime	// disable life aura for x seconds on targets
+			// $*-f float	UserDisableTime		// disable life aura for x seconds on user
+				CSpecialPowerBasicAura *lifeAura = new CSpecialPowerBasicAura(_ActorRowId, this, ((CSBrickParamLifeAura *)param)->Duration, ((CSBrickParamLifeAura *)param)->UserDisableTime, ((CSBrickParamLifeAura *)param)->TargetDisableTime, POWERS::LifeAura);
+				if (lifeAura)
+				{
+					lifeAura->setRadius(((CSBrickParamLifeAura *)param)->Radius);
+					lifeAura->setFamilies(EFFECT_FAMILIES::PowerRootLifeAura,EFFECT_FAMILIES::PowerLifeAura );
+					lifeAura->setParamValue(((CSBrickParamLifeAura *)param)->RegenMod*quality);
+					_Powers.push_back(lifeAura);
+					nlinfo("aura added");
+				}
+			}
+			break;
+
 		case TBrickParam::SP_STAMINA_AURA:
 			{
 				CSpecialPowerBasicAura *staminaAura = new CSpecialPowerBasicAura(_ActorRowId, this, ((CSBrickParamStaminaAura*)param)->Duration, ((CSBrickParamLifeAura *)param)->UserDisableTime, ((CSBrickParamStaminaAura *)param)->TargetDisableTime, POWERS::StaminaAura);
@@ -208,7 +228,20 @@ void CSpecialPowerPhrase::processParams(const vector<TBrickParam::IIdPtr> &param
 				}
 			}
 			break;
-		
+
+		case TBrickParam::SP_STAMINA_AURA2:
+			{
+				CSpecialPowerBasicAura *staminaAura = new CSpecialPowerBasicAura(_ActorRowId, this, ((CSBrickParamStaminaAura*)param)->Duration, ((CSBrickParamLifeAura *)param)->UserDisableTime, ((CSBrickParamStaminaAura *)param)->TargetDisableTime, POWERS::StaminaAura);
+				if (staminaAura)
+				{
+					staminaAura->setRadius(((CSBrickParamStaminaAura *)param)->Radius);
+					staminaAura->setFamilies(EFFECT_FAMILIES::PowerRootStaminaAura,EFFECT_FAMILIES::PowerStaminaAura );
+					staminaAura->setParamValue(((CSBrickParamStaminaAura *)param)->RegenMod*quality);
+					_Powers.push_back(staminaAura);
+				}
+			}
+			break;
+
 		case TBrickParam::SP_SAP_AURA:
 			{
 				CSpecialPowerBasicAura *sapAura = new CSpecialPowerBasicAura(_ActorRowId, this, ((CSBrickParamSapAura*)param)->Duration, ((CSBrickParamLifeAura *)param)->UserDisableTime, ((CSBrickParamSapAura *)param)->TargetDisableTime, POWERS::SapAura);
@@ -222,6 +255,18 @@ void CSpecialPowerPhrase::processParams(const vector<TBrickParam::IIdPtr> &param
 			}
 			break;
 
+		case TBrickParam::SP_SAP_AURA2:
+			{
+				CSpecialPowerBasicAura *sapAura = new CSpecialPowerBasicAura(_ActorRowId, this, ((CSBrickParamSapAura*)param)->Duration, ((CSBrickParamLifeAura *)param)->UserDisableTime, ((CSBrickParamSapAura *)param)->TargetDisableTime, POWERS::SapAura);
+				if (sapAura)
+				{
+					sapAura->setRadius(((CSBrickParamSapAura *)param)->Radius);
+					sapAura->setFamilies(EFFECT_FAMILIES::PowerRootSapAura,EFFECT_FAMILIES::PowerSapAura );
+					sapAura->setParamValue(((CSBrickParamSapAura *)param)->RegenMod*quality);
+					_Powers.push_back(sapAura);
+				}
+			}
+			break;
 
 		case TBrickParam::SP_SPEEDING_UP:
 			{
