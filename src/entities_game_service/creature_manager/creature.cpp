@@ -1696,7 +1696,7 @@ void CCreature::kill(TDataSetRow killerRowId)
 	{
 		if( killer != this && killer->getId().getType() != RYZOMID::player )
 		{
-			PROGRESSIONPVE::CCharacterProgressionPVE::getInstance()->removeCreature(_EntityRowId);
+			PROGRESSIONPVE::CCharacterProgressionPVE::getInstance()->removeXpCreature(_EntityRowId);
 		}
 		else if( killer != this )
 		{
