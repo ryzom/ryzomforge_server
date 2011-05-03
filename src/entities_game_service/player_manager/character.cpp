@@ -25,6 +25,8 @@
 #include "nel/misc/o_xml.h"
 #include "nel/misc/i_xml.h"
 #include "nel/misc/path.h"
+#include "nel/misc/md5.h"
+#include "nel/misc/sha1.h"
 #include "nel/misc/vectord.h"
 #include "nel/misc/vector_2d.h"
 #include "nel/misc/sstring.h"
@@ -13325,6 +13327,96 @@ uint16 CCharacter::getFirstFreeSlotInKnownPhrase()
 } // getFirstFreeSlotInKnownPhrase //
 
 
+void CCharacter::sendUrl(const string &url, const string &salt)
+{
+	string control;
+	if (!salt.empty()) {
+		string checksum = salt+url;
+		control = "&hmac="+getHMacSHA1((uint8*)&url[0], url.size(), (uint8*)&salt[0], salt.size()).toString();;
+	}
+
+	nlinfo(url.c_str());
+	TVectorParamCheck titleParams;
+	TVectorParamCheck textParams;
+	uint32 userId = PlayerManager.getPlayerId(getId());
+	std::string name = "CUSTOM_URL_"+toString(userId);
+	ucstring phrase = ucstring(name+"(){[WEB : "+url+control+"]}");
+	NLNET::CMessage	msgout("SET_PHRASE");
+	msgout.serial(name);
+	msgout.serial(phrase);
+	sendMessageViaMirror("IOS", msgout);
+
+	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "ANSWER_OK", titleParams);
+	uint32 textId = STRING_MANAGER::sendStringToUser(userId, name, textParams);
+	PlayerManager.sendImpulseToClient(getId(), "USER:POPUP", titleId, textId);
+}
+
+
+void CCharacter::addWebCommandCheck(const string &url, const string &data, const string &salt)
+{
+	CGameItemPtr item = createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, CSheetId("web_transaction.sitem"));
+	if (item != 0)
+	{
+		if (data.empty()) {
+			item->setCustomText(ucstring(url));
+			vector<string> infos;
+			NLMISC::splitString(url, "\n", infos);
+			sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added", salt);
+		} else {
+			item->setCustomText(ucstring(url+"\n"+data));
+			sendUrl(url+"&player_eid="+getId().toString()+"&event=command_added", salt);
+		}
+	}
+}
+
+uint CCharacter::getWebCommandCheck(const string &url)
+{
+	CInventoryPtr inv = getInventory(INVENTORIES::bag);
+	if(inv)
+	{
+		for(uint i = 0; i < INVENTORIES::NbBagSlots; ++i)
+		{
+			CGameItemPtr item = inv->getItem(i);
+			if (item != NULL && item->getStaticForm() != NULL )
+			{
+				if(item->getStaticForm()->Name == "Web Transaction"
+					|| item->getStaticForm()->Family == ITEMFAMILY::SCROLL)
+				{
+					string cText = item->getCustomText().toString();
+					if (!cText.empty())
+					{
+						vector<string> infos;
+						NLMISC::splitString(cText, "\n", infos);
+						if (infos.size() == 2)
+						{
+							if (infos[0] == url) {
+								return i;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return INVENTORIES::NbBagSlots;
+}
+
+uint CCharacter::checkWebCommand(const string &url, const string &data, const string &hmac, const string &salt)
+{
+	if (salt.empty())
+		return INVENTORIES::NbBagSlots;
+	uint slot = getWebCommandCheck(url);
+	if (slot == INVENTORIES::NbBagSlots)
+		return slot;
+	string checksum = url + data + getId().toString();
+	string realhmac = getHMacSHA1((uint8*)&checksum[0], checksum.size(), (uint8*)&salt[0], salt.size()).toString();
+	if (realhmac == hmac)
+		return slot;
+	return INVENTORIES::NbBagSlots;
+}
+
+
 //-----------------------------------------------
 // getAvailablePhrasesList
 //-----------------------------------------------
@@ -15263,11 +15355,14 @@ void CCharacter::onConnection()
 	{
 		IShardUnifierEvent::getInstance()->charConnected(_Id, getLastDisconnectionDate());
 	}
+
+	CPVPManager2::getInstance()->playerConnects(this);
 }
 
 //--------------------------------------------------------------
 void CCharacter::onDisconnection(bool bCrashed)
 {
+	nlinfo("deco");
 	// indicate to the char that it's going offline
 	online(false);
 	// remove dyn chats before saving
@@ -19226,7 +19321,6 @@ void CCharacter::setLastPosYInDB(sint32 y)
 {
 	_LastPosYInDB = y;
 }
-
 
 //------------------------------------------------------------------------------
 

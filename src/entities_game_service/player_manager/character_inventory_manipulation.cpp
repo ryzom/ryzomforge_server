@@ -72,6 +72,8 @@
 #include "server_share/log_item_gen.h"
 #include "egs_dynamic_sheet_manager.h"
 
+#include "game_share/visual_fx.h"
+
 ///////////
 // USING //
 ///////////
@@ -2439,7 +2441,21 @@ void CCharacter::sendItemInfos( uint16 slotId )
 
 		infos.TypeSkillMods = item->getTypeSkillMods();
 		
-		infos.CustomText = item->getCustomText();
+		// Special case of web missions items
+		if (item->getStaticForm()->Name == "Web Transaction" || item->getStaticForm()->Family == ITEMFAMILY::SCROLL)
+		{
+			string cText = item->getCustomText().toString();
+			string::size_type sPos = cText.find(" ");
+			string::size_type ePos = cText.find("\n---\n");
+			if (sPos != string::npos && sPos != (cText.length()-1) && ePos != string::npos && ePos != (cText.length()-1)) {
+				string cUrl = cText.substr(sPos, ePos-sPos);
+				infos.CustomText = ucstring("@WEBIG "+cUrl);
+			}
+			else
+				infos.CustomText = "";
+		}
+		else
+			infos.CustomText = item->getCustomText();
 
 		CMessage msgout( "IMPULSION_ID" );
 		CBitMemStream bms;
@@ -2892,6 +2908,15 @@ void CCharacter::useItem(uint32 slot)
 				_TpTicketSlot = slot;
 				lockItem( INVENTORIES::bag, slot, 1 );
 
+				// add fx
+				CMirrorPropValue<TYPE_VISUAL_FX> visualFx( TheDataset, _EntityRowId, DSPropertyVISUAL_FX );
+				CVisualFX fx;
+				fx.unpack(visualFx.getValue());
+				fx.Aura = MAGICFX::Teleport;
+				sint64 prop;
+				fx.pack(prop);
+				visualFx = (sint16)prop;
+
 				// add tp phrase in manager
 				static CSheetId tpBrick("bapa01.sbrick");
 				vector<CSheetId> bricks;
@@ -2964,6 +2989,13 @@ void CCharacter::useTeleport(const CStaticItem & form)
 	}
 	else
 	{	
+		CMirrorPropValue<TYPE_VISUAL_FX> visualFx( TheDataset, _EntityRowId, DSPropertyVISUAL_FX );
+		CVisualFX fx;
+		fx.unpack(visualFx.getValue());
+		fx.Aura = MAGICFX::NoAura;
+		sint64 prop;
+		fx.pack(prop);
+		visualFx = (sint16)prop;
 		sint32 x,y,z;
 		float theta;
 		zone->getRandomPoint( x,y,z,theta );

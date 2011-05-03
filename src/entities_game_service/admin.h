@@ -44,6 +44,10 @@ void initAdmin ();
 void initCommandsPrivileges(const std::string & fileName);
 void initPositionFlags(const std::string & fileName);
 
+// Manage Salt for web commands
+std::string getSalt();
+void saveSalt(const std::string salt);
+
 CAdminCommand * findAdminCommand(const std::string & name);
 
 extern void GET_CHARACTER_Helper(std::string& command, const NLMISC::CEntityId& id, const std::string& adminCommand);
