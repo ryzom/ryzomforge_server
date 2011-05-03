@@ -307,7 +307,7 @@ public:
 		if (copyOfStr=="sp_life_aura") {_Value=SP_LIFE_AURA; return *this;}
 		if (copyOfStr=="sp_life_aura2") {_Value=SP_LIFE_AURA2; return *this;}
 		if (copyOfStr=="sp_stamina_aura") {_Value=SP_STAMINA_AURA; return *this;}
-		if (copyOfStr=="sp_stamina_aura") {_Value=SP_STAMINA2_AURA; return *this;}
+		if (copyOfStr=="sp_stamina_aura") {_Value=SP_STAMINA_AURA2; return *this;}
 		if (copyOfStr=="sp_sap_aura") {_Value=SP_SAP_AURA; return *this;}
 		if (copyOfStr=="sp_sap_aura") {_Value=SP_SAP_AURA2; return *this;}
 		if (copyOfStr=="sp_speeding_up") {_Value=SP_SPEEDING_UP; return *this;}
