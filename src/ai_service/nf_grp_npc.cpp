@@ -2558,10 +2558,8 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, activateEasterEgg_fffsffffsss_);
 	REGISTER_NATIVE_FUNC(functions, deactivateEasterEgg_fff_);
 	REGISTER_NATIVE_FUNC(functions, receiveMissionItems_ssc_);
-	REGISTER_NATIVE_FUNC(functions, receiveMissionItems_ssss_);
 	REGISTER_NATIVE_FUNC(functions, giveMissionItems_ssc_);
 	REGISTER_NATIVE_FUNC(functions, talkTo_sc_);
-	REGISTER_NATIVE_FUNC(functions, addWebCommandIds_ssss_);
 	REGISTER_NATIVE_FUNC(functions, facing_cscs_);
 	REGISTER_NATIVE_FUNC(functions, emote_css_);
 	REGISTER_NATIVE_FUNC(functions, emote_ss_);
