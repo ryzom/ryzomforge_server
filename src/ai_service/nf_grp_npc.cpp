@@ -2281,7 +2281,7 @@ void emote_css_(CStateInstance* entity, CScriptStack& stack)
 
 	//CBot& bot = spawnBot->getPersistent();
 	
-	// The entity Id must be valid (whe know that the bot is alive so its entity Id must be ok)
+	// The entity Id must be valid (we know that the bot is alive so its entity Id must be ok)
 	NLMISC::CEntityId	entityId=spawnBot->getEntityId();
 	if (entityId == NLMISC::CEntityId::Unknown)
 	{
@@ -2337,6 +2337,91 @@ void emote_ss_(CStateInstance* entity, CScriptStack& stack)
 	msgout.serial(bh);
 
 	NLNET::CUnifiedNetwork::getInstance()->send( "EGS", msgout );
+}
+
+
+
+void emote_s_(CStateInstance* entity, CScriptStack& stack)
+{
+	string emoteName = (string)stack.top(); stack.pop();
+
+	// Is the emote valid
+	uint32 emoteId = CAIS::instance().getEmotNumber(emoteName);
+	if (emoteId == ~0)
+		return;
+
+	// Get the behaviour Id
+	MBEHAV::EBehaviour behaviourId = (MBEHAV::EBehaviour)(emoteId + MBEHAV::EMOTE_BEGIN);
+	
+
+	CGroup* group = entity->getGroup();
+	
+	if (group->isSpawned())
+	{
+		FOREACH(itBot, CCont<CBot>, group->bots())
+		{
+			CBot* bot = *itBot;
+			if (bot)
+			{
+				// Change the behaviour
+				CEntityId	botId = bot->getSpawnObj()->getEntityId();
+				NLNET::CMessage msgout("SET_BEHAVIOUR");
+				msgout.serial(botId);
+				MBEHAV::CBehaviour bh(behaviourId);
+				bh.Data = (uint16)(CTimeInterface::gameCycle());
+				msgout.serial(bh);
+
+				NLNET::CUnifiedNetwork::getInstance()->send( "EGS", msgout );
+			}
+		}
+	}
+	
+}
+
+void rename_s_(CStateInstance* entity, CScriptStack& stack)
+{
+	string newName = (string)stack.top(); stack.pop();	
+
+	CGroup* group = entity->getGroup();
+	
+	if (group->isSpawned())
+	{
+		FOREACH(itBot, CCont<CBot>, group->bots())
+		{
+			CBot* bot = *itBot;
+			if (bot)
+			{
+				TDataSetRow	row = bot->getSpawnObj()->dataSetRow();
+				ucstring name;
+				name.fromUtf8(newName);
+				NLNET::CMessage	msgout("CHARACTER_NAME");
+				msgout.serial(row);
+				msgout.serial(name);
+				sendMessageViaMirror("IOS", msgout);
+			}
+		}
+	}
+	
+}
+
+void vpx_s_(CStateInstance* entity, CScriptStack& stack)
+{
+	string vpx = (string)stack.top(); stack.pop();	
+
+	CGroup* group = entity->getGroup();
+	
+	if (group->isSpawned())
+	{
+		FOREACH(itBot, CCont<CBot>, group->bots())
+		{
+			CBotNpc* bot = NLMISC::safe_cast<CBotNpc*>(*itBot);
+			if (bot)
+			{
+				bot->setVisualProperties(vpx);
+				bot->sendVisualProperties();
+			}
+		}
+	}	
 }
 
 //----------------------------------------------------------------------------
@@ -2473,11 +2558,15 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, activateEasterEgg_fffsffffsss_);
 	REGISTER_NATIVE_FUNC(functions, deactivateEasterEgg_fff_);
 	REGISTER_NATIVE_FUNC(functions, receiveMissionItems_ssc_);
+	REGISTER_NATIVE_FUNC(functions, receiveMissionItems_ssss_);
 	REGISTER_NATIVE_FUNC(functions, giveMissionItems_ssc_);
 	REGISTER_NATIVE_FUNC(functions, talkTo_sc_);
+	REGISTER_NATIVE_FUNC(functions, addWebCommandIds_ssss_);
 	REGISTER_NATIVE_FUNC(functions, facing_cscs_);
 	REGISTER_NATIVE_FUNC(functions, emote_css_);
 	REGISTER_NATIVE_FUNC(functions, emote_ss_);
+	REGISTER_NATIVE_FUNC(functions, emote_s_);
+	REGISTER_NATIVE_FUNC(functions, rename_s_);
 	REGISTER_NATIVE_FUNC(functions, npcSay_css_);
 	REGISTER_NATIVE_FUNC(functions, dssMessage_fsss_);
 	REGISTER_NATIVE_FUNC(functions, despawnBotByAlias_s_);	
