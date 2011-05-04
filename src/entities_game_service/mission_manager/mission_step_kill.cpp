@@ -865,7 +865,7 @@ class CMissionStepKillByName : public IMissionStepTemplate
 		retParams[0].Type = STRING_MANAGER::bot_name;
 		retParams[0].Identifier = TargetName;
 		retParams[1].Type = STRING_MANAGER::integer;
-		nlassert( subStepStates.size() == 1 )
+		nlassert( subStepStates.size() == 1 );
 		retParams[1].Int = subStepStates[0];
 		if ( Place != 0xFFFF )
 		{
@@ -1052,7 +1052,7 @@ class CMissionStepKillPlayer : public IMissionStepTemplate
 			{
 				nbSubSteps++;
 				retParams.push_back(STRING_MANAGER::TParam());
-				retParams.back().Type = STRING_MANAGER::clan;
+				retParams.back().Type = STRING_MANAGER::faction;
 				retParams.back().Enum = _SubSteps[i].Clan;
 	
 				retParams.push_back(STRING_MANAGER::TParam());
