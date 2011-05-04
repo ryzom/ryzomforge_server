@@ -211,7 +211,6 @@ void CSpecialPowerPhrase::processParams(const vector<TBrickParam::IIdPtr> &param
 					lifeAura->setFamilies(EFFECT_FAMILIES::PowerRootLifeAura,EFFECT_FAMILIES::PowerLifeAura );
 					lifeAura->setParamValue(((CSBrickParamLifeAura *)param)->RegenMod*quality);
 					_Powers.push_back(lifeAura);
-					nlinfo("aura added");
 				}
 			}
 			break;

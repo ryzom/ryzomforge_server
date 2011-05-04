@@ -421,7 +421,6 @@ void CMagicPhrase::computeCastingTime(float castingTimeFactor, float wearMalus)
 		nlwarning("CMagicPhrase:computeCastingTime: _MaxCastTime(%u) < _MinCastTime(%u)", _MaxCastTime, _MinCastTime);
 		_MaxCastTime = _MinCastTime;
 	}
-	
 	// apply magic focus item factor
 	float meanFactor = 0.0f;
 	for (uint i = 0 ; i < _Skills.size() ; ++i)
@@ -922,6 +921,9 @@ void  CMagicPhrase::execute()
 	}
 	castingTime = NLMISC::TGameCycle ( castingTime * (slowingParam / 100.0f + 1.0f ) );
 	
+	if (_Nature == ACTNATURE::RECHARGE)
+		castingTime = NLMISC::TGameCycle(5.0f);
+
 	_ExecutionEndDate  = time + castingTime;
 
 	if (_IsStatic && caster->getId().getType() == RYZOMID::player )
@@ -953,6 +955,9 @@ void  CMagicPhrase::execute()
 				break;
 			case ACTNATURE::OFFENSIVE_MAGIC:
 				behav = MBEHAV::CAST_OFF;
+				break;
+			case ACTNATURE::RECHARGE:
+				behav =  MBEHAV::CAST_MIX;
 				break;
 			}
 		}
@@ -1412,6 +1417,10 @@ bool CMagicPhrase::launch()
 				// tmp nico : stats about projectiles
 				projStatsIncrement();
 				break;
+			case ACTNATURE::RECHARGE:
+				behav =  MBEHAV::CAST_MIX_SUCCESS;
+				break;
+
 			}
 		}
 		else
@@ -1428,6 +1437,10 @@ bool CMagicPhrase::launch()
 			case ACTNATURE::OFFENSIVE_MAGIC:
 				behav = MBEHAV::CAST_OFF_FAIL;
 				break;
+			case ACTNATURE::RECHARGE:
+				behav =  MBEHAV::CAST_MIX_FAIL;
+				break;
+
 			}
 		}
 	}
@@ -1769,6 +1782,10 @@ void CMagicPhrase::stop()
 		case ACTNATURE::OFFENSIVE_MAGIC:
 			behav = MBEHAV::CAST_OFF_FAIL;
 			break;
+		case ACTNATURE::RECHARGE:
+			behav = MBEHAV::CAST_MIX_FAIL;
+			break;
+
 		}
 		// set behaviour
 		PHRASE_UTILITIES::sendUpdateBehaviour( _ActorRowId, behav );
