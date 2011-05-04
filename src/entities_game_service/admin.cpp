@@ -4684,6 +4684,20 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed", getSalt());
 		}
 	}
+	//*************************************************
+	//***************** set_title
+	//*************************************************
+	
+	else if (command_args[0] == "set_title") {
+		if (command_args.size () != 2) return false;
+		TDataSetRow row = c->getEntityRowId();
+		ucstring name = ucstring(c->getName().toString()+"$"+command_args[1]+"$");
+		NLNET::CMessage	msgout("CHARACTER_NAME");
+		msgout.serial(row);
+		msgout.serial(name);
+		sendMessageViaMirror("IOS", msgout);
+	}
+
 
 	if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
 	{

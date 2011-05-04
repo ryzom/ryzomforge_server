@@ -219,6 +219,7 @@ CVariable<uint32> NBLoginStats("egs","NBLoginStats", "Nb logins stats kept (logo
 // Max Bonus/malus/consumable effects displayed by client (database corresponding array must have the same size, and client must process the same size)
 const uint32 MaxBonusMalusDisplayed = 12;
 
+const string randomStrings = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-#.$*,@";
 // We use this constant instead of the _StartingCharacteristicValues because _StartingCharacteristicValues is not working
 //TODO
 //const uint32 StartCharacteristicsValue = 10;
@@ -13354,17 +13355,59 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 
 void CCharacter::addWebCommandCheck(const string &url, const string &data, const string &salt)
 {
-	CGameItemPtr item = createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, CSheetId("web_transaction.sitem"));
-	if (item != 0)
+	uint webCommand = getWebCommandCheck(url);
+	string randomString;
+
+	for (uint8 i = 0; i < 8; i++) {
+		uint32 r = (uint32)((double)rand()/((double)RAND_MAX)*69);
+		randomString += randomStrings[r];
+	}
+ 
+	if (webCommand == INVENTORIES::NbBagSlots)
 	{
-		if (data.empty()) {
-			item->setCustomText(ucstring(url));
-			vector<string> infos;
-			NLMISC::splitString(url, "\n", infos);
-			sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added", salt);
-		} else {
-			item->setCustomText(ucstring(url+"\n"+data));
-			sendUrl(url+"&player_eid="+getId().toString()+"&event=command_added", salt);
+		CGameItemPtr item = createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, CSheetId("web_transaction.sitem"));
+		if (item != 0)
+		{
+			if (data.empty()) {
+				item->setCustomText(ucstring(url));
+				vector<string> infos;
+				NLMISC::splitString(url, "\n", infos);
+				sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added", salt);
+			} else {
+				vector<string> infos;
+				NLMISC::splitString(url, ",", infos);
+				string finalData = infos[0]+randomString;
+				for (uint i = 1; i < infos.size(); i++)
+				{
+					finalData += ","+randomString+infos[i];
+				}
+				item->setCustomText(ucstring(url+"\n"+finalData));
+				sendUrl(url+"&player_eid="+getId().toString()+"&event=command_added&transaction_id="+randomString, salt);
+			}
+		}
+	}
+	else
+	{
+		CInventoryPtr inv = getInventory(INVENTORIES::bag);
+		if(inv)
+		{
+			CGameItemPtr item = inv->getItem(webCommand);
+			if (item != NULL && item->getStaticForm() != NULL )
+			{
+				if(item->getStaticForm()->Name == "Web Transaction"
+					|| item->getStaticForm()->Family == ITEMFAMILY::SCROLL)
+				{
+					string cText = item->getCustomText().toString();
+					if (!cText.empty())
+					{
+						vector<string> infos;
+						NLMISC::splitString(cText, "\n", infos);
+						vector<string> datas;
+						NLMISC::splitString(infos[1], ",", datas);
+						sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added&transaction_id="+datas[1].substr(0, 8), salt);
+					}
+				}
+			}
 		}
 	}
 }
