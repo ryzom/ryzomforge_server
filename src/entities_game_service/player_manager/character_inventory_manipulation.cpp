@@ -2552,9 +2552,33 @@ void CCharacter::createRechargeItem(uint32 sapRecharge)
 		item->setSapLoad(sapRecharge);
 		addItemToInventory(INVENTORIES::temporary, item);
 	}******/
+
 	CInventoryPtr handlingInv = getInventory(INVENTORIES::handling);
+	if (handlingInv == NULL)
+		return;
+
 	CGameItemPtr rightHandItem = handlingInv->getItem(INVENTORIES::right); // item to reload
-	nlassert(rightHandItem != NULL);
+	if (rightHandItem == NULL)
+	{
+		TVectorParamCheck params;
+		sendDynamicSystemMessage(_EntityRowId, "RIGHT_HAND_EMPTY", params);
+		return;
+	}
+
+	// check the right hand holds a weapon item
+	const CStaticItem * form = rightHandItem->getStaticForm();
+	if (form == NULL)
+	{
+		nlwarning("item %s has no static form", rightHandItem->getSheetId().toString().c_str());
+		return;
+	}
+
+	if ((form->Family != ITEMFAMILY::MELEE_WEAPON) && (form->Family != ITEMFAMILY::RANGE_WEAPON))
+	{
+		TVectorParamCheck params;
+		sendDynamicSystemMessage(_EntityRowId, "WEAPONS_ONLY_CAN_BEEN_RECHARGED", params);
+		return;
+	}
 
 	rightHandItem->reloadSapLoad(sapRecharge);
 
