@@ -893,7 +893,7 @@ MISSION_REGISTER_STEP(CMissionStepKillByName,"kill_npc_by_name");
 
 
 
-/*
+
 
 // ----------------------------------------------------------------------------
 class CMissionStepKillPlayer : public IMissionStepTemplate
@@ -1064,7 +1064,25 @@ class CMissionStepKillPlayer : public IMissionStepTemplate
 				retParams.back().Int = _SubSteps[i].MaxLevel;
 			}
 		}
-
+		/*
+		if ( _Place != 0xFFFF )
+		{
+			STRING_MANAGER::TParam param;
+			param.Type = STRING_MANAGER::place;
+			CPlace * place = CZoneManager::getInstance().getPlaceFromId(_Place);
+			if ( !place )
+			{
+				MISLOG("sline:%u ERROR : kill_player : Invalid place %u", _SourceLine, _Place);
+			}
+			else
+			{
+				param.Identifier = place->getName();
+				retParams.push_back(param);
+			}
+			textPtr = &stepTextLoc;
+		}
+		else
+		*/
 		textPtr = &stepText;
 	}
 
@@ -1074,4 +1092,3 @@ class CMissionStepKillPlayer : public IMissionStepTemplate
 	MISSION_STEP_GETNEWPTR(CMissionStepKillPlayer)
 };
 MISSION_REGISTER_STEP(CMissionStepKillPlayer, "kill_player");
-*/
