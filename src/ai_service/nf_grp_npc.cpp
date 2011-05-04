@@ -2364,14 +2364,21 @@ void emote_s_(CStateInstance* entity, CScriptStack& stack)
 			if (bot)
 			{
 				// Change the behaviour
-				CEntityId	botId = bot->getSpawnObj()->getEntityId();
-				NLNET::CMessage msgout("SET_BEHAVIOUR");
-				msgout.serial(botId);
-				MBEHAV::CBehaviour bh(behaviourId);
-				bh.Data = (uint16)(CTimeInterface::gameCycle());
-				msgout.serial(bh);
+				if (bot->isSpawned())
+				{
+					CSpawnBot *spawnBot = bot->getSpawnObj();
+					if (spawnBot)
+						{
+						CEntityId	botId = spawnBot->getEntityId();
+						NLNET::CMessage msgout("SET_BEHAVIOUR");
+						msgout.serial(botId);
+						MBEHAV::CBehaviour bh(behaviourId);
+						bh.Data = (uint16)(CTimeInterface::gameCycle());
+						msgout.serial(bh);
 
-				NLNET::CUnifiedNetwork::getInstance()->send( "EGS", msgout );
+						NLNET::CUnifiedNetwork::getInstance()->send( "EGS", msgout );
+					}
+				}
 			}
 		}
 	}
@@ -2391,13 +2398,20 @@ void rename_s_(CStateInstance* entity, CScriptStack& stack)
 			CBot* bot = *itBot;
 			if (bot)
 			{
-				TDataSetRow	row = bot->getSpawnObj()->dataSetRow();
-				ucstring name;
-				name.fromUtf8(newName);
-				NLNET::CMessage	msgout("CHARACTER_NAME");
-				msgout.serial(row);
-				msgout.serial(name);
-				sendMessageViaMirror("IOS", msgout);
+				if (bot->isSpawned())
+				{
+					CSpawnBot *spawnBot = bot->getSpawnObj(); 
+					if (spawnBot)
+					{
+						TDataSetRow	row = spawnBot->dataSetRow();
+						ucstring name;
+						name.fromUtf8(newName);
+						NLNET::CMessage	msgout("CHARACTER_NAME");
+						msgout.serial(row);
+						msgout.serial(name);
+						sendMessageViaMirror("IOS", msgout);
+					}
+				}
 			}
 		}
 	}
