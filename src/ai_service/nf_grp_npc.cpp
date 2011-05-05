@@ -2579,6 +2579,7 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, emote_ss_);
 	REGISTER_NATIVE_FUNC(functions, emote_s_);
 	REGISTER_NATIVE_FUNC(functions, rename_s_);
+	REGISTER_NATIVE_FUNC(functions, vpx_s_);
 	REGISTER_NATIVE_FUNC(functions, npcSay_css_);
 	REGISTER_NATIVE_FUNC(functions, dssMessage_fsss_);
 	REGISTER_NATIVE_FUNC(functions, despawnBotByAlias_s_);	

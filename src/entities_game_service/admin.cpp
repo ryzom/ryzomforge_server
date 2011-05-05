@@ -2934,7 +2934,10 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 
 		NLMISC::CSString cs_res = CSString(res);
 		cs_res = cs_res.replace("#player", eid.toString().c_str());
-		cs_res = cs_res.replace("#target", targetEid.toString().c_str());
+		if (c->getTarget() != CEntityId::Unknown) {
+			cs_res = cs_res.replace("#target", c->getTarget().toString().c_str());
+			cs_res = cs_res.replace("#gtarget", string("#"+c->getTarget().toString()).c_str());
+		}
 		res = (string)cs_res;
 		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
 
