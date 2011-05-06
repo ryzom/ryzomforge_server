@@ -13347,7 +13347,7 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 	msgout.serial(phrase);
 	sendMessageViaMirror("IOS", msgout);
 
-	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "ANSWER_OK", titleParams);
+	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "web_transactions", titleParams);
 	uint32 textId = STRING_MANAGER::sendStringToUser(userId, name, textParams);
 	PlayerManager.sendImpulseToClient(getId(), "USER:POPUP", titleId, textId);
 }

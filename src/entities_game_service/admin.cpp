@@ -4407,7 +4407,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 	}
 
 	std::vector<std::string> command_args;
-	NLMISC::splitString(command, ":", command_args);
+	NLMISC::splitString(command, "§", command_args);
 	if (command_args.empty())
 		return false;
 
@@ -4620,6 +4620,14 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 			if( name == string("Sex") )
 			{
 				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.Sex, value );
+			}
+			if( name == string("HatModel") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.HatModel, value );
+			}
+			if( name == string("HatColor") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.HatColor, value );
 			}
 			if( name == string("MorphTarget1") )
 			{
