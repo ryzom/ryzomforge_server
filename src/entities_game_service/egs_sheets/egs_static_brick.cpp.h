@@ -307,9 +307,9 @@ public:
 		if (copyOfStr=="sp_life_aura") {_Value=SP_LIFE_AURA; return *this;}
 		if (copyOfStr=="sp_life_aura2") {_Value=SP_LIFE_AURA2; return *this;}
 		if (copyOfStr=="sp_stamina_aura") {_Value=SP_STAMINA_AURA; return *this;}
-		if (copyOfStr=="sp_stamina_aura") {_Value=SP_STAMINA_AURA2; return *this;}
-		if (copyOfStr=="sp_sap_aura") {_Value=SP_SAP_AURA; return *this;}
-		if (copyOfStr=="sp_sap_aura") {_Value=SP_SAP_AURA2; return *this;}
+		if (copyOfStr=="sp_stamina_aura2") {_Value=SP_STAMINA_AURA2; return *this;}
+		if (copyOfStr=="sp_sap_aura") {_Value=SP_SAP_AURA; return *this;} 
+		if (copyOfStr=="sp_sap_aura2") {_Value=SP_SAP_AURA2; return *this;}
 		if (copyOfStr=="sp_speeding_up") {_Value=SP_SPEEDING_UP; return *this;}
 		if (copyOfStr=="sp_invulnerability") {_Value=SP_INVULNERABILITY; return *this;}
 		if (copyOfStr=="sp_melee_protection_aura") {_Value=SP_MELEE_PROTECTION_AURA; return *this;}

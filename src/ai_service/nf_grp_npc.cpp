@@ -295,6 +295,12 @@ void setActivity_s_(CStateInstance* entity, CScriptStack& stack)
 			spawnGroup->activityProfile().setAIProfile(new CGrpProfileBandit(spawnGroup));
 			break;
 		}
+		if (activity=="moving")
+		{
+			spawnGroup->activityProfile().setAIProfile(new CGrpProfileWanderNoPrim(spawnGroup));
+			break;
+		}
+
 		nlwarning("trying to set activity profile to an unknown profile name");
 	}
 }
