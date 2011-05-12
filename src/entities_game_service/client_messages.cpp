@@ -3073,7 +3073,7 @@ void cbClientEventSetItemCustomText( NLNET::CMessage& msgin, const std::string &
 	CCharacter* character = PlayerManager.getChar(eid);
 	if(!character) return;
 
-	if (!character->havePriv(":DEV:SGM:EM:"))
+	if (!character->havePriv(":DEV:SGM:GM:EM:"))
 	{
 		// it should be the crafter of the item, check
 		if (inventory==INVENTORIES::UNDEFINED) return;

@@ -14707,7 +14707,7 @@ void CCharacter::addPlayerToIgnoreList(const NLMISC::CEntityId &id)
 	// update ios state
 	uint32 playerId = PlayerManager.getPlayerId(id);
 	CPlayer *player = PlayerManager.getPlayer( playerId );
-	if ( (!player) || (!player->havePriv( ":SGM:GM:VG:SG:G:" )) ) // if online, messages from CSRs can't be ignored
+	if ( (!player) || (!player->havePriv( ":SGM:GM:VG:SG:G:EM:EG:" )) ) // if online, messages from CSRs can't be ignored
 	{
 		CEntityId senderId = getId();
 		CEntityId ignoredId = id;
@@ -15209,7 +15209,7 @@ void CCharacter::online(bool onlineStatus)
 
 
 	// if the character has a CSR grade, remove from all ignore lists
-	if ( onlineStatus && (! _IsIgnoredBy.empty()) && havePriv( ":SGM:GM:VG:SG:G:" ) )
+	if ( onlineStatus && (! _IsIgnoredBy.empty()) && havePriv( ":SGM:GM:VG:SG:G:EM:EG:" ) )
 	{
 		CMessage msgout( "UNIGNORE_ALL" );
 		msgout.serial( _Id );
