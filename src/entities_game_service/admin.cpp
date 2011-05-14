@@ -4468,7 +4468,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 
 	else if (command_args[0] == "recv_item")
 	{
-		if (command_args.size() != 4)
+		if (command_args.size() < 4)
 			return false;
 
 		const CSheetId sheetId(command_args[1]);
@@ -4481,8 +4481,28 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		if (quantity == 0)
 			return false;
 
+		// Inventory to put item in; can be temp, bag or animals.
+		INVENTORIES::TInventory inventory = INVENTORIES::bag;
+		if (command_args.size() == 5) {
+			INVENTORIES::TInventory inv = INVENTORIES::toInventory(command_args[4].c_str());
+			switch (inv) {
+				case INVENTORIES::temporary:
+				case INVENTORIES::bag:
+				case INVENTORIES::pet_animal1:
+				case INVENTORIES::pet_animal2:
+				case INVENTORIES::pet_animal3:
+				case INVENTORIES::pet_animal4:
+					inventory = inv;
+					break;
+
+				default:
+					inventory = INVENTORIES::bag;
+			}
+		}
+
 		CGameItemPtr new_item = c->createItem(quality, quantity, sheetId);
-		if (!c->addItemToInventory(INVENTORIES::bag, new_item))
+
+		if (!c->addItemToInventory(inventory, new_item))
 		{
 			new_item.deleteItem();
 			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed", getSalt());
