@@ -295,11 +295,6 @@ void setActivity_s_(CStateInstance* entity, CScriptStack& stack)
 			spawnGroup->activityProfile().setAIProfile(new CGrpProfileBandit(spawnGroup));
 			break;
 		}
-		if (activity=="moving")
-		{
-			spawnGroup->activityProfile().setAIProfile(new CGrpProfileWanderNoPrim(spawnGroup));
-			break;
-		}
 
 		nlwarning("trying to set activity profile to an unknown profile name");
 	}
@@ -407,6 +402,106 @@ void stopMoving__(CStateInstance* entity, CScriptStack& stack)
 	
 	spawnGroup->movingProfile().setAIProfile(new CGrpProfileIdle(spawnGroup));
 }
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection startWander_f_
+Set activity to wander in current pos:
+
+Arguments: f(Radius) ->
+@param[in] Radius dispersion of wander activity
+
+@code
+()startWander(100); // Gives a wander activity to the group with dispersion of 100
+@endcode
+
+*/
+// Spawned CGroupNpc not in a family behaviour
+void startWander_f_(CStateInstance* entity, CScriptStack& stack)
+{
+	uint32 dispersionRadius = (uint32)(float&)stack.top();
+	stack.pop();
+	
+	IManagerParent* const managerParent = entity->getGroup()->getOwner()->getOwner();
+	CAIInstance* const aiInstance = dynamic_cast<CAIInstance*>(managerParent);
+	if (!aiInstance)
+		return;
+	
+	if (!entity) { nlwarning("setActivity failed!"); return; }
+	
+	CGroupNpc* group = dynamic_cast<CGroupNpc*>(entity->getGroup());
+	if (!group)
+	{	nlwarning("startWander failed: no NPC group");
+		return;
+	}
+	CSpawnGroupNpc* spawnGroup = group->getSpawnObj();
+	if (!spawnGroup)
+	{	nlwarning("startWander failed: no spawned group");
+		return;
+	}
+
+	CAIVector centerPos;
+	if	(!spawnGroup->calcCenterPos(centerPos))	// true if there's some bots in the group.
+	{	nlwarning("startWander failed: no center pos");
+		return;
+	}
+
+	NLMISC::CSmartPtr<CNpcZonePlaceNoPrim> destZone = NLMISC::CSmartPtr<CNpcZonePlaceNoPrim>(new CNpcZonePlaceNoPrim());
+	destZone->setPosAndRadius(AITYPES::vp_auto, CAIPos(centerPos, 0, 0), (uint32)(dispersionRadius*1000.));
+	spawnGroup->movingProfile().setAIProfile(new CGrpProfileWanderNoPrim(spawnGroup, destZone));
+}
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection startMoving_fff_
+Set activity to wander in current pos:
+
+Arguments: f(Radius) ->
+@param[in] Radius dispersion of wander activity
+
+@code
+()startWander(100); // Gives a wander activity to the group with dispersion of 100
+@endcode
+
+*/
+// Spawned CGroupNpc not in a family behaviour
+void startMoving_fff_(CStateInstance* entity, CScriptStack& stack)
+{
+	uint32 dispersionRadius = (uint32)(float&)stack.top();
+	stack.pop();
+	float const y = (float&)stack.top();
+	stack.pop();
+	float const x = (float&)stack.top();
+ 	stack.pop();
+	
+	IManagerParent* const managerParent = entity->getGroup()->getOwner()->getOwner();
+	CAIInstance* const aiInstance = dynamic_cast<CAIInstance*>(managerParent);
+	if (!aiInstance)
+		return;
+	
+	if (!entity) { nlwarning("setActivity failed!"); return; }
+	
+	CGroupNpc* group = dynamic_cast<CGroupNpc*>(entity->getGroup());
+	if (!group)
+	{	nlwarning("setActivity failed: no NPC group");
+		return;
+	}
+	CSpawnGroupNpc* spawnGroup = group->getSpawnObj();
+	if (!spawnGroup)
+	{	nlwarning("setActivity failed: no spawned group");
+		return;
+	}
+
+	NLMISC::CSmartPtr<CNpcZonePlaceNoPrim> destZone = NLMISC::CSmartPtr<CNpcZonePlaceNoPrim>(new CNpcZonePlaceNoPrim());
+	destZone->setPosAndRadius(AITYPES::vp_auto, CAIPos(CAIVector(x, y), 0, 0), (uint32)(dispersionRadius*1000.));
+	spawnGroup->movingProfile().setAIProfile(new CGrpProfileWanderNoPrim(spawnGroup, destZone));
+
+	return;
+}
+
+
 
 //----------------------------------------------------------------------------
 /** @page code
@@ -2548,6 +2643,8 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, setFactionProp_ss_);
 	REGISTER_NATIVE_FUNC(functions, moveToZone_ss_);
 	REGISTER_NATIVE_FUNC(functions, setActivity_s_);
+	REGISTER_NATIVE_FUNC(functions, startWander_f_);
+	REGISTER_NATIVE_FUNC(functions, startMoving_fff_);
 	REGISTER_NATIVE_FUNC(functions, waitInZone_s_);
 	REGISTER_NATIVE_FUNC(functions, stopMoving__);
 	REGISTER_NATIVE_FUNC(functions, wander__);
