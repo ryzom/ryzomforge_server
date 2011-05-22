@@ -54,8 +54,9 @@ void CSpecialPowerBasicAura::apply()
 	}
 
 	// disable auras
-	if (!_ByPassTargetsDisableAuraTime)
+	if (!_ByPassTargetsDisableAuraTime) {
 		actor->setForbidAuraUseDates(CTickEventHandler::getGameCycle(), CTickEventHandler::getGameCycle() + _DisablePowerTime);
+	}
 
 	const TGameCycle endDate = _Duration + CTickEventHandler::getGameCycle();
 
@@ -68,9 +69,10 @@ void CSpecialPowerBasicAura::apply()
 	}
 	effect->setRadius(_AuraRadius);
 
-	if (!_ByPassTargetsDisableAuraTime)
-		effect->setTargetDisableTime(_TargetsDisableAuraTime);
+	effect->setIsFromConsumable(_ByPassTargetsDisableAuraTime);
 
+	effect->setTargetDisableTime(_TargetsDisableAuraTime);
+	
 	actor->addSabrinaEffect(effect);
 
 	// add aura FX on the actor

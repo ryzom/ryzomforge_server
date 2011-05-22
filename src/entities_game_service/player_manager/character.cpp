@@ -219,7 +219,7 @@ CVariable<uint32> NBLoginStats("egs","NBLoginStats", "Nb logins stats kept (logo
 // Max Bonus/malus/consumable effects displayed by client (database corresponding array must have the same size, and client must process the same size)
 const uint32 MaxBonusMalusDisplayed = 12;
 
-const string randomStrings = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-#.$*,@";
+const string randomStrings = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#";
 // We use this constant instead of the _StartingCharacteristicValues because _StartingCharacteristicValues is not working
 //TODO
 //const uint32 StartCharacteristicsValue = 10;
@@ -13359,7 +13359,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 	string randomString;
 
 	for (uint8 i = 0; i < 8; i++) {
-		uint32 r = (uint32)((double)rand()/((double)RAND_MAX)*69);
+		uint32 r = (uint32)((double)rand()/((double)RAND_MAX)*62);
 		randomString += randomStrings[r];
 	}
  
@@ -13375,8 +13375,8 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 				sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added", salt);
 			} else {
 				vector<string> infos;
-				NLMISC::splitString(url, ",", infos);
-				string finalData = infos[0]+randomString;
+				NLMISC::splitString(data, ",", infos);
+				string finalData = randomString+infos[0];
 				for (uint i = 1; i < infos.size(); i++)
 				{
 					finalData += ","+randomString+infos[i];
@@ -13404,7 +13404,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 						NLMISC::splitString(cText, "\n", infos);
 						vector<string> datas;
 						NLMISC::splitString(infos[1], ",", datas);
-						sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added&transaction_id="+datas[1].substr(0, 8), salt);
+						sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added&transaction_id="+datas[0].substr(0, 8), salt);
 					}
 				}
 			}
