@@ -46,6 +46,7 @@
 #include "game_share/time_weather_season/time_date_season_manager.h"
 #include "game_share/permanent_ban_magic_number.h"
 #include "game_share/fame.h"
+#include "game_share/outpost.h"
 #include "game_share/visual_slot_manager.h"
 #include "game_share/shard_names.h"
 #include "server_share/log_command_gen.h"
@@ -107,7 +108,6 @@
 //
 // Externs
 //
-
 
 // Max number of user channel character can be have
 #define NB_MAX_USER_CHANNELS				2
@@ -372,6 +372,7 @@ AdminCommandsInit[] =
 		"forceMissionProgress",				true,
 		"eventSetBotURL",					true,
 		"eventSetBotURLName",				true,
+		"eventSpawnToxic",					true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -4392,8 +4393,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 	if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
 	{
 		uint item_idx = c->checkWebCommand(web_app_url, index+command, hmac, getSalt());
-		if (item_idx == INVENTORIES::NbBagSlots)
+		if (item_idx == INVENTORIES::NbBagSlots) {
+			nlwarning("Bad web command check");
 			return false;
+		}
 
 		item = inv->getItem(item_idx);
 		string cText = item->getCustomText().toString();
@@ -4407,7 +4410,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 	}
 
 	std::vector<std::string> command_args;
-	NLMISC::splitString(command, "§", command_args);
+	NLMISC::splitString(command, "!", command_args);
 	if (command_args.empty())
 		return false;
 
@@ -4443,8 +4446,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 			}
 		}
 
-		if (numberItem < quantity)
+		if (numberItem < quantity) {
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_items", getSalt());
 			return false;
+		}
 
 		numberItem = quantity;
 		for( uint32 i = 0; i < inv->getSlotCount(); ++ i)
@@ -4505,7 +4510,138 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		if (!c->addItemToInventory(inventory, new_item))
 		{
 			new_item.deleteItem();
-			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed", getSalt());
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=cant_add_item", getSalt());
+			return false;
+		}
+	}
+	//*************************************************
+	//***************** check_position
+	//*************************************************
+
+	else if (command_args[0] == "check_position")
+	{
+		if (command_args.size () != 5) return false;
+		sint32 x = (sint32)(c->getX() / 1000);
+		sint32 y = (sint32)(c->getY() / 1000);
+
+		sint32 min_x;
+		sint32 min_y;
+		sint32 max_x;
+		sint32 max_y;
+
+
+		NLMISC::fromString(command_args[1], min_x);
+		NLMISC::fromString(command_args[2], min_y);
+		NLMISC::fromString(command_args[3], max_x);
+		NLMISC::fromString(command_args[4], max_y);
+
+		nlinfo("x = %d, y = %d", x, y);
+		nlinfo("min_x = %d, min_y = %d", min_x, min_y);
+		nlinfo("max_x = %d, max_y = %d", max_x, max_y);
+		if ((x < min_x || y < min_y || x > max_x || y > max_y))
+		{
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_position", getSalt());
+			return false;
+		}
+
+	}
+
+	//*************************************************
+	//***************** check_fame
+	//*************************************************
+	else if (command_args[0] == "check_fame")
+	{
+		if (command_args.size () != 4) return false;
+
+
+		uint32 factionIndex	= PVP_CLAN::getFactionIndex(PVP_CLAN::fromString(command_args[1]));
+		sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
+
+		sint32 value;
+		NLMISC::fromString(command_args[3], value);
+		value = value*6000;
+
+		nlinfo("fame = %d, value = %d", fame, value);
+
+		if ((command_args[2] != "below" && command_args[2] != "above"))
+			return false;
+
+		if ((command_args[2] == "below" && fame > value) || (command_args[2] == "above" && fame < value))
+		{
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_fame", getSalt());
+			return false;
+		}
+
+	}
+
+	//*************************************************
+	//***************** check_item
+	//*************************************************
+	else if (command_args[0] == "check_item")
+	{
+		if (command_args.size() != 4)
+			return false;
+
+		const CSheetId sheetId(command_args[1]);
+		if (sheetId == CSheetId::Unknown)
+			return false;
+		const uint32 quality = (uint32)atoi(command_args[2].c_str());
+		if (quality == 0)
+			return false;
+		const uint32 quantity = (uint32)atoi(command_args[3].c_str());
+		if (quantity == 0)
+			return false;
+
+		uint32 numberItem = 0;
+		for( uint32 i = 0; i < inv->getSlotCount(); ++ i)
+		{
+			const CGameItemPtr itemPtr = inv->getItem(i);
+			if( itemPtr != NULL )
+			{
+				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() >= quality) )
+				{
+					numberItem += itemPtr->getStackSize();
+				}
+			}
+		}
+
+		if (numberItem < quantity) {
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_items", getSalt());
+			return false;
+		}
+	}
+
+	//*************************************************
+	//***************** check_outpost
+	//*************************************************
+	else if (command_args[0] == "check_outpost")
+	{
+		if (command_args.size() != 3)
+			return false;
+
+		CSmartPtr<COutpost> outpost;
+		TAIAlias outpostAlias = CPrimitivesParser::aliasFromString(command_args[1]);
+		outpost = COutpostManager::getInstance().getOutpostFromAlias(outpostAlias);
+		if (outpost == NULL)
+		{
+			CSheetId outpostSheet(command_args[1]);
+			outpost = COutpostManager::getInstance().getOutpostFromSheet(outpostSheet);
+		}
+		
+		if (outpost == NULL)
+		{
+			return false;
+		}
+		
+		if ((command_args[2] != "attacker") && (command_args[2] != "defender") && (command_args[2] != "attack") && (command_args[2] != "defend"))
+			return false;
+
+		nlinfo("oupost name : %s, State : %s, Owner : %d, Attacker = %d", outpost->getName().c_str(), outpost->getStateName().c_str(), outpost->getOwnerGuild(),  outpost->getAttackerGuild() );
+		if ((command_args[2] == "attacker" && (outpost->getAttackerGuild() == 0 || outpost->getAttackerGuild() != c->getGuildId())) ||
+			(command_args[2] == "defender" && (outpost->getOwnerGuild() == 0 || outpost->getOwnerGuild() != c->getGuildId())) ||
+			(command_args[2] == "attack" && outpost->getState() != OUTPOSTENUMS::AttackRound) ||
+			(command_args[2] == "defend" && outpost->getState() != OUTPOSTENUMS::DefenseRound)) {
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc="+command_args[2], getSalt());
 			return false;
 		}
 	}
@@ -4513,7 +4649,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 	//*************************************************
 	//***************** create_group
 	//*************************************************
-	
 	else if (command_args[0] == "create_group") {
 			
 		if (command_args.size () < 3) return false;
@@ -4591,8 +4726,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		msgout.serial(spawnBots);
 		msgout.serial(botsName);
 		CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
-
-		return true;
 	}
 
 	//*************************************************
@@ -4728,6 +4861,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		msgout.serial(name);
 		sendMessageViaMirror("IOS", msgout);
 	}
+	else
+		return false;
 
 
 	if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
@@ -4741,6 +4876,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		{
 			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 		}
+	} else {
+		nlinfo("OK");
 	}
 
 	return true;
@@ -6300,6 +6437,62 @@ NLMISC_COMMAND(eventResetItemCustomText, "set an item custom text, which replace
 	return true;
 }
 
+//----------------------------------------------------------------------------
+
+NLMISC_COMMAND(eventSpawnToxic, "Spawn a toxic cloud", "<player eid> <posXm> <posYm> <iRadius{0,1,2}=0> <dmgPerHit=0> <updateFrequency=ToxicCloudUpdateFrequency> <lifetimeInTicks=ToxicCloudDefaultLifetime>" )
+{
+	if ( args.size() < 1 )
+		return false;
+
+	GET_CHARACTER
+	
+	float x = (float)c->getX();
+	float y = (float)c->getY();
+
+	if (args.size() > 1)
+	{
+		NLMISC::fromString(args[1], x);
+	}
+	if (args.size() > 2)
+	{
+		NLMISC::fromString(args[2], y);
+	}
+
+	CVector cloudPos( x, y, 0.0f );
+	sint iRadius = 0;
+	sint32 dmgPerHit = 100;
+	TGameCycle updateFrequency = ToxicCloudUpdateFrequency;
+	TGameCycle lifetime = CToxicCloud::ToxicCloudDefaultLifetime;
+	if ( args.size() > 3 )
+	{
+		iRadius = atoi( args[3].c_str() );
+		if ( args.size() > 4 )
+		{
+			dmgPerHit = atoi( args[4].c_str() );
+			if ( args.size() > 5 )
+			{
+				updateFrequency = atoi( args[5].c_str() );
+				if ( args.size() > 6 )
+					lifetime = atoi( args[6].c_str() );
+			}
+		}
+	}
+	
+	CToxicCloud *tc = new CToxicCloud();
+	float radius = (float)(iRadius*2 + 1); // {1, 3, 5} corresponding to the 3 sheets
+	tc->init( cloudPos, radius, dmgPerHit, updateFrequency, lifetime );
+	CSheetId sheet( toString( "toxic_cloud_%d.fx", iRadius ));
+	if ( tc->spawn( sheet ) )
+	{
+		CEnvironmentalEffectManager::getInstance()->addEntity( tc );
+		log.displayNL( "Toxic cloud spawned (radius %g)", radius );
+	}
+	else
+	{
+		log.displayNL( "Unable to spawn toxic cloud (mirror range full?)" );
+	}
+	return true;
+}
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(useCatalyser, "use an xp catalyser", "<eId> [<slot in bag>]")
