@@ -704,6 +704,9 @@ public:
 	/// add a known brick
 	void addKnownBrick( const NLMISC::CSheetId& brickId );
 
+	/// check if have brick
+	bool haveBrick( const NLMISC::CSheetId& brickId );
+
 	/// remove a known brick
 	void removeKnownBrick( const NLMISC::CSheetId& brickId );
 

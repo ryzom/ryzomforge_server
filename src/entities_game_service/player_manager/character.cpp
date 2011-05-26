@@ -4206,6 +4206,20 @@ void CCharacter::setName(const ucstring &name)
 	}
 }
 
+//-----------------------------------------------
+// CCharacter::haveBrick check if player have the brick
+//-----------------------------------------------
+bool CCharacter::haveBrick( const CSheetId& brickId )
+{
+	const CStaticBrick* brickForm = CSheets::getSBrickForm( brickId );
+	if( brickForm )
+	{
+		// if brick already known, just return
+		if ( _KnownBricks.find( brickId ) != _KnownBricks.end())
+			return true;
+	}
+	return false;
+}
 
 //-----------------------------------------------
 // CCharacter::addKnownBrick add a know brick

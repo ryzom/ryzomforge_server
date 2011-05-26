@@ -4374,8 +4374,33 @@ NLMISC_COMMAND (webDelCommandsIds, "Del ids of commands", "<user id> <web_app_ur
 	return true;
 }
 
-NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <index> <command> <hmac>")
+CInventoryPtr getInv(CCharacter *c, const string &inv)
 {
+	INVENTORIES::TInventory inventory = INVENTORIES::bag;
+	if (!inv.empty()) {
+		INVENTORIES::TInventory selectedInv = INVENTORIES::toInventory(inv);
+		switch (selectedInv) {
+			case INVENTORIES::temporary:
+			case INVENTORIES::bag:
+			case INVENTORIES::pet_animal1:
+			case INVENTORIES::pet_animal2:
+			case INVENTORIES::pet_animal3:
+			case INVENTORIES::pet_animal4:
+			case INVENTORIES::guild:
+			case INVENTORIES::player_room:
+				inventory = selectedInv;
+				break;
+
+			default:
+				inventory = INVENTORIES::bag;
+		}
+	}
+	return c->getInventory(inventory);
+}
+
+NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac>")
+{
+
 	if (args.size() != 5)
 		return false;
 
@@ -4386,7 +4411,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 	string command = args[3];
 	string hmac = args[4];
 
-	CInventoryPtr inv = c->getInventory(INVENTORIES::bag);
+	CInventoryPtr check_inv = c->getInventory(INVENTORIES::bag);
 	vector<string> infos;
 	CGameItemPtr item;
 
@@ -4398,7 +4423,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 			return false;
 		}
 
-		item = inv->getItem(item_idx);
+		item = check_inv->getItem(item_idx);
 		string cText = item->getCustomText().toString();
 		NLMISC::splitString(cText, "\n", infos);
 
@@ -4420,7 +4445,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 
 	if (command_args[0] == "give_item")
 	{
-		if (command_args.size() != 4)
+		if (command_args.size() < 4)
 			return false;
 
 		const CSheetId sheetId(command_args[1]);
@@ -4433,10 +4458,15 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		if (quantity == 0)
 			return false;
 
+		string selected_inv;
+		if (command_args.size() == 5)
+			selected_inv = command_args[4];
+		CInventoryPtr inventory = getInv(c, selected_inv);
+
 		uint32 numberItem = 0;
-		for( uint32 i = 0; i < inv->getSlotCount(); ++ i)
+		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
-			const CGameItemPtr itemPtr = inv->getItem(i);
+			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if( itemPtr != NULL )
 			{
 				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() >= quality) )
@@ -4452,14 +4482,14 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		}
 
 		numberItem = quantity;
-		for( uint32 i = 0; i < inv->getSlotCount(); ++ i)
+		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
-			const CGameItemPtr itemPtr = inv->getItem(i);
+			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if( itemPtr != NULL )
 			{
 				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() >= quality) )
 				{
-					numberItem -= inv->deleteStackItem(i, quantity);
+					numberItem -= inventory->deleteStackItem(i, quantity);
 					if(numberItem == 0)
 						break;
 				}
@@ -4497,6 +4527,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 				case INVENTORIES::pet_animal2:
 				case INVENTORIES::pet_animal3:
 				case INVENTORIES::pet_animal4:
+				case INVENTORIES::guild:
+				case INVENTORIES::player_room:
 					inventory = inv;
 					break;
 
@@ -4543,7 +4575,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_position", getSalt());
 			return false;
 		}
-
 	}
 
 	//*************************************************
@@ -4573,13 +4604,100 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		}
 
 	}
+	
+	//*************************************************
+	//***************** check_target	
+	//*************************************************
+	else if (command_args[0] == "check_target")
+	{
+		if (command_args.size () != 3) return false;
+
+		const CEntityId &target = c->getTarget();
+		if (target == CEntityId::Unknown) {
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_target", getSalt());
+			return false;
+		}
+
+		if (command_args[1] == "sheet") {
+			if (target.getType() == RYZOMID::player) {
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
+				return false;
+			}
+			CSheetId creatureSheetId(command_args[2]);
+			CCreature *creature = CreatureManager.getCreature(target);
+			if (creature == NULL ||  creatureSheetId == CSheetId::Unknown || creatureSheetId != creature->getType()) {
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_sheet", getSalt());
+				return false;
+			}
+		} else if (command_args[1] == "bot_name") {
+			if (target.getType() == RYZOMID::player) {
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
+				return false;
+			}
+			vector<TAIAlias> aliases;
+			CAIAliasTranslator::getInstance()->getNPCAliasesFromName(command_args[2], aliases);
+
+			bool found = false;
+			for(uint k = 0; k < aliases.size(); ++k) {
+				const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId(aliases[k]);
+				if (botId != CEntityId::Unknown && botId == target)	{
+					found = true;
+				}
+			}
+			if (!found) {
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_bot", getSalt());
+				return false;
+			}
+		} else if (command_args[1] == "player_name") {
+			if (target.getType() != RYZOMID::player) {
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
+				return false;
+			}
+			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[2]));
+			if (entityBase == NULL) {
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_player", getSalt());
+				return false;
+			}
+		} else
+			return false;
+	}
+
+	//*************************************************
+	//***************** check_brick	
+	//*************************************************
+	else if (command_args[0] == "check_brick")
+	{
+		if (command_args.size () != 2) return false;
+
+		if (!c->haveBrick(CSheetId(command_args[1]))) {
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_brick", getSalt());
+			return false;
+		}
+	}
+
+	//*************************************************
+	//***************** set_brick 	
+	//*************************************************
+	else if (command_args[0] == "set_brick")
+	{
+		if (command_args.size () != 3) return false;
+
+		if (command_args[1] == "add") {
+			c->addKnownBrick(CSheetId(command_args[2]));
+		} else if (command_args[1] == "del") {
+			c->removeKnownBrick(CSheetId(command_args[2]));
+		} else {
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_action", getSalt());
+			return false;
+		}
+	}
 
 	//*************************************************
 	//***************** check_item
 	//*************************************************
 	else if (command_args[0] == "check_item")
 	{
-		if (command_args.size() != 4)
+		if (command_args.size() < 4)
 			return false;
 
 		const CSheetId sheetId(command_args[1]);
@@ -4592,10 +4710,15 @@ NLMISC_COMMAND (webExecCommand, "Execute a command", "<user id> <web_app_url> <i
 		if (quantity == 0)
 			return false;
 
+		string selected_inv;
+		if (command_args.size() == 5)
+			selected_inv = command_args[4];
+		CInventoryPtr inventory = getInv(c, selected_inv);
+
 		uint32 numberItem = 0;
-		for( uint32 i = 0; i < inv->getSlotCount(); ++ i)
+		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
-			const CGameItemPtr itemPtr = inv->getItem(i);
+			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if( itemPtr != NULL )
 			{
 				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() >= quality) )
