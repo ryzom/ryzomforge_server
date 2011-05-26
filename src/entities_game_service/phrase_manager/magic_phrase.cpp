@@ -921,6 +921,9 @@ void  CMagicPhrase::execute()
 	}
 	castingTime = NLMISC::TGameCycle ( castingTime * (slowingParam / 100.0f + 1.0f ) );
 	
+	if (_Nature == ACTNATURE::RECHARGE)
+		castingTime /= 2;
+
 	_ExecutionEndDate  = time + castingTime;
 
 	if (_IsStatic && caster->getId().getType() == RYZOMID::player )
