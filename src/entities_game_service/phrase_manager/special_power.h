@@ -104,7 +104,7 @@ public:
 	inline void affectGuild(bool flag) { _AffectGuild = flag; }
 
 	/// set ByPass TargetsDisableAuraTime
-	inline void setByPass(bool flag) { if (flag) nlinfo("set byPass"); else nlinfo("unset bypass"); _ByPassTargetsDisableAuraTime = flag; }
+	inline void setByPass(bool flag) { _ByPassTargetsDisableAuraTime = flag; }
 	
 protected:
 	// disable this aura on targets for x ticks
