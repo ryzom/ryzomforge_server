@@ -4897,15 +4897,63 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			{
 				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.Sex, value );
 			}
-			if( name == string("HatModel") )
+			else if( name == string("HatModel") )
 			{
 				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.HatModel, value );
 			}
-			if( name == string("HatColor") )
+			else if( name == string("HatColor") )
 			{
 				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.HatColor, value );
 			}
-			if( name == string("MorphTarget1") )
+			else if( name == string("JacketModel") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.JacketModel, value );
+			}
+			else if( name == string("JacketColor") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.JacketColor, value );
+			}
+			else if( name == string("TrouserModel") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.TrouserModel, value );
+			}
+			else if( name == string("TrouserColor") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.TrouserColor, value );
+			}
+			else if( name == string("WeaponRightHand") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.WeaponRightHand, value );
+			}
+			else if( name == string("WeaponLeftHand") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.WeaponLeftHand, value );
+			}
+			else if( name == string("ArmModel") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.ArmModel, value );
+			}
+			else if( name == string("ArmColor") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyA(), PropertySubData.ArmColor, value );
+			}
+			else if( name == string("HandsModel") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyB(), PropertySubData.HandsModel, value );
+			}
+			else if( name == string("HandsColor") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyB(), PropertySubData.HandsColor, value );
+			}
+			else if( name == string("FeetModel") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyB(), PropertySubData.FeetModel, value );
+			}
+			else if( name == string("FeetColor") )
+			{
+				SET_STRUCT_MEMBER( target->getVisualPropertyB(), PropertySubData.FeetColor, value );
+			}
+			else if( name == string("MorphTarget1") )
 			{
 				SET_STRUCT_MEMBER( target->getVisualPropertyC(), PropertySubData.MorphTarget1, value );
 			}
