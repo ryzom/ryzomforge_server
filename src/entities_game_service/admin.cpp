@@ -4382,6 +4382,7 @@ CInventoryPtr getInv(CCharacter *c, const string &inv)
 		switch (selectedInv) {
 			case INVENTORIES::temporary:
 			case INVENTORIES::bag:
+			case INVENTORIES::equipment:
 			case INVENTORIES::pet_animal1:
 			case INVENTORIES::pet_animal2:
 			case INVENTORIES::pet_animal3:
