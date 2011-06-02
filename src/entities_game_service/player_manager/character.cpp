@@ -18072,7 +18072,7 @@ void CCharacter::resetTpTicketSlot()
 //----------------------------------------------------------------------------
 void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills skill)
 {
-	if (family == ITEMFAMILY::MELEE_WEAPON && skill < SKILLS::NUM_SKILLS)
+	if ((family == ITEMFAMILY::MELEE_WEAPON || family == ITEMFAMILY::RANGE_WEAPON)  && skill < SKILLS::NUM_SKILLS)
 		_CurrentParrySkill = skill;
 	else
 		_CurrentParrySkill = BarehandCombatSkill;
