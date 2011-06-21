@@ -4470,7 +4470,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if( itemPtr != NULL )
 			{
-				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() >= quality) )
+				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() == quality) )
 				{
 					numberItem += itemPtr->getStackSize();
 				}
@@ -4488,7 +4488,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if( itemPtr != NULL )
 			{
-				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() >= quality) )
+				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() == quality) )
 				{
 					numberItem -= inventory->deleteStackItem(i, quantity);
 					if(numberItem == 0)
@@ -4722,7 +4722,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if( itemPtr != NULL )
 			{
-				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() >= quality) )
+				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() == quality) )
 				{
 					numberItem += itemPtr->getStackSize();
 				}
