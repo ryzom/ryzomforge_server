@@ -2381,6 +2381,11 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 	msgin.serial( id,opt );
 	const std::vector<CEntityId> * gms = NULL;
 
+	// Make sure opt is not like "A(c)" for "é"
+	ucstring ucopt;
+	ucopt.fromUtf8(opt);
+	opt = ucopt.toString();
+
 	uint nbAnswers = 0;
 
 	// standard who
@@ -2420,7 +2425,7 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 						&& user->getInstanceNumber() == ch->getInstanceNumber())
 					{
 						params[0].setEId( (*it) );
-						CCharacter::sendDynamicSystemMessage( id,"WHO_REGION_LIST",params );
+						CCharacter::sendDynamicSystemMessage( id,"WHO_REGION_LIST", params );
 						nbAnswers++;
 					}
 				}
@@ -2429,7 +2434,7 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 
 	}
 	// GM who
-	else if ( NLMISC::nlstricmp( opt.c_str() , "GM" ) == 0)
+	else if ( NLMISC::nlstricmp( opt.c_str(), "GM" ) == 0)
 	{
 		TVectorParamCheck params(1);
 		params[0].Type = STRING_MANAGER::player;
@@ -2475,6 +2480,43 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 				}
 			}
 		}
+	}
+	else {
+		TChanID channel = CPVPManager2::getInstance()->getUserDynChannel(opt);
+
+		if ( (channel == DYN_CHAT_INVALID_CHAN) )
+		{
+			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_NOT_FOUND" );
+			return;
+		}
+
+		CCharacter * user = PlayerManager.getChar( id );
+		std::vector<TChanID> userChannels = CPVPManager2::getInstance()->getCharacterUserChannels(user);
+
+		CPlayer *p = PlayerManager.getPlayer(PlayerManager.getPlayerId(user->getId()));
+
+		bool hasChannel = false;
+		for (uint j = 0; j < userChannels.size(); ++j)
+		{
+			if (userChannels[j] == channel)
+			{
+				hasChannel = true;
+			}
+		}
+
+		// GM+ can do /who of any channel
+		bool havePriv = p->havePriv(":DEV:SGM:GM:");
+		if (hasChannel || havePriv)
+		{
+			CPVPManager2::getInstance()->sendChannelUsers(channel, user, !hasChannel);
+			return;
+		}
+
+		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+		params[0].Literal = opt;
+		CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_NOT_CONNECTED", params );
+		
+		return;
 	}
 
 	if ( nbAnswers == 0 )

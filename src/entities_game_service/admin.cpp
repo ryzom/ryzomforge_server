@@ -373,6 +373,7 @@ AdminCommandsInit[] =
 		"eventSetBotURL",					true,
 		"eventSetBotURLName",				true,
 		"eventSpawnToxic",					true,
+		"eventNpcSay",						true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -4308,12 +4309,18 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 		{
 			inst->removeFactionChannelForCharacter(channel, c, true);
 		}
-		else
-			log.displayNL("You don't have rights to connect to channel %s", name.c_str());
+		else {
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal = name;
+			CCharacter::sendDynamicSystemMessage( eid, "EGS_CHANNEL_NO_RIGHTS", params );
+		}
 
 		return true;
 	}
 
+	SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+	params[0].Literal = name;
+	CCharacter::sendDynamicSystemMessage( eid, "EGS_CHANNEL_INVALID_NAME", params );
 	return false;
 
 }
@@ -7068,6 +7075,36 @@ NLMISC_COMMAND(eventSetBotURLName, "changes the url name of a bot", "<bot eid> <
 	(string &)wpn = args[1];
 
 	log.displayNL("Set url name '%s'", creature->getWebPageName().c_str());
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(eventNpcSay, "have a bot say a text", "<bot eid> <text to say> <optional mode (0 = say, 1 = shout)> ")
+{
+	if (args.size() < 2 || args.size() > 3) return false;
+	GET_ENTITY
+
+	string text(args[1]);
+
+	CChatGroup::TGroupType mode = CChatGroup::say;
+	if (args.size() == 3)
+	{
+		mode = (args[2] == "1") ? CChatGroup::shout : mode;
+	}
+
+	std::string prefix = NLMISC::CSString(text).left(3);
+	if (NLMISC::nlstricmp(prefix.c_str(), "ID:") == 0)
+	{
+		NLMISC::CSString phrase = NLMISC::CSString(text).right(text.length()-3);
+		npcChatToChannel(e->getEntityRowId(), mode, phrase);
+	}
+	else
+	{
+		npcChatToChannelSentence(e->getEntityRowId(), mode, ucstring(text));
+	}
+
+	
 
 	return true;
 }

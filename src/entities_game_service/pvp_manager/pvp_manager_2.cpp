@@ -39,6 +39,7 @@
 #include "stat_db.h"
 #include "admin.h"
 #include "game_share/fame.h"
+#include "game_share/send_chat.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -174,6 +175,21 @@ TChanID CPVPManager2::getUserDynChannel( const std::string& channelName)
 		return (*it).second;
 	else
 		return DYN_CHAT_INVALID_CHAN;
+}
+
+std::string CPVPManager2::getUserDynChannel(const TChanID& channelId)
+{
+	TMAPExtraFactionChannel::iterator it;
+	for (it = _UserChannel.begin(); it != _UserChannel.end(); ++it)
+	{
+		if ((*it).second == channelId)
+		{
+			return (*it).first;
+		}
+	}
+	// should not get here
+	nlassert(false);
+	return "";
 }
 
 const std::string & CPVPManager2::getPassUserChannel( TChanID channelId)
@@ -353,7 +369,7 @@ void CPVPManager2::broadcastMessage(TChanID channel, const ucstring& speakerName
 	sendMessageViaMirror("IOS", msgout);
 }
 
-void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user)
+void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user, bool outputToSys)
 {
 	std::vector<NLMISC::CEntityId> lst;
 
@@ -367,15 +383,27 @@ void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user)
 			players += "\n"+CEntityIdTranslator::getInstance()->getByEntity(lst[i]).toString();
 		}
 
-		CMessage msgout("DYN_CHAT:SERVICE_TELL");
-		msgout.serial(channel);
-		ucstring users = ucstring("<USERS>");
-		msgout.serial(const_cast<ucstring&>(users));	
 		TDataSetRow senderRow = TheDataset.getDataSetRow(user->getId());
-		msgout.serial(senderRow);
-		ucstring txt = ucstring(players);
-		msgout.serial(const_cast<ucstring&>(txt));
-		sendMessageViaMirror( "IOS", msgout);
+		if (outputToSys)
+		{
+			players = "Players in channel \"" + getUserDynChannel(channel) + "\": " + players;
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal = players;
+			CCharacter::sendDynamicSystemMessage( user->getId(), "LITERAL", params );
+		}
+		else
+		{
+			CMessage msgout("DYN_CHAT:SERVICE_TELL");
+			msgout.serial(channel);
+			ucstring users = ucstring("<USERS>");
+			msgout.serial(const_cast<ucstring&>(users));	
+			msgout.serial(senderRow);
+			ucstring txt = ucstring(players);
+			msgout.serial(const_cast<ucstring&>(txt));
+
+			sendMessageViaMirror("IOS", msgout);
+		}
+		
 	}
 }
 
@@ -1097,6 +1125,11 @@ void CPVPManager2::createExtraFactionChannel(const std::string & channelName)
 
 TChanID CPVPManager2::createUserChannel(const std::string & channelName, const std::string & pass)
 {
+	// Don't allow channels called "GM" (to not clash with the /who gm command)
+	if (NLMISC::nlstricmp( channelName.c_str() , "GM" ) == 0)
+	{
+		return DYN_CHAT_INVALID_CHAN;
+	}
 
 	TMAPExtraFactionChannel::iterator it = _UserChannel.find(channelName);
 	if( it == _UserChannel.end() )

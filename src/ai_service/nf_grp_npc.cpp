@@ -2183,8 +2183,6 @@ void facing_cscs_(CStateInstance* entity, CScriptStack& stack)
 
 @subsection npcSay_css_
 
-A new entry of the npc contextual menu will propose to the targeter player to talk to the npc.
-
 Make a npc say a text
 
 There are 3 type of text
@@ -2199,9 +2197,9 @@ Arguments: c(group), s(botname), s(text),  ->
 
 @code
 (@group)group_name.context();
-()emote(@group, "bob", "DSS_1601 RtEntryText_6") ;// Send To dss
-()emote(@group, "bob", "RAW Ca farte?"); // phrase direcly send to IOS as raw (for debug)
-()emote(@group, "bob", "answer_group_no_m"); //phrase id
+()npcSay(@group, "bob", "DSS_1601 RtEntryText_6") ;// Send To dss
+()npcSay(@group, "bob", "RAW Ca farte?"); // phrase direcly send to IOS as raw (for debug)
+()npcSay(@group, "bob", "answer_group_no_m"); //phrase id
 
 @endcode
 
@@ -2211,6 +2209,33 @@ Arguments: c(group), s(botname), s(text),  ->
 
 #include "game_share/chat_group.h"
 #include "game_share/send_chat.h"
+
+void execSayHelper(CSpawnBot *spawnBot, NLMISC::CSString text, CChatGroup::TGroupType mode = CChatGroup::say)
+{
+	if (spawnBot)
+	{
+		NLMISC::CSString prefix = text.left(4);
+		if (prefix=="DSS_")
+		{
+			
+			NLMISC::CSString phrase = text.right(text.length() - 4);
+			NLMISC::CSString idStr = phrase.strtok(" ",false,false,false,false);
+			uint32 scenarioId = atoi(idStr.c_str());
+			forwardToDss(spawnBot->dataSetRow(), mode, phrase, scenarioId);
+			return;
+		}
+		
+		if (prefix=="RAW ")
+		{
+			std::string phrase = text.right(text.length()-4);
+			npcChatToChannelSentence(spawnBot->dataSetRow(), mode, ucstring(phrase));
+			return;
+		}
+
+		//Classic phrase ID
+		npcChatToChannel(spawnBot->dataSetRow(), mode, text);
+	}
+}
 
 void npcSay_css_(CStateInstance* entity, CScriptStack& stack)
 {
@@ -2222,27 +2247,59 @@ void npcSay_css_(CStateInstance* entity, CScriptStack& stack)
 
 	if (!spawnBot) { return; }
 
+	execSayHelper(spawnBot, text);
+	return;
+}
 
-	std::string prefix =NLMISC::CSString (text).left(4);
-	if(prefix=="DSS_")
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection npcSay_fs_
+
+Make a npc say a text
+
+Arguments: s(text), f(mode) ->
+@param[in] text is the text to say. prefix with ID: to use an id
+@param[in] mode is the mode to use (0: say, 1: shout)
+
+@code
+()npcSay("Hello!", 0); // phrase direcly send to IOS as raw
+()npcSay("ID:answer_group_no_m", 0); // phrase id
+@endcode
+
+*/
+
+void npcSay_sf_(CStateInstance* entity, CScriptStack& stack)
+{
+	float const nMode = (float)stack.top(); stack.pop();
+	std::string text = (std::string)stack.top(); stack.pop();
+
+	CChatGroup::TGroupType mode = (nMode == 1) ? CChatGroup::shout : CChatGroup::say;
+	CGroup* group = entity->getGroup();
+
+	if (group->isSpawned())
 	{
-		
-		NLMISC::CSString phrase = NLMISC::CSString (text).right(text.length()-4);
-		NLMISC::CSString idStr = phrase.strtok(" ",false,false,false,false);
-		uint32 scenarioId = atoi(idStr.c_str());
-		forwardToDss(spawnBot->dataSetRow(), CChatGroup::say, phrase, scenarioId);
-		return;
-	}
-	
-	if (prefix=="RAW ")
-	{
-		NLMISC::CSString phrase = NLMISC::CSString (text).right(text.length()-4);
-		npcChatToChannelSentence(spawnBot->dataSetRow(),CChatGroup::say, phrase);
-		return;
+		FOREACH(itBot, CCont<CBot>, group->bots())
+		{
+			CBot* bot = *itBot;
+			if (bot)
+			{
+				if (bot->isSpawned())
+				{
+					CSpawnBot *spawnBot = bot->getSpawnObj();
+					std::string prefix = NLMISC::CSString(text).left(3);
+					if (NLMISC::nlstricmp(prefix.c_str(), "id:") == 0) {
+						text = NLMISC::CSString(text).right(text.length()-3);
+						execSayHelper(spawnBot, text, mode);
+					}
+					else {
+						execSayHelper(spawnBot, "RAW " + text, mode);
+					}
+				}
+			}
+		}
 	}
 
-	//Classic phrase ID
-	npcChatToChannel(spawnBot->dataSetRow(), CChatGroup::say, text);
 	return;
 }
 
@@ -2684,6 +2741,7 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, rename_s_);
 	REGISTER_NATIVE_FUNC(functions, vpx_s_);
 	REGISTER_NATIVE_FUNC(functions, npcSay_css_);
+	REGISTER_NATIVE_FUNC(functions, npcSay_sf_);
 	REGISTER_NATIVE_FUNC(functions, dssMessage_fsss_);
 	REGISTER_NATIVE_FUNC(functions, despawnBotByAlias_s_);	
 	REGISTER_NATIVE_FUNC(functions, giveReward_ssssc_);
