@@ -2228,7 +2228,8 @@ void execSayHelper(CSpawnBot *spawnBot, NLMISC::CSString text, CChatGroup::TGrou
 		if (prefix=="RAW ")
 		{
 			std::string phrase = text.right(text.length()-4);
-			npcChatToChannelSentence(spawnBot->dataSetRow(), mode, ucstring(phrase));
+			ucstring ucstr = phrase;
+			npcChatToChannelSentence(spawnBot->dataSetRow(), mode, ucstr);
 			return;
 		}
 

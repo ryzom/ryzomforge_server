@@ -3011,7 +3011,10 @@ public:
 		}	
 
 		if(!_Id)
-			npcChatToChannelSentence(bot->dataSetRow(),CChatGroup::say, ucstring(_Sentence));
+		{
+			ucstring ucstr = _Sentence;
+			npcChatToChannelSentence(bot->dataSetRow(),CChatGroup::say, ucstr);
+		}
 		else
 		{
 			if(!_Arg)
