@@ -7101,10 +7101,9 @@ NLMISC_COMMAND(eventNpcSay, "have a bot say a text", "<bot eid> <text to say> <o
 	}
 	else
 	{
-		npcChatToChannelSentence(e->getEntityRowId(), mode, ucstring(text));
+		ucstring ucstr = text;
+		npcChatToChannelSentence(e->getEntityRowId(), mode, ucstr);
 	}
-
-	
 
 	return true;
 }
