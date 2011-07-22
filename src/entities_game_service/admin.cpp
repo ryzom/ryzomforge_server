@@ -174,6 +174,7 @@ AdminCommandsInit[] =
 		"validateRespawnPoint",				true,
 		"summonPet",						true,
 		"connectUserChannel",				true,
+		"updateTarget",                     true,
 
 		// Web commands managment
 		"webExecCommand",					true,
@@ -4323,6 +4324,13 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 	CCharacter::sendDynamicSystemMessage( eid, "EGS_CHANNEL_INVALID_NAME", params );
 	return false;
 
+}
+
+NLMISC_COMMAND (updateTarget, "Update current target", "<user id>")
+{
+	GET_CHARACTER
+	c->updateTarget();
+	return true;
 }
 
 NLMISC_COMMAND (setSalt, "Set Salt", "<dev_eid> <salt>")
