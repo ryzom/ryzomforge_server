@@ -375,6 +375,7 @@ AdminCommandsInit[] =
 		"eventSetBotURLName",				true,
 		"eventSpawnToxic",					true,
 		"eventNpcSay",						true,
+		"eventSetBotFacing",                true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -4099,7 +4100,7 @@ ENTITY_VARIABLE(Invisible, "Invisibility of a player")
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(broadcast,"[repeat=<num repeat> or during=<time in seconds>] [every=<delay in secondes>] message","<message>")
+NLMISC_COMMAND(broadcast, "Broadcast a text", "[repeat=<num repeat> or during=<time in seconds>] [every=<delay in seconds>] <message>")
 {
 	if( args.size() < 1 )
 	{
@@ -4174,7 +4175,7 @@ NLMISC_COMMAND(broadcast,"[repeat=<num repeat> or during=<time in seconds>] [eve
 
 	if( message.size() == 0 )
 	{
-		log.displayNL("You must enter a not empty message");
+		log.displayNL("You must enter a message");
 		return false;
 	}
 
@@ -4186,7 +4187,7 @@ NLMISC_COMMAND(broadcast,"[repeat=<num repeat> or during=<time in seconds>] [eve
 
 	if( ( ( repeat > 1 || during > 0 ) && every == 0 ) || ( ( every > during ) && during > 0 ) )
 	{
-		log.displayNL("Can't execute broadcast command, check you'r repeat/during/every parameters");
+		log.displayNL("Can't execute broadcast command, check your repeat/during/every parameters");
 		return false;
 	}
 
@@ -7088,7 +7089,7 @@ NLMISC_COMMAND(eventSetBotURLName, "changes the url name of a bot", "<bot eid> <
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(eventNpcSay, "have a bot say a text", "<bot eid> <text to say> <optional mode (0 = say, 1 = shout)> ")
+NLMISC_COMMAND(eventNpcSay, "have a bot say a text", "<bot eid> <text to say> <optional mode ('say', 'shout'...)> ")
 {
 	if (args.size() < 2 || args.size() > 3) return false;
 	GET_ENTITY
@@ -7098,7 +7099,7 @@ NLMISC_COMMAND(eventNpcSay, "have a bot say a text", "<bot eid> <text to say> <o
 	CChatGroup::TGroupType mode = CChatGroup::say;
 	if (args.size() == 3)
 	{
-		mode = (args[2] == "1") ? CChatGroup::shout : mode;
+		mode = CChatGroup::stringToGroupType(args[2]);
 	}
 
 	std::string prefix = NLMISC::CSString(text).left(3);
@@ -7112,6 +7113,58 @@ NLMISC_COMMAND(eventNpcSay, "have a bot say a text", "<bot eid> <text to say> <o
 		ucstring ucstr = text;
 		npcChatToChannelSentence(e->getEntityRowId(), mode, ucstr);
 	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(eventSetBotFacing, "Set the direction in which a bot faces", "<bot eid> <angle 0-360|random> [<whole group (0,1)>]")
+{
+	if (args.size () < 2) return false;
+	GET_ENTITY
+
+	float orientation = 0;
+	std::string param = args[1];
+	if (param == "random")
+	{
+		orientation = 6666; // used to specify a random orientation
+	}
+	else
+	{
+		NLMISC::fromString(args[1], orientation);
+		orientation = (orientation / 360.0 * (NLMISC::Pi * 2.0));
+	}
+
+
+	std::vector<std::string> args2;
+
+	if (args.size() == 3 && args[3] != "0")
+	{
+		// Do the whole group
+		args2.push_back(args[0]);
+		args2.push_back(NLMISC::toString("()facing(%f);", orientation));
+	}
+	else
+	{
+		// This bot only
+		TAIAlias alias = CAIAliasTranslator::getInstance()->getAIAlias(eid);
+		args2.push_back(args[0]);
+		args2.push_back(NLMISC::toString("()facing(\"%s\",%f);", NLMISC::toString(alias).c_str(), orientation));
+	}
+
+	uint32 instanceNumber = e->getInstanceNumber();
+	uint32 nbString = args2.size();
+
+	CMessage msgout("EVENT_NPC_GROUP_SCRIPT");
+	uint32 messageVersion = 1;
+	msgout.serial(messageVersion);
+	msgout.serial(nbString);
+	for (uint32 i=0; i<nbString; ++i)
+	{
+		string arg = args2[i];
+		msgout.serial(arg);
+	}
+	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
 
 	return true;
 }

@@ -4581,6 +4581,64 @@ void setConditionSuccess_f_(CStateInstance* entity, CScriptStack& stack)
 	CAILogicDynamicIfHelper::setConditionSuccess(conditionState);
 }
 
+inline
+static float randomAngle()
+{
+	uint32 const maxLimit = CAngle::PI*2;
+	float val = (float)CAIS::rand32(maxLimit);
+	return val;
+}
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection facing_f_
+
+The npc will face the given direction
+
+
+Arguments: f(direction)
+@param[in] direction is the new angle of the bot in radians
+
+@code
+()facing(3.14);
+@endcode
+
+*/
+
+// CStateInstance
+void facing_f_(CStateInstance* entity, CScriptStack& stack)
+{
+	float const theta = (float)stack.top(); stack.pop();
+	CGroup* group = entity->getGroup();
+
+	bool bRandomAngle = false;
+	if (theta > (NLMISC::Pi * 2.0) || theta < (-NLMISC::Pi * 2.0))
+		bRandomAngle = true;
+
+	if (group->isSpawned())
+	{
+		FOREACH(itBot, CCont<CBot>, group->bots())
+		{
+			CBot* bot = *itBot;
+			if (bot)
+			{
+				if (bot->isSpawned())
+				{
+					CSpawnBot *spawnBot = bot->getSpawnObj();
+
+					if (bRandomAngle)
+						spawnBot->setTheta(randomAngle());
+					else
+						spawnBot->setTheta(theta);
+					
+				}
+			}
+		}
+	}
+
+	return;
+}
 
 std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 {
@@ -4653,8 +4711,7 @@ std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, setSheet_s_);
 	REGISTER_NATIVE_FUNC(functions, setHealer_f_);
 	REGISTER_NATIVE_FUNC(functions, setConditionSuccess_f_);
-
-
+	REGISTER_NATIVE_FUNC(functions, facing_f_);
 
 	// Boss functions (custom text)
 	REGISTER_NATIVE_FUNC(functions, phraseBegin__);

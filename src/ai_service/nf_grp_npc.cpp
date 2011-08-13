@@ -2177,7 +2177,6 @@ void facing_cscs_(CStateInstance* entity, CScriptStack& stack)
 	//	bot1->setTheta(bot1->pos().angleTo(bot2->pos()));
 }
 
-
 //----------------------------------------------------------------------------
 /** @page code
 
@@ -2255,27 +2254,28 @@ void npcSay_css_(CStateInstance* entity, CScriptStack& stack)
 //----------------------------------------------------------------------------
 /** @page code
 
-@subsection npcSay_fs_
+@subsection npcSay_ss_
 
 Make a npc say a text
 
-Arguments: s(text), f(mode) ->
+Arguments: s(text), s(mode) ->
 @param[in] text is the text to say. prefix with ID: to use an id
-@param[in] mode is the mode to use (0: say, 1: shout)
+@param[in] mode is the mode to use (say, shout)
 
 @code
-()npcSay("Hello!", 0); // phrase direcly send to IOS as raw
+()npcSay("Hello!","say"); // phrase direcly send to IOS as raw
 ()npcSay("ID:answer_group_no_m", 0); // phrase id
 @endcode
 
 */
 
-void npcSay_sf_(CStateInstance* entity, CScriptStack& stack)
+void npcSay_ss_(CStateInstance* entity, CScriptStack& stack)
 {
-	float const nMode = (float)stack.top(); stack.pop();
+	std::string sMode = (std::string)stack.top(); stack.pop();
 	std::string text = (std::string)stack.top(); stack.pop();
 
-	CChatGroup::TGroupType mode = (nMode == 1) ? CChatGroup::shout : CChatGroup::say;
+	CChatGroup::TGroupType mode = CChatGroup::say;
+	mode = CChatGroup::stringToGroupType(sMode);
 	CGroup* group = entity->getGroup();
 
 	if (group->isSpawned())
@@ -2742,7 +2742,7 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, rename_s_);
 	REGISTER_NATIVE_FUNC(functions, vpx_s_);
 	REGISTER_NATIVE_FUNC(functions, npcSay_css_);
-	REGISTER_NATIVE_FUNC(functions, npcSay_sf_);
+	REGISTER_NATIVE_FUNC(functions, npcSay_ss_);
 	REGISTER_NATIVE_FUNC(functions, dssMessage_fsss_);
 	REGISTER_NATIVE_FUNC(functions, despawnBotByAlias_s_);	
 	REGISTER_NATIVE_FUNC(functions, giveReward_ssssc_);
