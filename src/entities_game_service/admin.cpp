@@ -3843,8 +3843,6 @@ NLMISC_COMMAND (unmuteUniverse, "unmute the univers chat", "<csr id><player name
 //----------------------------------------------------------------------------
 NLMISC_COMMAND (setGMGuild, "set the current GM guild", "")
 {
-	if ( args.size() != 1 )
-		return false;
 	GET_CHARACTER;
 	uint32 guildId = c->getGuildId();
 	CGuildManager::getInstance()->setGMGuild( guildId );
