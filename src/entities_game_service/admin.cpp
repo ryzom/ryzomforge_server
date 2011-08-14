@@ -3910,15 +3910,15 @@ NLMISC_COMMAND (targetInfos, "give infos on the target", "")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND (infos, "give info on character (GodMode, Invisible...)", "")
 {
-	CSString str("GM STATUS: ");
+	CSString str("INFO: ");
 	GET_CHARACTER
 	if( c->invulnerableMode() )
 	{
-		str << "INVULNERABLE MODE ";
+		str << "INVULNERABLE_MODE ";
 	}
 	if( c->godMode() )
 	{
-		str << "GOD MODE ";
+		str << "GOD_MODE ";
 	}
 	else
 	{
@@ -3934,31 +3934,29 @@ NLMISC_COMMAND (infos, "give info on character (GodMode, Invisible...)", "")
 	{
 		if (IsRingShard)
 		{
-			str << "INVISIBLE(" <<R2_VISION::extractInvisibilityLevel(c->getWhoSeesMe()) << ")";
+			str << "INVISIBLE(" <<R2_VISION::extractInvisibilityLevel(c->getWhoSeesMe()) << ") ";
 		}
 		else
 		{
-			str << "INVISIBLE";
+			str << "INVISIBLE ";
 		}
 	}
 
 	if ( IsRingShard && R2_VISION::extractVisionLevel(c->getWhoSeesMe())!=R2_VISION::VISIBLE )
 	{
-		str << "SEEINVIS(" << R2_VISION::extractVisionLevel(c->getWhoSeesMe()) << ")";
+		str << "SEEINVIS(" << R2_VISION::extractVisionLevel(c->getWhoSeesMe()) << ") ";
 	}
 
 	if (c->getAggroableSave())
 	{
-		str << " AGGROABLE";
+		str << "AGGROABLE ";
 	}
 	else
 	{
-		str << " NOT_AGGROABLE";
+		str << "NOT_AGGROABLE ";
 	}
 
-	SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
-	params[0].Literal = str;
-	CCharacter::sendDynamicSystemMessage( eid,"LITERAL", params );
+	log.displayNL(str.c_str());
 	return true;
 }
 
@@ -6323,7 +6321,7 @@ NLMISC_COMMAND(eventNpcGroupScript, "executes a script on an event npc group", "
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid> <botname> <script>")
+NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid> <groupname> <script>")
 {
 	if (args.size () < 3) return false;
 	GET_CHARACTER
