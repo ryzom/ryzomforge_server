@@ -175,6 +175,7 @@ AdminCommandsInit[] =
 		"summonPet",						true,
 		"connectUserChannel",				true,
 		"updateTarget",                     true,
+		"resetName",						true,
 
 		// Web commands managment
 		"webExecCommand",					true,
@@ -301,7 +302,8 @@ AdminCommandsInit[] =
 		"RyzomTime",						false,
 		"addGuildXp",						false,
 		"setGuildChargePoint",				false,
-
+		"characterInventoryDump",			true,
+		"deleteInventoryItem",				true,
 
 		// PUT HERE THE VARIABLE / COMMAND THAT ARE TEMPORARY
 		// remove when message of the day interface is ready
@@ -7162,5 +7164,88 @@ NLMISC_COMMAND(eventSetBotFacing, "Set the direction in which a bot faces", "<bo
 	}
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
 
+	return true;
+}
+
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <inventory>")
+{
+	if (args.size () < 2) return false;
+	GET_CHARACTER
+
+	string selected_inv = args[1];
+
+	CInventoryPtr inventory = getInv(c, selected_inv);
+
+	for (uint32 i = 0; i < inventory->getSlotCount(); ++ i)
+	{
+		const CGameItemPtr itemPtr = inventory->getItem(i);
+		if (itemPtr != NULL)
+		{
+			log.displayNL("SLOT %d: SHEETID: %s    QUALITY: %d   QUANTITY: %d", 
+				i,
+				itemPtr->getSheetId().toString().c_str(),
+				itemPtr->quality(),
+				itemPtr->getStackSize(),
+				itemPtr->getPhraseId().c_str()
+			);
+		}
+	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(deleteInventoryItem, "Delete an item from a characters inventory", "<eid> <inventory> <slot> <sheetname> <quality> <quantity>")
+{
+	if (args.size () < 6) return false;
+	GET_CHARACTER
+
+	string selected_inv = args[1];
+
+	sint32 slot = -1;
+	fromString(args[2], slot);
+
+	string sheet_name = args[3];
+
+	uint32 quality = 0;
+	fromString(args[4], quality);
+
+	uint32 quantity = 0;
+	fromString(args[5], quantity);
+
+	if (sheet_name.find(".") == string::npos)
+		sheet_name += ".sitem";
+
+	CInventoryPtr inventory = getInv(c, selected_inv);
+
+	if (slot < 0 || quality == 0 || quantity == 0) return false;
+
+	const CGameItemPtr itemPtr = inventory->getItem(slot);
+	if (itemPtr != NULL)
+	{
+		if (itemPtr->getSheetId().toString() == sheet_name &&
+			itemPtr->quality() == quality &&
+			itemPtr->getStackSize() >= quantity)
+		{
+			log.displayNL("Deleted item '%s' in slot %d of inventory '%s'", 
+				itemPtr->getSheetId().toString().c_str(),
+				slot,
+				INVENTORIES::toString(inventory->getInventoryId()).c_str()
+			);
+			inventory->deleteStackItem(slot, quantity);
+		}
+	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND (resetName, "Reset your name; undo a temporary rename", "<user id>")
+{
+	GET_CHARACTER
+	c->registerName();
 	return true;
 }
