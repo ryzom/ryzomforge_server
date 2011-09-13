@@ -2569,6 +2569,7 @@ void rename_s_(CStateInstance* entity, CScriptStack& stack)
 						msgout.serial(row);
 						msgout.serial(name);
 						sendMessageViaMirror("IOS", msgout);
+						bot->setCustomName(newName);
 					}
 				}
 			}
