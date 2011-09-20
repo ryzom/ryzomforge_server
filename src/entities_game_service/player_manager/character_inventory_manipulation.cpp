@@ -2453,7 +2453,7 @@ void CCharacter::sendItemInfos( uint16 slotId )
 				infos.CustomText = ucstring("@WEBIG "+cUrl);
 			}
 			else
-				infos.CustomText = "";
+				infos.CustomText = item->getCustomText();
 		}
 		else
 			infos.CustomText = item->getCustomText();
