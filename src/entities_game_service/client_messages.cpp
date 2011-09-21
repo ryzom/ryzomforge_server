@@ -857,7 +857,8 @@ void cbClientTeamSetSuccessor( NLNET::CMessage& msgin, const std::string &servic
 
 	CEntityId id;
 	uint8 idx;
-	msgin.serial( id,idx );
+	msgin.serial(id);
+	msgin.serial(idx);
 	CCharacter* user = PlayerManager.getChar( id );
 	if ( !user )
 	{
@@ -872,9 +873,17 @@ void cbClientTeamSetSuccessor( NLNET::CMessage& msgin, const std::string &servic
 	}
 	if ( team->getLeader() != id )
 	{
-		nlwarning("<TEAM> user %s is not leader : cant set successor",id.toString().c_str() );
+		nlwarning("<TEAM> user %s is not leader: cant set successor",id.toString().c_str() );
 		return;
 	}
+	if (team->getSuccessor() == id)
+	{
+		nlwarning("<TEAM> user %s already is successor", id.toString().c_str() );
+		return;
+	}
+
+	// increment the target index as the leader is not in its team list
+	++idx;
 	team->setSuccessor( idx );
 
 }

@@ -423,7 +423,7 @@ void CTeamManager::removeCharacter( const CEntityId &charId )
 		{
 			const list<CEntityId> &members = team->getTeamMembers();
 			
-			CEntityId eId(*(++members.begin()));
+			CEntityId eId(team->getSuccessor());
 			params[0].setEIdAIAlias( eId, CAIAliasTranslator::getInstance()->getAIAlias(eId) );
 			PHRASE_UTILITIES::sendDynamicSystemMessage(TheDataset.getDataSetRow(charId), "TEAM_YOU_LEAVE_LEADER", params);
 		}

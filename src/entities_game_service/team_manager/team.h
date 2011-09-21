@@ -73,16 +73,29 @@ public:
 	void removeCharacter( CCharacter * newChar );
 
 	/**
-	 * set the successor of the team leader
-	 * \param memberIdx is the index of the member in hte team
+	 * return the index of team leader successor
+	 * 
 	 */
-	void setSuccessor( uint8 memberIdx );
+	uint8 CTeam::getSuccessorIndex(void);
+
+	/**
+	 * set the successor of the team leader
+	 * \param memberIdx is the index of the member in the team
+	 * \param bMessage whether to show the message
+	 */
+	void setSuccessor( uint8 memberIdx, bool bMessage = true );
 	
 	/**
 	 * get the leader of the team
 	 * \return team leader Id
 	 */
 	inline const NLMISC::CEntityId & getLeader() const { return _LeaderId; }
+
+	/**
+	 * get the successor of the team
+	 * \return successor Id
+	 */
+	inline const NLMISC::CEntityId & getSuccessor() const { return _SuccessorId; }
 
 	///\return number of team members
 	inline uint8 getTeamSize() const { return _NbMembers; }
