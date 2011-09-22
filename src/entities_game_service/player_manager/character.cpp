@@ -10174,6 +10174,17 @@ void CCharacter::exchangeProposal()
 			return;
 		}
 
+		// If not a privileged player and in ignorelist, don't trade
+		if ( !haveAnyPrivilege() && c->hasInIgnoreList( getId() ) )
+		{
+			params.resize(1);
+			params[0].Type = STRING_MANAGER::player;
+			params[0].setEIdAIAlias( c->getId(), CAIAliasTranslator::getInstance()->getAIAlias(c->getId()) );
+			CCharacter::sendDynamicSystemMessage(_EntityRowId, "EXCHANGE_DECLINE", params);
+			return;
+		}
+
+
 		//set the target's exchange asker, and inform the target
 		c->_ExchangeAsker = _Id;
 
@@ -15821,6 +15832,7 @@ void CCharacter::sendEmote( const NLMISC::CEntityId& id, MBEHAV::EBehaviour beha
 			uint32 txtId = STRING_MANAGER::sendStringToClient( targetRow, phraseCont->TargetTarget, params );
 			// send emote message to IOS
 			NLNET::CMessage	msgout("EMOTE_PLAYER");
+			msgout.serial( const_cast<TDataSetRow&>( getEntityRowId() ) );
 			msgout.serial( targetRow );
 			msgout.serial(txtId);
 			sendMessageViaMirror("IOS", msgout);
@@ -15831,7 +15843,8 @@ void CCharacter::sendEmote( const NLMISC::CEntityId& id, MBEHAV::EBehaviour beha
 	uint32 txtId = STRING_MANAGER::sendStringToClient(getEntityRowId(), *self, params );
 	// send emote message to IOS
 	NLNET::CMessage	msgout("EMOTE_PLAYER");
-	msgout.serial( const_cast<TDataSetRow&>( getEntityRowId() ) );
+	msgout.serial( const_cast<TDataSetRow&>( getEntityRowId() ) ); // sender
+	msgout.serial( const_cast<TDataSetRow&>( getEntityRowId() ) ); // receiver
 	msgout.serial(txtId);
 	sendMessageViaMirror("IOS", msgout);
 

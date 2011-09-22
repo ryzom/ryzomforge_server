@@ -1513,12 +1513,14 @@ void cbEmoteCrowd( CMessage& msgin, const string &serviceName, TServiceId servic
 //-----------------------------------------------
 void cbEmoteSolePlayer( CMessage& msgin, const string &serviceName, TServiceId serviceId )
 {
+	TDataSetRow				sender;
 	TDataSetRow				target;
 	uint32					phraseId;
+	msgin.serial(sender);
 	msgin.serial(target);
 	msgin.serial(phraseId);
 	CChatManager &cm = IOS->getChatManager();
-	cm.sendEmoteTextToPlayer( target,phraseId );
+	cm.sendEmoteTextToPlayer(sender, target, phraseId );
 }
 
 

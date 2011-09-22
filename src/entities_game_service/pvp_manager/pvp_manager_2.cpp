@@ -1278,6 +1278,14 @@ void CPVPManager2::askForDuel( const NLMISC::CEntityId & userId )
 		return;
 	}
 
+	// If not a privileged player and in ignorelist, cannot duel
+	if ( !user->haveAnyPrivilege() && target->hasInIgnoreList( user->getId() ) )
+	{
+		params[0].setEIdAIAlias( target->getId(), CAIAliasTranslator::getInstance()->getAIAlias(target->getId()) );
+		CCharacter::sendDynamicSystemMessage(userId, "DUEL_REFUSE_INVITATION", params);
+		return;
+	}
+
 	// remove previous invitation, and check that user is not invited
 	bool problem = false;
 
