@@ -4544,13 +4544,31 @@ bool CCharacter::fillFaberMaterialArray( vector<CFaberMsgItem>& materialsSelecte
 	lowerMaterialQuality = USHRT_MAX;
 	for( uint s = 0; s < materialsSelectedForFaber.size(); ++s )
 	{
+		bool bOk = false;
+		CInventoryPtr pInv = NULL;
 		if( materialsSelectedForFaber[ s ].getInvId() >= INVENTORIES::NUM_INVENTORY )
 		{
-			nlwarning("<CCharacter::fillFaberMaterialArray> CFaberMsgItem[%d] sended by client contains an invalid inventory index %d", s, materialsSelectedForFaber[ s ].getInvId() );
-			return false;
+			// Also allow crafting from player's room
+			if (materialsSelectedForFaber[ s ].getInvId() == INVENTORIES::player_room)
+			{
+				if (getRoomInterface().isValid() && getRoomInterface().canUseInventory(this, this))
+				{
+					pInv = getRoomInterface().getInventory();
+					bOk = true;
+				}
+			}
+
+			if ( ! bOk) 
+			{
+				nlwarning("<CCharacter::fillFaberMaterialArray> CFaberMsgItem[%d] sended by client contains an invalid inventory index %d", s, materialsSelectedForFaber[ s ].getInvId() );
+				return false;
+			}
+		}
+		else
+		{
+			pInv = _Inventory[ materialsSelectedForFaber[ s ].getInvId() ];
 		}
 
-		CInventoryPtr pInv = _Inventory[ materialsSelectedForFaber[ s ].getInvId() ];
 		if( materialsSelectedForFaber[ s ].IndexInInv >= pInv->getSlotCount() )
 		{
 			nlwarning("<CCharacter::fillFaberMaterialArray> CFaberMsgItem[%d] sended by client contains an invalid index %d for inventory %d", s, materialsSelectedForFaber[ s ].IndexInInv, materialsSelectedForFaber[ s ].getInvId() );
