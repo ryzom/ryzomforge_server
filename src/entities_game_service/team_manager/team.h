@@ -76,7 +76,7 @@ public:
 	 * return the index of team leader successor
 	 * 
 	 */
-	uint8 CTeam::getSuccessorIndex(void);
+	uint8 getSuccessorIndex(void);
 
 	/**
 	 * set the successor of the team leader
