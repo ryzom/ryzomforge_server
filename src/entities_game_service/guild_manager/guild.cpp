@@ -1042,23 +1042,34 @@ uint16 CGuild::getMaxGradeCount(EGSPD::CGuildGrade::TGuildGrade grade)const
 	for ( uint i = 0; i < size; ++i )
 		count+=_GradeCounts[i];
 	
-	if ( grade == EGSPD::CGuildGrade::Leader )
-		return 1;
-	if ( grade == EGSPD::CGuildGrade::HighOfficer )
+	switch (grade)
 	{
-		count *= 5;
-		if ( count %100 == 0 )
-			return count/100;
-		else
-			return count/100 + 1;
-	}
-	if ( grade == EGSPD::CGuildGrade::Officer )
-	{
-		count *= 10;
-		if ( count %100 == 0 )
-			return count/100;
-		else
-			return count/100 + 1;
+		case EGSPD::CGuildGrade::Leader:
+			return 1;
+			break;
+		case EGSPD::CGuildGrade::HighOfficer:
+		{
+			return GuildMaxMemberCount;
+			/*
+			count *= 5;
+			if ( count %100 == 0 )
+				return count/100;
+			else
+				return count/100 + 1;
+			*/
+		}
+		break;
+		case EGSPD::CGuildGrade::Officer:
+		{
+			return GuildMaxMemberCount;
+			/*
+			count *= 10;
+			if ( count %100 == 0 )
+				return count/100;
+			else
+				return count/100 + 1;
+			*/
+		}
 	}
 	return 0xFFFF;
 }
