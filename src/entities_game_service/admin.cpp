@@ -314,6 +314,8 @@ AdminCommandsInit[] =
 		"EntitiesNoActionFailure",			false,
 		"EntitiesNoCastBreak",				false,
 		"EntitiesNoResist",					false,
+		"lockItem",                         true,
+		"setTeamLeader",                    true,
 		// aggroable state
 		"Aggro",							true,
 
@@ -7247,5 +7249,63 @@ NLMISC_COMMAND (resetName, "Reset your name; undo a temporary rename", "<user id
 {
 	GET_CHARACTER
 	c->registerName();
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND (lockItem, "Lock/unlock item in inventory", "<user id> <inventory> <slot> <lock=0,1>")
+{
+	if (args.size () < 4) return false;
+	GET_CHARACTER;
+
+	string selected_inv = args[1];
+	bool lock = (args[3] != "0");
+	sint32 slot = -1;
+	fromString(args[2], slot);
+
+	CInventoryPtr inventory = getInv(c, selected_inv);
+
+	if (slot < 0 || slot >= INVENTORIES::NbBagSlots) return false;
+
+	const CGameItemPtr itemPtr = inventory->getItem(slot);
+	if (itemPtr != NULL)
+	{
+		// If some of the stack is locked for trading, cannot owner-lock.
+		if (itemPtr->getNonLockedStackSize() < itemPtr->getStackSize())
+		{
+			// TODO: send error message to client?
+			return false;
+		}
+		itemPtr->setLockedByOwner(lock);
+	}
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND (setTeamLeader, "Set the leader of the team", "<user id> <member>")
+{
+	if (args.size () < 2) return false;
+	GET_CHARACTER;
+
+	uint8 idx = 0;
+	fromString(args[1], idx);
+
+	CTeam *team = TeamManager.getTeam(c->getTeamId());
+
+	if ( ! team)
+	{
+		nlwarning("<TEAM> Invalid team for user %s",c->getId().toString().c_str() );
+		return false;
+	}
+	if (team->getLeader() != c->getId())
+	{
+		nlwarning("<TEAM> user %s is not leader: cant set leader",c->getId().toString().c_str() );
+		return false;
+	}
+
+	// increment the target index as the leader is not in his own team list
+	++idx;
+	team->setLeader(idx);
+	team->updateMembersDb();
 	return true;
 }
