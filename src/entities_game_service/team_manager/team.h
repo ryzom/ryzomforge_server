@@ -79,6 +79,20 @@ public:
 	uint8 getSuccessorIndex(void);
 
 	/**
+	 * set the team leader
+	 * \param id is the Entity ID of the member in the team
+	 * \param bMessage whether to show the message
+	 */
+	void setLeader(NLMISC::CEntityId id, bool bMessage = true);
+	
+	/**
+	 * set the team leader
+	 * \param memberIdx is the index of the member in the team
+	 * \param bMessage whether to show the message
+	 */
+	void setLeader(uint8 memberIdx, bool bMessage = true);
+
+	/**
 	 * set the successor of the team leader
 	 * \param memberIdx is the index of the member in the team
 	 * \param bMessage whether to show the message
@@ -184,6 +198,7 @@ public:
 
 	CMissionTeam* getMissionByAlias( TAIAlias missionAlias );
 	
+	void updateMembersDb();
 		/*
 	bool processMissionStepEvent(std::list< const CMissionEvent* > & eventList, uint missionIndex, uint32 stepIndex );
 	bool processMissionEvent( std::list< const CMissionEvent* > & eventList, uint missionIndex, uint32 stepIndex );

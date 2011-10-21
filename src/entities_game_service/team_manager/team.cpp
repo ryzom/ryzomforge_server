@@ -438,45 +438,7 @@ void CTeam::removeCharacter( CCharacter * player )
 	// if that was the leader, get another one
 	else if ( _LeaderId == charId )
 	{
-		_LeaderId = _SuccessorId;
-		_SuccessorId = CEntityId::Unknown;
-
-		// Move new leader to top of list
-		_TeamMembers.remove(_LeaderId);
-		_TeamMembers.insert(_TeamMembers.begin(), _LeaderId);
-
-		// switch dyn chat speaker
-		CMissionManager::getInstance()->switchDynChatSpeaker(player,_LeaderId);
-
-		// inform the new leader
-		SM_STATIC_PARAMS_1(params1, STRING_MANAGER::player);		
-		params1[0].setEId( charId );
-		PHRASE_UTILITIES::sendDynamicSystemMessage(TheDataset.getDataSetRow(_LeaderId), "TEAM_YOU_NEW_LEADER", params1);
-
-		// inform the group 
-		SM_STATIC_PARAMS_2(params, STRING_MANAGER::player, STRING_MANAGER::player);		
-		params[0].setEId( charId );
-		params[1].setEId( _LeaderId );
-
-		set<CEntityId> exclude;
-		exclude.insert( _LeaderId );
-		exclude.insert( charId );
-		sendDynamicMessageToMembers("TEAM_NEW_LEADER", params, exclude);
-
-		// Set the new successor to next in line
-		setSuccessor(1);
-
-		// update leader DB
-		CCharacter *leader = PlayerManager.getOnlineChar( _LeaderId );
-		if (leader)
-		{
-//			leader->_PropertyDatabase.setProp( "GROUP:LEADER_INDEX", -1 );
-			CBankAccessor_PLR::getGROUP().setLEADER_INDEX(leader->_PropertyDatabase, 0xf);
-//			leader->_PropertyDatabase.setProp( "GROUP:SUCCESSOR_INDEX", 0 );
-			//CBankAccessor_PLR::getGROUP().setSUCCESSOR_INDEX(leader->_PropertyDatabase, 0);
-		}
-		else
-			nlwarning("<CTeam removeCharacter> invalid new leader %s", _LeaderId.toString().c_str() );
+		setLeader(_SuccessorId);
 	}
 	else if ( _SuccessorId == charId )
 	{
@@ -603,6 +565,70 @@ uint8 CTeam::getSuccessorIndex(void)
 		++i;
 	}
 	return i;
+}
+
+void CTeam::setLeader(CEntityId id, bool bMessage)
+{
+	_LeaderId = id;
+
+	// Move new leader to top of list
+	_TeamMembers.remove(_LeaderId);
+	_TeamMembers.insert(_TeamMembers.begin(), _LeaderId);
+
+	// inform the new leader
+	SM_STATIC_PARAMS_1(params1, STRING_MANAGER::player);		
+	params1[0].setEId( id );
+	PHRASE_UTILITIES::sendDynamicSystemMessage(TheDataset.getDataSetRow(_LeaderId), "TEAM_YOU_NEW_LEADER", params1);
+
+	// inform the group 
+	SM_STATIC_PARAMS_2(params, STRING_MANAGER::player, STRING_MANAGER::player);		
+	params[0].setEId( id );
+	params[1].setEId( _LeaderId );
+
+	set<CEntityId> exclude;
+	exclude.insert( _LeaderId );
+	exclude.insert( id );
+	sendDynamicMessageToMembers("TEAM_NEW_LEADER", params, exclude);
+
+	// New leader was successor, choose a new successor
+	if (id == _SuccessorId)
+	{
+		_SuccessorId = CEntityId::Unknown;
+		// Set the new successor to next in line
+		setSuccessor(1);
+	}
+
+	// update leader DB
+	CCharacter *leader = PlayerManager.getOnlineChar( _LeaderId );
+	if (leader)
+	{
+		// switch dyn chat speaker
+		CMissionManager::getInstance()->switchDynChatSpeaker(leader, _LeaderId);
+
+		CBankAccessor_PLR::getGROUP().setLEADER_INDEX(leader->_PropertyDatabase, 0xf);
+	}
+	else
+		nlwarning("<CTeam setLeader> invalid new leader %s", _LeaderId.toString().c_str() );
+
+}
+
+void CTeam::setLeader(uint8 memberIdx, bool bMessage)
+{
+	list<CEntityId>::const_iterator it = _TeamMembers.begin();
+	uint8 i = 0;
+	for (; it != _TeamMembers.end(); ++it)
+	{
+		if ( i == memberIdx )
+			break;
+		++i;
+	}
+	if ( it == _TeamMembers.end() )
+	{
+		nlwarning("invalid team member %u : count is %u", memberIdx,_TeamMembers.size() );
+		return;
+	}
+	CEntityId newLeaderId = (*it);
+	setLeader(newLeaderId, bMessage);
 }
 
 void CTeam::setSuccessor( uint8 memberIdx, bool bMessage)
@@ -1069,22 +1095,71 @@ CMissionTeam* CTeam::getMissionByAlias( TAIAlias missionAlias )
 	return NULL;
 }
 
+void CTeam::updateMembersDb()
+{
+	for (std::list<NLMISC::CEntityId>::iterator it = _TeamMembers.begin() ; it != _TeamMembers.end() ; ++it)
+	{
+		uint8 hp, sap, stamina;
+		uint32 nameId;
+		uint pos = 0;
 
+		CCharacter * ch1 = PlayerManager.getOnlineChar( (*it) );
 
+		if (ch1->getId() == _LeaderId)
+		{
+			CBankAccessor_PLR::getGROUP().setLEADER_INDEX(ch1->_PropertyDatabase, 0xf);
+		}
+		else 
+		{
+			CBankAccessor_PLR::getGROUP().setLEADER_INDEX(ch1->_PropertyDatabase, 0);
+		}
+		///\todo log if nothing
+		if (ch1)
+		{
+			for (std::list<NLMISC::CEntityId>::iterator it2 = _TeamMembers.begin() ; it2 != _TeamMembers.end() ; ++it2)
+			{
+				if ( (*it) == (*it2) )
+					continue;	
 
+				CBankAccessor_PLR::TGROUP::TArray &groupItem = CBankAccessor_PLR::getGROUP().getArray(pos);
 
+				CCharacter * ch2 = PlayerManager.getOnlineChar( (*it2) );	
+				if (ch2 != NULL)
+				{
+					// update new char for old char
+					if ( ch2->getPhysScores()._PhysicalScores[ SCORES::hit_points ].Max != 0)
+						hp = (uint8) ( ( float(TeamMembersStatusMaxValue) * ( ch2->getPhysScores()._PhysicalScores[ SCORES::hit_points ].Current ) ) / ( ch2->getPhysScores()._PhysicalScores[ SCORES::hit_points ].Max ) );
+					else
+						hp = 0;
+					if ( ch2->getPhysScores()._PhysicalScores[ SCORES::sap ].Max != 0)
+						sap = (uint8) ( ( float(TeamMembersStatusMaxValue) * ( ch2->getPhysScores()._PhysicalScores[ SCORES::sap ].Current ) ) / ( ch2->getPhysScores()._PhysicalScores[ SCORES::sap ].Max ) );
+					else
+						sap = 0;
+					if ( ch2->getPhysScores()._PhysicalScores[ SCORES::stamina ].Max != 0)
+						stamina = (uint8) ( ( float(TeamMembersStatusMaxValue) * ( ch2->getPhysScores()._PhysicalScores[ SCORES::stamina ].Current ) ) / ( ch2->getPhysScores()._PhysicalScores[ SCORES::stamina ].Max ) );
+					else
+						stamina = 0;
+					
+					CMirrorPropValueRO<uint32> nameIndexValue( TheDataset, ch2->getId(), "NameIndex" );
+					nameId = nameIndexValue();
+									
+					groupItem.setHP(ch1->_PropertyDatabase, hp);
+					groupItem.setSAP(ch1->_PropertyDatabase, sap);
+					groupItem.setSTA(ch1->_PropertyDatabase, stamina);
+					groupItem.setNAME(ch1->_PropertyDatabase, nameId);
+					groupItem.setUID(ch1->_PropertyDatabase, ch2->getEntityRowId().getCompressedIndex());
+					groupItem.setPRESENT(ch1->_PropertyDatabase, true);
+				}
+				pos++;
+			}
 
+			CBankAccessor_PLR::TGROUP::TArray &groupItem = CBankAccessor_PLR::getGROUP().getArray(pos);
 
-
-
-
-
-
-
-
-
-
-
-
+			groupItem.setHP(ch1->_PropertyDatabase, 0);
+			groupItem.setNAME(ch1->_PropertyDatabase, 0);
+			groupItem.setUID(ch1->_PropertyDatabase, CLFECOMMON::INVALID_CLIENT_DATASET_INDEX);
+		}
+	}
+}
 
 
