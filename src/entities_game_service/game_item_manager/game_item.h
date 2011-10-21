@@ -679,6 +679,9 @@ public :
 	/// set required skill level
 	inline void setRequiredSkillLevel2( uint16 l ) { _RequiredSkillLevel2 = l; }
 
+	bool getLockedByOwner() const { return _LockedByOwner; }
+	void setLockedByOwner(bool value);
+
 	/// get required stat
 	inline CHARACTERISTICS::TCharacteristics getRequiredCharac() const { return _RequiredCharac; }
 	/// set required stat
@@ -947,6 +950,7 @@ private:
 	std::vector<CTypeSkillMod>	_TypeSkillMods;
 
 	ucstring			_CustomText;
+	bool                _LockedByOwner;
 };
 
 /**

@@ -1146,6 +1146,14 @@ uint32	CGameItem::getNonLockedStackSize()
 		return _StackSize - _LockCount;
 }
 
+void CGameItem::setLockedByOwner(bool value)
+{
+	if (value != _LockedByOwner)
+	{
+		_LockedByOwner = value;
+		callItemChanged(INVENTORIES::TItemChangeFlags(INVENTORIES::itc_lock_state));
+	}
+}
 
 //-----------------------------------------------
 // getCopy :
@@ -1361,6 +1369,8 @@ void CGameItem::clear()
 	_RequiredCharac = CHARACTERISTICS::Unknown;
 	_RequiredCharacLevel = 0;
 	_HasPrerequisit= false;
+
+	_LockedByOwner = false;
 
 	_TypeSkillMods.clear();
 	_PhraseId.clear();

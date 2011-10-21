@@ -1344,6 +1344,7 @@ private:
 	STRUCT_VECT(_TypeSkillMods)\
 	LPROP_VECT(CSheetId, _Enchantment, VECT_LOGIC(_Enchantment) if (_Enchantment[i]!=CSheetId::Unknown))\
 	PROP2(_CustomText,					ucstring,	_CustomText,				_CustomText=val)\
+	PROP(bool, _LockedByOwner)\
 	
 #pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
