@@ -2264,7 +2264,7 @@ Arguments: s(text), s(mode) ->
 
 @code
 ()npcSay("Hello!","say"); // phrase direcly send to IOS as raw
-()npcSay("ID:answer_group_no_m", 0); // phrase id
+()npcSay("ID:answer_group_no_m","shout"); // phrase id
 @endcode
 
 */
