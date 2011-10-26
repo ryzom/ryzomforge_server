@@ -104,6 +104,7 @@
 #include "server_share/log_command_gen.h"
 #include "server_share/log_item_gen.h"
 #include "server_share/log_character_gen.h"
+#include "server_share/used_continent.h"
 
 //
 // Externs
@@ -394,6 +395,22 @@ static void loadCommandsPrivileges(const string & fileName, bool init);
 void cbRemoteClientCallback (uint32 rid, const std::string &cmd, const std::string &entityNames);
 //
 
+// get AI instance and remove it form the group name
+bool getAIInstanceFromGroupName(string& groupName, uint32& instanceNumber)
+{
+	if (groupName.find("@") != string::npos)
+	{
+		string continent = groupName.substr(0, groupName.find('@'));
+		uint32 nr = CUsedContinent::instance().getInstanceForContinent(continent);
+		if (nr == ~0)
+		{
+			return false;
+		}
+		instanceNumber = nr;
+		groupName = groupName.substr(groupName.find('@'), groupName.size());
+	}
+	return true;
+}
 
 CAdminCommand * findAdminCommand(const string & name)
 {
@@ -4839,15 +4856,19 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (botsName == "*")
 			botsName.clear();
 
-		if (command_args.size()>6)
+		if (command_args.size()>7)
 		{
 			NLMISC::fromString(command_args[6], x);
 			x = x * 1000;
-		}
-		if (command_args.size()>7)
-		{
+			
 			NLMISC::fromString(command_args[7], y);
 			y = y * 1000;
+
+			// If coordinates specified, see if it needs another AI instance
+			if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+			{
+				return true;
+			}
 		}
 
 		CEntityId playerId = c->getId();
@@ -4879,6 +4900,13 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		uint32 instanceNumber = c->getInstanceNumber(); 
 		uint32 nbString = command_args.size();
 	 
+		// See if it needs another AI instance
+		string botsName = command_args[1];
+		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+		{
+			return false;
+		}
+
 		CMessage msgout("EVENT_NPC_GROUP_SCRIPT");
 		uint32 messageVersion = 1;
 		msgout.serial(messageVersion);
@@ -4886,8 +4914,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		string command = command_args[0];
 		msgout.serial(command);
-		string botEid = command_args[1];
-		msgout.serial(botEid);
+		msgout.serial(botsName);
 		for (uint32 i=2; i<nbString; ++i)
 		{
 			string arg = command_args[i]+";";
@@ -6267,15 +6294,21 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 
 	std::string botsName;
 	if (args.size()>6) botsName = args[6];
-	if (args.size()>7)
+	if (botsName == "*")
+			botsName.clear();
+
+	if (args.size()>8)
 	{
 		NLMISC::fromString(args[7], x);
 		x = x * 1000;
-	}
-	if (args.size()>8)
-	{
+
 		NLMISC::fromString(args[8], y);
 		y = y * 1000;
+
+		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+		{
+			return true;
+		}
 	}
 
 	CEntityId playerId = c->getId();
@@ -6328,10 +6361,16 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	if (args.size () < 3) return false;
 	GET_CHARACTER
 
-	uint32 instanceNumber = c->getInstanceNumber(); 
+	uint32 instanceNumber = c->getInstanceNumber();
 
 	uint32 nbString = args.size();
  
+	string botsName = args[1];
+	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+	{
+		return false;
+	}
+
 	CMessage msgout("EVENT_NPC_GROUP_SCRIPT");
 	uint32 messageVersion = 1;
 	msgout.serial(messageVersion);
@@ -6339,8 +6378,7 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 
 	string playerEid = args[0];
 	msgout.serial(playerEid);
-	string botEid = args[1];
-	msgout.serial(botEid);
+	msgout.serial(botsName);
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
