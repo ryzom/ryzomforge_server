@@ -4856,19 +4856,19 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (botsName == "*")
 			botsName.clear();
 
-		if (command_args.size()>7)
+		if (command_args.size() > 7)
 		{
 			NLMISC::fromString(command_args[6], x);
 			x = x * 1000;
 			
 			NLMISC::fromString(command_args[7], y);
 			y = y * 1000;
+		}
 
-			// If coordinates specified, see if it needs another AI instance
-			if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
-			{
-				return true;
-			}
+		// See if another AI instance has been specified
+		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+		{
+			return true;
 		}
 
 		CEntityId playerId = c->getId();
@@ -6297,7 +6297,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	if (botsName == "*")
 			botsName.clear();
 
-	if (args.size()>8)
+	if (args.size() > 8)
 	{
 		NLMISC::fromString(args[7], x);
 		x = x * 1000;
@@ -6305,10 +6305,12 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		NLMISC::fromString(args[8], y);
 		y = y * 1000;
 
-		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
-		{
-			return true;
-		}
+	}
+
+	// See if another AI instance has been specified
+	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+	{
+		return true;
 	}
 
 	CEntityId playerId = c->getId();
