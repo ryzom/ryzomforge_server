@@ -381,6 +381,7 @@ AdminCommandsInit[] =
 		"eventSpawnToxic",					true,
 		"eventNpcSay",						true,
 		"eventSetBotFacing",                true,
+		"eventGiveControl",					true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -7347,5 +7348,27 @@ NLMISC_COMMAND (setTeamLeader, "Set the leader of the team", "<user id> <member>
 	++idx;
 	team->setLeader(idx);
 	team->updateMembersDb();
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(eventGiveControl, "Give control of entity A to entity B", "<eid> <master eid> <slave eid>")
+{
+	if (args.size() != 3) return false;
+ 
+	CEntityId masterEid(args[1]);
+	CEntityId slaveEid(args[2]);
+	
+	nlinfo("%s takes control of %s", args[1].c_str(), args[2].c_str());
+
+	CMessage msgout("ACQUIRE_CONTROL");
+	msgout.serial( slaveEid );
+	msgout.serial( masterEid );
+	sint32 local = 0;
+	msgout.serial( local );
+	msgout.serial( local );
+	msgout.serial( local );
+	sendMessageViaMirror( "GPMS", msgout );
+
 	return true;
 }
