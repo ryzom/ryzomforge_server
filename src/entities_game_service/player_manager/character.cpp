@@ -6841,6 +6841,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 	}
 
 	// check whether this character is on a free trial account
+	bool bFreeTrialLimitReached = false;
 	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( getId() ));
 	BOMB_IF(p == NULL,"Failed to find player record for character: "<<getId().toString(),return 0.0);
 	if (p->isTrialPlayer())
@@ -6852,7 +6853,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::skill);
 			params[0].Enum = skillEnum;
 			PHRASE_UTILITIES::sendDynamicSystemMessage(getEntityRowId(), "PROGRESS_FREE_TRIAL_LIMIT", params);
-			return 0.0;
+			bFreeTrialLimitReached = true;
 		}
 	}
 
@@ -6891,6 +6892,11 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 
 	// update death penalty
 	_DeathPenalties->addXP( *this, skillEnum, XpGain);
+
+	if (bFreeTrialLimitReached)
+	{
+		return 0.0;
+	}
 
 	// if no remaining XPGain, return
 	if (XpGain == 0.0f)
