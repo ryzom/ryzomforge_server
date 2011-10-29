@@ -15439,8 +15439,6 @@ void CCharacter::onConnection()
 {
 	// Add all handledAIGroups for all missions of the player
 	spawnAllHandledAIGroup();
-	// add character to event channel if event occurs
-	CGameEventManager::getInstance().addCharacterToChannelEvent( this );
 
 	// update for the unified entity locator
 	if (IShardUnifierEvent::getInstance() != NULL)

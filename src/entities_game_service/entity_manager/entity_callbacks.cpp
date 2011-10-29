@@ -520,17 +520,6 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 	// ask backup for offline commands file
 	COfflineCharacterCommand::getInstance()->characterOnline( characterId );
 	
-	if( CGameEventManager::getInstance().getChannelEventId() != TChanID::Unknown )
-	{
-		if( c->haveAnyPrivilege() )
-		{
-			DynChatEGS.addSession(CGameEventManager::getInstance().getChannelEventId(), entityIndex, true);
-		}
-		else
-		{
-			DynChatEGS.addSession(CGameEventManager::getInstance().getChannelEventId(), entityIndex, false);
-		}
-	}
 	c->onConnection();
 } // cbClientReady //
 
@@ -683,6 +672,9 @@ void finalizeClientReady( uint32 userId, uint32 index )
 	CPVPManager2::getInstance()->updateFactionChannel( c );
 	CPVPManager2::getInstance()->setPVPModeInMirror( c );
 	c->updatePVPClanVP();
+
+	// Add character to event channel if event is active
+	CGameEventManager::getInstance().addCharacterToChannelEvent( c );
 
 	// for GM player, trigger a 'infos' command to remember their persistent state
 	if (!PlayerManager.getPlayer(uint32(c->getId().getShortId())>>4)->getUserPriv().empty())
