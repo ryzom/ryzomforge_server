@@ -2221,13 +2221,19 @@ NLMISC_COMMAND(addPetAnimal,"Add pet animal to character","<eid> <PetTicket>")
 		{
 			CGameItemPtr item = c->createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, ticket);
 			if( item != 0 )
-				c->addCharacterAnimal( ticket, 0, item );
-			return true;
+			{
+				if ( ! c->addCharacterAnimal( ticket, 0, item ))
+				{
+					item.deleteItem();
+					return false;
+				}
+				return true;
+			}
+
+			log.displayNL("<addPetAnimal> command, cannot create item in bag '%s'", args[1].c_str() );
 		}
-		else
-		{
-			log.displayNL("<addPetAnimal> command, unknown pet ticket '%s'", args[1].c_str() );
-		}
+
+		log.displayNL("<addPetAnimal> command, unknown pet ticket '%s'", args[1].c_str() );
 	}
 
 	return false;
@@ -2269,7 +2275,9 @@ NLMISC_COMMAND(setPetAnimalSatiety,"Set the satiety of pet animal (petIndex in 0
 			if ( addressee )
 			{
 				CHECK_RIGHT( addressee, c );
-				CCharacter::sendDynamicSystemMessage( addressee->getId(), result );
+				SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+				params[0].Literal = trim(result);
+				CCharacter::sendDynamicSystemMessage(addressee->getId(), "LITERAL", params);
 			}
 			else
 				result += " nameForAnswer not found";
@@ -2281,7 +2289,7 @@ NLMISC_COMMAND(setPetAnimalSatiety,"Set the satiety of pet animal (petIndex in 0
 	return true;
 }
 
-NLMISC_COMMAND(getPetAnimalSatiety,"Set the satiety of pet animal (petIndex in 0..3)","<eid> <petIndex> [<nameForAnswer>]")
+NLMISC_COMMAND(getPetAnimalSatiety,"Get the satiety of pet animal (petIndex in 0..3)","<eid> <petIndex> [<nameForAnswer>]")
 {
 	if (args.size () < 2) return false;
 	GET_CHARACTER
@@ -2304,7 +2312,9 @@ NLMISC_COMMAND(getPetAnimalSatiety,"Set the satiety of pet animal (petIndex in 0
 			if ( addressee )
 			{
 				CHECK_RIGHT( addressee, c );
-				CCharacter::sendDynamicSystemMessage( addressee->getId(), result );
+				SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+				params[0].Literal = trim(result);
+				CCharacter::sendDynamicSystemMessage(addressee->getId(), "LITERAL", params);
 			}
 			else
 				result += " nameForAnswer not found";
@@ -6996,7 +7006,7 @@ NLMISC_COMMAND(teamInvite, "send a team invite to a player character", "<eid> <m
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(resetPVPTimers, "reset the pvp timers of a player", "<CSR eId><player name>")
+NLMISC_COMMAND(resetPVPTimers, "Reset the pvp timers of a player", "<CSR eId><player name>")
 {
 	if ( args.size() < 1 )
 		return false;
