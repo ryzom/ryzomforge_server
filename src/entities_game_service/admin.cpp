@@ -233,7 +233,7 @@ AdminCommandsInit[] =
 		"renamePlayerForEvent",				true,
 		"renamePlayer",						true,
 		"renameGuild",						true,
-		"setGuildDescription",				true,
+		"setGuildDescription",				false,
 		"setGuildIcon",						false,
 		"killMob",							true,
 		"changeVar",						true,
