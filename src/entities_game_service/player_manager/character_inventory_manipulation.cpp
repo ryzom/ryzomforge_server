@@ -2448,15 +2448,20 @@ void CCharacter::sendItemInfos( uint16 slotId )
 			string cText = item->getCustomText().toString();
 			string::size_type sPos = cText.find(" ");
 			string::size_type ePos = cText.find("\n---\n");
-			if (sPos != string::npos && sPos != (cText.length()-1) && ePos != string::npos && ePos != (cText.length()-1)) {
+			if (sPos != string::npos && sPos != (cText.length()-1) && ePos != string::npos && ePos != (cText.length()-1))
+			{
 				string cUrl = cText.substr(sPos, ePos-sPos);
 				infos.CustomText = ucstring("@WEBIG "+cUrl);
 			}
-			else
+			else if (item->getStaticForm()->Name != "Web Transaction")
+			{
 				infos.CustomText = item->getCustomText();
+			}
 		}
 		else
+		{
 			infos.CustomText = item->getCustomText();
+		}
 
 		CMessage msgout( "IMPULSION_ID" );
 		CBitMemStream bms;
