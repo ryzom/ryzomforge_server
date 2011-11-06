@@ -7223,7 +7223,7 @@ NLMISC_COMMAND(eventSetBotFacing, "Set the direction in which a bot faces", "<bo
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <inventory>")
+NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <inventory> <from slot> <to slot>")
 {
 	if (args.size () < 2) return false;
 	GET_CHARACTER
@@ -7232,20 +7232,44 @@ NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <
 
 	CInventoryPtr inventory = getInv(c, selected_inv);
 
-	for (uint32 i = 0; i < inventory->getSlotCount(); ++ i)
+	uint32 start_slot = 0;
+	uint32 end_slot = inventory->getSlotCount();
+
+	if (args.size() == 4)
 	{
-		const CGameItemPtr itemPtr = inventory->getItem(i);
+		fromString(args[2], start_slot);
+		fromString(args[3], end_slot);
+		start_slot = std::max(uint32(0), start_slot);
+		end_slot = std::min(end_slot, inventory->getSlotCount());
+	}
+
+	uint32 j = 0;
+	string msg;
+	for (uint32 i = start_slot; i < end_slot; ++i)
+	{
+		CGameItemPtr itemPtr = inventory->getItem(i);
 		if (itemPtr != NULL)
 		{
-			log.displayNL("SLOT %d: SHEETID: %s    QUALITY: %d   QUANTITY: %d", 
+			string sheet = itemPtr->getSheetId().toString();
+			uint32 quality = itemPtr->quality();
+			uint32 stacksize = itemPtr->getStackSize();
+			
+			msg += NLMISC::toString("- Slot %3d: SHEETID: %s    QUALITY: %d   QUANTITY: %d\n", 
 				i,
-				itemPtr->getSheetId().toString().c_str(),
-				itemPtr->quality(),
-				itemPtr->getStackSize(),
-				itemPtr->getPhraseId().c_str()
-			);
+				sheet.c_str(),
+				quality,
+				stacksize);
+
+			++j;
+			if ( ! (j % 3)) {
+				log.displayNL(msg.c_str());	
+				msg = "";
+				j = 0;
+			}
 		}
 	}
+
+	log.displayNL(msg.c_str());
 
 	return true;
 }
