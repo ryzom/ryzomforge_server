@@ -3708,7 +3708,7 @@ NLMISC_COMMAND( failMission, "force mission failure", "<CSR id><mission idx>" )
 //----------------------------------------------------------------------------
 NLMISC_COMMAND( progressMission, "force mission progression", "<CSR id><mission idx>[repeat]")
 {
-	if ( args.size() != 2  || args.size() != 3 )
+	if ( args.size() != 2  && args.size() != 3 )
 		return false;
 	GET_CHARACTER;
 	CMission * mission = c->getAdminProperties().getMission( atoi(args[1].c_str() ) );
