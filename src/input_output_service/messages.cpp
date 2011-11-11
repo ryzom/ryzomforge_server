@@ -1569,6 +1569,10 @@ void cbSetPhrase( CMessage& msgin, const string &serviceName, TServiceId service
 	SM->setPhrase(msgin);
 }
 
+void cbSetPhraseLang( CMessage& msgin, const string& serviceName, TServiceId serviceId )
+{
+	SM->setPhraseLang(msgin);
+}
 
 //-----------------------------------------------
 //	Add a new channel in the dyn chat
@@ -2050,6 +2054,7 @@ TUnifiedCallbackItem CbIOSArray[]=
 	{ "CUSTOM_EMOTE", cbCustomEmote },	// EGS wants IOS to dispatch an emote custom text to all users around
 	
 	{ "SET_PHRASE", cbSetPhrase },			// AIS wants IOS to change a phrase content
+	{ "SET_PHRASE_LANG", cbSetPhraseLang }, // AIS or EGS wants IOS to change a phrase content for a language
 
 	{ "UPDATE_AIALIAS", cbUpdateAIAlias},
 

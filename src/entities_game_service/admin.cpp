@@ -305,6 +305,7 @@ AdminCommandsInit[] =
 		"setGuildChargePoint",				false,
 		"characterInventoryDump",			true,
 		"deleteInventoryItem",				true,
+		"setSimplePhrase",                  false,
 
 		// PUT HERE THE VARIABLE / COMMAND THAT ARE TEMPORARY
 		// remove when message of the day interface is ready
@@ -382,6 +383,7 @@ AdminCommandsInit[] =
 		"eventNpcSay",						true,
 		"eventSetBotFacing",                true,
 		"eventGiveControl",					true,
+		"eventLeaveControl",				true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -7404,5 +7406,55 @@ NLMISC_COMMAND(eventGiveControl, "Give control of entity A to entity B", "<eid> 
 	msgout.serial( local );
 	sendMessageViaMirror( "GPMS", msgout );
 
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(eventLeaveControl, "Leave control of entity", "<eid> <master eid>")
+{
+	if (args.size() != 2) return false;
+ 
+	CEntityId masterEid(args[1]);
+	
+	nlinfo("%s leaves control", args[1].c_str());
+
+	CMessage msgout("LEAVE_CONTROL");
+	msgout.serial( masterEid );
+	sendMessageViaMirror( "GPMS", msgout );
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setSimplePhrase, "Set an IOS phrase", "<id> <phrase> [<language code>]")
+{
+	if (args.size() < 2)
+		return false;
+
+	string phraseName = args[0];
+	ucstring phraseContent = phraseName;
+	phraseContent += "(){[";
+	phraseContent += args[1];
+	phraseContent += "]}";
+	
+	string msgname = "SET_PHRASE";
+	bool withLang = false;
+	string lang = "";
+	if (args.size() == 3) 
+	{
+		lang = args[2];
+		if (lang != "all")
+		{
+			withLang = true;
+			msgname = "SET_PHRASE_LANG";
+		}
+	}
+
+	NLNET::CMessage	msgout(msgname);
+	msgout.serial(phraseName);
+	msgout.serial(phraseContent);
+	if (withLang)
+		msgout.serial(lang);
+	sendMessageViaMirror("IOS", msgout);
 	return true;
 }
