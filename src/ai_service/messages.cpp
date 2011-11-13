@@ -770,10 +770,10 @@ void	CAIAskForInfosOnEntityImp::callback (const std::string &name, NLNET::TServi
 			}
 			break;
 		default:
+			std::vector<std::string> strings = phys->getMultiLineInfoString();
+			msg.Infos.insert(msg.Infos.end(), strings.begin(), strings.end());
 			break;
 		}
-		std::vector<std::string> strings = phys->getMultiLineInfoString();
-		msg.Infos.insert(msg.Infos.end(), strings.begin(), strings.end());
 	}
 	else
 	{
