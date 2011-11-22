@@ -459,6 +459,7 @@ void initCommandsPrivileges(const std::string & fileName)
 {
 	H_AUTO(initCommandsPrivileges);
 
+	initSalt();
 	loadCommandsPrivileges(fileName, true);
 }
 
@@ -580,42 +581,45 @@ void initPositionFlags(const std::string & fileName)
 	PositionFlagsFileName = fileName;
 }
 
-string getSalt()
+struct SaltFileLoadCallback: public IBackupFileReceiveCallback
 {
-	if (Salt.empty()) {
-		string fileNameAndPath = Bsi.getLocalPath() + "salt.txt";
-		if (CFile::fileExists(fileNameAndPath))
-		{
-			FILE* f;
-			string fileName;
+	std::string FileName;
 
-			// open the file
-			f=fopen(fileNameAndPath.c_str(),"rb");
-			if (f == NULL)
-			{
-				nlinfo("Failed to open file for reading: %s", fileName.c_str() );
-				return false;
-			}
+	SaltFileLoadCallback(const std::string& fileName): FileName(fileName)  {}
 
-			CSString input;
-			// read the file content into a buffer
-			uint32 size=NLMISC::CFile::getFileSize(f);
-			input.resize(size);
-			uint32 readSize= fread(&input[0],1,size,f);
-			fclose(f);
-			Salt = input;
-			return Salt;
-		}
-		return "";
+	virtual void callback(const CFileDescription& fileDescription, NLMISC::IStream& dataStream)
+	{
+		// if the file isn't found then just give up
+		DROP_IF(fileDescription.FileName.empty(),"<SaltFileLoadCallback> file not found: "<< FileName, return);
+		
+		dataStream.serial(Salt);
+		nlinfo("Salt loaded : %s", Salt.c_str());
 	}
+};
+
+
+void initSalt()
+{
+	H_AUTO(initSalt);
+	
+	/*string fileNameAndPath = Bsi.getLocalPath() + "salt_egs.txt";
+	if (CFile::fileExists(fileNameAndPath))
+	{*/
+		nlinfo("Salt loading : salt_egs.txt");
+		Bsi.syncLoadFile("salt_egs.txt", new SaltFileLoadCallback("salt_egs.txt"));
+	//}
+}
+
+const string &getSalt()
+{
 	return Salt;
 }
 
 void saveSalt(const string salt)
 {
 	Salt = salt;
-	CBackupMsgSaveFile msg("salt.txt", CBackupMsgSaveFile::SaveFile, Bsi );
-	msg.DataMsg.serialBuffer((uint8*)Salt.c_str(), Salt.size());
+	CBackupMsgSaveFile msg("salt_egs.txt", CBackupMsgSaveFile::SaveFile, Bsi );
+	msg.DataMsg.serial(Salt);
 	Bsi.sendFile(msg);
 }
 
