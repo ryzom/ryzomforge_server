@@ -4828,7 +4828,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		sint32 y = c->getY();
 		sint32 orientation = 6666; // used to specify a random orientation
 
-		uint32 nbBots = NLMISC::atoui(command_args[1].c_str());
+		uint32 nbBots;
+		fromString(command_args[1], nbBots);
 		if (nbBots<=0)
 		{
 			log.displayNL("invalid bot count");
@@ -4844,7 +4845,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		double dispersionRadius = 10.;
 		if (command_args.size()>3)
 		{
-			dispersionRadius = atof(command_args[3].c_str());
+			fromString(command_args[3], dispersionRadius);
 			if (dispersionRadius < 0.)
 				return true;
 		}
@@ -4871,12 +4872,22 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		if (command_args.size() > 7)
 		{
-			NLMISC::fromString(command_args[6], x);
-			x = x * 1000;
 			
-			NLMISC::fromString(command_args[7], y);
-			y = y * 1000;
+			if (command_args[6] != "*") {
+				float userX;
+				NLMISC::fromString(command_args[6], userX);
+				x = (sint32)(userX * 1000);
+			}
+
+			if (command_args[7] != "*") {
+				float userY;
+				NLMISC::fromString(command_args[7], userY);
+				y = (sint32)(userY * 1000);
+			}
 		}
+
+		std::string look;
+		if (command_args.size() > 8) look = command_args[8];
 
 		// See if another AI instance has been specified
 		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
@@ -4899,6 +4910,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial(dispersionRadius);
 		msgout.serial(spawnBots);
 		msgout.serial(botsName);
+		msgout.serial(look);
 		CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
 	}
 
@@ -6259,7 +6271,8 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	sint32 y = c->getY();
 	sint32 orientation = 6666; // used to specify a random orientation
 
-	uint32 nbBots = NLMISC::atoui(args[1].c_str());
+	uint32 nbBots;
+	fromString(args[1], nbBots);
 	if (nbBots<=0)
 	{
 		log.displayNL("invalid bot count");
@@ -6267,9 +6280,9 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	}
 
 	NLMISC::CSheetId sheetId(args[2]);
-	if (sheetId==NLMISC::CSheetId::Unknown)
+	if (sheetId==CSheetId::Unknown)
 		sheetId = args[2] + ".creature";
-	if (sheetId==NLMISC::CSheetId::Unknown)
+	if (sheetId==CSheetId::Unknown)
 	{
 		log.displayNL("invalid sheet id");
 		return true;
@@ -6278,8 +6291,8 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	double dispersionRadius = 10.;
 	if (args.size()>3)
 	{
-		dispersionRadius = atof(args[3].c_str());
-		if (dispersionRadius<0.)
+		fromString(args[3], dispersionRadius);
+		if (dispersionRadius < 0.)
 		{
 			log.displayNL("invalid dispersion radius");
 			return true;
@@ -6288,9 +6301,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 
 	bool spawnBots = true;
 	if (args.size()>4)
-	{
-		NLMISC::fromString(args[4], spawnBots);
-	}
+		fromString(args[4], spawnBots);
 
 	if (args.size()>5)
 	{
@@ -6300,7 +6311,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		}
 		else if (args[5] != "random")
 		{
-			NLMISC::fromString(args[5], orientation);
+			fromString(args[5], orientation);
 			orientation = (sint32)((double)orientation / 360.0 * (NLMISC::Pi * 2.0) * 1000.0);
 		}
 	}
@@ -6312,13 +6323,21 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 
 	if (args.size() > 8)
 	{
-		NLMISC::fromString(args[7], x);
-		x = x * 1000;
+		if (args[7] != "*") {
+			float userX;
+			NLMISC::fromString(args[7], userX);
+			x = (sint32)(userX * 1000);
+		}
 
-		NLMISC::fromString(args[8], y);
-		y = y * 1000;
-
+		if (args[8] != "*") {
+			float userY;
+			NLMISC::fromString(args[8], userY);
+			y = (sint32)(userY * 1000);
+		}
 	}
+
+	std::string look;
+	if (args.size() > 9) look = args[9];
 
 	// See if another AI instance has been specified
 	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
@@ -6341,6 +6360,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	msgout.serial(dispersionRadius);
 	msgout.serial(spawnBots);
 	msgout.serial(botsName);
+	msgout.serial(look);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
 
 	return true;

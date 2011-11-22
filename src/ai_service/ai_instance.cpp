@@ -653,7 +653,7 @@ static float randomAngle()
 	return val;
 }
 
-CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const& sheetId, CAIVector const& pos, double dispersionRadius, bool spawnBots, double orientation, const std::string &botsName)
+CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const& sheetId, CAIVector const& pos, double dispersionRadius, bool spawnBots, double orientation, const std::string &botsName, const std::string &look)
 {
 	if (!_EventNpcManager)
 		return NULL;
@@ -689,6 +689,8 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 			CBotNpc* const bot = NLMISC::safe_cast<CBotNpc*>(grp->bots()[i]);
 
 			bot->setSheet(sheet);
+			if (!look.empty())
+				bot->setClientSheet(look);
 			bot->equipmentInit();
 			bot->initEnergy(/*groupEnergyCoef()*/0);
 			CAIVector rpos(pos);
@@ -855,6 +857,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 	double dispersionRadius;
 	bool spawnBots;
 	std::string botsName;
+	std::string look;
 	msgin.serial(messageVersion);
 	nlassert(messageVersion==1);
 	msgin.serial(instanceNumber);
@@ -867,10 +870,11 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 	msgin.serial(dispersionRadius);
 	msgin.serial(spawnBots);
 	msgin.serial(botsName);
+	msgin.serial(look);
 	CAIInstance* instance = CAIS::instance().getAIInstance(instanceNumber);
 	if (instance)
 	{
-		CGroupNpc* npcGroup = instance->eventCreateNpcGroup(nbBots, sheetId, CAIVector((double)x/1000., (double)y/1000.), dispersionRadius, spawnBots, (double)orientation/1000., botsName);
+		CGroupNpc* npcGroup = instance->eventCreateNpcGroup(nbBots, sheetId, CAIVector((double)x/1000., (double)y/1000.), dispersionRadius, spawnBots, (double)orientation/1000., botsName, look);
 		if (npcGroup != NULL)
 		{
 			_PlayersLastCreatedNpcGroup[playerId] = npcGroup->getName();
