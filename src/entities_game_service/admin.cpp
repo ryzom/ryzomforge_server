@@ -4449,42 +4449,66 @@ CInventoryPtr getInv(CCharacter *c, const string &inv)
 	return c->getInventory(inventory);
 }
 
-NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac>")
+NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac> [<new_check=1>]")
 {
 
-	if (args.size() != 5)
+	if (args.size() < 5)
 		return false;
-
+	
+	bool new_check = false;
+	if (args.size() == 6)
+		new_check = true;
+	
 	GET_CHARACTER
 
+ 	c->setAfkState(false);
+	
 	string web_app_url = args[1];
 	string index = args[2];
 	string command = args[3];
 	string hmac = args[4];
-
-	CInventoryPtr check_inv = c->getInventory(INVENTORIES::bag);
+	
 	vector<string> infos;
 	CGameItemPtr item;
+	
 
-	if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
-	{
-		uint item_idx = c->checkWebCommand(web_app_url, index+command, hmac, getSalt());
-		if (item_idx == INVENTORIES::NbBagSlots) {
-			nlwarning("Bad web command check");
+	if (new_check) {
+		uint32 saved_index = c->getWebCommandIndex();
+		uint32 iindex = (uint32)atoi(index.c_str());
+		if (iindex <= saved_index)
+			return false;
+		string salt = getSalt();
+		string checksum = web_app_url + toString(c->getLastConnectedDate()) + index + command + c->getId().toString();
+		string realhmac = getHMacSHA1((uint8*)&checksum[0], checksum.size(), (uint8*)&salt[0], salt.size()).toString();
+		if (realhmac != hmac) {
+			nlinfo("BAD WEB COMMAND CHECKSUM !!!");
 			return false;
 		}
+		c->setWebCommandIndex(iindex);
+	
+	} else {
+		
+		CInventoryPtr check_inv = c->getInventory(INVENTORIES::bag);
+		if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
+		{
+			uint item_idx = c->checkWebCommand(web_app_url, index+command, hmac, getSalt());
+			if (item_idx == INVENTORIES::NbBagSlots) {
+				nlwarning("Bad web command check");
+				return false;
+			}
 
-		item = check_inv->getItem(item_idx);
-		string cText = item->getCustomText().toString();
-		NLMISC::splitString(cText, "\n", infos);
+			item = check_inv->getItem(item_idx);
+			string cText = item->getCustomText().toString();
+			NLMISC::splitString(cText, "\n", infos);
 
-		vector<string> indexes;
-		NLMISC::splitString(infos[1], ",", indexes);
+			vector<string> indexes;
+			NLMISC::splitString(infos[1], ",", indexes);
 
-		if (index != indexes[0])
-			return false;
+			if (index != indexes[0])
+				return false;
+		}
 	}
-
+	
 	std::vector<std::string> command_args;
 	NLMISC::splitString(command, "!", command_args);
 	if (command_args.empty())
@@ -5109,21 +5133,20 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		return false;
 
 
-	if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
-	{
-		string::size_type pos = infos[1].find(",");
-		if (pos!=string::npos && pos!=(infos[1].length()-1))
+	if (!new_check) {
+		if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
 		{
-			item->setCustomText(ucstring(infos[0]+"\n"+infos[1].substr(pos+1)));
+			string::size_type pos = infos[1].find(",");
+			if (pos!=string::npos && pos!=(infos[1].length()-1))
+			{
+				item->setCustomText(ucstring(infos[0]+"\n"+infos[1].substr(pos+1)));
+			}
+			else
+			{
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
+			}
 		}
-		else
-		{
-			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
-		}
-	} else {
-		nlinfo("OK");
 	}
-
 	return true;
 }
 

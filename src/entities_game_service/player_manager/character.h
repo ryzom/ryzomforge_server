@@ -1925,6 +1925,9 @@ public:
 		/// player is going online or offline
 		void online(bool onlineStatus);
 
+		/// player last connection date (from SU, exactly like on mysql db)
+		void setLastConnectionDate(uint32 date);
+
 		/// player is permanently erased, unreferenced it from all contact lists
 		void destroyCharacter();
 
@@ -2318,6 +2321,7 @@ public:
 	/// character log stats accessors
 	uint32 getFirstConnectedTime() const;
 	uint32 getLastConnectedTime() const;
+	uint32 getLastConnectedDate() const;
 	uint32 getPlayedTime() const;
 	const std::list<TCharacterLogTime>& getLastLogStats() const;
 	void updateConnexionStat();
@@ -3573,7 +3577,8 @@ private:
 	std::set<NLMISC::CEntityId>		_EntitiesToSaveWithMe;
 
 	uint32 _FirstConnectedTime;						//first connected time in second since midnight (00:00:00), January 1, 1970
-	uint32 _LastConnectedTime;						//last connected time in second since midnight (00:00:00), January 1, 1970
+	uint32 _LastConnectedTime;						//last connected time in second since midnight (00:00:00), January 1, 1970 (change each tick update)
+	uint32 _LastConnectedDate;						//last connected time in second since midnight (00:00:00), January 1, 1970 (never change after login, exactly like in mysql db)
 	uint32 _PlayedTime;								//cumulated played time in second
 	mutable std::list<TCharacterLogTime> _LastLogStats;		//keep n login/duration/logoff time
 

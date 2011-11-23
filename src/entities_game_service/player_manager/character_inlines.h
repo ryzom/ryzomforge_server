@@ -875,6 +875,13 @@ inline uint32 CCharacter::getLastConnectedTime() const
 
 //------------------------------------------------------------------------------
 
+inline uint32 CCharacter::getLastConnectedDate() const
+{
+	return _LastConnectedDate; 
+}
+
+//------------------------------------------------------------------------------
+
 inline uint32 CCharacter::getPlayedTime() const
 {
 	return _PlayedTime; 

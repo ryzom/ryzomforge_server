@@ -1,18 +1,3 @@
-// Ryzom - MMORPG Framework <http://dev.ryzom.com/projects/ryzom/>
-// Copyright (C) 2010  Winch Gate Property Limited
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /////////////////////////////////////////////////////////////////
 // WARNING : this is a generated file, don't change it !
@@ -98,7 +83,7 @@ namespace ENTITYLOC
 		{
 
 		}
-		
+
 		void serial(NLMISC::IStream &s)
 		{
 			s.serial(_CharEId);
@@ -137,12 +122,12 @@ namespace ENTITYLOC
 			_Interceptor.init(this, module);
 		}
 
-		// unused interceptors 
+		// unused interceptors
 		std::string			fwdBuildModuleManifest() const	{ return std::string(); }
 		void				fwdOnModuleUp(NLNET::IModuleProxy *moduleProxy)  {};
 		void				fwdOnModuleDown(NLNET::IModuleProxy *moduleProxy) {};
 		void				fwdOnModuleSecurityChange(NLNET::IModuleProxy *moduleProxy) {};
-	
+
 		// process module message interceptor
 		bool fwdOnProcessModuleMessage(NLNET::IModuleProxy *sender, const NLNET::CMessage &message);
 	private:
@@ -273,8 +258,10 @@ namespace ENTITYLOC
 		uint32	_CharId;
 		// Type of the event : true for a connection, false otherwise
 		bool	_Connection;
-		// The privilege of the character (e.g :GM:)
+		// The privilege of the character (e.g :GM:DEV:)
 		std::string	_Privilege;
+		// Last Connection Date
+		uint32	_lastConnectionDate;
 	public:
 		// The character id the the character
 		uint32 getCharId() const
@@ -300,7 +287,7 @@ namespace ENTITYLOC
 				_Connection = value;
 
 		}
-			// The privilege of the character (e.g :GM:)
+			// The privilege of the character (e.g :GM:DEV:)
 		std::string getPrivilege() const
 		{
 			return _Privilege;
@@ -312,12 +299,25 @@ namespace ENTITYLOC
 				_Privilege = value;
 
 		}
+			// Last Connection Date
+		uint32 getlastConnectionDate() const
+		{
+			return _lastConnectionDate;
+		}
+
+		void setlastConnectionDate(uint32 value)
+		{
+
+				_lastConnectionDate = value;
+
+		}
 	
 		bool operator == (const TCharConnectionEvent &other) const
 		{
 			return _CharId == other._CharId
 				&& _Connection == other._Connection
-				&& _Privilege == other._Privilege;
+				&& _Privilege == other._Privilege
+				&& _lastConnectionDate == other._lastConnectionDate;
 		}
 
 
@@ -326,12 +326,13 @@ namespace ENTITYLOC
 		{
 
 		}
-		
+
 		void serial(NLMISC::IStream &s)
 		{
 			s.serial(_CharId);
 			s.serial(_Connection);
 			s.serial(_Privilege);
+			s.serial(_lastConnectionDate);
 
 		}
 		
@@ -366,12 +367,12 @@ namespace ENTITYLOC
 			_Interceptor.init(this, module);
 		}
 
-		// unused interceptors 
+		// unused interceptors
 		std::string			fwdBuildModuleManifest() const	{ return std::string(); }
 		void				fwdOnModuleUp(NLNET::IModuleProxy *moduleProxy)  {};
 		void				fwdOnModuleDown(NLNET::IModuleProxy *moduleProxy) {};
 		void				fwdOnModuleSecurityChange(NLNET::IModuleProxy *moduleProxy) {};
-	
+
 		// process module message interceptor
 		bool fwdOnProcessModuleMessage(NLNET::IModuleProxy *sender, const NLNET::CMessage &message);
 	private:
@@ -454,7 +455,7 @@ namespace ENTITYLOC
 		static void broadcast_connectionEvents(ProxyIterator first, ProxyIterator last, NLNET::IModule *sender, const std::vector < TCharConnectionEvent > &events)
 		{
 			NLNET::CMessage message;
-			
+
 			// create the message to send to multiple dest
 			buildMessageFor_connectionEvents(message , events);
 

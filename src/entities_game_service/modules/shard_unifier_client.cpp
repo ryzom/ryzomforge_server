@@ -1112,6 +1112,10 @@ public:
 			}
 
 			updateContactListAndGuilMembers(charEid, cci.getConnection());
+			
+			// Update LastPlayedDate
+			ICharacter *character = ICharacter::getInterface(IPlayerManager::getInstance().getActiveChar(uint32(charEid.getShortId()>>4)), true);
+			character->setLastConnectionDate(cci.getlastConnectionDate());
 //
 //			// if the character is not connected here, update the contact list of
 //			// all characters

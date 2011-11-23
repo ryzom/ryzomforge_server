@@ -210,7 +210,7 @@ CVariable<uint32>			SpawnedDeadMektoubDelay("egs","SpawnedDeadMektoubDelay", "nb
 CVariable<bool>				ForceQuarteringRight("egs","ForceQuarteringRight", "Allow anyone to quarter a dead creature", false, 0, true );
 CVariable<bool>				AllowAnimalInventoryAccessFromAnyStable("egs", "AllowAnimalInventoryAccessFromAnyStable", "If true a player can access to his animal inventory (if the animal is inside a stable) from any stable over the world", true, 0, true );
 CVariable<uint32>			FreeTrialSkillLimit("egs", "FreeTrialSkillLimit", "Level limit for characters belonging to free trial accounts", 125,0,true);
-CVariable<uint32>			CraftFailureProbaMpLost("egs", "CraftFailureProbaMpLost", "Probabilité de destruction de chaque MP en cas d'echec du craft", 50,0,true);
+CVariable<uint32>			CraftFailureProbaMpLost("egs", "CraftFailureProbaMpLost", "ProbabilitÃ© de destruction de chaque MP en cas d'echec du craft", 50,0,true);
 
 
 // Number of login stats kept for a character
@@ -15291,6 +15291,15 @@ void CCharacter::sendRemoveContactMessage(uint32 contactId, uint8 listNumber)
 	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
 	CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(_Id.getDynamicId()), msgout );
 } // sendRemoveContactMessage //
+
+//--------------------------------------------------------------
+//	CCharacter::setLastConnectionDate()
+//--------------------------------------------------------------
+void CCharacter::setLastConnectionDate(uint32 date)
+{
+	_LastConnectedDate = date;	
+}
+
 
 //--------------------------------------------------------------
 //	CCharacter::destroyCharacter()
