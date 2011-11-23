@@ -300,6 +300,7 @@ AdminCommandsInit[] =
 		"Position",							true,
 		"Priv",								true,
 		"PriviledgePVP",					true,
+		"FullPVP",							true,
 		"FBT",								true,
 		"RyzomDate",						false,
 		"RyzomTime",						false,
@@ -5173,6 +5174,26 @@ ENTITY_VARIABLE (PriviledgePVP, "Priviledge Pvp Mode")
 	}
 }
 
+//----------------------------------------------------------------------------
+ENTITY_VARIABLE (FullPVP, "Full Pvp Mode")
+{
+	ENTITY_GET_CHARACTER
+
+	if (get)
+	{
+		value = c->getFullPVP()?"1":"0";
+	}
+	else
+	{
+		if (value=="1" || value=="on" || strlwr(value)=="pvp" || strlwr(value)=="true" )
+			c->setFullPVP(true);
+		else if (value=="0" || value=="off" || strlwr(value)=="false" )
+			c->setFullPVP(false);
+//		c->setPVPRecentActionFlag();
+		CPVPManager2::getInstance()->setPVPModeInMirror(c);
+		nlinfo ("%s %s now in pvp mode", entity.toString().c_str(), c->getFullPVP()?"is":"isn't");
+	}
+}
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(addPosFlag, "add a new position flag", "<csr_eid> <flag_name>")

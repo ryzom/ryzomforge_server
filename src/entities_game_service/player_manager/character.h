@@ -2244,6 +2244,8 @@ public:
 	// priviledge PVP mode
 	void setPriviledgePVP( bool b );
 	bool priviledgePVP();
+	// full PVP mode
+	void setFullPVP( bool b );
 	/// set the current PVP zone where the player is
 	void setCurrentPVPZone(TAIAlias alias);
 	/// get the current PVP zone where the player is
@@ -2260,6 +2262,8 @@ public:
 	void openPVPVersusDialog() const;
 	/// get priviledgePvp
 	bool getPriviledgePVP() const {return _PriviledgePvp;};
+	/// get fullPvp
+	bool getFullPVP() const {return _FullPvp;};
 	/// get character pvp flag
 	bool getPVPFlag( bool updatePVPModeInMirror = true ) const;
 	/// change pvp flag
@@ -3400,6 +3404,8 @@ private:
 	CPVPInterface					*_PVPInterface;
 	// set pvp mode for priviledge player
 	bool							_PriviledgePvp;
+	// set full pvp mode for player
+	bool							_FullPvp;
 	// flag PVP, true for player involved in Faction PVP and other PVP
 	bool							_PVPFlag;
 	// time of last change in pvp flag (for prevent change PVP flag exploits)
@@ -3669,6 +3675,7 @@ public:
 
 	/// Send the current timer period if is different from the default or force is true
 	void			sendNpcMissionGiverTimer(bool force);
+	
 };
 
 

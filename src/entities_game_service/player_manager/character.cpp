@@ -412,6 +412,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 
 	// pvp for player with privilege inactive
 	_PriviledgePvp = false;
+	// full pvp
+	_FullPvp = false;
 	// aggroable undefined
 	_Aggroable = true;
 	_AggroableOverride = -1;
@@ -19867,6 +19869,13 @@ void CCharacter::updateConsumableFamily()
 void CCharacter::setPriviledgePVP( bool b )
 {
 	_PriviledgePvp = b;
+}
+
+//------------------------------------------------------------------------------
+
+void CCharacter::setFullPVP( bool b )
+{
+	_FullPvp = b;
 }
 
 
