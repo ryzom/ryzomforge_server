@@ -163,6 +163,8 @@ AdminCommandsInit[] =
 {
 		// player character accessible commands
 		"teamInvite",						true,
+		"setLeague",						true,
+		"leagueInvite",						true,
 		"guildInvite",						true,
 		"roomInvite",						true,
 		"roomKick",							true,
@@ -7053,6 +7055,48 @@ NLMISC_COMMAND(teamInvite, "send a team invite to a player character", "<eid> <m
 	return true;
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(leagueInvite, "send a League invite to a player character", "<eid> <member name>")
+{
+	if(args.size() != 2 )
+		return false;
+
+	CEntityId eId;
+	eId.fromString(args[0].c_str());
+
+	// check user
+	CCharacter * user = PlayerManager.getChar( eId );
+	if (!user)
+	{
+		log.displayNL("<LEAGUE_INVITE>'%s' is not a valid char. Cant process command",eId.toString().c_str());
+		return true;
+	}
+	if (!user->getEnterFlag())
+	{
+		log.displayNL("'%s' is not entered", eId.toString().c_str());
+		return true;
+	}
+	if (!TheDataset.isAccessible(user->getEntityRowId()))
+	{
+		log.displayNL("'%s' is not valid in mirror", eId.toString().c_str());
+		return true;
+	}
+
+	// Get target
+	CCharacter	*invitedCharacter= PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
+	if(invitedCharacter == 0 || invitedCharacter->getEnterFlag() == false )
+	{
+		CCharacter::sendDynamicSystemMessage( user->getId(),"TEAM_INVITED_CHARACTER_MUST_BE_ONLINE" );
+		return true;
+	}
+
+	// Join
+	user->setAfkState(false);
+	TeamManager.joinLeagueProposal( user, invitedCharacter->getId() );
+
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(resetPVPTimers, "Reset the pvp timers of a player", "<CSR eId><player name>")
@@ -7431,6 +7475,31 @@ NLMISC_COMMAND (setTeamLeader, "Set the leader of the team", "<user id> <member>
 	++idx;
 	team->setLeader(idx);
 	team->updateMembersDb();
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND (setLeague, "Set the League of the team", "<user id> [<name>]")
+{
+	GET_CHARACTER;
+
+	CTeam *team = TeamManager.getTeam(c->getTeamId());
+
+	if ( ! team)
+	{
+		nlwarning("<LEAGUE> Invalid team for user %s",c->getId().toString().c_str() );
+		return false;
+	}
+	if (team->getLeader() != c->getId())
+	{
+		nlwarning("<LEAGUE> user %s is not leader: cant set alliance",c->getId().toString().c_str() );
+		return false;
+	}
+
+	if (args.size () == 2)
+		team->setLeague(args[1]);
+	else
+		team->setLeague("");
 	return true;
 }
 
