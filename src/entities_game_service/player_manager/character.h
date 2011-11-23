@@ -3202,6 +3202,9 @@ private:
 	/// nb of users channels
 	uint8						_NbUserChannels;
 
+	/// last webcommand index
+	uint32						_LastWebCommandIndex;
+
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange {
 
@@ -3652,6 +3655,11 @@ private:
 	/// General god flag for persistence
 	bool			_GodModeSave;
 public:
+
+	void			setWebCommandIndex(uint32 index) { _LastWebCommandIndex = index;}
+	uint32			getWebCommandIndex() const { return _LastWebCommandIndex;}
+
+
 	bool			getInvisibility() const	{ return _Invisibility;}
 	/// Set the invisibility flag, NB : just for persistence, do not change nothing.
 	void			setInvisibility(bool invisible)	{ 
