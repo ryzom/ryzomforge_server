@@ -815,6 +815,34 @@ void cbClientCombatDodge( NLNET::CMessage& msgin, const std::string &serviceName
 	}
 }
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//		CLIENT:LEAGUE
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//
+void cbClientLeagueJoin( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
+{
+	cbJoinLeague(msgin, serviceName, serviceId);
+}
+
+//
+void cbClientLeagueJoinProposal( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
+{
+	cbJoinLeagueProposal(msgin, serviceName, serviceId);
+}
+
+//
+void cbClientLeagueJoinProposalDecline( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
+{
+	cbJoinLeagueDecline(msgin, serviceName, serviceId);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //		CLIENT:TEAM
@@ -3559,9 +3587,9 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:DUEL:REFUSE",						cbClientDuelRefuse },
 	{ "CLIENT:DUEL:ABANDON",					cbClientDuelAbandon },
 
-	{ "CLIENT:PVP_CHALLENGE:ASK",				cbClientPVPChallengeAsked },
-	{ "CLIENT:PVP_CHALLENGE:ACCEPT",			cbClientPVPChallengeAccept },
-	{ "CLIENT:PVP_CHALLENGE:REFUSE",			cbClientPVPChallengeRefuse },
+	{ "CLIENT:PVP_CHALLENGE:ASK",				cbClientLeagueJoinProposal },
+	{ "CLIENT:PVP_CHALLENGE:ACCEPT",			cbClientLeagueJoin },
+	{ "CLIENT:PVP_CHALLENGE:REFUSE",			cbClientLeagueJoinProposalDecline },
 	{ "CLIENT:PVP_CHALLENGE:ABANDON",			cbClientPVPChallengeAbandon },
 
 //	{ "CLIENT:PVP_VERSUS:CLAN",					cbClientPvpChooseClan },

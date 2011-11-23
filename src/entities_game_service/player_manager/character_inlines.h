@@ -131,6 +131,13 @@ inline const NLMISC::CEntityId & CCharacter::getTeamInvitor() const
 
 //------------------------------------------------------------------------------
 
+inline const NLMISC::CEntityId & CCharacter::getLeagueInvitor() const
+{
+	return _LeagueInvitor; 
+}
+
+//------------------------------------------------------------------------------
+
 inline const NLMISC::CEntityId &CCharacter::harvestedEntity() const
 {
 	return _MpSourceId; 

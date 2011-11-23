@@ -1597,6 +1597,53 @@ void cbJoinTeamProposal( NLNET::CMessage& msgin, const std::string &serviceName,
 
 
 //---------------------------------------------------
+// cbJoinLeague: join specified League
+//---------------------------------------------------
+void cbJoinLeague( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
+{
+	H_AUTO(cbJoinLeague);
+	
+	CEntityId charId;
+	msgin.serial( charId );
+	TeamManager.joinLeagueAccept( charId );
+} // cbJoinLeague //
+
+//---------------------------------------------------
+// cbJoinLeagueDecline: player decline the proposition
+//---------------------------------------------------
+void cbJoinLeagueDecline( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
+{
+	H_AUTO(cbJoinLeagueDecline);
+	
+	CEntityId charId;
+	msgin.serial( charId );
+	TeamManager.joinLeagueDecline( charId );
+} // cbJoinLeagueDecline //
+
+
+//---------------------------------------------------
+// cbJoinLeagueProposal: propose a player (current target) to enter the League
+//---------------------------------------------------
+void cbJoinLeagueProposal( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
+{
+	H_AUTO(cbJoinLeagueProposal);
+	
+	CEntityId charId;
+	msgin.serial( charId );
+
+	CCharacter *character = PlayerManager.getChar( charId );
+	if (character == NULL || !character->getEnterFlag())
+	{
+		nlwarning("<cbJoinLeagueProposal> Invalid player Id %s", charId.toString().c_str() );
+		return;
+	}
+	character->setAfkState(false);
+	TeamManager.joinLeagueProposal( character, character->getTarget() );
+} // cbJoinLeagueProposal //
+
+
+
+//---------------------------------------------------
 // cbKickTeammate: kick your target from your team
 //---------------------------------------------------
 void cbKickTeammate( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)

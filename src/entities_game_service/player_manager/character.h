@@ -739,6 +739,9 @@ public:
 
 	// return the season in wich is the current character
 	uint8 getRingSeason() const { return _RingSeason;}
+
+	/// get the League id
+	TChanID getLeagueId() const { return _LeagueId;}
 	
 	
 		
@@ -748,10 +751,16 @@ public:
 	uint16 getTeamId() const;
 	/// set the team Id of this player
 	void setTeamId(uint16 id);
+	/// set the League id
+	void setLeagueId(TChanID id);
 	/// get team invitor
 	const NLMISC::CEntityId & getTeamInvitor() const;
 	/// set team invitor
 	void setTeamInvitor(const NLMISC::CEntityId & invitorId);
+	/// get League invitor
+	const NLMISC::CEntityId & getLeagueInvitor() const;
+	/// set League invitor
+	void setLeagueInvitor(const NLMISC::CEntityId & invitorId);
 	//@}
 
 	/// Set fighting target
@@ -2950,8 +2959,13 @@ private:
 	/// if this player has an invitation for another team, keep the team here
 	NLMISC::CEntityId 					_TeamInvitor;
 
+	/// if this player has an invitation for League, keep the invitor here
+	NLMISC::CEntityId 					_LeagueInvitor;
+
 	// id of the current team
 	CMirrorPropValueAlice< uint16, CPropLocationPacked<2> >	_TeamId;
+	
+	TChanID								_LeagueId;
 	
 	/// temp values used to test if team bars need an update or not
 	mutable uint8						_OldHpBarSentToTeam;

@@ -57,6 +57,7 @@ void CTeam::init( CCharacter*  leader, uint16 teamId )
 	_ValidityFlags.Fake = false;
 	_NbMembers = 1;
 	_TeamId  = teamId;
+	_LeagueId = DYN_CHAT_INVALID_CHAN;
 	_LeaderId = leader->getId();
 	_TeamMembers.push_back(_LeaderId);
 	// init the team chat group
@@ -120,6 +121,13 @@ void CTeam::release()
 	PROGRESSIONPVE::CCharacterProgressionPVE::getInstance()->disbandTeam(_TeamId, _TeamMembers);
 	PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->disbandTeam(_TeamId, _TeamMembers);
 
+	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
+	{
+		nlinfo("Release team : remove League channel");
+		DynChatEGS.removeChan(_LeagueId);
+	}
+	
+	_LeagueId = DYN_CHAT_INVALID_CHAN;
 	_TeamId = CTEAM::InvalidTeamId;
 	_TeamMembers.clear();
 	_NbMembers = 0;
@@ -283,6 +291,9 @@ void CTeam::addCharacter(CCharacter *newCharacter)
 	
 	// set the character team
 	newCharacter->setTeamId(_TeamId);
+	
+	// set the character alliance
+	newCharacter->setLeagueId(_LeagueId);
 
 	// Add character to chat group
 	TGroupId idGroupe = CHAT_GROUPS_IDS::getTeamChatGroupId(_TeamId);
@@ -384,6 +395,7 @@ void CTeam::removeCharacter( CCharacter * player )
 
 	///\todo give him a player team Id
 	player->setTeamId( CTEAM::InvalidTeamId );
+	player->setLeagueId(DYN_CHAT_INVALID_CHAN);
 	player->updateTargetingChars();
 
 	// tell progression system this player has been removed from his team
@@ -411,7 +423,10 @@ void CTeam::removeCharacter( CCharacter * player )
 		clearPlayerTeamDB( *_TeamMembers.begin() );
 		CCharacter * lastPlayer = PlayerManager.getOnlineChar( *_TeamMembers.begin() );
 		if ( lastPlayer )
+		{
 			lastPlayer->setTeamId( CTEAM::InvalidTeamId );
+			lastPlayer->setLeagueId(DYN_CHAT_INVALID_CHAN);
+		}
 		else
 		{
 			nlwarning("<CTeam removeCharacter> charId %s not found in the team", (*_TeamMembers.begin()).toString().c_str() );
@@ -553,6 +568,38 @@ void CTeam::removeCharacter( CCharacter * player )
 	sendMessageViaMirror( "IOS", msgRemoveGroup );
 
 }// CTeam removeCharacter
+
+void CTeam::setLeague(const string &leagueName)
+{
+	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
+	{
+		nlinfo("Allready have league, remove channel");
+		DynChatEGS.removeChan(_LeagueId);
+	}
+	
+	_LeagueId = DYN_CHAT_INVALID_CHAN;
+	
+	if (!leagueName.empty())
+	{
+		_LeagueId = DynChatEGS.addChan("league_"+leagueName, "League "+leagueName);
+		if (_LeagueId == DYN_CHAT_INVALID_CHAN)
+		{
+			nlinfo("Error channel creation !!!");
+			return;
+		}
+		nlinfo("v2 Add channel %s = [%s]", _LeagueId.toString().c_str(), leagueName.c_str());
+		// set historic size of the newly created channel
+		DynChatEGS.setHistoricSize(_LeagueId, 100);
+	}
+	
+	for (list<CEntityId>::iterator it = _TeamMembers.begin() ; it != _TeamMembers.end() ; ++it)
+	{
+		
+		CCharacter * ch = PlayerManager.getOnlineChar((*it));
+		if (ch != NULL)
+			ch->setLeagueId(_LeagueId);
+	}
+}
 
 uint8 CTeam::getSuccessorIndex(void)
 {

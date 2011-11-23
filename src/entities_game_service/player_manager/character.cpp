@@ -494,6 +494,9 @@ CCharacter::CCharacter():	CEntityBase(false),
 	///init teamId
 	_TeamId= CTEAM::InvalidTeamId;
 
+	///init LeagueId
+	_LeagueId = TChanID::Unknown;
+
 	// init combat flags
 	_CombatEventFlagTicks.resize(32);
 	for( uint i=0; i<32; ++i )
@@ -18672,7 +18675,24 @@ void CCharacter::setTeamId(uint16 id)
 	_TeamId = id;
 }
 
-
+void CCharacter::setLeagueId(TChanID id)
+{
+	// Remove old dynamic channel
+	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
+	{
+		nlinfo("Remove old League session");
+		DynChatEGS.removeSession(_LeagueId, getEntityRowId());
+	}
+	
+	if (id != DYN_CHAT_INVALID_CHAN)
+	{
+		nlinfo("Add League session");		
+		DynChatEGS.addSession(id, getEntityRowId(), true);
+	} else {
+		nlinfo("No add League session");
+	}
+	_LeagueId = id;
+}
 //------------------------------------------------------------------------------
 
 void CCharacter::setTeamInvitor(const NLMISC::CEntityId & invitorId)
@@ -18680,6 +18700,12 @@ void CCharacter::setTeamInvitor(const NLMISC::CEntityId & invitorId)
 	_TeamInvitor = invitorId;
 }
 
+//------------------------------------------------------------------------------
+
+void CCharacter::setLeagueInvitor(const NLMISC::CEntityId & invitorId)
+{
+	_LeagueInvitor = invitorId;
+}
 
 //------------------------------------------------------------------------------
 
