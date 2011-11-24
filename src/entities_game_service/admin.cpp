@@ -4663,7 +4663,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (command_args.size () != 4) return false;
 
 
-		uint32 factionIndex	= PVP_CLAN::getFactionIndex(PVP_CLAN::fromString(command_args[1]));
+		uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex(command_args[1]);
+		if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
+			return false;
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
 
 		sint32 value;
@@ -4679,6 +4681,35 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		{
 			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_fame", getSalt());
 			return false;
+		}
+
+	}
+	
+	
+	//*************************************************
+	//***************** set_fame (need x6000 to change 1 point)
+	//*************************************************
+	else if (command_args[0] == "change_fame")
+	{
+		if (command_args.size () != 4) return false;
+
+		uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex(command_args[1]);
+		if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
+			return false;
+		sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
+
+		sint32 value;
+		NLMISC::fromString(command_args[3], value);
+
+		if (command_args[2] == "add") {
+			CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame+value, false);
+			nlinfo("fame : %d => %d", fame, fame+value);
+		} else if (command_args[2] == "del") {
+			CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame-value, false);
+			nlinfo("fame : %d => %d", fame, fame-value);			
+		} else if (command_args[2] == "set") {
+			CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, value, false);
+			nlinfo("fame : %d => %d", fame, value);
 		}
 
 	}
@@ -6298,8 +6329,10 @@ NLMISC_COMMAND(setFamePlayer, "set the fame value of a player in the given facti
 
 	GET_CHARACTER
 
-	string faction = args[1];
-	uint32 factionIndex	= PVP_CLAN::getFactionIndex( PVP_CLAN::fromString(faction) );
+	uint32 factionIndex	=CStaticFames::getInstance().getFactionIndex(args[1]);
+	if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
+			return false;	
+
 	sint32 fame = atoi( args[2].c_str() );
 
 	CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame, true);
