@@ -168,7 +168,7 @@ void CTeamManager::joinLeagueDecline( const NLMISC::CEntityId &charId)
 		return;
 	}
 	invited->setAfkState(false);
-	if ( invited->getAllianceInvitor() == CEntityId::Unknown )
+	if ( invited->getLeagueInvitor() == CEntityId::Unknown )
 	{
 		nlwarning("<CTeamManager joinLeagueDecline>character %s has an Invalid invitor",charId.toString().c_str());
 		return;
@@ -200,7 +200,7 @@ void CTeamManager::joinLeagueAccept( const NLMISC::CEntityId &charId)
 	}
 
 	// get the invitor id
-	const NLMISC::CEntityId & invitorId = invited->getAllianceInvitor();
+	const NLMISC::CEntityId & invitorId = invited->getLeagueInvitor();
 
 	if ( invitorId == CEntityId::Unknown )
 	{
