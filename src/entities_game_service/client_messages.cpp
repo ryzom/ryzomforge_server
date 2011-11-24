@@ -2518,42 +2518,66 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 			}
 		}
 	}
-	else {
-		TChanID channel = CPVPManager2::getInstance()->getUserDynChannel(opt);
-
-		if ( (channel == DYN_CHAT_INVALID_CHAN) )
+	else
+	{
+		TChanID chanID;
+		
+		CCharacter * user = PlayerManager.getChar( id );
+		if ( !user )
+		{
+			nlwarning("<WHO>'%s' is invalid", id.toString().c_str() );
+			return;
+		}
+		CPlayer *p = PlayerManager.getPlayer(PlayerManager.getPlayerId(user->getId()));
+		
+		if (NLMISC::nlstricmp( opt.c_str(), "league" ) == 0)
+		{
+			
+			chanID = user->getLeagueId();
+		}
+		else
+		{
+			chanID = DynChatEGS.getChanIDFromName(opt);
+		}
+		
+		if (chanID == DYN_CHAT_INVALID_CHAN)
 		{
 			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_NOT_FOUND" );
 			return;
 		}
-
-		CCharacter * user = PlayerManager.getChar( id );
-		std::vector<TChanID> userChannels = CPVPManager2::getInstance()->getCharacterUserChannels(user);
-
-		CPlayer *p = PlayerManager.getPlayer(PlayerManager.getPlayerId(user->getId()));
-
-		bool hasChannel = false;
-		for (uint j = 0; j < userChannels.size(); ++j)
-		{
-			if (userChannels[j] == channel)
-			{
-				hasChannel = true;
-			}
-		}
-
-		// GM+ can do /who of any channel
+		
 		bool havePriv = p->havePriv(":DEV:SGM:GM:");
-		if (hasChannel || havePriv)
+		bool hasChannel = false;
+		nbAnswers = 0;
+		
+		vector<NLMISC::CEntityId> players;
+		DynChatEGS.getPlayersInChan(chanID, players);
+		string playerNames = "";
+		for (uint i = 0; i < players.size(); i++)
 		{
-			CPVPManager2::getInstance()->sendChannelUsers(channel, user, !hasChannel);
+			if (players[i] == id)
+				hasChannel = true;
+			playerNames += "\n"+CEntityIdTranslator::getInstance()->getByEntity(players[i]).toString();
+		}
+			
+		if (!hasChannel && !havePriv)
+		{
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal = opt;
+			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_NOT_CONNECTED", params );
+			
 			return;
 		}
-
-		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-		params[0].Literal = opt;
-		CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_NOT_CONNECTED", params );
 		
-		return;
+		if (!playerNames.empty())
+		{
+			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_INTRO" );
+			//playerNames = "Players in channel \"" + opt + "\":" + playerNames;
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal = playerNames;
+			CCharacter::sendDynamicSystemMessage( id, "LITERAL", params );
+			return;
+		}
 	}
 
 	if ( nbAnswers == 0 )
