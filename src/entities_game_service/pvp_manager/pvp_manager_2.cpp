@@ -386,7 +386,8 @@ void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user, bool out
 		TDataSetRow senderRow = TheDataset.getDataSetRow(user->getId());
 		if (outputToSys)
 		{
-			players = "Players in channel \"" + getUserDynChannel(channel) + "\": " + players;
+			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_INTRO" );
+			//players = "Players in channel \"" + getUserDynChannel(channel) + "\": " + players;
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
 			params[0].Literal = players;
 			CCharacter::sendDynamicSystemMessage( user->getId(), "LITERAL", params );
@@ -590,7 +591,7 @@ void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 	uint8 pvpMode = 0;
 	
 	// Full pvp
-	if ( user->getPriviledgePVP() )
+	if ( user->getFullPVP() )
 	{
 		pvpMode |= PVP_MODE::PvpChallenge;
 	}
@@ -676,15 +677,9 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
 	if( pTarget )
 	{
-		// priviledgePVP is Full PVP, only ally of teammates anf guildmates
-		if (pTarget->priviledgePVP() || actor->priviledgePVP())
+		// Full PVP is ennemy of everybody
+		if (pTarget->getFullPVP() || actor->getFullPVP())
 		{
-			if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
-				return PVP_RELATION::Ally;
-		
-			if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()))
-				return PVP_RELATION::Ally;
-
 			return PVP_RELATION::Ennemy;
 		}
 
@@ -741,8 +736,12 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 		if( relationTmp == PVP_RELATION::NeutralPVP )
 			relation = PVP_RELATION::NeutralPVP;
 
-		// Check if ally (neutralpvp has priority over ally)
-		if( relationTmp == PVP_RELATION::Ally && relation != PVP_RELATION::NeutralPVP )
+		// Active pvp (neutralpvp has priority over active)
+		if( relationTmp == PVP_RELATION::Active && relation != PVP_RELATION::NeutralPVP)
+			relation = PVP_RELATION::Active;
+			
+		// Check if ally (neutralpvp and active has priority over ally)
+		if( relationTmp == PVP_RELATION::Ally && relation != PVP_RELATION::NeutralPVP && relation != PVP_RELATION::Active )
 			relation = PVP_RELATION::Ally;
 	}
 
@@ -755,9 +754,10 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 {
 	nlassert(actor);
 	nlassert(target);
-
+	
 	PVP_RELATION::TPVPRelation pvpRelation = getPVPRelation( actor, target, true );
 	bool actionValid;
+	nlinfo("Pvp relation = %d", pvpRelation);
 	switch( pvpRelation )
 	{
 		case PVP_RELATION::Ally :
@@ -776,6 +776,9 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 			if( !checkMode )
 				CCharacter::sendDynamicSystemMessage(actor->getEntityRowId(), "PVP_CANT_HELP_NEUTRAL_PVP");
 			break;
+		case PVP_RELATION::Active :
+			actionValid = true;
+			break;
 		default:
 			actionValid = false;
 			if( !checkMode )
@@ -785,10 +788,12 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 	if( actionValid && !checkMode )
 	{
 		CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
-		if(pTarget)
-			actor->clearSafeInPvPSafeZone();
+	
+		//if(pTarget)
+		//	actor->clearSafeInPvPSafeZone();
+		
 		// propagate faction pvp flag
-		if( pvpRelation == PVP_RELATION::Ally )
+		if( pvpRelation == PVP_RELATION::Ally || pvpRelation == PVP_RELATION::Active )
 		{
 			if( _PVPFactionAllyReminder )
 			{
@@ -804,17 +809,12 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 				}
 			}
 		
-		// stop outpost leaving timer
-		if( _PVPOutpostAllyReminder )
-		{
-			actor->refreshOutpostLeavingTimer();
+			// stop outpost leaving timer
+			if( _PVPOutpostAllyReminder )
+			{
+				actor->refreshOutpostLeavingTimer();
+			}
 		}
-		
-		// propagate full pvp
-		if( pTarget->priviledgePVP() )
-			actor->setPriviledgePVP(true);
-	}
-
 	}
 	return actionValid;
 }
@@ -851,6 +851,9 @@ bool CPVPManager2::isOffensiveActionValid( CCharacter * actor, CEntityBase * tar
 			actionValid = false;
 			if( !checkMode )
 				CCharacter::sendDynamicSystemMessage(actor->getEntityRowId(), "PVP_CANT_ATTACK_NEUTRAL");
+			break;
+		case PVP_RELATION::Active :
+			actionValid = true;
 			break;
 		default:
 			actionValid = false;
@@ -908,16 +911,28 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 		case PVP_RELATION::NeutralPVP :
 			actionValid = false;
 			break;
+		case PVP_RELATION::Active :
+			actionValid = false;
+			break;
 		default:
 			actionValid = offensive;
 	}
 	
 	if( actionValid )
 	{
+		
+		/*if (!offensive) {
+			if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != pTarget->getTeamId()))
+				return false;
+		
+			if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() != pTarget->getGuildId()))
+				return false;
+		}*/
+		
 		if( areaTarget->getId().getType() == RYZOMID::player )
 		{
 			CCharacter * pTarget = dynamic_cast<CCharacter*>(areaTarget);
-			if(pTarget)
+			if(pTarget && offensive)
 				actor->clearSafeInPvPSafeZone();
 			// set faction flag
 			if( offensive && _PVPFactionEnemyReminder )
