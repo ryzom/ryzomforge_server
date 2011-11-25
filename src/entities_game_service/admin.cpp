@@ -605,12 +605,12 @@ void initSalt()
 {
 	H_AUTO(initSalt);
 	
-	/*string fileNameAndPath = Bsi.getLocalPath() + "salt_egs.txt";
+	string fileNameAndPath = Bsi.getLocalPath() + "salt_egs.txt";
 	if (CFile::fileExists(fileNameAndPath))
-	{*/
+	{
 		nlinfo("Salt loading : salt_egs.txt");
 		Bsi.syncLoadFile("salt_egs.txt", new SaltFileLoadCallback("salt_egs.txt"));
-	//}
+	}
 }
 
 const string &getSalt()
