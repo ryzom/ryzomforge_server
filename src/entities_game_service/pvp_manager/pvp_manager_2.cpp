@@ -386,7 +386,7 @@ void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user, bool out
 		TDataSetRow senderRow = TheDataset.getDataSetRow(user->getId());
 		if (outputToSys)
 		{
-			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_INTRO" );
+			CCharacter::sendDynamicSystemMessage( user->getId(), "WHO_CHANNEL_INTRO" );
 			//players = "Players in channel \"" + getUserDynChannel(channel) + "\": " + players;
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
 			params[0].Literal = players;

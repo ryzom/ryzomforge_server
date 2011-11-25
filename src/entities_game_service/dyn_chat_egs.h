@@ -76,6 +76,9 @@ public:
 	bool				setWriteRight(TChanID chan, const TDataSetRow &client, bool writeRight);
 	// Set size of historic for a given channel
 	void				setHistoricSize(TChanID chan, uint32 size);
+	// Get list of players in channel
+	bool 				getPlayersInChan(TChanID chanID, std::vector<NLMISC::CEntityId> &players);
+	
 	// Resend all channel / sessions to the IOS
 	void				iosConnection();	
 	// Get all channel names (for read only)
