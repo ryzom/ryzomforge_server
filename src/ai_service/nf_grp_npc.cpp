@@ -462,7 +462,7 @@ Arguments: f(Radius) ->
 @param[in] Radius dispersion of wander activity
 
 @code
-()startWander(100); // Gives a wander activity to the group with dispersion of 100
+()startMoving(100,-100,10); // Moves the group to 100,-100 with radius of 10
 @endcode
 
 */
@@ -501,6 +501,56 @@ void startMoving_fff_(CStateInstance* entity, CScriptStack& stack)
 	return;
 }
 
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection followPlayer_sf_
+Set activity to follow the given player
+
+Arguments: s(PlayerEid) f(Radius) ->
+@param[in] PlayerEid id of player to follow
+@param[in] Radius dispersion of wander activity
+
+@code
+()followPlayer("(0x0002015bb4:01:88:88)",10);
+@endcode
+
+*/
+// Spawned CGroupNpc not in a family behaviour
+void followPlayer_sf_(CStateInstance* entity, CScriptStack& stack)
+{
+	uint32 dispersionRadius = (uint32)(float&)stack.top(); stack.pop();
+	NLMISC::CEntityId playerId = NLMISC::CEntityId((std::string)stack.top());
+	
+	IManagerParent* const managerParent = entity->getGroup()->getOwner()->getOwner();
+	CAIInstance* const aiInstance = dynamic_cast<CAIInstance*>(managerParent);
+	if (!aiInstance)
+		return;
+	
+	if (!entity) { nlwarning("followPlayer failed!"); return; }
+	
+	CGroupNpc* group = dynamic_cast<CGroupNpc*>(entity->getGroup());
+	if (!group)
+	{	nlwarning("followPlayer failed: no NPC group");
+		return;
+	}
+	CSpawnGroupNpc* spawnGroup = group->getSpawnObj();
+	if (!spawnGroup)
+	{	nlwarning("followPlayer failed: no spawned group");
+		return;
+	}
+
+	if (playerId == CEntityId::Unknown)
+	{
+		nlwarning("followPlayer failed: unknown player");
+		DEBUG_STOP;
+		return;
+	}
+
+	spawnGroup->movingProfile().setAIProfile(new CGrpProfileFollowPlayer(spawnGroup, TheDataset.getDataSetRow(playerId), dispersionRadius));
+
+	return;
+}
 
 
 //----------------------------------------------------------------------------
@@ -2706,6 +2756,7 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, startMoving_fff_);
 	REGISTER_NATIVE_FUNC(functions, waitInZone_s_);
 	REGISTER_NATIVE_FUNC(functions, stopMoving__);
+	REGISTER_NATIVE_FUNC(functions, followPlayer_sf_);
 	REGISTER_NATIVE_FUNC(functions, wander__);
 	REGISTER_NATIVE_FUNC(functions, setAttackable_f_);
 	REGISTER_NATIVE_FUNC(functions, setPlayerAttackable_f_);

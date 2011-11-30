@@ -2299,6 +2299,94 @@ void CGrpProfileStandOnVertices::updateProfile(uint ticksSinceLastUpdate)
 }
 	
 //////////////////////////////////////////////////////////////////////////////
+// CGrpProfileFollowPlayer                                                //
+//////////////////////////////////////////////////////////////////////////////
+CGrpProfileFollowPlayer::CGrpProfileFollowPlayer(CProfileOwner* owner, TDataSetRow const& playerRow, uint32 dispersionRadius)
+: CMoveProfile(owner)
+, _PlayerRow(playerRow)
+, _DispersionRadius(dispersionRadius)
+, _PathPos(CAngle(0))
+, _PathCont(NLMISC::safe_cast<CSpawnBotNpc*>(owner)->getAStarFlag())
+{
+	PROFILE_LOG("group", "follow player", "ctor", "");
+	_Status = CFollowPath::FOLLOWING;
+}
+
+bool CGrpProfileFollowPlayer::destinationReach()	const
+{
+	return	_Status == CFollowPath::FOLLOW_ARRIVED
+		||	_Status==CFollowPath::FOLLOW_NO_PATH;
+}
+
+void CGrpProfileFollowPlayer::beginProfile()
+{
+	_Status = CFollowPath::FOLLOWING;
+}
+
+// TODO: this doesn't work very well at all...
+void CGrpProfileFollowPlayer::updateProfile(uint ticksSinceLastUpdate)
+{
+	H_AUTO(CGrpProfileFollowPlayerUpdate);
+	CFollowPathContext fpcGrpFollowPlayerUpdate("CGrpProfileFollowPlayerUpdate");
+
+	// check all bot to see if there need to move 
+	CSpawnGroupNpc* grp = static_cast<CSpawnGroupNpc*>(static_cast<CSpawnGroup*>(_Grp));
+	CGroupNpc &pgrp = grp->getPersistent();
+	
+	CBotPlayer*	plrPtr	=	dynamic_cast<CBotPlayer*>(CAIS::instance().getEntityPhysical(_PlayerRow));
+
+	if ( ! plrPtr) {
+		nlwarning("CGrpProfileFollowPlayer: No valid player position to follow");
+		return;
+	}
+
+	_PathCont.setDestination(plrPtr->wpos());
+	_PathPos._Angle = plrPtr->theta();
+
+	for (uint i = 0; i < pgrp.bots().size(); ++i)
+	{
+		CBotNpc* bot = static_cast<CBotNpc*>(pgrp.bots()[i]);
+		if (!bot)
+			continue;
+
+		// check current bot state
+		CSpawnBotNpc *sbot = bot->getSpawn();
+		if (!sbot)
+			continue;
+
+		// Need to wait for a correct position before moving?
+		CAIVector const& dest = _PathCont.getDestination();
+		if (dest.x()==0 || dest.y()==0)
+			return;
+		
+		static const std::string runParameter("running");
+		float	dist;
+		if (sbot->getPersistent().getOwner()->getSpawnObj()->checkProfileParameter(runParameter))
+			dist = sbot->runSpeed()*ticksSinceLastUpdate;		
+		else
+			dist = sbot->walkSpeed()*ticksSinceLastUpdate;
+
+		// Move
+		CFollowPath::TFollowStatus const status = CFollowPath::getInstance()->followPath(
+			sbot,
+			_PathPos,
+			_PathCont,
+			dist,
+			0.f,
+			0.5f);
+
+		if (status==CFollowPath::FOLLOW_NO_PATH)
+		{
+			nlwarning("Problem with following player");
+		}
+
+		
+	}	
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////
 // CGrpProfileIdle                                                     //
 //////////////////////////////////////////////////////////////////////////////
 

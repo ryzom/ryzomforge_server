@@ -6500,6 +6500,26 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
+
+		// Replace "(eid:<player name>)" with player Entity ID string
+		size_t pos = arg.find("(eid:");
+		while (pos != string::npos)
+		{
+			string s = arg.substr(pos, arg.find(")\"", pos) - pos + 1);
+			if (s.length() > 6)
+			{
+				string name = s.substr(5, s.length() - 6);
+				CCharacter * player = PlayerManager.getCharacterByName( CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), name) );
+				CEntityId id = CEntityId::Unknown;
+				if (player != NULL)
+				{
+					id = player->getId();
+				}
+				strFindReplace(arg, s, id.toString());
+			}
+			pos = arg.find("(eid:");
+		}
+
 		msgout.serial(arg);
 	}
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
