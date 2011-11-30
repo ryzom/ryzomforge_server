@@ -697,7 +697,7 @@ void CMessages::init()
 	TRANSPORT_CLASS_REGISTER (CReportStaticAIInstanceMsg);
 	TRANSPORT_CLASS_REGISTER (CReportAIInstanceDespawnMsg);
 	TRANSPORT_CLASS_REGISTER (CWarnBadInstanceMsgImp);
-
+	TRANSPORT_CLASS_REGISTER (CChangeCreatureMaxHPMsg)
 	TRANSPORT_CLASS_REGISTER (CChangeCreatureHPMsg);
 	TRANSPORT_CLASS_REGISTER (CChangeCreatureModeMsgImp);
 	TRANSPORT_CLASS_REGISTER (CQueryEgs);

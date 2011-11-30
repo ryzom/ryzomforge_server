@@ -1374,6 +1374,7 @@ void CPlayerService::init()
 	TRANSPORT_CLASS_REGISTER (CReportAIInstanceDespawnMsgImp);
 	TRANSPORT_CLASS_REGISTER (CWarnBadInstanceMsg);
 	TRANSPORT_CLASS_REGISTER (CCreatureCompleteHealImp);
+	TRANSPORT_CLASS_REGISTER (CChangeCreatureMaxHPImp);
 	TRANSPORT_CLASS_REGISTER (CChangeCreatureHPImp);
 	TRANSPORT_CLASS_REGISTER (CChangeCreatureModeMsg);
 	TRANSPORT_CLASS_REGISTER (CGiveItemRequestMsgImp);

@@ -196,6 +196,28 @@ void CCreatureCompleteHealImp::callback(const string &, NLNET::TServiceId sid)
 }
 
 //--------------------------------------------------------------
+//				CChangeCreatureMaxHPImp ::callback()  
+//--------------------------------------------------------------
+void CChangeCreatureMaxHPImp::callback(const string &, NLNET::TServiceId sid)
+{
+	H_AUTO(CChangeCreatureMaxHPImp);
+	
+	// for each creature, restore full HP
+	for ( uint i = 0; i < Entities.size(); ++i )
+	{
+		CCreature * c = CreatureManager.getCreature( Entities[i] );
+		if ( c )
+		{
+			c->getScores()._PhysicalScores[SCORES::hit_points].Max = MaxHp[i];
+			if (SetFull[i] != 0)
+				c->changeCurrentHp( c->maxHp() - c->currentHp() );
+		}
+	}
+}
+
+
+
+//--------------------------------------------------------------
 //				CChangeCreatureHPImp ::callback()  
 //--------------------------------------------------------------
 void CChangeCreatureHPImp::callback(const string &, NLNET::TServiceId sid)

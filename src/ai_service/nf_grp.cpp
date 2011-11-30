@@ -1497,6 +1497,41 @@ void setAutoSpawn_f_(CStateInstance* entity, CScriptStack& stack)
 // HP related methods
 /** @page code
 
+@subsection setMaxHP_ff_
+Sets the Max HP level of each bot of the group.
+
+Arguments: f(MaxHp) f(SetFull) ->
+@param[in] MaxHP is the new maximum HP for each bot
+@param[in] SetFull if not 0, will set the HP to the new maximum
+
+@code
+()setMaxHP(50000,1);
+@endcode
+
+*/
+// CGroup
+void setMaxHP_ff_(CStateInstance* entity, CScriptStack& stack)
+{
+	bool  setFull = ((float)stack.top() != 0.f); stack.pop();
+	float maxHp = ((float)stack.top()); stack.pop();
+	
+	CChangeCreatureMaxHPMsg& msgList = CAIS::instance().getCreatureChangeMaxHP();
+	
+	FOREACH(bot, CCont<CBot>, entity->getGroup()->bots())
+	{
+		if (!bot->isSpawned())
+			continue;
+		
+		CSpawnBot* const sbot = bot->getSpawnObj();
+		
+		msgList.Entities.push_back(sbot->dataSetRow());
+		msgList.MaxHp.push_back((uint32)(maxHp));
+		msgList.SetFull.push_back((uint8)(setFull?1:0));
+	}
+}
+
+/** @page code
+
 @subsection setHPLevel_f_
 Sets the current HP level of each bot of the group.
 
@@ -4686,6 +4721,7 @@ std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, clearAggroList__);
 	REGISTER_NATIVE_FUNC(functions, setMode_s_);
 	REGISTER_NATIVE_FUNC(functions, setAutoSpawn_f_);
+	REGISTER_NATIVE_FUNC(functions, setMaxHP_ff_);
 	REGISTER_NATIVE_FUNC(functions, setHPLevel_f_);
 	REGISTER_NATIVE_FUNC(functions, setHPScale_f_);
 	REGISTER_NATIVE_FUNC(functions, scaleHP_f_);
