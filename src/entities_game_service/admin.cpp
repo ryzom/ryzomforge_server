@@ -4949,7 +4949,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 
 		std::string look;
-		if (command_args.size() > 8) look = command_args[8];
+		if (command_args.size() > 8)
+		{
+			look = command_args[8];
+			if (look.find(".creature") == string::npos)
+				look += ".creature";
+		}
 
 		// See if another AI instance has been specified
 		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
@@ -6420,7 +6425,12 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	}
 
 	std::string look;
-	if (args.size() > 9) look = args[9];
+	if (args.size() > 9)
+	{
+		look = args[9];
+		if (look.find(".creature") == string::npos)
+			look += ".creature";
+	}
 
 	// See if another AI instance has been specified
 	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))

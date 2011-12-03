@@ -4491,6 +4491,37 @@ void setSheet_s_(CStateInstance* entity, CScriptStack& stack)
 	}
 }
 
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection setClientSheet_s_
+Change the client sheet of a creature
+
+Arguments: -> s(sheetName)
+
+@code
+()setClientSheet('ccdeb2');
+
+@endcode
+
+*/
+void setClientSheet_s_(CStateInstance* entity, CScriptStack& stack)
+{
+	string sheetname = stack.top();
+	stack.pop();
+	
+	if (sheetname.find(".creature") == string::npos)
+		sheetname += ".creature";
+
+	FOREACH(itBot, CCont<CBot>, entity->getGroup()->bots())
+	{
+		CBot* bot = *itBot;
+		if (bot)
+		{
+			bot->setClientSheet(sheetname);
+		}
+	}
+}
 
 /****************************************************************************/
 
@@ -4745,6 +4776,7 @@ std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, getEventParam_f_f);
 	REGISTER_NATIVE_FUNC(functions, getEventParam_f_s);
 	REGISTER_NATIVE_FUNC(functions, setSheet_s_);
+	REGISTER_NATIVE_FUNC(functions, setClientSheet_s_);
 	REGISTER_NATIVE_FUNC(functions, setHealer_f_);
 	REGISTER_NATIVE_FUNC(functions, setConditionSuccess_f_);
 	REGISTER_NATIVE_FUNC(functions, facing_f_);
