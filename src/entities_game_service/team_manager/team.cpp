@@ -433,6 +433,9 @@ void CTeam::removeCharacter( CCharacter * player )
 			return;
 		}
 
+		// remove league
+		setLeague("");
+		
 		// remove the team chat group
 		TGroupId idGroupe = CHAT_GROUPS_IDS::getTeamChatGroupId(_TeamId);
 		CMessage msgRemoveGroup("REMOVE_GROUP");
