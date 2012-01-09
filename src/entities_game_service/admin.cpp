@@ -5168,9 +5168,45 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial(name);
 		sendMessageViaMirror("IOS", msgout);
 	}
-	else
-		return false;
 
+	//*************************************************
+	//***************** teleport
+	//*************************************************
+
+	else if (command_args[0] == "teleport")
+	{
+		// args: x y z [t]
+		if (command_args.size () < 4 ||
+			command_args.size () > 5 ) return false;
+
+		sint32 x;
+		sint32 y;
+		sint32 z;
+		float  t;
+		fromString(command_args[1], x);
+		fromString(command_args[2], y);
+		fromString(command_args[3], z);
+		if (command_args.size() > 4)
+		{
+			fromString(command_args[4], t);
+		}
+		else
+		{
+			t = c->getState().Heading;
+		}
+
+		NLNET::CMessage msgout( "TELEPORT_PLAYER" );
+		msgout.serial( const_cast<CEntityId &>(c->getId()) );
+		msgout.serial( const_cast<sint32 &>(x) );
+		msgout.serial( const_cast<sint32 &>(y) );		
+		msgout.serial( const_cast<sint32 &>(z) );		
+		msgout.serial( const_cast<float &>(t) );		
+		sendMessageViaMirror( "EGS", msgout );	
+	}
+	else
+	{
+		return false;
+	}
 
 	if (!new_check) {
 		if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
