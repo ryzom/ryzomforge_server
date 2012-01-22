@@ -694,7 +694,8 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 			bot->equipmentInit();
 			bot->initEnergy(/*groupEnergyCoef()*/0);
 			CAIVector rpos(pos);
-			//if (i!=0)
+			// Spawn all randomly except if only 1 bot
+			if (nbBots > 1)
 			{
 				RYAI_MAP_CRUNCH::CWorldMap const& worldMap = CWorldContainer::getWorldMap();
 				RYAI_MAP_CRUNCH::CWorldPosition	wp;
