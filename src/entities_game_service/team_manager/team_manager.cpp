@@ -110,14 +110,21 @@ void CTeamManager::joinLeagueProposal( CCharacter * leader, const CEntityId &tar
 		CCharacter::sendDynamicSystemMessage( leader->getId(),"LEAGUE_ALREADY_INVITED" );
 		return;
 	}
-	else if ( code == NotInTeam )
+	else if ( code == AlreadyInLeague )
 	{
-		CCharacter::sendDynamicSystemMessage( leader->getId(),"LEAGUE_TARGET_NOT_IN_TEAM" );
+		CTeam * team = getRealTeam( invitedPlayer->getTeamId() );
+		CCharacter::sendDynamicSystemMessage( leader->getId(),"LEAGUE_ALREADY_IN_LEAGUE" );
+		return;
+	}
+	else if ( code == NotLeader )
+	{
+		CTeam * team = getRealTeam( invitedPlayer->getTeamId() );
+		joinLeagueProposal(leader, team->getLeader());
 		return;
 	}
 	else if ( code == CantInvite )
 	{
-		CCharacter::sendDynamicSystemMessage( leader->getId(),"LEAGUE_TARGET_NOT_IN_TEAM" );
+		CCharacter::sendDynamicSystemMessage( leader->getId(),"LEAGUE_INVITOR_NOT_LEADER" );
 		return;
 	}
 
@@ -226,13 +233,25 @@ void CTeamManager::joinLeagueAccept( const NLMISC::CEntityId &charId)
 	teamInvited = getRealTeam( invited->getTeamId() );
 	teamInvitor = getRealTeam(invitor->getTeamId());
 	
-	if ( !teamInvitor || !teamInvited)
+	if ( !teamInvitor )
 	{
 		nlwarning("<CTeamManager joinLeagueAccept>character %s, invitor id %s, the invited or invitor player is not in a valid team. ",charId.toString().c_str(),invitor->getId().toString().c_str() );
 		return;
 	}
-
-	teamInvited->setLeagueId(teamInvitor->getLeagueId());
+	
+	
+	// check that the invitor team have league else create them
+	if (teamInvitor->getLeagueId() == DYN_CHAT_INVALID_CHAN )
+	{
+		teamInvitor->setLeague("League");
+	}
+	
+	if (teamInvited) {
+		teamInvited->setLeagueId(teamInvitor->getLeagueId());
+		teamInvited->updateLeague();
+	} else {
+		invited->setLeagueId(teamInvitor->getLeagueId(), true);
+	}
 	
 } // joinLeagueAccept //
 
@@ -283,7 +302,7 @@ void CTeamManager::joinProposal( CCharacter * leader, const CEntityId &targetId)
 	}
 	else if ( code == CantInviteEnemy )
 	{
-		CCharacter::sendDynamicSystemMessage( leader->getId(),"TEAM_CANT_INVITE_ENEMIE" );
+		CCharacter::sendDynamicSystemMessage( leader->getId(),"TEAM_CANT_INVITE_ENEMY" );
 		return;
 	}
 	else if ( code == CantInvite )
@@ -680,37 +699,35 @@ CTeamManager::TInviteRetCode CTeamManager::isLeagueInvitableBy(CCharacter * invi
 	nlassert( invited );
 	nlassert( invitor );
 
-	// check if target is not already invited
-	if( invited->getLeagueInvitor() != CEntityId::Unknown )
-	{
-		return AlreadyInvited;
-	}
-	  
-	// get the target team
-	CTeam * team = getRealTeam( invited->getTeamId() );
-	if(!team )
-		return NotInTeam;
-	
-	// check that the invited is the leader
-	if (team->getLeader() != invited->getId() )
+	if ( !TheDataset.isAccessible(invited->getEntityRowId()) || !TheDataset.isAccessible(invitor->getEntityRowId()))
 		return CantInvite;
-
+	
 	// check that the invitor is in team
-	team = getRealTeam( invitor->getTeamId() );
-	if(!team )
-		return NotInTeam;
+	CTeam * team = getRealTeam( invitor->getTeamId() );
+	if (!team)
+		return CantInvite;
 	
 	// check that the invitor is the leader
 	if (team->getLeader() != invitor->getId() )
 		return CantInvite;
-	
-	if ( !TheDataset.isAccessible(invited->getEntityRowId()) || !TheDataset.isAccessible(invitor->getEntityRowId()))
-		return CantInvite;
+		
+	// check that the invited don't have league
+	if (invited->getLeagueId() !=  DYN_CHAT_INVALID_CHAN)
+		return AlreadyInLeague;
+	  
+	// check if target is not already invited
+	if( invited->getLeagueInvitor() != CEntityId::Unknown )
+		return AlreadyInvited;	
 
-	// cannot invite enemy in faction PvP zones
-	//if( CPVPManager2::getInstance()->isOffensiveActionValid( invited, invitor, true ) )
-	//	if( invited->getPvPRecentActionFlag() || invitor->getPvPRecentActionFlag() )
-	//		return CantInviteEnemy;
+	// get the target team
+	team = getRealTeam( invited->getTeamId() );
+	if (!team)
+		return NotInTeam;
+
+	// check that the invited is the leader
+	if (team->getLeader() != invited->getId() )
+		return NotLeader;
+
 	return Ok;
 }
 
@@ -739,19 +756,20 @@ CTeamManager::TInviteRetCode CTeamManager::isInvitableBy(CCharacter * invited, C
 	
 	// check that the invitor is alone or a group leader
 	team = getRealTeam( invitor->getTeamId() );
-	if ( team && team->getLeader()!= invitor->getId() )
+	
+	if (team && team->getLeader()!= invitor->getId())
 	{
 		return CantInvite;
 	}
-
+		
 	// check faction of invitor  and invited, player can't invite an enemy in team.
 	if ( !TheDataset.isAccessible(invited->getEntityRowId()) || !TheDataset.isAccessible(invitor->getEntityRowId()))
 		return CantInvite;
 
 	// cannot invite enemy in faction PvP zones
-	if( CPVPManager2::getInstance()->isOffensiveActionValid( invited, invitor, true ) )
+/*	if( CPVPManager2::getInstance()->isOffensiveActionValid( invited, invitor, true ) )
 		if( invited->getPvPRecentActionFlag() || invitor->getPvPRecentActionFlag() )
-			return CantInviteEnemy;
+			return CantInviteEnemy;*/
 	return Ok;
 }
 

@@ -386,7 +386,7 @@ PVP_RELATION::TPVPRelation CPVPFreeZone::getPVPRelation( CCharacter * user, CEnt
 	bool targetSafe = false;
 	bool actorSafe = false;
 	
-	if( target->getId().getType() != RYZOMID::player )
+	if (target->getId().getType() != RYZOMID::player)
 	{
 		return PVP_RELATION::Unknown;
 	}
@@ -397,46 +397,30 @@ PVP_RELATION::TPVPRelation CPVPFreeZone::getPVPRelation( CCharacter * user, CEnt
 			targetSafe = true;
 	}
 
-	if( CPVPManager2::getInstance()->inSafeZone(user->getPosition()))
+	if (CPVPManager2::getInstance()->inSafeZone(user->getPosition()))
 	{
 		if( user->getSafeInPvPSafeZone())
 			actorSafe = true;
 	}
 
 	if ((targetSafe && !actorSafe) || (actorSafe && !targetSafe)) {
-		nlinfo("NeutralPVP one in safe zone");
 		return PVP_RELATION::NeutralPVP;
 	}
 
-	// if target is in same zone then he's an ennemy or ally 
-	if ( _Users.find( target->getEntityRowId() ) != _Users.end() )
+	// In same Zone
+	if (_Users.find( target->getEntityRowId() ) != _Users.end())
 	{
-		if( inSameTeam( user, pTarget ) || inSameLeague( user, pTarget ))
+		// In Same Team or League => Ally
+		if (inSameTeam( user, pTarget ) || inSameLeague( user, pTarget ))
 		{
 			return PVP_RELATION::Ally;
 		}
-		else
-		{
-			if (targetSafe && actorSafe) {
-				nlinfo("NeutralPVP both in safe zone");
-				return PVP_RELATION::NeutralPVP;
-			}
+				
+		// If both not in safe zone => Ennemy
+		if (!targetSafe && !actorSafe)
 			return PVP_RELATION::Ennemy;
-		}
 	}
-/*
-	// if target is in free pvp then he's neutral pvp
-	const CCharacter * targetChar = static_cast<const CCharacter*>(target);
-	if( targetChar->getPVPInterface().isValid() )
-	{
-		if( targetChar->getPVPInterface().getPVPSession()->getPVPMode() == PVP_MODE::PvpZoneFree );
-		{
-			return PVP_RELATION::NeutralPVP;
-		}
-	}
-	
-	return PVP_RELATION::Neutral;
-	 */
+
 	return PVP_RELATION::NeutralPVP;
 }
 
@@ -1195,39 +1179,29 @@ PVP_RELATION::TPVPRelation CPVPGuildZone::getPVPRelation( CCharacter * user, CEn
 	}
 
 	if ((targetSafe && !actorSafe) || (actorSafe && !targetSafe)) {
-		nlinfo("NeutralPVP one in safe zone");
 		return PVP_RELATION::NeutralPVP;
 	}
 
 	// if target is in same zone then he's an ennemy or ally 
 	if ( _Users.find( target->getEntityRowId() ) != _Users.end() )
 	{
-		if( inSameGuild(pTarget, user) || inSameTeam( user, pTarget ) || inSameLeague( user, pTarget ))
+		// In Same Team or League => Ally
+		if (inSameTeam( user, pTarget ) || inSameLeague( user, pTarget ))
 		{
 			return PVP_RELATION::Ally;
 		}
-		else
+		
+		// in same Guild and not in Leagues => Ally 
+		if (inSameGuild( user, pTarget ) && user->getLeagueId() == DYN_CHAT_INVALID_CHAN && pTarget->getLeagueId() == DYN_CHAT_INVALID_CHAN)
 		{
-			if (targetSafe && actorSafe) {
-				nlinfo("NeutralPVP both in safe zone");
-				return PVP_RELATION::NeutralPVP;
-			}
+			return PVP_RELATION::Ally;
+		}
+		
+		// If both not in safe zone => Ennemy
+		if (!targetSafe && !actorSafe)
 			return PVP_RELATION::Ennemy;
-		}
 	}
-/*
-	
-	// if target is in guild pvp then he's neutral pvp
-	if( targetChar->getPVPInterface().isValid() )
-	{
-		if( targetChar->getPVPInterface().getPVPSession()->getPVPMode() == PVP_MODE::PvpZoneGuild )
-		{
-			return PVP_RELATION::NeutralPVP;		
-		}
-	}
-	
-	return PVP_RELATION::Neutral;
-*/
+
 	return PVP_RELATION::NeutralPVP;	 
 }
 	

@@ -84,7 +84,11 @@ public:
 	 * \param leagueName is the name of League
 	 */
 	void setLeague(const std::string &leagueName);
-
+	/**
+	 * update the League (set LeagueId to all teammates)
+	 */
+	void updateLeague();
+	
 	/**
 	 * set the team leader
 	 * \param id is the Entity ID of the member in the team

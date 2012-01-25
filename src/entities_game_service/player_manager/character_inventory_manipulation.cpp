@@ -2443,7 +2443,7 @@ void CCharacter::sendItemInfos( uint16 slotId )
 		infos.TypeSkillMods = item->getTypeSkillMods();
 		
 		// Special case of web missions items
-		if (item->getStaticForm()->Name == "Web Transaction" || item->getStaticForm()->Family == ITEMFAMILY::SCROLL)
+		if (item->getStaticForm()->Name == "Web Transaction")
 		{
 			string cText = item->getCustomText().toString();
 			string::size_type sPos = cText.find(" ");
@@ -2452,10 +2452,6 @@ void CCharacter::sendItemInfos( uint16 slotId )
 			{
 				string cUrl = cText.substr(sPos, ePos-sPos);
 				infos.CustomText = ucstring("@WEBIG "+cUrl);
-			}
-			else if (item->getStaticForm()->Name != "Web Transaction")
-			{
-				infos.CustomText = item->getCustomText();
 			}
 		}
 		else

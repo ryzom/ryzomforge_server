@@ -854,7 +854,7 @@ inline uint16 CCharacter::getKilledPvPRegion()
 
 //------------------------------------------------------------------------------
 
-inline bool CCharacter::getSafeInPvPSafeZone()
+inline bool CCharacter::getSafeInPvPSafeZone() const
 {
 	return _PvPSafeZoneActive; 
 }

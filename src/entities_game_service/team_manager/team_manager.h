@@ -47,10 +47,12 @@ public:
 	{
 		AlreadyInvited,
 		AlreadyInTeam,
+		AlreadyInLeague,
 		CantInviteEnemy,
 		CantInvite,
 		Ok,
 		NotInTeam,
+		NotLeader,
 	};
 	/// default constructor
 	CTeamManager()

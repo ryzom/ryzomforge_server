@@ -86,7 +86,8 @@ public:
 	const TChanIDToName	&getChanIDToNameMap() const { return _ChanNames.getAToBMap(); }
 	// Get pointer on all channels
 	void				getChans(std::vector<CDynChatChan *> &channels) { _DynChat.getChans(channels); }
-
+	const TChanID				getNextChanID() const { return _NextChanID; }
+	
 	/// Message from a service that need to create a new dynamic channel
 	static void			cbServiceAddChan(NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId);
 	/// Message from a service that need to hide bubbble of player/npc speaking in that channel

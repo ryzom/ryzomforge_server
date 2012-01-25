@@ -418,6 +418,10 @@ private:
 		RemoveFriend,
 		RemoveIgnored,
 		
+		AddedAsLeague,
+		RemovedFromLeague,
+		RemoveLeague,
+		
 		NB_CONTACT_LIST_ACTIONS,
 		UnknownContactListAction= NB_CONTACT_LIST_ACTIONS,
 	};
@@ -752,7 +756,7 @@ public:
 	/// set the team Id of this player
 	void setTeamId(uint16 id);
 	/// set the League id
-	void setLeagueId(TChanID id);
+	void setLeagueId(TChanID id, bool removeIfEmpty=false);
 	/// get team invitor
 	const NLMISC::CEntityId & getTeamInvitor() const;
 	/// set team invitor
@@ -1162,6 +1166,12 @@ public:
 	/// get the number of faction point given a faction
 	uint32	getFactionPoint(PVP_CLAN::TPVPClan clan);
 
+	/// set the number of pvp point
+	void	setPvpPoint(uint32 nbPt);
+
+	/// get the number of pvp point given a faction
+	uint32	getPvpPoint();
+	
 	/// set the SDB path where player wins HoF points in PvP (if not empty)
 	void	setSDBPvPPath(const std::string & sdbPvPPath);
 
@@ -1171,6 +1181,9 @@ public:
 	/// init faction point in client database
 	void	initFactionPointDb();
 
+	/// init pvp point in client database
+	void	initPvpPointDb();
+	
 	/// send faction point gain phrase to the client
 	void	sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain);
 	/// send faction point gain kill phrase to the client
@@ -1867,15 +1880,18 @@ public:
 		/// add a player to friend list by name
 		void addPlayerToFriendList(const ucstring &name);
 
-		/// add a player to friend list by id
-		void addPlayerToFriendList(const NLMISC::CEntityId &id);
-
 		/// add a player to ignore list by name
 		void addPlayerToIgnoreList(const ucstring &name);
 
 		/// add a player to ignore list by Id
 		void addPlayerToIgnoreList(const NLMISC::CEntityId &id);
 		
+		/// add a player to league list by id
+		void addPlayerToLeagueList(const NLMISC::CEntityId &id);
+
+		/// add a player to friend list by id
+		void addPlayerToFriendList(const NLMISC::CEntityId &id);
+
 		/// get a player from friend or ignore list, by contact id
 		const NLMISC::CEntityId	&getFriendByContactId(uint32 contactId);
 		const NLMISC::CEntityId	&getIgnoreByContactId(uint32 contactId);
@@ -1896,10 +1912,14 @@ public:
 		/// remove room acces to player
 		void removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick);
 
+		/// remove player from league list
+		void removePlayerFromLeagueListByContactId(uint32 contactId);
+		void removePlayerFromLeagueListByEntityId(const NLMISC::CEntityId &id);
 
 		/// remove player from ignore list
 		void removePlayerFromIgnoreListByContactId(uint32 contactId);
 		void removePlayerFromIgnoreListByEntityId(const NLMISC::CEntityId &id);
+
 		
 		/// clear friend list
 		void clearFriendList();
@@ -2292,7 +2312,7 @@ public:
 	/// Set an allegiance to neutral from indetermined status, used for process message from client want set it's allegiance to neutral when it's idetermined, over case are managed by missions. 
 	void setAllegianceFromIndeterminedStatus(PVP_CLAN::TPVPClan allegiance);
 	/// true if pvp safe zone active for character
-	bool getSafeInPvPSafeZone();
+	bool getSafeInPvPSafeZone() const;
 	/// set pvp safe zone to true
 	void setPvPSafeZoneActive();
 	/// clear pvp zone safe flag
@@ -2654,6 +2674,8 @@ private:
 
 	/// remove player from friend list
 	void removePlayerFromFriendListByIndex(uint16 index);
+	/// remove player from league list
+	void removePlayerFromLeagueListByIndex(uint16 index);
 	/// remove player from ignore list
 	void removePlayerFromIgnoreListByIndex(uint16 index);
 	
@@ -2952,6 +2974,8 @@ private:
 	uint64								_Money;
 
 	uint32								_FactionPoint[PVP_CLAN::EndClans-PVP_CLAN::BeginClans+1];
+	
+	uint32								_PvpPoint;
 
 	/// SDB path where player wins HoF points in PvP (if not empty)
 	std::string							_SDBPvPPath;
@@ -3270,6 +3294,8 @@ private:
 
 	// friends list
 	std::vector<CContactId>	_FriendsList;
+	// league list
+	std::vector<CContactId>	_LeagueList;
 	// ignore list
 	std::vector<CContactId>	_IgnoreList;
 	// list of players for whom this player is in the friendlist (to update online status and to remove from players list if this char is permanently deleted)
@@ -3411,6 +3437,10 @@ private:
 	bool							_FullPvp;
 	// flag PVP, true for player involved in Faction PVP and other PVP
 	bool							_PVPFlag;
+	// time of last change in pvp safe
+	NLMISC::TGameCycle				_PVPSafeLastTimeChange;
+	bool							_PVPSafeLastTime;
+	bool							_PVPInSafeZoneLastTime;
 	// time of last change in pvp flag (for prevent change PVP flag exploits)
 	NLMISC::TGameCycle				_PVPFlagLastTimeChange;
 	// time of pvp flag are setted to on (for prevent change PVP flag exploits)

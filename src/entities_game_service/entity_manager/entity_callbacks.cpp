@@ -449,6 +449,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 	c->initAnimalHungerDb();
 
 	c->initFactionPointDb();
+	c->initPvpPointDb();
 
 	c->updateOutpostAdminFlagInDB();
 

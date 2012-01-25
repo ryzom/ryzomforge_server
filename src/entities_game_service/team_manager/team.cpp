@@ -574,33 +574,42 @@ void CTeam::removeCharacter( CCharacter * player )
 
 void CTeam::setLeague(const string &leagueName)
 {
+	TChanID chanId = _LeagueId;
 	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
 	{
-		nlinfo("Allready have league, remove channel");
-		DynChatEGS.removeChan(_LeagueId);
+		// Remove players from previous channel
+		_LeagueId = DYN_CHAT_INVALID_CHAN;
+		updateLeague();
+		// Remove channel if empty
+		vector<CEntityId> players;
+		if (!DynChatEGS.getPlayersInChan(chanId, players))
+			DynChatEGS.removeChan(chanId);
 	}
-	
-	_LeagueId = DYN_CHAT_INVALID_CHAN;
-	
+		
 	if (!leagueName.empty())
 	{
-		_LeagueId = DynChatEGS.addChan("league_"+leagueName, "League "+leagueName);
+		_LeagueId = DynChatEGS.addChan("league_"+toString(DynChatEGS.getNextChanID()), leagueName);
 		if (_LeagueId == DYN_CHAT_INVALID_CHAN)
 		{
 			nlinfo("Error channel creation !!!");
 			return;
 		}
-		nlinfo("v2 Add channel %s = [%s]", _LeagueId.toString().c_str(), leagueName.c_str());
+		nlinfo("v2 Add channel %d = [%s]", (uint32)(_LeagueId.getShortId() & ((1 << 32)-1)), leagueName.c_str());
 		// set historic size of the newly created channel
 		DynChatEGS.setHistoricSize(_LeagueId, 100);
 	}
 	
+	updateLeague();
+}
+
+void CTeam::updateLeague() {
 	for (list<CEntityId>::iterator it = _TeamMembers.begin() ; it != _TeamMembers.end() ; ++it)
 	{
-		
 		CCharacter * ch = PlayerManager.getOnlineChar((*it));
-		if (ch != NULL)
+		if (ch != NULL) {
+			PHRASE_UTILITIES::sendDynamicSystemMessage(TheDataset.getDataSetRow(*it), "TEAM_JOIN_LEAGUE");
 			ch->setLeagueId(_LeagueId);
+		}
 	}
 }
 

@@ -424,6 +424,7 @@ CCharacter::CCharacter():	CEntityBase(false),
 	for (uint i = 0 ; i < (PVP_CLAN::EndClans-PVP_CLAN::BeginClans+1); ++i)
 		_FactionPoint[i] = 0;
 
+	_PvpPoint = 0;
 	_PVPFlagLastTimeChange = 0;
 	_PVPFlagTimeSettedOn = 0;
 	_PvPDatabaseCounter = 0;
@@ -647,6 +648,10 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_CurrentSessionId = _SessionId;
 	_PvPSafeZoneActive = false;
 
+	_PVPSafeLastTimeChange = CTickEventHandler::getGameCycle();
+	_PVPSafeLastTime = false;
+	_PVPInSafeZoneLastTime = false;
+	
 	// For client/server contact list communication
 	_ContactIdPool= 0;
 
@@ -779,12 +784,12 @@ void	CCharacter::initPDStructs()
 void CCharacter::updatePVPClanVP() const
 {
 	TYPE_PVP_CLAN propPvpClanTemp = 0;
-	uint32 maxFameCiv = 0;
+	/*uint32 maxFameCiv = 0;
 	uint8 civOfMaxFame = 255;
 	uint32 maxFameCult = 0;
 	uint8 cultOfMaxFame = 255;
 
-	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++) 
 	{
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
 		if (fameIdx < 4)
@@ -818,13 +823,16 @@ void CCharacter::updatePVPClanVP() const
 		}
 
 	}
-	propPvpClanTemp |= TYPE_PVP_CLAN(civOfMaxFame) << (2*TYPE_PVP_CLAN(7));
-	propPvpClanTemp |= TYPE_PVP_CLAN(cultOfMaxFame) << (2*TYPE_PVP_CLAN(8));
+	propPvpClanTemp |= TYPE_PVP_CLAN(civOfMaxFame) << (2*TYPE_PVP_CLAN(7)); 
+	propPvpClanTemp |= TYPE_PVP_CLAN(cultOfMaxFame) << (2*TYPE_PVP_CLAN(8));*/
+	
 	CMirrorPropValue<TYPE_PVP_CLAN> propPvpClan( TheDataset, TheDataset.getDataSetRow(_Id), DSPropertyPVP_CLAN );
-
-	propPvpClan = (uint32)propPvpClanTemp;
+	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
+		propPvpClan = 1+(uint32)(_LeagueId.getShortId());
+	else
+		propPvpClan = 0;
 }
-
+/*
 TYPE_PVP_CLAN CCharacter::getPVPFamesAllies()
 {
 	TYPE_PVP_CLAN propPvpClanTemp = 0;
@@ -846,7 +854,7 @@ TYPE_PVP_CLAN CCharacter::getPVPFamesEnemies()
 		return propPvpClanTemp | _PVPFlagEnemy;
 	return propPvpClanTemp;
 }
-
+*/
 
 //-----------------------------------------------
 // addPropertiesToMirror :
@@ -1448,6 +1456,33 @@ uint32 CCharacter::tickUpdate()
 
 	{
 		H_AUTO(CharacterUpdatePVPMode);
+		
+		if (_PVPSafeLastTimeChange + 20 < CTickEventHandler::getGameCycle())
+		{
+			bool update = false;
+			_PVPSafeLastTimeChange = CTickEventHandler::getGameCycle();
+
+			nlinfo("_PVPSafeLastTimeChange : %d", _PVPSafeLastTimeChange);
+			if (_PVPSafeLastTime != getSafeInPvPSafeZone())
+			{
+				nlinfo("update  _PVPSafeLastTime");
+				_PVPSafeLastTime = !_PVPSafeLastTime;
+				update = true;
+			}
+
+			if (_PVPInSafeZoneLastTime != CPVPManager2::getInstance()->inSafeZone(getPosition()))
+			{
+				nlinfo("update  _PVPInSafeZoneLastTime");
+				_PVPInSafeZoneLastTime = !_PVPInSafeZoneLastTime;
+				update = true;
+			}
+			
+			if (update) {
+				CPVPManager2::getInstance()->setPVPModeInMirror(this);
+				updatePVPClanVP();
+			}
+		}
+
 
 		if( _HaveToUpdatePVPMode )
 		{
@@ -2986,6 +3021,8 @@ void CCharacter::postLoadTreatment()
 	H_AUTO(CheckPvPTagValidity);
 
 	_HaveToUpdatePVPMode = true;
+
+
 
 	}
 
@@ -8809,7 +8846,7 @@ void CCharacter::setDatabase()
 	_IneffectiveAuras.activate();
 	_ConsumableOverdoseEndDates.activate();
 	// init the RRPs
-	RingRewardPoints.initDb();
+	//RingRewardPoints.initDb();
 
 }// setDatabase //
 
@@ -10095,6 +10132,34 @@ void CCharacter::initFactionPointDb()
 		CBankAccessor_PLR::getUSER().getFACTION_POINTS_(i).setVALUE(_PropertyDatabase, _FactionPoint[i] );
 	}
 }
+
+
+//-----------------------------------------------
+// setPvpPoint : set the number of pvp point
+//
+//-----------------------------------------------
+void CCharacter::setPvpPoint(uint32 nbPt)
+{
+	_PvpPoint = nbPt;
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(0).setVALUE(_PropertyDatabase, nbPt );
+
+}
+
+//-----------------------------------------------
+// getPvpPoint : get the number of pvp point
+//
+//-----------------------------------------------
+uint32 CCharacter::getPvpPoint()
+{
+	return _PvpPoint;
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::initPvpPointDb()
+{
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(0).setVALUE(_PropertyDatabase, _PvpPoint );
+}
+
 
 //-----------------------------------------------------------------------------
 void CCharacter::sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain)
@@ -14618,7 +14683,7 @@ void CCharacter::addRoomAccessToPlayer(const NLMISC::CEntityId &id)
 //--------------------------------------------------------------
 void CCharacter::addPlayerToFriendList(const NLMISC::CEntityId &id)
 {
-	// if player not found
+	/*// if player not found
 	if (id == CEntityId::Unknown || PlayerManager.getChar(id)==NULL)
 	{
 		if ( ! (IShardUnifierEvent::getInstance() && IShardUnifierEvent::getInstance()->isCharacterOnlineAbroad(id)))
@@ -14627,7 +14692,7 @@ void CCharacter::addPlayerToFriendList(const NLMISC::CEntityId &id)
 			PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
 			return;
 		}
-	}
+	}*/
 
 	// check not already in list
 	const uint size = _FriendsList.size();
@@ -14687,6 +14752,82 @@ void CCharacter::addPlayerToFriendList(const NLMISC::CEntityId &id)
 	CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(_Id.getDynamicId()), msgout );
 
 }
+
+
+//--------------------------------------------------------------
+//	CCharacter::addPlayerToLeagueList() // unused, need more tests
+//--------------------------------------------------------------
+void CCharacter::addPlayerToLeagueList(const NLMISC::CEntityId &id)
+{
+	// if player not found
+	/*if (id == CEntityId::Unknown || PlayerManager.getChar(id)==NULL)
+	{
+		if ( ! (IShardUnifierEvent::getInstance() && IShardUnifierEvent::getInstance()->isCharacterOnlineAbroad(id)))
+		{
+			// player not found => message
+			PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
+			return;
+		}
+	}*/
+
+	// check not already in list
+	const uint size = _LeagueList.size();
+	for ( uint i =0 ; i < size ; ++i)
+	{
+		if ( _LeagueList[i].EntityId.getShortId() == id.getShortId())
+		{
+			return;
+		}
+	}
+
+	if(haveAnyPrivilege() == false && PlayerManager.haveAnyPriv(id))
+		return; // a character without privilege can't add one with privilege.
+
+	uint32 playerId = PlayerManager.getPlayerId(id);
+
+	// check the two char aren't from the same account
+	if (playerId == PlayerManager.getPlayerId(_Id))
+	{
+		egs_chinfo("Char %s tried to add %s in his friend list but they are from the same account->return", _Id.toString().c_str(), id.toString().c_str());
+		return;
+	}
+
+	// reference count
+	contactListRefChange( id, AddedAsLeague);
+
+	// add the char to friends
+	CContactId	contactId;
+	contactId.EntityId= id;
+	contactId.ContactId= _ContactIdPool++;	// create a new Id for client/server communication
+	_LeagueList.push_back(contactId);
+
+
+	// send create message to client
+	CMessage msgout( "IMPULSION_ID" );
+	msgout.serial( _Id );
+	CBitMemStream bms;
+
+	if ( ! GenericMsgManager.pushNameToStream( "TEAM:CONTACT_CREATE", bms) )
+	{
+		nlwarning("<CEntityBase::addPlayerToFriendList> Msg name TEAM:CONTACT_CREATE not found");
+		return;
+	}
+	
+	TCharConnectionState onlineStatus = ccs_online;
+
+	uint32	nameId = CEntityIdTranslator::getInstance()->getEntityNameStringId(id);
+	uint8	listIndex = 2;
+
+	bms.serial(contactId.ContactId);
+	bms.serial(nameId);
+	bms.serialShortEnum(onlineStatus);
+	bms.serial(listIndex);
+
+	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
+	CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(_Id.getDynamicId()), msgout );
+
+}
+
 
 
 //--------------------------------------------------------------
@@ -14791,6 +14932,23 @@ void CCharacter::removePlayerFromFriendListByIndex(uint16 index)
 }
 
 //--------------------------------------------------------------
+//	CCharacter::removePlayerFromFriendListByIndex() // unused, need more tests
+//--------------------------------------------------------------
+void CCharacter::removePlayerFromLeagueListByIndex(uint16 index)
+{
+	if (index >= _LeagueList.size())
+		return;
+
+	const	CEntityId id = _LeagueList[index].EntityId;
+	uint32	contactId= _LeagueList[index].ContactId;
+
+	// remove entry
+	_LeagueList.erase(_LeagueList.begin() + index);
+	sendRemoveContactMessage(contactId, 2);
+	contactListRefChange( id, RemovedFromLeague);
+}
+
+//--------------------------------------------------------------
 //	CCharacter::removePlayerFromIgnoreListByIndex()
 //--------------------------------------------------------------
 void CCharacter::removePlayerFromIgnoreListByIndex(uint16 index)
@@ -14870,6 +15028,25 @@ void CCharacter::removePlayerFromFriendListByEntityId(const NLMISC::CEntityId &i
 }
 
 //--------------------------------------------------------------
+//	CCharacter::removePlayerFromLeagueListByEntityId() // unused, need more tests
+//--------------------------------------------------------------
+void CCharacter::removePlayerFromLeagueListByEntityId(const NLMISC::CEntityId &id)
+{
+	if (id == NLMISC::CEntityId::Unknown)
+		return;
+
+	for ( uint i = 0 ; i < _LeagueList.size() ; ++i)
+	{
+		if ( _LeagueList[i].EntityId.getShortId() == id.getShortId() )
+		{
+			removePlayerFromLeagueListByIndex(i);
+			break;
+		}
+	}
+}
+
+
+//--------------------------------------------------------------
 //	CCharacter::removePlayerFromIgnoreListByEntityId()
 //--------------------------------------------------------------
 void CCharacter::removePlayerFromIgnoreListByEntityId(const NLMISC::CEntityId &id)
@@ -14901,6 +15078,22 @@ void CCharacter::removePlayerFromFriendListByContactId(uint32 contactId)
 		}
 	}
 }
+
+//--------------------------------------------------------------
+//	CCharacter::removePlayerFromFriendListByContactId() unused, need more tests
+//--------------------------------------------------------------
+void CCharacter::removePlayerFromLeagueListByContactId(uint32 contactId)
+{
+	for ( uint i = 0 ; i < _LeagueList.size() ; ++i)
+	{
+		if ( _LeagueList[i].ContactId == contactId )
+		{
+			removePlayerFromLeagueListByIndex(i);
+			break;
+		}
+	}
+}
+
 
 //--------------------------------------------------------------
 //	CCharacter::removePlayerFromIgnoreListByContactId()
@@ -17124,13 +17317,6 @@ void CCharacter::setPVPRecentActionFlag(CCharacter *target)
 
 	_PVPRecentActionTime = CTickEventHandler::getGameCycle();
 
-	if (target != NULL)
-	{
-		_PVPFlagAlly |= target->getPVPFamesAllies();
-		_PVPFlagEnemy |= target->getPVPFamesEnemies();
-		updatePVPClanVP();
-	}
-
 //	_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:FLAG_PVP_TIME_LEFT", _PVPRecentActionTime + PVPActionTimer );
 	CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setFLAG_PVP_TIME_LEFT(_PropertyDatabase, _PVPRecentActionTime + PVPActionTimer );
 
@@ -18675,15 +18861,25 @@ void CCharacter::teleportCharacter( sint32 x, sint32 y)
 void CCharacter::setTeamId(uint16 id)
 {
 	_TeamId = id;
+	updatePVPClanVP();
 }
 
-void CCharacter::setLeagueId(TChanID id)
+void CCharacter::setLeagueId(TChanID id, bool removeIfEmpty)
 {
 	// Remove old dynamic channel
 	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
 	{
 		nlinfo("Remove old League session");
-		DynChatEGS.removeSession(_LeagueId, getEntityRowId());
+		DynChatEGS.removeSession(_LeagueId, getEntityRowId());		
+		
+		vector<CEntityId> players;
+		bool isEmpty = DynChatEGS.getPlayersInChan(_LeagueId, players);
+				
+		if (isEmpty)
+		{
+			if (removeIfEmpty)
+				DynChatEGS.removeChan(_LeagueId);
+		}
 	}
 	
 	if (id != DYN_CHAT_INVALID_CHAN)
@@ -18694,6 +18890,7 @@ void CCharacter::setLeagueId(TChanID id)
 		nlinfo("No add League session");
 	}
 	_LeagueId = id;
+	updatePVPClanVP();
 }
 //------------------------------------------------------------------------------
 
