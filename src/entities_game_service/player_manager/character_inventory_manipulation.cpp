@@ -2458,6 +2458,11 @@ void CCharacter::sendItemInfos( uint16 slotId )
 		{
 			infos.CustomText = item->getCustomText();
 		}
+		
+		if (item->getPetIndex() < MAX_INVENTORY_ANIMAL)
+		{
+			infos.PetNumber = item->getPetIndex() + 1;
+		}
 
 		CMessage msgout( "IMPULSION_ID" );
 		CBitMemStream bms;

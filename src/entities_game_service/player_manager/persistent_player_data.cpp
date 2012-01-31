@@ -688,6 +688,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	LPROP(bool,IsMounted,if(IsMounted))\
 	PROP(bool,IsTpAllowed)\
 	PROP(TSatiety,Satiety)\
+	PROP2(CustomName, ucstring, CustomName, CustomName = val);
 
 #pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
@@ -1183,7 +1184,7 @@ static void displayWarning(const std::string& s)
 //-----------------------------------------------------------------------------
 /**
  * This class is used to load old player room inventory, DO NOT BREAK IT!
- * \author SÃ©bastien 'kxu' Guignot
+ * \author Sébastien 'kxu' Guignot
  * \author Nevrax France
  * \date 2005
  */

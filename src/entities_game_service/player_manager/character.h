@@ -299,6 +299,7 @@ struct CPetAnimal
 	bool				IsMounted;
 	bool				IsTpAllowed;
 	bool				spawnFlag;
+	ucstring			CustomName;
 	
 	// ctor
 	CPetAnimal();
@@ -307,10 +308,13 @@ struct CPetAnimal
 	void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
 
 	// init found ticket item pointer with slot
-	uint32 initLinkAnimalToTicket( CCharacter * c );
+	uint32 initLinkAnimalToTicket( CCharacter * c, uint8 index);
 
 	// get the max bulk of the animal inventory
 	uint32 getAnimalMaxBulk();
+
+	void setCustomName(const ucstring& customName) { CustomName = customName; }
+
 };
 
 /**
@@ -989,6 +993,9 @@ public:
 	
 	// return the index of a player pet, or -1 if not found
 	sint32 getPlayerPet( const TDataSetRow& petRowId ) const;
+
+	// Set the name of the animal
+	void setAnimalName( uint8 petIndex, ucstring customName );
 
 	// near character's pets are TP with player (continent tp)
 	void allowNearPetTp();

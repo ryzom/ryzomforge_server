@@ -222,6 +222,7 @@ AdminCommandsInit[] =
 		"allowSummonPet",					true,
 		"setPetAnimalSatiety",				true,
 		"getPetAnimalSatiety",				true,
+		"setPetAnimalName",					true,
 		"taskPass",							true,
 		"setFamePlayer",					true,
 		"guildMOTD",						true,
@@ -2332,6 +2333,21 @@ NLMISC_COMMAND(getPetAnimalSatiety,"Get the satiety of pet animal (petIndex in 0
 
 		log.displayNL( result.c_str() );
 	}
+	return true;
+}
+
+NLMISC_COMMAND(setPetAnimalName, "Set the name of a pet animal (petIndex in 0..3)","<eid> <petIndex> <name>")
+{
+	if (args.size () < 3) return false;
+	GET_CHARACTER
+
+	if ( c )
+	{
+		uint petIndex = atoi( args[1].c_str() );
+		ucstring customName = args[2];
+		c->setAnimalName(petIndex, customName);
+	}
+
 	return true;
 }
 
@@ -5238,6 +5254,18 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial( const_cast<sint32 &>(z) );		
 		msgout.serial( const_cast<float &>(t) );		
 		sendMessageViaMirror( "EGS", msgout );	
+	}
+
+	//*************************************************
+	//***************** rename_animal
+	//*************************************************
+	else if (command_args[0] == "rename_animal")
+	{
+		if (command_args.size () < 3) return false;
+
+		uint petIndex = atoi( command_args[1].c_str() );
+		ucstring customName = ucstring(command_args[2]);
+		c->setAnimalName(petIndex, customName);
 	}
 	else
 	{

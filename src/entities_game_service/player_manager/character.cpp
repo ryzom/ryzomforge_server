@@ -2885,7 +2885,7 @@ void CCharacter::postLoadTreatment()
 			{
 				_PlayerPets[ i ].Slot = INVENTORIES::INVALID_INVENTORY_SLOT;
 			}
-			uint32 slot = _PlayerPets[ i ].initLinkAnimalToTicket( this );
+			uint32 slot = _PlayerPets[ i ].initLinkAnimalToTicket( this, i );
 			if( slot < INVENTORIES::NbPackerSlots )
 			{
 				tickets[ slot ] =  true;
@@ -3021,8 +3021,6 @@ void CCharacter::postLoadTreatment()
 	H_AUTO(CheckPvPTagValidity);
 
 	_HaveToUpdatePVPMode = true;
-
-
 
 	}
 
@@ -5211,6 +5209,9 @@ bool CCharacter::addCharacterAnimal( const CSheetId& PetTicket, uint32 Price, CG
 		{
 			_PlayerPets[ i ] = pet;
 
+			pet.ItemPtr->setPetIndex(i);
+			pet.Slot = ptr->getInventorySlot();
+
 			// init pet inventory
 			const uint32 petMaxWeight = 0xFFFFFFFF; // no weight limit
 			const uint32 petMaxBulk = _PlayerPets[ i ].getAnimalMaxBulk();
@@ -5474,6 +5475,7 @@ bool CCharacter::spawnWaitingCharacterAnimalNear( uint index, const SGameCoordin
 	msg.CharacterMirrorRow = _EntityRowId;
 	msg.PetSheetId = _PlayerPets[ index ].PetSheetId;
 	msg.PetIdx = index;
+	msg.CustomName = _PlayerPets[ index ].CustomName;
 	msg.AIInstanceId = (uint16)destAIInstance;
 	CWorldInstances::instance().msgToAIInstance( msg.AIInstanceId, msg);
 	// The row will be received in AnimalSpawned()
@@ -5585,6 +5587,7 @@ bool CCharacter::spawnCharacterAnimal(uint index )
 			msg.CharacterMirrorRow = _EntityRowId;
 			msg.PetSheetId = _PlayerPets[ index ].PetSheetId;
 			msg.PetIdx = index;
+			msg.CustomName = _PlayerPets[ index ].CustomName;
 
 			CVector pos;
 			pos.x = msg.Coordinate_X * 0.001f;
@@ -6764,7 +6767,18 @@ void CCharacter::sendAnimalCommand( uint8 petIndexCode, uint8 command )
 	}
 }
 
+void CCharacter::setAnimalName( uint8 petIndex, ucstring customName )
+{
+	CPetAnimal& animal = _PlayerPets[petIndex];
 
+	animal.setCustomName(customName);
+
+	TDataSetRow row = animal.SpawnedPets;
+	NLNET::CMessage	msgout("CHARACTER_NAME");
+	msgout.serial(row);
+	msgout.serial(customName);
+	sendMessageViaMirror("IOS", msgout);
+}
 
 //-----------------------------------------------
 //		addCatalyserXpBonus
@@ -18044,7 +18058,7 @@ void CPetAnimal::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
 }
 
 //-----------------------------------------------------------------------------
-uint32 CPetAnimal::initLinkAnimalToTicket( CCharacter * c )
+uint32 CPetAnimal::initLinkAnimalToTicket( CCharacter * c, uint8 index )
 {
 	if( c )
 	{
@@ -18052,6 +18066,8 @@ uint32 CPetAnimal::initLinkAnimalToTicket( CCharacter * c )
 		if( ( ItemPtr != 0 ) && ( ItemPtr->getStaticForm() != NULL ) && ( ItemPtr->getStaticForm()->Family == ITEMFAMILY::PET_ANIMAL_TICKET ) )
 		{
 //			Slot = ItemPtr->getLocSlot();
+			ItemPtr->setPetIndex(index);
+			ItemPtr->setCustomName(CustomName);
 			Slot = ItemPtr->getInventorySlot();
 			return Slot;
 		}
@@ -18064,6 +18080,8 @@ uint32 CPetAnimal::initLinkAnimalToTicket( CCharacter * c )
 			{
 //				Slot = ItemPtr->getLocSlot();
 				Slot = ItemPtr->getInventorySlot();
+				ItemPtr->setPetIndex(index);
+				ItemPtr->setCustomName(CustomName);
 				return Slot;
 			}
 			else

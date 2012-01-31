@@ -791,6 +791,7 @@ void CGameItem::ctor( const CSheetId& sheetId, uint32 recommended, bool destroya
 //	SlotCount = slotCount;
 	_Recommended = recommended;
 	_TotalSaleCycle = 0;
+	_PetIndex = MAX_INVENTORY_ANIMAL;
 
 	_Form = CSheets::getForm( sheetId );
 	if (_Form)

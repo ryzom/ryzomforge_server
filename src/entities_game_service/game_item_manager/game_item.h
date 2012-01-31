@@ -709,6 +709,13 @@ public :
 	/// set custom string (for scroll-like items)
 	void setCustomText(ucstring val);
 
+	uint8 getPetIndex() const { return _PetIndex; }
+	void setPetIndex(uint8 val) { _PetIndex = val; }
+
+	ucstring getCustomName() const { return _CustomName; }
+	void setCustomName(ucstring val) { _CustomName = val; }
+
+
 protected:
 	friend class CFaberPhrase;
 	// set Default Color (for craft only)
@@ -951,6 +958,8 @@ private:
 
 	ucstring			_CustomText;
 	bool                _LockedByOwner;
+	uint8               _PetIndex;
+	ucstring            _CustomName;
 };
 
 /**

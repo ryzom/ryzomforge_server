@@ -61,7 +61,7 @@ CAIInstance* CSpawnBot::getAIInstance() const
 void CSpawnBot::setVisualPropertiesName()
 {
 	CBot& botRef = CSpawnBot::getPersistent();
-	std::string name = botRef.getName();
+	ucstring name = botRef.getName();
 	
 	if (CVisualPropertiesInterface::UseIdForName)
 	{
@@ -85,7 +85,7 @@ void CSpawnBot::setVisualPropertiesName()
 	if (! botRef.getFaunaBotUseBotName()) //false by default
 	{
 		if (botRef.getSheet()->ForceDisplayCreatureName())
-		return;
+			return;
 		// the npc name is displayed as a fauna
 	}
 

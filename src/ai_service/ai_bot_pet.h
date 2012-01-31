@@ -63,6 +63,8 @@ public:
 	CPathPosition& pathPos() { return _PathPos; }
 	
 	uint32 _DeathTime;
+
+	void setVisualPropertiesName();
 	
 private:
 
