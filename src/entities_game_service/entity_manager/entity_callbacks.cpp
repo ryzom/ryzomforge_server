@@ -450,6 +450,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 
 	c->initFactionPointDb();
 	c->initPvpPointDb();
+	c->initOrganizationInfos();
 
 	c->updateOutpostAdminFlagInDB();
 

@@ -389,6 +389,9 @@ AdminCommandsInit[] =
 		"eventSetBotFacing",                true,
 		"eventGiveControl",					true,
 		"eventLeaveControl",				true,
+		
+		"setOrganization",					true,
+		"setOrganizationStatus", 			true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -6449,6 +6452,49 @@ NLMISC_COMMAND(setFamePlayer, "set the fame value of a player in the given facti
 }
 
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setOrganization, "set the organization of a player to the given faction", "<player eid> <faction>")
+{
+	if (args.size () != 2)
+		return false;
+
+	GET_CHARACTER
+
+	uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex(args[1]);
+	if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
+			return false;	
+	
+	c->setOrganization(factionIndex);
+
+	return true;
+
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setOrganizationStatus, "set the organization status of a player", "<player eid> <status>")
+{
+	if (args.size () != 2)
+		return false;
+
+	GET_CHARACTER
+	
+	sint32 status;
+	
+	if (args[1][0] == '+') {
+		status = atoi(args[1].substr(1).c_str());
+	} else if (args[1][0] == '-') {
+		status = atoi(args[1].c_str());
+	} else {
+		status = atoi(args[1].c_str());
+		c->setOrganizationStatus(status);
+		return true;
+	}
+	
+	c->changeOrganizationStatus(status);
+
+	return true;
+
+}
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <nbBots> <sheet> [<dispersionRadius=10m> [<spawnBots=true> [<orientation=random|self|-360..360> [<name> [<x> [<y>]]]]]]")

@@ -10176,6 +10176,40 @@ void CCharacter::initPvpPointDb()
 
 
 //-----------------------------------------------------------------------------
+void CCharacter::setOrganization(uint32 org)
+{
+	if (org == _Organization)
+		return;
+	_Organization = org;
+	_OrganizationStatus = 0;
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(1).setVALUE(_PropertyDatabase, _Organization );
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::setOrganizationStatus(uint32 status)
+{
+	_OrganizationStatus = status;
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::changeOrganizationStatus(uint32 status)
+{
+	_OrganizationStatus += status;
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
+}
+
+
+//-----------------------------------------------------------------------------
+void CCharacter::initOrganizationInfos()
+{
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(1).setVALUE(_PropertyDatabase, _Organization );
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
+}
+
+
+//-----------------------------------------------------------------------------
 void CCharacter::sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain)
 {
 	BOMB_IF(clan < PVP_CLAN::BeginClans || clan > PVP_CLAN::EndClans, "invalid pvp clan!", return);

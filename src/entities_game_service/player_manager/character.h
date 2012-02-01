@@ -1191,6 +1191,11 @@ public:
 	/// init pvp point in client database
 	void	initPvpPointDb();
 	
+	void initOrganizationInfos();
+	void setOrganization(uint32 org);
+	void setOrganizationStatus(uint32 status);
+	void changeOrganizationStatus(uint32 status);
+	
 	/// send faction point gain phrase to the client
 	void	sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain);
 	/// send faction point gain kill phrase to the client
@@ -2983,6 +2988,9 @@ private:
 	uint32								_FactionPoint[PVP_CLAN::EndClans-PVP_CLAN::BeginClans+1];
 	
 	uint32								_PvpPoint;
+
+	uint32								_Organization;
+	uint32								_OrganizationStatus;
 
 	/// SDB path where player wins HoF points in PvP (if not empty)
 	std::string							_SDBPvPPath;
