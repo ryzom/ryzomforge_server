@@ -2407,7 +2407,6 @@ void cbClientWhere( NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 	}\
 }
 
-
 // Send list of connected character name / account to client
 void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
@@ -2552,12 +2551,21 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 		
 		vector<NLMISC::CEntityId> players;
 		DynChatEGS.getPlayersInChan(chanID, players);
-		string playerNames = "";
+		ucstring playerNames = "";
+		uint32 shardId = CEntityIdTranslator::getInstance()->getEntityShardId(id);
+
 		for (uint i = 0; i < players.size(); i++)
 		{
 			if (players[i] == id)
 				hasChannel = true;
-			playerNames += "\n"+CEntityIdTranslator::getInstance()->getByEntity(players[i]).toString();
+
+			ucstring name = CEntityIdTranslator::getInstance()->getByEntity(players[i]);
+			if (shardId == CEntityIdTranslator::getInstance()->getEntityShardId(players[i]))
+			{
+				// Same shard, remove shard from name
+				CEntityIdTranslator::removeShardFromName(name);
+			}
+			playerNames += ((i > 0) ? "\n" : "") + name ;
 		}
 			
 		if (!hasChannel && !havePriv)

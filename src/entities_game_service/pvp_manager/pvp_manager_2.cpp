@@ -377,10 +377,17 @@ void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user, bool out
 	if(it != _UserChannelCharacters.end())
 	{
 		lst = (*it).second;
-		string players = "";
+		ucstring players = "";
+		uint32 shardId = CEntityIdTranslator::getInstance()->getEntityShardId(user->getId());
 		for (uint i = 0; i < lst.size(); i++)
 		{
-			players += "\n"+CEntityIdTranslator::getInstance()->getByEntity(lst[i]).toString();
+			ucstring name = CEntityIdTranslator::getInstance()->getByEntity(lst[i]);
+			if (shardId == CEntityIdTranslator::getInstance()->getEntityShardId(lst[i]))
+			{
+				// Same shard, remove shard from name
+				CEntityIdTranslator::removeShardFromName(name);
+			}
+			players += "\n" + name ;
 		}
 
 		TDataSetRow senderRow = TheDataset.getDataSetRow(user->getId());
