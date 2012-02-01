@@ -7393,7 +7393,7 @@ NLMISC_COMMAND(leagueKick, "kick a player character from league", "<eid> <member
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(resetPVPTimers, "Reset the pvp timers of a player", "<CSR eId><player name>")
 {
-	if ( args.size() < 1 )
+	if ( args.size() < 2 )
 		return false;
 
 	GET_CHARACTER
