@@ -377,7 +377,7 @@ void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user, bool out
 	if(it != _UserChannelCharacters.end())
 	{
 		lst = (*it).second;
-		ucstring players = "";
+		ucstring players("");
 		uint32 shardId = CEntityIdTranslator::getInstance()->getEntityShardId(user->getId());
 		for (uint i = 0; i < lst.size(); i++)
 		{
@@ -595,7 +595,7 @@ void CPVPManager2::playerTeleports(CCharacter * user)
 void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 {
 	nlassert(user);
-	uint16 pvpMode = 0;
+	TYPE_PVP_MODE pvpMode = 0;
 	
 	// Full pvp
 	if ( user->getFullPVP() )
@@ -642,6 +642,8 @@ void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 			pvpMode |= interf.getPVPSession()->getPVPMode();
 		}
 	}
+	
+	nlinfo("New pvp Mode : %d", pvpMode);
 	
 	CMirrorPropValue<TYPE_PVP_MODE> propPvpMode( TheDataset, user->getEntityRowId(), DSPropertyPVP_MODE );
 	propPvpMode = pvpMode;

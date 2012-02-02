@@ -72,6 +72,8 @@
 #include "team_manager/team_manager.h"
 #include "world_instances.h"
 #include "egs_variables.h"
+#include "building_manager/building_manager.h"
+#include "building_manager/building_physical.h"
 #include "player_manager/gm_tp_pending_command.h"
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
@@ -392,6 +394,8 @@ AdminCommandsInit[] =
 		
 		"setOrganization",					true,
 		"setOrganizationStatus", 			true,
+		
+		"addGuildBuilding",					true,
 };
 
 static vector<CAdminCommand>	AdminCommands;
@@ -6451,6 +6455,28 @@ NLMISC_COMMAND(setFamePlayer, "set the fame value of a player in the given facti
 
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(addGuildBuilding, "sadd a building to guild", "<player eid> <building name>")
+{
+	if (args.size () != 2)
+		return false;
+
+	GET_CHARACTER
+	
+	
+	IBuildingPhysical *building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[1]);
+	
+	if (building == NULL)
+		return true;
+		
+	if (c->getGuildId() == 0)
+		return true;
+	
+	CBuildingManager::getInstance()->registerGuild( c->getGuildId(), building->getAlias() );
+	
+	return true;
+
+}
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setOrganization, "set the organization of a player to the given faction", "<player eid> <faction>")

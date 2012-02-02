@@ -57,7 +57,7 @@ void CTeam::init( CCharacter*  leader, uint16 teamId )
 	_ValidityFlags.Fake = false;
 	_NbMembers = 1;
 	_TeamId  = teamId;
-	_LeagueId = DYN_CHAT_INVALID_CHAN;
+	_LeagueId = leader->getLeagueId();
 	_LeaderId = leader->getId();
 	_TeamMembers.push_back(_LeaderId);
 	// init the team chat group
@@ -594,7 +594,6 @@ void CTeam::setLeague(const string &leagueName)
 			nlinfo("Error channel creation !!!");
 			return;
 		}
-		nlinfo("v2 Add channel %d = [%s]", (uint32)(_LeagueId.getShortId() & ((1 << 32)-1)), leagueName.c_str());
 		// set historic size of the newly created channel
 		DynChatEGS.setHistoricSize(_LeagueId, 100);
 	}
@@ -606,8 +605,7 @@ void CTeam::updateLeague() {
 	for (list<CEntityId>::iterator it = _TeamMembers.begin() ; it != _TeamMembers.end() ; ++it)
 	{
 		CCharacter * ch = PlayerManager.getOnlineChar((*it));
-		if (ch != NULL) {
-			PHRASE_UTILITIES::sendDynamicSystemMessage(TheDataset.getDataSetRow(*it), "TEAM_JOIN_LEAGUE");
+		if (ch != NULL && ch->getLeagueId() != _LeagueId) {
 			ch->setLeagueId(_LeagueId);
 		}
 	}

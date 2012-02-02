@@ -1462,17 +1462,14 @@ uint32 CCharacter::tickUpdate()
 			bool update = false;
 			_PVPSafeLastTimeChange = CTickEventHandler::getGameCycle();
 
-			nlinfo("_PVPSafeLastTimeChange : %d", _PVPSafeLastTimeChange);
 			if (_PVPSafeLastTime != getSafeInPvPSafeZone())
 			{
-				nlinfo("update  _PVPSafeLastTime");
 				_PVPSafeLastTime = !_PVPSafeLastTime;
 				update = true;
 			}
 
 			if (_PVPInSafeZoneLastTime != CPVPManager2::getInstance()->inSafeZone(getPosition()))
 			{
-				nlinfo("update  _PVPInSafeZoneLastTime");
 				_PVPInSafeZoneLastTime = !_PVPInSafeZoneLastTime;
 				update = true;
 			}
@@ -18918,10 +18915,16 @@ void CCharacter::setTeamId(uint16 id)
 
 void CCharacter::setLeagueId(TChanID id, bool removeIfEmpty)
 {
+
+	ucstring name = CEntityIdTranslator::getInstance()->getByEntity(getId());
+	CEntityIdTranslator::removeShardFromName(name);
+
 	// Remove old dynamic channel
 	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
 	{
-		nlinfo("Remove old League session");
+		
+		CPVPManager2::getInstance()->broadcastMessage(_LeagueId, string("<INFO>"), name+" -->[]");
+		PHRASE_UTILITIES::sendDynamicSystemMessage(getEntityRowId(), "TEAM_QUIT_LEAGUE");
 		DynChatEGS.removeSession(_LeagueId, getEntityRowId());		
 		
 		vector<CEntityId> players;
@@ -18936,11 +18939,11 @@ void CCharacter::setLeagueId(TChanID id, bool removeIfEmpty)
 	
 	if (id != DYN_CHAT_INVALID_CHAN)
 	{
-		nlinfo("Add League session");		
+		PHRASE_UTILITIES::sendDynamicSystemMessage(getEntityRowId(), "TEAM_JOIN_LEAGUE");
 		DynChatEGS.addSession(id, getEntityRowId(), true);
-	} else {
-		nlinfo("No add League session");
+		CPVPManager2::getInstance()->broadcastMessage(id, string("<INFO>"), "<-- "+name);
 	}
+	
 	_LeagueId = id;
 	updatePVPClanVP();
 }

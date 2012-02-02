@@ -82,7 +82,7 @@ void CTeamManager::joinLeagueProposal( CCharacter * leader, const CEntityId &tar
 	const NLMISC::CEntityId &leaderId = leader->getId();
 	if (targetId == leaderId )
 	{
-		nlwarning("<CTeamManager joinLeagueProposal> Player %s invited himself in his League, cancel", leaderId.toString().c_str() );
+		CCharacter::sendDynamicSystemMessage( leader->getId(),"INVALID_TEAM_TARGET" );
 		return;
 	}
 
@@ -230,7 +230,7 @@ void CTeamManager::joinLeagueAccept( const NLMISC::CEntityId &charId)
 	CTeam *teamInvitor;
 	CTeam *teamInvited;
 	//if the invited player had a fake team, remove it
-	teamInvited = getRealTeam( invited->getTeamId() );
+	teamInvited = getRealTeam(invited->getTeamId());
 	teamInvitor = getRealTeam(invitor->getTeamId());
 	
 	if ( !teamInvitor )
@@ -275,7 +275,7 @@ void CTeamManager::joinProposal( CCharacter * leader, const CEntityId &targetId)
 	CCharacter *invitedPlayer = PlayerManager.getOnlineChar( targetId );
 	if ( invitedPlayer == NULL )
 	{
-		CCharacter::sendDynamicSystemMessage( leader->getId(),"INVALID_TEAM_TARGET" );
+		CCharacter::sendDynamicSystemMessage( leader->getId(),"INVALID_LEAGUE_TARGET" );
 		return;
 	}
 	

@@ -2551,7 +2551,7 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 		
 		vector<NLMISC::CEntityId> players;
 		DynChatEGS.getPlayersInChan(chanID, players);
-		ucstring playerNames = "";
+		ucstring playerNames("");
 		uint32 shardId = CEntityIdTranslator::getInstance()->getEntityShardId(id);
 
 		for (uint i = 0; i < players.size(); i++)
