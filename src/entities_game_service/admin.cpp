@@ -7781,12 +7781,14 @@ NLMISC_COMMAND (setLeague, "Set the League of the team", "<user id> [<name>]")
 	{
 		if (args.size () != 2)
 			c->setLeagueId(DYN_CHAT_INVALID_CHAN);
+		else
+			CCharacter::sendDynamicSystemMessage( c->getId(),"LEAGUE_INVITOR_NOT_LEADER" );
 		return true;
 	}
 	
 	if (team->getLeader() != c->getId())
 	{
-		nlwarning("<LEAGUE> user %s is not leader: cant set alliance",c->getId().toString().c_str() );
+		CCharacter::sendDynamicSystemMessage( c->getId(),"LEAGUE_INVITOR_NOT_LEADER" );
 		return false;
 	}
 
