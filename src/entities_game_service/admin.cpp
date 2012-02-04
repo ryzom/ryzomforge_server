@@ -4455,7 +4455,7 @@ NLMISC_COMMAND (webDelCommandsIds, "Del ids of commands", "<user id> <web_app_ur
 
 CInventoryPtr getInv(CCharacter *c, const string &inv)
 {
-	INVENTORIES::TInventory inventory = INVENTORIES::bag;
+	CInventoryPtr inventoryPtr = NULL;
 	if (!inv.empty()) {
 		INVENTORIES::TInventory selectedInv = INVENTORIES::toInventory(inv);
 		switch (selectedInv) {
@@ -4468,14 +4468,15 @@ CInventoryPtr getInv(CCharacter *c, const string &inv)
 			case INVENTORIES::pet_animal4:
 			case INVENTORIES::guild:
 			case INVENTORIES::player_room:
-				inventory = selectedInv;
+				inventoryPtr = c->getInventory(selectedInv);
 				break;
 
 			default:
-				inventory = INVENTORIES::bag;
+				// No-op
+				break;
 		}
 	}
-	return c->getInventory(inventory);
+	return inventoryPtr;
 }
 
 NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac> [<new_check=0|1>] [<next_step=0|1>] [<send_url=0|1>]")
@@ -4582,6 +4583,13 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (command_args.size() == 5)
 			selected_inv = command_args[4];
 		CInventoryPtr inventory = getInv(c, selected_inv);
+
+		if (inventory == NULL)
+		{
+			if (send_url)
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_inventory", getSalt());
+			return false;
+		}
 
 		uint32 numberItem = 0;
 		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
@@ -4878,6 +4886,13 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (command_args.size() == 5)
 			selected_inv = command_args[4];
 		CInventoryPtr inventory = getInv(c, selected_inv);
+
+		if (inventory == NULL)
+		{
+			if (send_url)
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_inventory", getSalt());
+			return false;
+		}
 
 		uint32 numberItem = 0;
 		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
@@ -7634,14 +7649,24 @@ NLMISC_COMMAND(eventSetBotFacing, "Set the direction in which a bot faces", "<bo
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <inventory> <from slot> <to slot>")
+NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <inventory> [<from slot> <to slot>]")
 {
-	if (args.size () < 2) return false;
+	if (args.size () < 2)
+	{
+		log.displayNL("Invalid number of parameters. Parameters: <inventory> [<from slot> <to slot>]");
+		return false;
+	}
 	GET_CHARACTER
 
 	string selected_inv = args[1];
 
 	CInventoryPtr inventory = getInv(c, selected_inv);
+
+	if (inventory == NULL)
+	{
+		log.displayNL("Invalid inventory '%s'.", selected_inv.c_str());
+		return false;
+	}
 
 	uint32 start_slot = 0;
 	uint32 end_slot = inventory->getSlotCount();
@@ -7680,7 +7705,14 @@ NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <
 		}
 	}
 
-	log.displayNL(msg.c_str());
+	log.displayNL("Showing slot %d - %d for inventory '%s':", start_slot, end_slot, selected_inv.c_str());
+	if (msg.length() > 0)
+	{
+		log.displayNL(msg.c_str());
+	}
+	else {
+		log.displayNL("Nothing to display.");
+	}
 
 	return true;
 }
@@ -7688,7 +7720,12 @@ NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(deleteInventoryItem, "Delete an item from a characters inventory", "<eid> <inventory> <slot> <sheetname> <quality> <quantity>")
 {
-	if (args.size () < 6) return false;
+	if (args.size () < 6)
+	{
+		log.displayNL("Invalid number of parameters. Parameters: <inventory> <slot> <sheetname> <quality> <quantity>");
+		return false;
+	}
+
 	GET_CHARACTER
 
 	string selected_inv = args[1];
@@ -7709,7 +7746,17 @@ NLMISC_COMMAND(deleteInventoryItem, "Delete an item from a characters inventory"
 
 	CInventoryPtr inventory = getInv(c, selected_inv);
 
-	if (slot < 0 || quality == 0 || quantity == 0) return false;
+	if (inventory == NULL)
+	{
+		log.displayNL("Invalid inventory '%s'.", selected_inv.c_str());
+		return false;
+	}
+
+	if (slot < 0 || quality == 0 || quantity == 0)
+	{
+		log.displayNL("Invalid slot or quantity.");
+		return false;
+	}
 
 	const CGameItemPtr itemPtr = inventory->getItem(slot);
 	if (itemPtr != NULL)
@@ -7724,10 +7771,14 @@ NLMISC_COMMAND(deleteInventoryItem, "Delete an item from a characters inventory"
 				INVENTORIES::toString(inventory->getInventoryId()).c_str()
 			);
 			inventory->deleteStackItem(slot, quantity);
+			return true;
 		}
+		log.displayNL("Incorrect sheetid, quality, or quantity.");
+		return false;
 	}
 
-	return true;
+	log.displayNL("Invalid slot or item.");
+	return false;
 }
 
 //----------------------------------------------------------------------------
@@ -7750,6 +7801,8 @@ NLMISC_COMMAND (lockItem, "Lock/unlock item in inventory", "<user id> <inventory
 	fromString(args[2], slot);
 
 	CInventoryPtr inventory = getInv(c, selected_inv);
+
+	if (inventory == NULL) return false;
 
 	if (slot < 0 || slot >= INVENTORIES::NbBagSlots) return false;
 
