@@ -416,6 +416,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP(uint32,_PvpPoint)\
 	PROP(uint32,_Organization)\
 	PROP(uint32,_OrganizationStatus)\
+	PROP(uint32,_OrganizationPoints)\
 	PROP2(DeclaredCult,string,PVP_CLAN::toString(_DeclaredCult),_DeclaredCult=PVP_CLAN::fromString(val))\
 	PROP2(DeclaredCiv,string,PVP_CLAN::toString(_DeclaredCiv),_DeclaredCiv=PVP_CLAN::fromString(val))\
 \
@@ -690,7 +691,6 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	LPROP(bool,IsMounted,if(IsMounted))\
 	PROP(bool,IsTpAllowed)\
 	PROP(TSatiety,Satiety)\
-	PROP2(CustomName, ucstring, CustomName, CustomName = val);
 
 #pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
@@ -1186,7 +1186,7 @@ static void displayWarning(const std::string& s)
 //-----------------------------------------------------------------------------
 /**
  * This class is used to load old player room inventory, DO NOT BREAK IT!
- * \author Sébastien 'kxu' Guignot
+ * \author SÃ©bastien 'kxu' Guignot
  * \author Nevrax France
  * \date 2005
  */

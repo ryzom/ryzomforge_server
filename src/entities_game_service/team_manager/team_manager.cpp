@@ -82,7 +82,7 @@ void CTeamManager::joinLeagueProposal( CCharacter * leader, const CEntityId &tar
 	const NLMISC::CEntityId &leaderId = leader->getId();
 	if (targetId == leaderId )
 	{
-		CCharacter::sendDynamicSystemMessage( leader->getId(),"INVALID_TEAM_TARGET" );
+		CCharacter::sendDynamicSystemMessage( leader->getId(),"INVALID_LEAGUE_TARGET" );
 		return;
 	}
 
@@ -90,7 +90,7 @@ void CTeamManager::joinLeagueProposal( CCharacter * leader, const CEntityId &tar
 	CCharacter *invitedPlayer = PlayerManager.getOnlineChar( targetId );
 	if ( invitedPlayer == NULL )
 	{
-		CCharacter::sendDynamicSystemMessage( leader->getId(),"INVALID_TEAM_TARGET" );
+		CCharacter::sendDynamicSystemMessage( leader->getId(),"INVALID_LEAGUE_TARGET" );
 		return;
 	}
 	
@@ -247,9 +247,13 @@ void CTeamManager::joinLeagueAccept( const NLMISC::CEntityId &charId)
 	}
 	
 	if (teamInvited) {
+		const string playerName = CEntityIdTranslator::getInstance()->getByEntity(invited->getId()).toString();
+		CPVPManager2::getInstance()->broadcastMessage(teamInvitor->getLeagueId(), string("<TEAM>"), "<-- "+playerName);
 		teamInvited->setLeagueId(teamInvitor->getLeagueId());
 		teamInvited->updateLeague();
 	} else {
+		const string playerName = CEntityIdTranslator::getInstance()->getByEntity(invited->getId()).toString();
+		CPVPManager2::getInstance()->broadcastMessage(teamInvitor->getLeagueId(), string("<PLAYER>"), "<-- "+playerName);
 		invited->setLeagueId(teamInvitor->getLeagueId(), true);
 	}
 	

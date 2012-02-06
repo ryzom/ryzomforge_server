@@ -123,7 +123,6 @@ void CTeam::release()
 
 	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
 	{
-		nlinfo("Release team : remove League channel");
 		DynChatEGS.removeChan(_LeagueId);
 	}
 	

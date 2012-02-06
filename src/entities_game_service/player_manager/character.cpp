@@ -431,6 +431,10 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_PVPFlag = false;
 	_PVPRecentActionTime = 0;
 
+	_Organization = 0;
+	_OrganizationStatus = 0;
+	_OrganizationPoints = 0;
+
 	// do not start berserk
 	_IsBerserk = false;
 
@@ -663,6 +667,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_RingSeason = 0;
 
 	_LastTickNpcControlUpdated = CTickEventHandler::getGameCycle();
+
+	_LastWebCommandIndex = 0;
 
 	initDatabase();
 } // CCharacter  //
@@ -10179,8 +10185,10 @@ void CCharacter::setOrganization(uint32 org)
 		return;
 	_Organization = org;
 	_OrganizationStatus = 0;
+	_OrganizationPoints = 0;
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(1).setVALUE(_PropertyDatabase, _Organization );
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(3).setVALUE(_PropertyDatabase, _OrganizationPoints );
 }
 
 //-----------------------------------------------------------------------------
@@ -10191,10 +10199,23 @@ void CCharacter::setOrganizationStatus(uint32 status)
 }
 
 //-----------------------------------------------------------------------------
-void CCharacter::changeOrganizationStatus(uint32 status)
+void CCharacter::changeOrganizationStatus(sint32 status)
 {
-	_OrganizationStatus += status;
+	if (status < 0 && abs(status) > _OrganizationStatus)
+		_OrganizationStatus = 0;
+	else
+		_OrganizationStatus += status;
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::changeOrganizationPoints(sint32 points)
+{
+	if (points < 0 && abs(points) > _OrganizationPoints)
+		_OrganizationPoints = 0;
+	else
+		_OrganizationPoints += points;
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(3).setVALUE(_PropertyDatabase, _OrganizationPoints );
 }
 
 
@@ -10203,6 +10224,7 @@ void CCharacter::initOrganizationInfos()
 {
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(1).setVALUE(_PropertyDatabase, _Organization );
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
+	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(3).setVALUE(_PropertyDatabase, _OrganizationPoints );
 }
 
 

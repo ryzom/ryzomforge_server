@@ -1194,7 +1194,9 @@ public:
 	void initOrganizationInfos();
 	void setOrganization(uint32 org);
 	void setOrganizationStatus(uint32 status);
-	void changeOrganizationStatus(uint32 status);
+	void changeOrganizationStatus(sint32 status);
+	void changeOrganizationPoints(sint32 points);
+	
 	
 	/// send faction point gain phrase to the client
 	void	sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain);
@@ -2991,6 +2993,7 @@ private:
 
 	uint32								_Organization;
 	uint32								_OrganizationStatus;
+	uint32								_OrganizationPoints;
 
 	/// SDB path where player wins HoF points in PvP (if not empty)
 	std::string							_SDBPvPPath;
