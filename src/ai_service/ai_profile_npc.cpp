@@ -1561,7 +1561,7 @@ void CGrpProfileGoToPoint::updateProfile(uint ticksSinceLastUpdate)
 			dx+=dir.x;
 			dy+=dir.y;
 			
-			// 4 rangées.
+			// 4 rangÃ©es.
 			CAIVector	idealPos=groupPosition;
 			if (botIndex>=_NbBotInNormalShape)
 			{
@@ -2053,7 +2053,7 @@ void CGrpProfileFollowRoute::updateProfile(uint ticksSinceLastUpdate)
 			dx+=dir.x;
 			dy+=dir.y;
 			
-			// 4 rangées.
+			// 4 rangÃ©es.
 			CAIVector	idealPos=groupPosition;
 			if (botIndex>=_NbBotInNormalShape)
 			{
@@ -3774,10 +3774,14 @@ bool CGrpProfileFaction::entityHavePartOfFactions(CAIEntityPhysical const* entit
 			std::set<TStringId>::const_iterator it, end = factionsSet.end();
 			for (it=factionsSet.begin(); it!=end; ++it)
 			{
-				std::string fameFaction = scriptFactionToFameFaction(CStringMapper::unmap(*it));
+				string factionInfos = CStringMapper::unmap(*it);
+				string fameFaction = scriptFactionToFameFaction(factionInfos);
 			//	sint32 fame = CFameInterface::getInstance().getFameOrCivilisationFame(entity->getEntityId(), CStringMapper::map(fameFaction));
 				sint32 const fame = entity->getFame(fameFaction);
-				if (fame!=NO_FAME && fame>0)
+				sint32 const value = scriptFactionToFameFactionValue(factionInfos);
+				bool gt = scriptFactionToFameFactionGreaterThan(factionInfos);
+				if ((fame != NO_FAME && gt && fame > value) ||
+					(fame != NO_FAME && !gt && fame < value))
 				{
 					//	nldebug("Entity has faction %s", CStringMapper::unmap(*it).c_str());
 					return true;
@@ -3818,11 +3822,37 @@ std::string CGrpProfileFaction::scriptFactionToFameFaction(std::string name)
 			ret += "_";
 			ret += name[i]-'A'+'a';
 		}
-		else
+		else if  (name[i] == '>' || name[i] == '<')
+		{
+			return ret;
+		} else
 			ret += name[i];
 	}
 	return ret;
 }
+
+bool CGrpProfileFaction::scriptFactionToFameFactionGreaterThan(string name)
+{	
+	if (name.find("<") != string::npos)
+		return false;
+		
+	return true;
+}
+
+sint32 CGrpProfileFaction::scriptFactionToFameFactionValue(string name)
+{
+	size_t start = name.find(">");
+	if (start == string::npos)
+	{
+		start = name.find("<");
+		if (start == string::npos)
+			return 0;
+	}
+
+	sint32 value = atoi(name.substr(start+1).c_str());
+	return value*6000;
+}
+
 
 std::string CGrpProfileFaction::fameFactionToScriptFaction(std::string name)
 {
@@ -3859,9 +3889,9 @@ void CGrpProfileFaction::checkTargetsAround()
 	CPropertySetWithExtraList<TAllianceId> const& thisEnnemyFactions = thisGrpNpc.ennemyFaction();
 
 	// We don't assist or attack players if our friends/ennemies are not in factions
-	bool const assistPlayers = thisFriendFactions.containsPartOfStrict(_FameFactions);
+	bool const assistPlayers = thisFriendFactions.containsPartOfStrictFilter("Famous*");
 	bool const assistBots    = !thisFriendFactions.empty() && !bNoAssist;
-	bool const attackPlayers = (!thisEnnemyFactions.extraSetEmpty()) || thisEnnemyFactions.containsPartOfStrict(_FameFactions) || thisEnnemyFactions.containsPartOfStrictFilter("outpost:*");
+	bool const attackPlayers = (!thisEnnemyFactions.extraSetEmpty()) || thisEnnemyFactions.containsPartOfStrictFilter("Famous*") || thisEnnemyFactions.containsPartOfStrictFilter("outpost:*");
 	bool const attackBots    = !thisEnnemyFactions.empty();
 	
 	CAIVision<CPersistentOfPhysical>	Vision;

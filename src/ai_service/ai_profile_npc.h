@@ -834,6 +834,10 @@ public:
 
 	static std::string scriptFactionToFameFaction(std::string name);
 	static std::string fameFactionToScriptFaction(std::string name);
+	
+	static bool scriptFactionToFameFactionGreaterThan(std::string name);
+	static sint32 scriptFactionToFameFactionValue(std::string name);
+	
 
 private:
 	CAITimer	_checkTargetTimer;
