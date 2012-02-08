@@ -267,6 +267,7 @@ bool CBuildingManager::parsePhysicalBuildings( const NLLIGO::IPrimitive* prim, C
 			else
 			{
 				_BuildingPhysicals.insert( make_pair( alias, building ) );
+				_BuildingPhysicalsName.insert( make_pair( building->getName(), building));
 				return true;
 			}
 		}
@@ -851,18 +852,18 @@ IBuildingPhysical * CBuildingManager::getBuildingPhysicalsByAlias( TAIAlias alia
 //----------------------------------------------------------------------------
 IBuildingPhysical* CBuildingManager::getBuildingPhysicalsByName( const std::string & name )
 {
-	for ( std::map<TAIAlias,IBuildingPhysical*>::iterator it =  _BuildingPhysicals.begin(); it != _BuildingPhysicals.end(); ++it )
+	std::map<std::string,IBuildingPhysical*>::iterator it =  _BuildingPhysicalsName.find( name );
+	if ( it != _BuildingPhysicalsName.end() )
 	{
 		if( (*it).second == NULL )
 		{
 			nlwarning("<BUILDING> NULL building in building maps. Checks should be done at init time");
 			return NULL;
 		}
-		if ( (*it).second->getName() == name )
-			return (*it).second;
+		return (*it).second;
 	}
+	
 	return NULL;
-
 }
 
 //----------------------------------------------------------------------------

@@ -4525,9 +4525,11 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 			
 		string salt = getSalt();
-		string checksum = web_app_url + toString(c->getLastConnectedDate()) + index + command + c->getId().toString();
-		string realhmac = getHMacSHA1((uint8*)&checksum[0], checksum.size(), (uint8*)&salt[0], salt.size()).toString();
-		if (realhmac != hmac) {
+		string checksumEid = web_app_url + toString(c->getLastConnectedDate()) + index + command + c->getId().toString();
+		string checksumRowId = web_app_url + toString(c->getLastConnectedDate()) + index + command + toString(c->getEntityRowId().getIndex());
+		string realhmacEid = getHMacSHA1((uint8*)&checksumEid[0], checksumEid.size(), (uint8*)&salt[0], salt.size()).toString();
+		string realhmacRowId = getHMacSHA1((uint8*)&checksumRowId[0], checksumRowId.size(), (uint8*)&salt[0], salt.size()).toString();
+		if (realhmacEid != hmac && realhmacRowId != hmac) {
 			if (send_url)
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_auth", getSalt());
 			return false;
@@ -5289,6 +5291,61 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		ucstring customName = ucstring(command_args[2]);
 		c->setAnimalName(petIndex, customName);
 	}
+	
+	//*************************************************
+	//***************** organization
+	//*************************************************
+	else if (command_args[0] == "organization")
+	{
+		if (command_args.size () < 3) return false;
+
+		string action = command_args[1]; // change, add_points, set_status, add_status
+		sint32 value;
+		fromString(command_args[2], value);
+		
+		if (action == "change" && value >= 0)
+			c->setOrganization((uint32)value);
+		else if (action == "add_points")
+			c->changeOrganizationPoints(value);
+		else if (action == "set_status" && value >= 0)
+			c->setOrganizationStatus(value);
+		else if (action == "add_status")
+			c->changeOrganizationStatus(value);
+	}
+		
+	//*************************************************
+	//***************** buildings
+	//*************************************************
+	else if (command_args[0] == "building")
+	{
+		if (command_args.size () < 2) return false;
+
+		string action = command_args[1]; // trigger_in, trigger_out, add_guild_room, add_player_room
+		
+		if (action == "trigger_in" && command_args.size () == 3)
+		{
+			uint32 liftId = atoi(command_args[2].c_str());		
+			CBuildingManager::getInstance()->addTriggerRequest(c->getEntityRowId(), liftId);
+		}
+		else if (action == "trigger_out")
+		{
+			CBuildingManager::getInstance()->removeTriggerRequest(c->getEntityRowId());
+			
+		}
+		else if (action == "add_guild_room" && command_args.size () == 3)
+		{
+			CBuildingPhysicalGuild * building = dynamic_cast<CBuildingPhysicalGuild *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
+			if ( building )
+				building->addGuild(c->getGuildId());
+		}
+		else if (action == "add_player_room"  && command_args.size () == 3)
+		{
+			CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
+			if ( building )
+				building->addPlayer(c->getId());
+		}
+	}	
+	
 	else
 	{
 		return false;

@@ -215,7 +215,7 @@ void CGuild::setBuilding(TAIAlias buildingAlias)
 	if (getBuilding() != CAIAliasTranslator::Invalid)
 	{
 		CBuildingManager::getInstance()->removeGuildBuilding( getId() );
-		_Inventory->clearInventory();
+		//_Inventory->clearInventory();
 	}
 
 	// set the new guild building
@@ -1993,7 +1993,7 @@ void	IGuild::updateMembersStringIds()
 //-----------------------------------------------------------------------------
 /**
  * This class is used to load old guild inventory, DO NOT BREAK IT!
- * \author Sébastien 'kxu' Guignot
+ * \author SÃ©bastien 'kxu' Guignot
  * \author Nevrax France
  * \date 2005
  */
