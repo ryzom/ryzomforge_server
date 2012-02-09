@@ -642,11 +642,14 @@ void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 			pvpMode |= interf.getPVPSession()->getPVPMode();
 		}
 	}
-	
-	nlinfo("New pvp Mode : %d", pvpMode);
-	
+		
 	CMirrorPropValue<TYPE_PVP_MODE> propPvpMode( TheDataset, user->getEntityRowId(), DSPropertyPVP_MODE );
-	propPvpMode = pvpMode;
+	if (propPvpMode.getValue() != pvpMode)
+	{
+		nlinfo("New pvp Mode : %d", pvpMode);
+		propPvpMode = pvpMode;
+		propPvpMode.setChanged();
+	}
 }
 
 //----------------------------------------------------------------------------

@@ -4647,6 +4647,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (quantity == 0)
 			return false;
 
+
 		// Inventory to put item in; can be temp, bag or animals.
 		INVENTORIES::TInventory inventory = INVENTORIES::bag;
 		if (command_args.size() == 5) {
@@ -4668,6 +4669,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			}
 		}
 
+
 		CGameItemPtr new_item = c->createItem(quality, quantity, sheetId);
 
 		if (!c->addItemToInventory(inventory, new_item))
@@ -4676,6 +4678,20 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if (send_url)
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=cant_add_item", getSalt());
 			return false;
+		}
+
+		ucstring customValue;
+
+		if (command_args.size() == 6 && command_args[5] != "*")
+		{
+			customValue.fromUtf8(command_args[5]);
+			new_item->setCustomName(customValue);
+		}
+
+		if (command_args.size() == 7 && command_args[6] != "*")
+		{
+			customValue.fromUtf8(command_args[6]);
+			new_item->setCustomText(customValue);
 		}
 	}
 	//*************************************************
@@ -4869,7 +4885,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	//***************** check_item
 	//*************************************************
-	else if (command_args[0] == "check_item")
+	else if (command_args[0] == "check_item") // sheetid ! quality ! quantity ! iscrafted
 	{
 		if (command_args.size() < 4)
 			return false;
@@ -4883,6 +4899,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		const uint32 quantity = (uint32)atoi(command_args[3].c_str());
 		if (quantity == 0)
 			return false;
+
+		bool crafted = false;
+		if (command_args.size() == 5)
+			crafted = (command_args[4] == "1");
 
 		string selected_inv;
 		if (command_args.size() == 5)
@@ -4904,10 +4924,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			{
 				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() == quality) )
 				{
-					numberItem += itemPtr->getStackSize();
+					if (!crafted || itemPtr->getCreator() == c->getId())
+						numberItem += itemPtr->getStackSize();
 				}
 			}
-			itemPtr->getCraftParameters();
 		}
 
 		if (numberItem < quantity) {

@@ -790,53 +790,19 @@ void	CCharacter::initPDStructs()
 void CCharacter::updatePVPClanVP() const
 {
 	TYPE_PVP_CLAN propPvpClanTemp = 0;
-	/*uint32 maxFameCiv = 0;
-	uint8 civOfMaxFame = 255;
-	uint32 maxFameCult = 0;
-	uint8 cultOfMaxFame = 255;
-
-	for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++) 
-	{
-		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
-		if (fameIdx < 4)
-		{
-			if ((uint32)abs(fame) >= maxFameCiv)
-			{
-				civOfMaxFame = fameIdx;
-				maxFameCiv = abs(fame);
-			}
-		}
-		else
-		{ 
-			if ((uint32)abs(fame) >= maxFameCult)
-			{
-				cultOfMaxFame = fameIdx - 4;
-				maxFameCult = abs(fame);
-			}
-		}
-
-		if (fame >= PVPFameRequired*6000) {
-			propPvpClanTemp |= TYPE_PVP_CLAN(1) << (2*TYPE_PVP_CLAN(fameIdx));
-		} else if (fame <= -PVPFameRequired*6000) {
-			propPvpClanTemp |= TYPE_PVP_CLAN(1) << ((2*TYPE_PVP_CLAN(fameIdx))+1);
-		}
-		if (getPvPRecentActionFlag())
-		{
-			uint8 flagAlly = (_PVPFlagAlly & (1 << TYPE_PVP_CLAN(fameIdx))) >> TYPE_PVP_CLAN(fameIdx);
-			uint8 flagEnemy = (_PVPFlagEnemy & (1 << TYPE_PVP_CLAN(fameIdx))) >> TYPE_PVP_CLAN(fameIdx);
-			propPvpClanTemp |= flagAlly << (2*TYPE_PVP_CLAN(fameIdx));
-			propPvpClanTemp |= flagEnemy << ((2*TYPE_PVP_CLAN(fameIdx))+1);
-		}
-
-	}
-	propPvpClanTemp |= TYPE_PVP_CLAN(civOfMaxFame) << (2*TYPE_PVP_CLAN(7)); 
-	propPvpClanTemp |= TYPE_PVP_CLAN(cultOfMaxFame) << (2*TYPE_PVP_CLAN(8));*/
 	
-	CMirrorPropValue<TYPE_PVP_CLAN> propPvpClan( TheDataset, TheDataset.getDataSetRow(_Id), DSPropertyPVP_CLAN );
 	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
-		propPvpClan = 1+(uint32)(_LeagueId.getShortId());
+		propPvpClanTemp = 1+(uint32)(_LeagueId.getShortId());
 	else
-		propPvpClan = 0;
+		propPvpClanTemp = 0;
+
+	CMirrorPropValue<TYPE_PVP_CLAN> propPvpClan( TheDataset, TheDataset.getDataSetRow(_Id), DSPropertyPVP_CLAN );
+	if (propPvpClan.getValue() != propPvpClanTemp)
+	{
+		nlinfo("update PVP CLAN");
+		propPvpClan = propPvpClanTemp;
+		propPvpClan.setChanged();
+	}
 }
 /*
 TYPE_PVP_CLAN CCharacter::getPVPFamesAllies()
@@ -13538,7 +13504,7 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 	PlayerManager.sendImpulseToClient(getId(), "USER:POPUP", titleId, textId);
 }
 
-
+// !!! Deprecated !!!
 void CCharacter::addWebCommandCheck(const string &url, const string &data, const string &salt)
 {
 	uint webCommand = getWebCommandCheck(url);
@@ -13598,6 +13564,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 	}
 }
 
+// !!! Deprecated !!!
 uint CCharacter::getWebCommandCheck(const string &url)
 {
 	CInventoryPtr inv = getInventory(INVENTORIES::bag);
@@ -13631,6 +13598,7 @@ uint CCharacter::getWebCommandCheck(const string &url)
 	return INVENTORIES::NbBagSlots;
 }
 
+// !!! Deprecated !!!
 uint CCharacter::checkWebCommand(const string &url, const string &data, const string &hmac, const string &salt)
 {
 	if (salt.empty())

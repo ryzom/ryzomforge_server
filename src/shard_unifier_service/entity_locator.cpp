@@ -660,7 +660,7 @@ namespace ENTITYLOC
 			if (character !=NULL)
 			{
 				// update the last played date
-				character->setLastPlayedDate(CTime::getSecondsSince1970());
+				character->setLastPlayedDate(0);
 				character->update(_RingDB);
 			}
 
