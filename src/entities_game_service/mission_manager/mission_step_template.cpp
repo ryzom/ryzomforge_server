@@ -143,6 +143,8 @@ uint32 IMissionStepTemplate::sendStepText(CCharacter * user,const std::vector<ui
 	uint nbSteps = 0;
 	const std::string* textPtr = NULL;
 
+	_User = user;
+
 	// build the param list
 	getTextParams(nbSteps,(const std::string *&)textPtr,params,stepStates);
 	

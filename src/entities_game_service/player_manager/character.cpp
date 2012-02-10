@@ -13504,6 +13504,40 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 	PlayerManager.sendImpulseToClient(getId(), "USER:POPUP", titleId, textId);
 }
 
+void CCharacter::validateDynamicMissionStep(const string &url)
+{
+	sendUrl(url+"&player_eid="+getId().toString()+"&event=mission_step_finished", getSalt());
+}
+
+/// set custom mission param
+void CCharacter::setCustomMissionParams(const string &missionName, const string &params)
+{
+	_CustomMissionsParams[missionName] = params;
+}
+
+/// add custom mission param
+void CCharacter::addCustomMissionParam(const string &missionName, const string &param)
+{
+	if (_CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
+		_CustomMissionsParams[missionName] += ","+param;
+	else
+		_CustomMissionsParams[missionName] = param;
+}
+
+/// get custom mission params 
+vector<string> CCharacter::getCustomMissionParams(const string &missionName)
+{
+	vector<string> params;
+	if (_CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
+	{
+		if (!_CustomMissionsParams[missionName].empty())
+			NLMISC::splitString(_CustomMissionsParams[missionName], ",", params);
+	}
+
+	return params;
+}
+
+
 // !!! Deprecated !!!
 void CCharacter::addWebCommandCheck(const string &url, const string &data, const string &salt)
 {

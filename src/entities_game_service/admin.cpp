@@ -5338,7 +5338,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	else if (command_args[0] == "building")
 	{
-		if (command_args.size () < 2) return false;
+		if (command_args.size() < 2) return false;
 
 		string action = command_args[1]; // trigger_in, trigger_out, add_guild_room, add_player_room
 		
@@ -5365,6 +5365,60 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				building->addPlayer(c->getId());
 		}
 	}	
+	
+	//*************************************************
+	//***************** missions
+	//*************************************************
+	
+	else if (command_args[0] == "mission") // Please set params before spawn mission
+	{
+		if (command_args.size() < 3)
+			return false;
+		
+		string action = command_args[1]; // spawn, set_params, add_param
+		
+		if (action == "spawn" && command_args.size() == 4)
+		{
+			// try to find the bot name
+			vector<TAIAlias> aliases;
+			CAIAliasTranslator::getInstance()->getNPCAliasesFromName(command_args[2], aliases);
+			if (aliases.empty())
+			{
+				nldebug ("<spawn_mission> No NPC found matching name '%s'", command_args[2].c_str());
+				return false;
+			}
+			
+			TAIAlias giverAlias = aliases[0];
+			
+			TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(command_args[3]);
+			
+			if (missionAlias == CAIAliasTranslator::Invalid)
+			{
+				nldebug ("<addMissionByName> No Mission found matching name '%s'", command_args[3].c_str());
+				return false;
+			}
+			
+			c->endBotChat();
+			
+			std::list< CMissionEvent* > eventList;
+			CMissionManager::getInstance()->instanciateMission(c, missionAlias,	giverAlias, eventList);
+			c->processMissionEventList(eventList,true, CAIAliasTranslator::Invalid);
+		}
+		else if (action == "remove")
+		{
+			TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(command_args[2]);
+			c->removeMission(missionAlias, 0);
+			c->removeMissionFromHistories(missionAlias);
+		}
+		else if (action == "set_params" && command_args.size() == 4)
+		{
+			c->setCustomMissionParams(command_args[2], web_app_url+","+command_args[3]);
+		}
+		else if (action == "add_params" && command_args.size() == 4)
+		{
+			c->addCustomMissionParam(command_args[2], command_args[3]);
+		}
+	}
 	
 	else
 	{

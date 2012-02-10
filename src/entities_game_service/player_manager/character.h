@@ -1652,6 +1652,18 @@ public:
 	/// send custom url
 	void sendUrl(const std::string &url, const std::string &salt);
 
+	/// set custom mission param
+ 	void setCustomMissionParams(const std::string &missionName, const std::string &params);
+ 	
+ 	/// add custom mission param
+ 	void addCustomMissionParam(const std::string &missionName, const std::string &param);
+ 	
+ 	/// get custom mission params
+ 	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
+ 	
+ 	/// validate dynamic mission step sending url
+ 	void validateDynamicMissionStep(const std::string &url);
+
 	/// add web command validation check
 	void addWebCommandCheck(const std::string &url, const std::string &data, const std::string &salt);
 
@@ -3246,6 +3258,8 @@ private:
 
 	/// last webcommand index
 	uint32						_LastWebCommandIndex;
+
+ 	std::map<std::string, std::string>	_CustomMissionsParams;
 
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange {

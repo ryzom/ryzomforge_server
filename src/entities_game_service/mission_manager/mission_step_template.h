@@ -164,7 +164,8 @@ protected:
 	bool								_AddDefaultParams;
 	/// flag set to true if the step is in an OOO block which text wad overriden
 	bool								_IsInOverridenOOO;
-
+	/// Player running the mission
+	CCharacter * 						_User;
 };
 
 
