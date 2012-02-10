@@ -997,6 +997,8 @@ public:
 	// Set the name of the animal
 	void setAnimalName( uint8 petIndex, ucstring customName );
 
+	void sendPetCustomNameToClient(uint8 petIndex);
+
 	// near character's pets are TP with player (continent tp)
 	void allowNearPetTp();
 	bool isNearPetTpIsAllowed() const;

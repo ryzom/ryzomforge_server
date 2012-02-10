@@ -2854,6 +2854,8 @@ void CCharacter::postLoadTreatment()
 			{
 				_PlayerPets[ i ].Slot = INVENTORIES::INVALID_INVENTORY_SLOT;
 			}
+
+			sendPetCustomNameToClient(i);
 			uint32 slot = _PlayerPets[ i ].initLinkAnimalToTicket( this, i );
 			if( slot < INVENTORIES::NbPackerSlots )
 			{
@@ -6738,16 +6740,37 @@ void CCharacter::sendAnimalCommand( uint8 petIndexCode, uint8 command )
 
 void CCharacter::setAnimalName( uint8 petIndex, ucstring customName )
 {
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
 	CPetAnimal& animal = _PlayerPets[petIndex];
 
 	animal.setCustomName(customName);
-
+	sendPetCustomNameToClient(petIndex);
+	
 	TDataSetRow row = animal.SpawnedPets;
 	NLNET::CMessage	msgout("CHARACTER_NAME");
 	msgout.serial(row);
 	msgout.serial(customName);
 	sendMessageViaMirror("IOS", msgout);
 }
+
+//-----------------------------------------------------------------------------
+void CCharacter::sendPetCustomNameToClient(uint8 petIndex)
+{
+	uint32 textId = 0;
+	if (_PlayerPets[petIndex].CustomName.length() > 0)
+	{
+		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+		params[0].Literal= _PlayerPets[petIndex].CustomName;
+		uint32 userId = PlayerManager.getPlayerId(_Id);
+		textId = STRING_MANAGER::sendStringToUser(userId, "LITERAL", params);
+	}
+	CBankAccessor_PLR::getPACK_ANIMAL().getBEAST(petIndex).setNAME(_PropertyDatabase, textId);
+}
+
 
 //-----------------------------------------------
 //		addCatalyserXpBonus
@@ -18152,7 +18175,6 @@ uint32 CPetAnimal::initLinkAnimalToTicket( CCharacter * c, uint8 index )
 	}
 	return INVENTORIES::INVALID_INVENTORY_SLOT;
 }
-
 
 //-----------------------------------------------
 // getAnimalMaxBulk
