@@ -644,11 +644,12 @@ void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 	}
 		
 	CMirrorPropValue<TYPE_PVP_MODE> propPvpMode( TheDataset, user->getEntityRowId(), DSPropertyPVP_MODE );
+	CMirrorPropValue<TYPE_EVENT_FACTION_ID> propPvpMode2( TheDataset, user->getEntityRowId(), DSPropertyEVENT_FACTION_ID );
 	if (propPvpMode.getValue() != pvpMode)
 	{
 		nlinfo("New pvp Mode : %d", pvpMode);
 		propPvpMode = pvpMode;
-		propPvpMode.setChanged();
+		propPvpMode2 = pvpMode;
 	}
 }
 
