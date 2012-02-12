@@ -7740,7 +7740,7 @@ NLMISC_COMMAND(eventSetBotFacing, "Set the direction in which a bot faces", "<bo
 	else
 	{
 		NLMISC::fromString(args[1], orientation);
-		orientation = (orientation / 360.0 * (NLMISC::Pi * 2.0));
+		orientation = (orientation / 360.0f * (float(NLMISC::Pi) * 2.0f));
 	}
 
 
