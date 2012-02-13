@@ -1376,6 +1376,7 @@ void CPlayerService::init()
 	TRANSPORT_CLASS_REGISTER (CCreatureCompleteHealImp);
 	TRANSPORT_CLASS_REGISTER (CChangeCreatureMaxHPImp);
 	TRANSPORT_CLASS_REGISTER (CChangeCreatureHPImp);
+	TRANSPORT_CLASS_REGISTER (CCreatureSetUrlImp);
 	TRANSPORT_CLASS_REGISTER (CChangeCreatureModeMsg);
 	TRANSPORT_CLASS_REGISTER (CGiveItemRequestMsgImp);
 	TRANSPORT_CLASS_REGISTER (CReceiveItemRequestMsgImp);

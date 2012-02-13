@@ -1608,10 +1608,42 @@ void setHPScale_f_(CStateInstance* entity, CScriptStack& stack)
 	}
 }
 
+//----------------------------------------------------------------------------
+// Url related method
+/** @page code
 
+@subsection setUrl_ss_
+Sets the name and url of right-click action
 
+Arguments: s(actionName),s(url) ->
+@param[in] actionName of action when player mouse over
+@param[in] url of action when player mouse over
 
+@code
+()setUrl("Test","http://atys.ryzom.com/start/index.php");
+@endcode
 
+*/
+// CGroup
+void setUrl_ss_(CStateInstance* entity, CScriptStack& stack)
+{
+	std::string url = (std::string)stack.top();stack.pop();	
+	std::string actionName = (std::string)stack.top();stack.pop();	
+	
+	CCreatureSetUrlMsg msg;
+	FOREACH(botIt, CCont<CBot>,	entity->getGroup()->bots())
+	{
+		CSpawnBot* pbot = botIt->getSpawnObj();
+		if (pbot!=NULL)
+		{		
+			msg.Entities.push_back(pbot->dataSetRow());
+		}
+	}
+	
+	msg.ActionName = actionName;
+	msg.Url = url;
+	msg.send(egsString);
+}
 
 
 
@@ -1905,7 +1937,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to add
 
 @code
-()addProfileParameter("running"); // équivalent à un parameter "running" dans la primitive du groupe
+()addProfileParameter("running"); // Ã©quivalent Ã  un parameter "running" dans la primitive du groupe
 @endcode
 
 */
@@ -1933,7 +1965,7 @@ Arguments: s(parameterName),s(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addProfileParameter("foo", "bar"); // équivalent à un parameter "foo:bar" dans la primitive du groupe
+()addProfileParameter("foo", "bar"); // Ã©quivalent Ã  un parameter "foo:bar" dans la primitive du groupe
 @endcode
 
 */
@@ -1962,7 +1994,7 @@ Arguments: s(parameterName),f(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addProfileParameter("foo", 0.5); // équivalent à un parameter "foo:0.5" dans la primitive du groupe
+()addProfileParameter("foo", 0.5); // Ã©quivalent Ã  un parameter "foo:0.5" dans la primitive du groupe
 @endcode
 
 */
@@ -1990,7 +2022,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to remove
 
 @code
-()removeProfileParameter("running"); // retire le paramètre "running" ou "running:<*>" du groupe
+()removeProfileParameter("running"); // retire le paramÃ¨tre "running" ou "running:<*>" du groupe
 @endcode
 
 */
@@ -2016,7 +2048,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to add
 
 @code
-()addProfileParameter("running"); // équivalent à un parameter "running" dans la primitive du groupe
+()addProfileParameter("running"); // Ã©quivalent Ã  un parameter "running" dans la primitive du groupe
 @endcode
 
 */
@@ -2045,7 +2077,7 @@ Arguments: s(parameterName),s(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addPersistentProfileParameter("foo", "bar"); // équivalent à un parameter "foo:bar" dans la primitive du groupe
+()addPersistentProfileParameter("foo", "bar"); // Ã©quivalent Ã  un parameter "foo:bar" dans la primitive du groupe
 @endcode
 
 */
@@ -2076,7 +2108,7 @@ Arguments: s(parameterName),f(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addPersistentProfileParameter("foo", 0.5); // équivalent à un parameter "foo:0.5" dans la primitive du groupe
+()addPersistentProfileParameter("foo", 0.5); // Ã©quivalent Ã  un parameter "foo:0.5" dans la primitive du groupe
 @endcode
 
 */
@@ -2105,7 +2137,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to remove
 
 @code
-()removeProfileParameter("running"); // retire le paramètre "running" ou "running:<*>" du groupe
+()removeProfileParameter("running"); // retire le paramÃ¨tre "running" ou "running:<*>" du groupe
 @endcode
 
 */
@@ -4780,6 +4812,7 @@ std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, setHealer_f_);
 	REGISTER_NATIVE_FUNC(functions, setConditionSuccess_f_);
 	REGISTER_NATIVE_FUNC(functions, facing_f_);
+	REGISTER_NATIVE_FUNC(functions, setUrl_ss_);
 
 	// Boss functions (custom text)
 	REGISTER_NATIVE_FUNC(functions, phraseBegin__);
@@ -4824,10 +4857,7 @@ std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, teleportPlayer_sffff_);
 	REGISTER_NATIVE_FUNC(functions, summonPlayer_fs_);
 
-	
-
-	
-	
+		
 #undef REGISTER_NATIVE_FUNC
 	
 	return functions;

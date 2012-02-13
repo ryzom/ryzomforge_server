@@ -504,6 +504,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AIS -> EGS send bot url information
+//----------------------------------------------------------------------------
+class CCreatureSetUrlMsg : public CMirrorTransportClass
+{
+public:
+	std::vector<TDataSetRow>	Entities;
+	std::string		ActionName;
+	std::string		Url;
+	
+	virtual void description ()
+	{
+		className ("CCreatureSetUrlMsg");
+		propertyCont ("Entities", PropDataSetRow, Entities);
+		property ("ActionName", PropString, std::string(), ActionName);
+		property ("Url", PropString, std::string(), Url);
+	}
+	virtual void callback (const std::string &name, NLNET::TServiceId id) {}
+};
+
+//----------------------------------------------------------------------------
 // AIS -> EGS send despawn of aiinstance
 //----------------------------------------------------------------------------
 class CReportAIInstanceDespawnMsg : public CMirrorTransportClass

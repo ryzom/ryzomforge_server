@@ -90,6 +90,16 @@ public:
 };
 
 
+/**
+ * Implementation of the change setUrl message for creatures
+ */
+class CCreatureSetUrlImp : public CCreatureSetUrlMsg
+{
+public:
+	virtual void callback (const std::string &name, NLNET::TServiceId id);
+};
+
+
 typedef CHashMap< NLMISC::CEntityId, CCreature *, NLMISC::CEntityIdHashMapTraits> TMapCreatures;
 
 /**
