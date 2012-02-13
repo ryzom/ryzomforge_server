@@ -5410,6 +5410,46 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			c->removeMission(missionAlias, 0);
 			c->removeMissionFromHistories(missionAlias);
 		}
+		else if (action == "add_compass" && command_args.size() == 4)
+		{
+			TVectorParamCheck params(1);
+			sint32 x = 0;
+			sint32 y = 0;
+			string msg;
+			if (command_args[2] == "bot")
+			{
+				vector<TAIAlias> aliases;
+				CAIAliasTranslator::getInstance()->getNPCAliasesFromName(command_args[3], aliases);
+				if (aliases.empty())
+					return false;
+				CCreature * bot = CreatureManager.getCreature(CAIAliasTranslator::getInstance()->getEntityId(aliases[0]));
+				if (bot)
+				{
+					x = bot->getState().X();
+					y = bot->getState().Y();
+					params[0].Type = STRING_MANAGER::bot;
+					params[0].setEIdAIAlias( bot->getId(), aliases[0] );
+					msg = "COMPASS_BOT";
+					uint32 txt = STRING_MANAGER::sendStringToClient(c->getEntityRowId(), msg, params);
+					PlayerManager.sendImpulseToClient(c->getId(), "JOURNAL:ADD_COMPASS_BOT", x, y, txt, bot->getEntityRowId().getCompressedIndex());
+				}
+			}
+			else if (command_args[2] == "place")
+			{
+				CPlace * place = CZoneManager::getInstance().getPlaceFromName(command_args[3]);
+				if (place)
+				{
+					x = place->getCenterX();
+					y = place->getCenterY();
+
+					params[0].Identifier = place->getName();
+					params[0].Type = STRING_MANAGER::place;
+					msg = "COMPASS_PLACE";
+					uint32 txt = STRING_MANAGER::sendStringToClient(c->getEntityRowId(), msg, params);
+					PlayerManager.sendImpulseToClient(c->getId(), "JOURNAL:ADD_COMPASS", x, y, txt);
+				}
+			}		
+		}
 		else if (action == "set_params" && command_args.size() == 4)
 		{
 			c->setCustomMissionParams(command_args[2], web_app_url+","+command_args[3]);
@@ -5438,8 +5478,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 			}
 		}
-	} else
+	} else {
+		
 		c->setWebCommandIndex(iindex);
+		if (send_url)
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
+	}
 		
 	return true;
 }
