@@ -5367,6 +5367,120 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}	
 	
 	//*************************************************
+	//***************** Money
+	//*************************************************
+	
+	else if (command_args[0] == "money")
+	{
+		if (command_args.size() < 3) return false;
+		
+		string action = command_args[1]; // check, give, spend
+		
+		if (action == "check")
+		{
+			uint64 wantedMoney;
+			fromString(command_args[2], wantedMoney);
+			if (c->getMoney() < wantedMoney) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_money", getSalt());
+				return true;
+			}
+		}
+		else if (action == "give")
+		{
+			uint64 money;
+			fromString(command_args[2], money);
+			c->giveMoney(money);
+		}
+		else if (action == "spend")
+		{
+			uint64 money;
+			fromString(command_args[2], money);
+			c->spendMoney(money);
+		}
+	}
+	
+	//*************************************************
+	//***************** Faction Points
+	//*************************************************
+	
+	else if (command_args[0] == "faction_points")
+	{
+		if (command_args.size() < 4) return false;
+		
+		string action = command_args[1]; // check, set, add, remove
+		
+		
+		PVP_CLAN::TPVPClan clan = PVP_CLAN::fromString(command_args[2]);
+		if ((clan < PVP_CLAN::BeginClans) || (clan > PVP_CLAN::EndClans))
+		{
+			return false;
+		}
+
+		uint32 value;
+		fromString(command_args[3], value);
+		
+		if (action=="check")
+		{
+			if (c->getFactionPoint(clan) < value)
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_faction_points", getSalt());
+			}
+		}
+		else if (action=="set")
+		{
+			c->setFactionPoint(clan, value, true);
+		}
+		else if (action=="add")
+		{
+			c->setFactionPoint(clan, c->getFactionPoint(clan)+value, true);
+		}
+		else if (action=="remove")
+		{
+			if (c->getFactionPoint(clan) < value)
+				c->setFactionPoint(clan, 0, true);
+			else
+				c->setFactionPoint(clan, c->getFactionPoint(clan)-value, true);
+		} 
+	}
+	
+	//*************************************************
+	//***************** Pvp Points
+	//*************************************************
+	
+	else if (command_args[0] == "pvp_points")
+	{
+		if (command_args.size() < 3) return false;
+		
+		string action = command_args[1]; // check, set, add, remove
+		
+		uint32 value;
+		fromString(command_args[2], value);
+		
+		if (action=="check")
+		{
+			if (c->getPvpPoint() < value)
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_pvp_points", getSalt());
+			}
+		}
+		else if (action=="set")
+		{
+			c->setPvpPoint(value);
+		}
+		else if (action=="add")
+		{
+			c->setPvpPoint(c->getPvpPoint()+value);
+		}
+		else if (action=="remove")
+		{
+			c->setPvpPoint(c->getPvpPoint()-value);
+		}
+	}
+	
+	//*************************************************
 	//***************** missions
 	//*************************************************
 	
@@ -7784,7 +7898,7 @@ NLMISC_COMMAND(eventSetBotFacing, "Set the direction in which a bot faces", "<bo
 	else
 	{
 		NLMISC::fromString(args[1], orientation);
-		orientation = (orientation / 360.0f * (float(NLMISC::Pi) * 2.0f));
+		orientation = (orientation / 360.0 * (NLMISC::Pi * 2.0));
 	}
 
 

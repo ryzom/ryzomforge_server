@@ -1620,7 +1620,7 @@ Arguments: s(actionName),s(url) ->
 @param[in] url of action when player mouse over
 
 @code
-()setUrl("Test","http://atys.ryzom.com/start/index.php");
+()setHPLevel(0.8);
 @endcode
 
 */
