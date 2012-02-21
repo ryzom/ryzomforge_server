@@ -3889,9 +3889,9 @@ void CGrpProfileFaction::checkTargetsAround()
 	CPropertySetWithExtraList<TAllianceId> const& thisEnnemyFactions = thisGrpNpc.ennemyFaction();
 
 	// We don't assist or attack players if our friends/ennemies are not in factions
-	bool const assistPlayers = thisFriendFactions.containsPartOfStrictFilter("Famous*");
+	bool const assistPlayers = (thisFriendFactions.containsPartOfStrictFilter("Famous*") || thisFriendFactions.have(AITYPES::CPropertyId("Player")));
 	bool const assistBots    = !thisFriendFactions.empty() && !bNoAssist;
-	bool const attackPlayers = (!thisEnnemyFactions.extraSetEmpty()) || thisEnnemyFactions.containsPartOfStrictFilter("Famous*") || thisEnnemyFactions.containsPartOfStrictFilter("outpost:*");
+	bool const attackPlayers = (!thisEnnemyFactions.extraSetEmpty()) || thisEnnemyFactions.containsPartOfStrictFilter("Famous*") || thisEnnemyFactions.have(AITYPES::CPropertyId("Player")) || thisEnnemyFactions.containsPartOfStrictFilter("outpost:*");
 	bool const attackBots    = !thisEnnemyFactions.empty();
 	
 	CAIVision<CPersistentOfPhysical>	Vision;
