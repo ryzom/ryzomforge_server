@@ -1620,7 +1620,7 @@ Arguments: s(actionName),s(url) ->
 @param[in] url of action when player mouse over
 
 @code
-()setHPLevel(0.8);
+()setUrl("Click on Me", "http://www.domain.com/script.php");
 @endcode
 
 */
