@@ -709,8 +709,8 @@ static void cbCharacterEventFaction(CMessage& msgin, const string &serviceName, 
 		else
 			ci->UntranslatedEventFactionId = SM->storeString( eventFaction );
 
-		CMirrorPropValue<TYPE_EVENT_FACTION_ID> propEventFactionId( TheDataset, chId, DSPropertyEVENT_FACTION_ID );
-		propEventFactionId = SM->translateEventFaction( ci->UntranslatedEventFactionId );
+//		CMirrorPropValue<TYPE_EVENT_FACTION_ID> propEventFactionId( TheDataset, chId, DSPropertyEVENT_FACTION_ID );
+//		propEventFactionId = SM->translateEventFaction( ci->UntranslatedEventFactionId );
 	}
 	else
 	{

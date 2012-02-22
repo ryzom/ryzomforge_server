@@ -490,8 +490,8 @@ void CInputOutputService::scanMirrorChanges()
 		if (entityId.getType() == RYZOMID::player)
 		{
 			// init event faction ID in mirror
-			CMirrorPropValue<TYPE_EVENT_FACTION_ID> propEventFactionId( TheDataset, entityIndex, DSPropertyEVENT_FACTION_ID );
-			propEventFactionId = 0;
+			//CMirrorPropValue<TYPE_EVENT_FACTION_ID> propEventFactionId( TheDataset, entityIndex, DSPropertyEVENT_FACTION_ID );
+			//propEventFactionId = 0;
 		}
 
 		entityIndex = DataSet->getNextAddedEntity();
