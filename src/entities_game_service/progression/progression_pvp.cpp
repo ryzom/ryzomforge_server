@@ -1234,7 +1234,7 @@ void CDamageScoreManager::playerDeath(CCharacter * victimChar, const CCharacter 
 			if (winnerGainFactionPoints)
 			{
 				// Compute Fames delta
-				uint32 fameFactor = 0;
+				sint32 fameFactor = 0;
 				for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
 				{
 					sint32 victimFame = CFameInterface::getInstance().getFameIndexed(victimChar->getId(), fameIdx);
@@ -1248,11 +1248,11 @@ void CDamageScoreManager::playerDeath(CCharacter * victimChar, const CCharacter 
 						 (victimFame <= -25*6000 && winnerFame <= -25*6000) )
 						fameFactor--;						
 				}
-				clamp(fameFactor, 0, 4);
+				clamp(fameFactor, 0, 3);
 				nlinfo("points = %d * %d", fpPerPlayer, fameFactor);
 				
 				// player gains faction points
-				changePlayerPvpPoints(winnerChar, sint32(fpPerPlayer * fameFactor));
+				changePlayerPvpPoints(winnerChar, sint32(fpPerPlayer) * fameFactor);
 				winnerChar->sendFactionPointGainKillMessage(winnerFaction, fpPerPlayer * fameFactor, victimChar->getId());
 			}
 
