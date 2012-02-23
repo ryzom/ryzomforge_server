@@ -74,9 +74,16 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 	if (!pTarget->getPVPFlag() && !pTarget->getPvPRecentActionFlag())
 		return PVP_RELATION::Neutral;
 
-	// Actor is not tagged => Neutral 
+	// Actor is not tagged => Check target
 	if (!actor->getPVPFlag() && !actor->getPvPRecentActionFlag())
-		return PVP_RELATION::Neutral;
+	{
+		// Target flag => NeutralPVP
+		if (pTarget->getPvPRecentActionFlag())
+			return PVP_RELATION::NeutralPVP;
+		else
+			return PVP_RELATION::Neutral;
+	}
+
 
 	// In same Team => Ally
 	if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
