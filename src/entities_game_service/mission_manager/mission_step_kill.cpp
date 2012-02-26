@@ -561,20 +561,15 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 					else
 					{
 						webAppUrl = params[0];
-						vector<TAIAlias> aliases;
-						CAIAliasTranslator::getInstance()->getNPCAliasesFromName( params[1] , aliases );
-						if ( aliases.empty() )
-						{
-							LOGMISSIONSTEPERROR("kill_npc : invalid dynamic npc name");
-							return 0;
-						}
-						if (aliases[0] != CAIAliasTranslator::Invalid &&  aliases[0] == c->getAlias())
+						string name;
+						
+						CAIAliasTranslator::getInstance()->getNPCNameFromAlias(c->getAlias(), name);
+						if ( name == params[1] )
 						{
 							user->validateDynamicMissionStep(webAppUrl);
 							LOGMISSIONSTEPSUCCESS("kill_npc");
 							return 1;
 						}
-
 					}
 					////
 				}

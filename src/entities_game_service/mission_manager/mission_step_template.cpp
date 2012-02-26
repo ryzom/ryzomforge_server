@@ -102,6 +102,8 @@ uint32 IMissionStepTemplate::sendRpStepText(CCharacter * user,const std::vector<
 	uint nbSteps = 0;
 	const std::string* textPtr = NULL;
 
+	_User = user;
+
 	if ( !_RoleplayText.empty() )
 	{
 		// build the param list

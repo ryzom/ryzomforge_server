@@ -670,6 +670,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 
 	_LastWebCommandIndex = 0;
 
+	_CustomMissionsParams.clear();
+
 	initDatabase();
 } // CCharacter  //
 
@@ -13541,7 +13543,7 @@ void CCharacter::setCustomMissionParams(const string &missionName, const string 
 /// add custom mission param
 void CCharacter::addCustomMissionParam(const string &missionName, const string &param)
 {
-	if (_CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
+	if (!_CustomMissionsParams.empty() && _CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
 		_CustomMissionsParams[missionName] += ","+param;
 	else
 		_CustomMissionsParams[missionName] = param;
@@ -13551,12 +13553,16 @@ void CCharacter::addCustomMissionParam(const string &missionName, const string &
 vector<string> CCharacter::getCustomMissionParams(const string &missionName)
 {
 	vector<string> params;
-	if (_CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
+	if (_CustomMissionsParams.empty()) 
+	{
+		return params;
+	}
+	
+	if (!_CustomMissionsParams.empty() && _CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
 	{
 		if (!_CustomMissionsParams[missionName].empty())
 			NLMISC::splitString(_CustomMissionsParams[missionName], ",", params);
 	}
-
 	return params;
 }
 

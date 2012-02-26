@@ -41,7 +41,7 @@ public:
 	//@{
 	/// ctor
 	inline IMissionStepTemplate()
-		:_OOOStepIndex(0xFFFFFFFF),_Any(false),_Displayed(true),_IconDisplayedOnStepNPC(true),_IsInOverridenOOO(false) {}	
+		:_OOOStepIndex(0xFFFFFFFF),_User(NULL),_Any(false),_Displayed(true),_IconDisplayedOnStepNPC(true),_IsInOverridenOOO(false) {}	
 
 	//BRIANCODE my appologies, need access to this data from CMissionStepGiveItem	
 	struct CSubStep
