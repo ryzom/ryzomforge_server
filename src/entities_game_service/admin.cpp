@@ -5111,6 +5111,52 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}
 
 	//*************************************************
+	//***************** change_hair
+	//*************************************************
+	
+	else if (command_args[0] == "change_hair") {
+		if (command_args.size () != 3) return false;
+
+		CCharacter *target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[1]));
+
+		CSheetId sheetId(command_args[2]);
+		
+		const CStaticItem * form = CSheets::getForm(sheetId);
+		if (form == NULL)
+		{
+			nlwarning("unknown item : '%s'", sheetId.toString().c_str());
+			return true;
+		}
+
+		if (form->Type != ITEM_TYPE::HAIR_MALE && form->Type != ITEM_TYPE::HAIR_FEMALE)
+		{
+			nlwarning("'%s' is not a haircut item", sheetId.toString().c_str());
+			return true;
+		}
+
+		uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(form->SheetId, SLOTTYPE::HEAD_SLOT);
+		if (target->setHair(hairValue))
+		{
+			target->resetHairCutDiscount();
+		}
+	}
+	
+	//*************************************************
+	//***************** change_hair_color
+	//*************************************************
+	
+	else if (command_args[0] == "change_hair_color") {
+		if (command_args.size () != 3) return false;
+
+		CCharacter *target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[1]));
+
+		uint32 value;
+		fromString(command_args[2], value);
+
+		target->setHairColor(value);
+	}
+	
+	//*************************************************
 	//***************** change_vpx
 	//*************************************************
 	
@@ -5120,7 +5166,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		CCharacter *target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[1]));
 
 		string name = command_args[2];
-		uint32 value = (uint32)atoi(command_args[3].c_str());
+		
+		uint32 value;
+		fromString(command_args[3], value);
 
 		if(target && target->getEnterFlag())
 		{
