@@ -4637,9 +4637,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (command_args.size() < 4)
 			return false;
 
-		const CSheetId sheetId(command_args[1]);
-		if (sheetId == CSheetId::Unknown)
-			return false;
 		const uint32 quality = (uint32)atoi(command_args[2].c_str());
 		if (quality == 0)
 			return false;
@@ -4669,9 +4666,23 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			}
 		}
 
+		CGameItemPtr new_item;
+		string sheet = command_args[1];
 
-		CGameItemPtr new_item = c->createItem(quality, quantity, sheetId);
-
+		if ( sheet.find(".sitem") == string::npos ) // try named item
+		{
+			new_item = CNamedItems::getInstance().createNamedItem(command_args[1], quantity);
+			if (new_item == NULL)
+				return true;
+		}
+		else
+		{
+			const CSheetId sheetId(sheet);
+			if (sheetId == CSheetId::Unknown)
+				return true;
+			new_item = c->createItem(quality, quantity, sheetId);
+		}
+		
 		if (!c->addItemToInventory(inventory, new_item))
 		{
 			new_item.deleteItem();
@@ -5413,6 +5424,48 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				building->addPlayer(c->getId());
 		}
 	}	
+	
+	//*************************************************
+	//***************** Skill
+	//*************************************************
+	
+	else if (command_args[0] == "skill")
+	{
+		if (command_args.size() < 4) return false;
+		
+		string action = command_args[1]; // check, best, add_xp
+		
+		if (action == "check")
+		{
+			SKILLS::ESkills skillEnum = SKILLS::toSkill( command_args[2] );
+			uint32 wantedValue;
+			fromString(command_args[3], wantedValue);
+			
+			if (c->getSkillValue(skillEnum) < wantedValue) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_skill", getSalt());
+				return true;
+			}
+		}
+		else if (action == "best")
+		{
+			SKILLS::ESkills skillEnum = SKILLS::toSkill( command_args[2] );
+			uint32 wantedValue;
+			fromString(command_args[3], wantedValue);
+			
+			if (c->getBestChildSkillValue(skillEnum) < wantedValue) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_best_skill", getSalt());
+				return true;
+			}
+		}
+		else if (action == "add_xp")
+		{
+			double xp;
+			fromString(command_args[3], xp);
+			c->addXpToSkill(xp, command_args[2]);
+		}
+	}
 	
 	//*************************************************
 	//***************** Money
