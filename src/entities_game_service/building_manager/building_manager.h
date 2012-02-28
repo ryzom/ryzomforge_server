@@ -122,6 +122,7 @@ public:
 	void buildBuildingTradeList(const NLMISC::CEntityId & userId, uint16 session);
 	/// buy a player flat option
 	void buyBuildingOption(const NLMISC::CEntityId & userId, uint8 idx);
+	void buyBuilding(const NLMISC::CEntityId & userId, TAIAlias alias);
 	//@}
 
 private:

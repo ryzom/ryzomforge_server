@@ -5423,6 +5423,23 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if ( building )
 				building->addPlayer(c->getId());
 		}
+		else if (action == "buy_guild_room"  && command_args.size () == 3)
+		{
+			CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
+			if ( building )
+			{
+				CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
+				if (guild != NULL)
+				{
+					guild->setBuilding(building->getAlias());
+				}
+			}
+		}
+		else if (action == "buy_player_room"  && command_args.size () == 3)
+		{
+			CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
+			CBuildingManager::getInstance()->buyBuilding(c->getId(), building->getAlias());
+		}
 	}	
 	
 	//*************************************************

@@ -1133,3 +1133,9 @@ void CBuildingManager::buyBuildingOption(const NLMISC::CEntityId & userId, uint8
 	}
 }
 
+//----------------------------------------------------------------------------
+void CBuildingManager::buyBuilding(const NLMISC::CEntityId & userId, TAIAlias alias)
+{
+	CCharacter * user = PlayerManager.getChar(userId);
+	user->getRoomInterface().init( user, dynamic_cast<CBuildingPhysicalPlayer*>(getBuildingPhysicalsByAlias(alias)) );
+}
