@@ -2917,7 +2917,8 @@ void CCharacter::useItem(uint32 slot)
 	{
 		pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();
 		if ((form->TpType == TELEPORT_TYPES::KAMI) && (allegeance.first == PVP_CLAN::Karavan)
-			|| (form->TpType == TELEPORT_TYPES::KARAVAN) && (allegeance.first == PVP_CLAN::Kami))
+			|| (form->TpType == TELEPORT_TYPES::KARAVAN) && (allegeance.first == PVP_CLAN::Kami)
+			|| getOrganization() == 5 ) //marauder
 		{
 			CCharacter::sendDynamicSystemMessage(_Id, "ALTAR_RESTRICTION");
 			return;

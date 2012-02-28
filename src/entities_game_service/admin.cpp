@@ -5415,17 +5415,21 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		{
 			CBuildingPhysicalGuild * building = dynamic_cast<CBuildingPhysicalGuild *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
 			if ( building )
+			{
 				building->addGuild(c->getGuildId());
+			}
 		}
 		else if (action == "add_player_room"  && command_args.size () == 3)
 		{
 			CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
 			if ( building )
+			{
 				building->addPlayer(c->getId());
+			}
 		}
 		else if (action == "buy_guild_room"  && command_args.size () == 3)
 		{
-			CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
+			CBuildingPhysicalGuild * building = dynamic_cast<CBuildingPhysicalGuild *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
 			if ( building )
 			{
 				CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
@@ -5438,7 +5442,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		else if (action == "buy_player_room"  && command_args.size () == 3)
 		{
 			CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
-			CBuildingManager::getInstance()->buyBuilding(c->getId(), building->getAlias());
+			if ( building )
+			{
+				CBuildingManager::getInstance()->buyBuilding(c->getId(), building->getAlias());
+			}
 		}
 	}	
 	

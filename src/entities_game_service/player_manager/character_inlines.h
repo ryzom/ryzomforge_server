@@ -896,6 +896,14 @@ inline uint32 CCharacter::getPlayedTime() const
 
 //------------------------------------------------------------------------------
 
+inline uint32 CCharacter::getOrganization() const
+{
+	return _Organization; 
+}
+
+
+//------------------------------------------------------------------------------
+
 inline const std::list<TCharacterLogTime>& CCharacter::getLastLogStats() const
 {
 	return _LastLogStats; 
