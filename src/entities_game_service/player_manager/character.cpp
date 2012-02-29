@@ -17318,6 +17318,9 @@ void CCharacter::setPVPFlag( bool pvpFlag )
 		//  set the new pvp flag and time last change for apply timer delay before this change become effective
 		if( pvpFlag == false )
 		{
+			if (_PVPFlagTimeSettedOn > CTickEventHandler::getGameCycle())
+				_PVPFlagTimeSettedOn = CTickEventHandler::getGameCycle() - TimeForResetPVPFlag;
+				
 			if( _PVPFlagTimeSettedOn + TimeForResetPVPFlag > CTickEventHandler::getGameCycle() )
 			{
 				// we need wait a minimal of time before reset your pvp tag
