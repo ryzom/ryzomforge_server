@@ -624,7 +624,7 @@ void initSalt()
 
 const string &getSalt()
 {
-	Salt = "qdRUODw9Vk78Y5MW4Ec1J0FKxjyNgrCfI"
+	Salt = "qdRUODw9Vk78Y5MW4Ec1J0FKxjyNgrCfI";
 	return Salt;
 }
 
