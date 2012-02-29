@@ -136,14 +136,11 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 //----------------------------------------------------------------------------
 bool IBuildingPhysical::isUserInsideBuilding( const TDataSetRow & user )
 {
-	nlinfo("ok");
-	
 	for (uint32 i = 0; i < _UsersInside.size(); ++i )
 	{
 		if( _UsersInside[i] == user )
 			return true;
 	}
-	nlinfo("ok");
 	return false;
 }
 
