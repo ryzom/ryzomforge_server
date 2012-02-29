@@ -155,7 +155,7 @@ void CTradeBase::copy( IItemTrade * itt )
 	else _ItemPtr = 0;
 }
 
-TGameCycle CTradeBase::getGameCycleLeft() const
+TGameCycle CItemForSale::getGameCycleLeft() const
 {
 	TGameCycle dt = CTickEventHandler::getGameCycle() - _StartSaleCycle;
 	return (TGameCycle) ( (sint32) std::max( (sint32)0, (sint32)( ((sint32) MaxGameCycleSaleStore) - (sint32)( dt + _ItemPtr->getTotalSaleCycle() ) ) ) );
