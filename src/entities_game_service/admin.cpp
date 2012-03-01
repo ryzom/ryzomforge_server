@@ -5308,7 +5308,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		else
 		{
 			if (send_url)
-				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed", getSalt());
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_vpx_def", getSalt());
 		}
 	}
 	//*************************************************
@@ -5468,7 +5468,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			
 			if (c->getSkillValue(skillEnum) < wantedValue) {
 				if (send_url)
-					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_skill", getSalt());
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_enough_skill", getSalt());
 				return true;
 			}
 		}
@@ -5480,7 +5480,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			
 			if (c->getBestChildSkillValue(skillEnum) < wantedValue) {
 				if (send_url)
-					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_best_skill", getSalt());
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_best_skill", getSalt());
 				return true;
 			}
 		}
@@ -5508,7 +5508,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			fromString(command_args[2], wantedMoney);
 			if (c->getMoney() < wantedMoney) {
 				if (send_url)
-					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_money", getSalt());
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_enough_money", getSalt());
 				return true;
 			}
 		}
@@ -5523,6 +5523,89 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			uint64 money;
 			fromString(command_args[2], money);
 			c->spendMoney(money);
+		}
+	}
+	
+	//*************************************************
+	//***************** Guild
+	//*************************************************
+	
+	else if (command_args[0] == "guild")
+	{
+		if (command_args.size() < 3) return false;
+		
+		CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
+		if (guild == NULL)
+		{
+			if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_guild", getSalt());
+			return true;
+		}
+		
+		string action = command_args[1]; // check, give, spend
+		
+		if (action == "check_money")
+		{
+			uint64 wantedMoney;
+			fromString(command_args[2], wantedMoney);
+			if (guild->getMoney() < wantedMoney) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_enough_money", getSalt());
+				return true;
+			}
+		}
+		else if (action == "money_give")
+		{
+			uint64 money;
+			fromString(command_args[2], money);
+			guild->addMoney(money);
+		}
+		else if (action == "money_spend")
+		{
+			uint64 money;
+			fromString(command_args[2], money);
+			guild->spendMoney(money);
+		}
+		else if (action == "check_rank")
+		{
+			CGuildMember * member = guild->getMemberFromEId(c->getId());
+			if ( member == NULL )
+			{
+				return false;
+			}
+			
+			EGSPD::CGuildGrade::TGuildGrade wanted_grade = EGSPD::CGuildGrade::fromString(command_args[2]);
+			if (wanted_grade == EGSPD::CGuildGrade::Unknown)
+				return false;
+			
+			EGSPD::CGuildGrade::TGuildGrade memberGrade = member->getGrade();
+			if( memberGrade > wanted_grade)
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_enough_rank", getSalt());
+				return true;
+			}
+		}
+		
+	}
+	
+	//*************************************************
+	//***************** Resets
+	//*************************************************
+	
+	else if (command_args[0] == "reset")
+	{
+		if (command_args.size() < 2) return false;
+		
+		string action = command_args[1]; // pvp, powers
+		
+		if (action == "pvp")
+		{
+			c->resetPVPTimers();
+		}
+		else if (action == "powers")
+		{
+			c->resetPowerFlags();
 		}
 	}
 	
@@ -5551,7 +5634,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if (c->getFactionPoint(clan) < value)
 			{
 				if (send_url)
-					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_faction_points", getSalt());
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_enough_faction_points", getSalt());
 			}
 		}
 		else if (action=="set")
@@ -5589,7 +5672,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if (c->getPvpPoint() < value)
 			{
 				if (send_url)
-					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=no_enough_pvp_points", getSalt());
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_enough_pvp_points", getSalt());
 			}
 		}
 		else if (action=="set")
