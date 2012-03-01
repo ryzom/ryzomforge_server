@@ -801,7 +801,6 @@ void CCharacter::updatePVPClanVP() const
 	CMirrorPropValue<TYPE_PVP_CLAN> propPvpClan( TheDataset, TheDataset.getDataSetRow(_Id), DSPropertyPVP_CLAN );
 	if (propPvpClan.getValue() != propPvpClanTemp)
 	{
-		nlinfo("update PVP CLAN");
 		propPvpClan = propPvpClanTemp;
 		propPvpClan.setChanged();
 	}
@@ -8916,7 +8915,7 @@ void CCharacter::startTradeItemSession( uint16 session )
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 		fame = MinFameToTrade;
 	}
-	else if ( fame < MinFameToTrade )
+	else if ( fame < MinFameToTrade && bot->getOrganization() != getOrganization() )
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
@@ -9015,14 +9014,13 @@ void CCharacter::startTradePhrases(uint16 session)
 		return;
 	}
 
-
 	// *** Check the player has sufficient fame to Trade with Bot.
 	sint32 fame = CFameInterface::getInstance().getFameIndexed( _Id, bot->getForm()->getFaction() );
 	if ( fame == NO_FAME )
 	{
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 	}
-	if ( fame < MinFameToTrade )
+	if ( fame < MinFameToTrade && bot->getOrganization() != getOrganization() )
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
@@ -9792,7 +9790,7 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 		fame = MinFameToTrade;
 	}
-	else if ( fame < MinFameToTrade )
+	else if ( fame < MinFameToTrade && bot->getOrganization() != getOrganization() )
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
@@ -16495,7 +16493,14 @@ NLMISC::TGameCycle CCharacter::getMissionLastSuccess(const CMissionTemplate & te
 {
 	std::map< TAIAlias, TMissionHistory >::iterator it(_MissionHistories.find(templ.Alias));
 	if (it != _MissionHistories.end())
+	{
+		TGameCycle lastSuccessDate =  it->second.LastSuccessDate;
+
+		if (lastSuccessDate > CTickEventHandler::getGameCycle())
+			return 0;
+			
 		return it->second.LastSuccessDate;
+	}
 	return 0;
 
 }

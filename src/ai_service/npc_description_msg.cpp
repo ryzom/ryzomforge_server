@@ -766,6 +766,13 @@ bool	CNpcChatProfileImp::parseChatArgs(CAIInstance	*aiInstance, const std::strin
 		return	true;
 	}
 	
+	// organization entry
+	if (NLMISC::nlstricmp(keyword, "organization") == 0)
+	{
+		NLMISC::fromString(tail, _Organization);
+		return	true;
+	}
+	
 	// if no match found throw an error
 	return false;
 }
@@ -808,4 +815,5 @@ void	TGenNpcDescMsgImp::setChat(const CNpcChatProfileImp& chatProfile)
 	_OptionalProperties		= chatProfile.getOptionalProperties();
 
 	_Outpost					=	chatProfile.getOutpost();
+	_Organization					=	chatProfile.getOrganization();
 }
