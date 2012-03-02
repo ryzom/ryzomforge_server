@@ -1177,9 +1177,6 @@ void CTeam::updateMembersDb()
 				if ( (*it) == (*it2) )
 					continue;	
 
-				if (pos > 7)
-					return;
-					
 				CBankAccessor_PLR::TGROUP::TArray &groupItem = CBankAccessor_PLR::getGROUP().getArray(pos);
 
 				CCharacter * ch2 = PlayerManager.getOnlineChar( (*it2) );	
@@ -1211,12 +1208,6 @@ void CTeam::updateMembersDb()
 				}
 				pos++;
 			}
-
-			CBankAccessor_PLR::TGROUP::TArray &groupItem = CBankAccessor_PLR::getGROUP().getArray(pos);
-
-			groupItem.setHP(ch1->_PropertyDatabase, 0);
-			groupItem.setNAME(ch1->_PropertyDatabase, 0);
-			groupItem.setUID(ch1->_PropertyDatabase, CLFECOMMON::INVALID_CLIENT_DATASET_INDEX);
 		}
 	}
 }
