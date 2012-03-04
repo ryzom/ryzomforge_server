@@ -14779,16 +14779,12 @@ void CCharacter::addRoomAccessToPlayer(const NLMISC::CEntityId &id)
 //--------------------------------------------------------------
 void CCharacter::addPlayerToFriendList(const NLMISC::CEntityId &id)
 {
-	/*// if player not found
-	if (id == CEntityId::Unknown || PlayerManager.getChar(id)==NULL)
+	// if player not found
+	if (id == CEntityId::Unknown)
 	{
-		if ( ! (IShardUnifierEvent::getInstance() && IShardUnifierEvent::getInstance()->isCharacterOnlineAbroad(id)))
-		{
-			// player not found => message
-			PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
-			return;
-		}
-	}*/
+		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
+		return;
+	}
 
 	// check not already in list
 	const uint size = _FriendsList.size();
