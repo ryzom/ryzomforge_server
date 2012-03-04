@@ -523,15 +523,16 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 					_CharacterUserChannels.insert(make_pair(user->getId(), currentChannels));
 				}
 			}
-
-			TChannelsCharacter::iterator cit = _UserChannelCharacters.find(channel);
-			if (cit != _UserChannelCharacters.end())
-			{
-				std::vector<NLMISC::CEntityId> lst = _UserChannelCharacters[channel];
-				lst.erase(find(lst.begin(), lst.end(), user->getId()));
-				_UserChannelCharacters[channel] = lst;
-			}
 		}
+
+		TChannelsCharacter::iterator cit = _UserChannelCharacters.find(channel);
+		if (cit != _UserChannelCharacters.end())
+		{
+			std::vector<NLMISC::CEntityId> lst = _UserChannelCharacters[channel];
+			lst.erase(find(lst.begin(), lst.end(), user->getId()));
+			_UserChannelCharacters[channel] = lst;
+		}
+
 	}
 }
 
