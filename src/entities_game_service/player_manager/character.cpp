@@ -8915,7 +8915,7 @@ void CCharacter::startTradeItemSession( uint16 session )
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 		fame = MinFameToTrade;
 	}
-	else if ( fame < MinFameToTrade && bot->getOrganization() != getOrganization() )
+	else if ( fame < MinFameToTrade || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization() ))
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
@@ -9020,7 +9020,7 @@ void CCharacter::startTradePhrases(uint16 session)
 	{
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 	}
-	if ( fame < MinFameToTrade && bot->getOrganization() != getOrganization() )
+	if ( fame < MinFameToTrade || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization() ))
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
@@ -9790,7 +9790,7 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 		fame = MinFameToTrade;
 	}
-	else if ( fame < MinFameToTrade && bot->getOrganization() != getOrganization() )
+	else if ( fame < MinFameToTrade || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization() ))
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
