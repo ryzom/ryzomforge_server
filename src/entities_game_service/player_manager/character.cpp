@@ -672,6 +672,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 
 	_CustomMissionsParams.clear();
 
+	_FriendVisibility = VisibleToAll;
+
 	initDatabase();
 } // CCharacter  //
 
@@ -14583,20 +14585,52 @@ void CCharacter::addPlayerToIgnoreList(const ucstring &name)
 TCharConnectionState CCharacter::isFriendCharVisualyOnline(const NLMISC::CEntityId &friendId)
 {
 	TCharConnectionState ret = ccs_offline;
+
 	if (CEntityIdTranslator::getInstance()->isEntityOnline(friendId))
 	{
 		if ( PlayerManager.hasBetterCSRGrade(friendId, _Id, true))
+		{
 			// better CSR grade return always 'offline' status
 			return ccs_offline;
+		}
 
 		ret = ccs_online;
+	}
+
+	// Handle friend preference setting
+	CCharacter *friendChar = PlayerManager.getChar(friendId);
+	if (friendChar != NULL)
+	{
+		volatile TFriendVisibility friendMode = friendChar->getFriendVisibility();
+		switch (friendMode)
+		{
+			case VisibleToGuildOnly:
+				{
+					uint32 fgid = friendChar->getGuildId();
+					uint32 mgid = this->getGuildId();
+					bool inSameGuild = (mgid != 0) && (fgid == mgid);
+					if ( ! inSameGuild)
+					{
+						return ccs_offline;
+					}
+				}
+				break;
+			case VisibleToGuildAndFriends:
+				if (this->isIgnoredBy(friendId))
+				{
+					return ccs_offline;
+				}
+				break;
+			case VisibleToAll: // fallthrough
+			default:
+				break; // no-op
+		}
 	}
 
 	// Additional online check for ring shard :
 	//   - a contact is online only if it is in the same ring session
 	if (ret == ccs_online && IsRingShard)
 	{
-		CCharacter *friendChar = PlayerManager.getChar(friendId);
 		if (friendChar == NULL)	// not found ! set offline
 			ret = ccs_offline;
 		else
@@ -15349,25 +15383,50 @@ void CCharacter::contactListRefChange(const NLMISC::CEntityId &id, TConctactList
 
 }
 
+//--------------------------------------------------------------
+//	CCharacter::isIgnoredBy()
+//--------------------------------------------------------------
+bool CCharacter::isIgnoredBy(const NLMISC::CEntityId &id)
+{
+	const uint size = _IsIgnoredBy.size();
+	for (uint i = 0; i < size; ++i)
+	{
+		if (_IsIgnoredBy[i].getShortId() == id.getShortId())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+//--------------------------------------------------------------
+//	CCharacter::isFriendOf()
+//--------------------------------------------------------------
+bool CCharacter::isFriendOf(const NLMISC::CEntityId &id)
+{
+	const uint size = _IsFriendOf.size();
+	for (uint i = 0 ; i < size ; ++i)
+	{
+		if (_IsFriendOf[i].getShortId() == id.getShortId())
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 //--------------------------------------------------------------
 //	CCharacter::referencedAsFriendBy()
 //--------------------------------------------------------------
 void CCharacter::referencedAsFriendBy( const NLMISC::CEntityId &id)
 {
-	// check this entity isn't already in the list
-	const uint size = _IsFriendOf.size();
-	for ( uint i =0 ; i < size ; ++i)
+	if (isFriendOf(id))
 	{
-		if ( _IsFriendOf[i].getShortId() == id.getShortId())
-		{
-			return;
-		}
+		return;
 	}
 
 	// not found -> add it
 	_IsFriendOf.push_back(id);
-
 }
 
 //--------------------------------------------------------------
@@ -17388,6 +17447,15 @@ void CCharacter::pvpActionMade()
 //-----------------------------------------------------------------------------
 void CCharacter::setPVPFlagDatabase()
 {
+	// Fix for when negative ticks were saved
+	if (_PVPRecentActionTime > CTickEventHandler::getGameCycle() + TimeForResetPVPFlag)
+	{
+		_PVPRecentActionTime   = CTickEventHandler::getGameCycle() - TimeForResetPVPFlag;
+		_PVPFlagLastTimeChange = _PVPRecentActionTime;
+		_PVPFlagTimeSettedOn   = _PVPRecentActionTime;
+		_PVPSafeLastTimeChange = _PVPRecentActionTime;
+	}
+
 	uint32 activationTime;
 	if( _PVPFlag == true )
 		activationTime = _PVPFlagLastTimeChange + TimeForSetPVPFlag;

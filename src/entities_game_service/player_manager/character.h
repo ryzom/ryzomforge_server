@@ -397,6 +397,15 @@ struct CXpProgressInfos
 	}
 };
 
+enum TFriendVisibility
+{
+	VisibleToAll = 0,			// Visible to all people who have me on their friends list, even if I am ignoring them.
+	VisibleToGuildAndFriends,	// Visible to people in my guild and those that have me on their friends list.
+	VisibleToGuildOnly,			// Only visible to people in my guild.
+	NB_FRIEND_VISIBILITY
+
+};
+
 
 /**
  * CCharacter
@@ -2696,6 +2705,10 @@ private:
 		
 	void contactListRefChange(const NLMISC::CEntityId &id, TConctactListAction actionType);
 	
+	/// return true if player is ignored by the given entity
+	bool isIgnoredBy(const NLMISC::CEntityId &id);
+	/// return true if given entity has player on friend list
+	bool isFriendOf(const NLMISC::CEntityId &id);
 	/// player is referenced as friend by the given entity
 	void referencedAsFriendBy( const NLMISC::CEntityId &id);
 	/// player is no longer referenced as friend by the given entity
@@ -2951,6 +2964,12 @@ public:
 
 	void setFinalized(bool isFinalized) { _LoadingFinish = isFinalized; };
 	bool isFinalized() const { return _LoadingFinish; };
+
+	void setFriendVisibility(TFriendVisibility val) { _FriendVisibility = val; }
+	const TFriendVisibility& getFriendVisibility() const { return _FriendVisibility; }
+	
+	void setFriendVisibilitySave(uint8 val) { if (val < NB_FRIEND_VISIBILITY) _FriendVisibility = (TFriendVisibility)val; }
+	uint8 getFriendVisibilitySave() const { return (uint8)_FriendVisibility; }
 
 	//////////////////
 	// Private members
@@ -3519,6 +3538,8 @@ private:
 	CCharacter						* _DuelOpponent;
 
 	TAIAlias						_LastCreatedNpcGroup;
+
+	TFriendVisibility               _FriendVisibility;
 
 	// :KLUDGE: ICDBStructNode non-const 'coz getName and getParent are not
 	// const methods. See CCDBSynchronised::getICDBStructNodeFromName for more

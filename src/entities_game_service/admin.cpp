@@ -180,8 +180,9 @@ AdminCommandsInit[] =
 		"validateRespawnPoint",				true,
 		"summonPet",						true,
 		"connectUserChannel",				true,
-		"updateTarget",                     true,
+		"updateTarget",						true,
 		"resetName",						true,
+		"showOnline",						true,
 
 		// Web commands managment
 		"webExecCommand",					true,
@@ -212,7 +213,7 @@ AdminCommandsInit[] =
 		"learnBrick",						true,
 		"unlearnBrick",						true,
 		"learnPhrase",						true,
-		"learnAllForagePhrases",            true,
+		"learnAllForagePhrases",			true,
 		"learnAllFaberPlans",				true,
 		"logXpGain",						true,
 		"memorizePhrase",					true,
@@ -312,7 +313,7 @@ AdminCommandsInit[] =
 		"setGuildChargePoint",				false,
 		"characterInventoryDump",			true,
 		"deleteInventoryItem",				true,
-		"setSimplePhrase",                  false,
+		"setSimplePhrase",					false,
 
 		// PUT HERE THE VARIABLE / COMMAND THAT ARE TEMPORARY
 		// remove when message of the day interface is ready
@@ -323,8 +324,8 @@ AdminCommandsInit[] =
 		"EntitiesNoActionFailure",			false,
 		"EntitiesNoCastBreak",				false,
 		"EntitiesNoResist",					false,
-		"lockItem",                         true,
-		"setTeamLeader",                    true,
+		"lockItem",							true,
+		"setTeamLeader",					true,
 		// aggroable state
 		"Aggro",							true,
 
@@ -388,7 +389,7 @@ AdminCommandsInit[] =
 		"eventSetBotURLName",				true,
 		"eventSpawnToxic",					true,
 		"eventNpcSay",						true,
-		"eventSetBotFacing",                true,
+		"eventSetBotFacing",				true,
 		"eventGiveControl",					true,
 		"eventLeaveControl",				true,
 		
@@ -8284,6 +8285,20 @@ NLMISC_COMMAND (resetName, "Reset your name; undo a temporary rename", "<user id
 {
 	GET_CHARACTER
 	c->registerName();
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(showOnline, "Set friend visibility", "<user id> <mode=0,1,2>")
+{
+	if (args.size() < 2) return false;
+	GET_CHARACTER;
+
+	uint8 mode = 0;
+	NLMISC::fromString(args[1], mode);
+	if (mode < NB_FRIEND_VISIBILITY) {
+		c->setFriendVisibility((TFriendVisibility)mode);
+	}
 	return true;
 }
 
