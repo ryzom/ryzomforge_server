@@ -14244,16 +14244,14 @@ void CCharacter::setAuraFlagDates()
 	const NLMISC::TGameCycle time = CTickEventHandler::getGameCycle();
 
 	uint32 flag = BRICK_FLAGS::Aura - BRICK_FLAGS::BeginPowerFlags;
-	if ( (_ForbidAuraUseEndDate > time) && (_ForbidAuraUseEndDate - time < 72000) )
-	{
-		_PowerFlagTicks[flag].StartTick = _ForbidAuraUseStartDate;
-		_PowerFlagTicks[flag].EndTick = _ForbidAuraUseEndDate;
+	if ( (_ForbidAuraUseEndDate < time) || (_ForbidAuraUseEndDate - time > 72000) )
+ 	{
+		_ForbidAuraUseStartDate = 0;
+		_ForbidAuraUseEndDate = 0;
 	}
-	else
-	{
-		_PowerFlagTicks[flag].StartTick = 0;
-		_PowerFlagTicks[flag].EndTick = 0;
-	}
+	_PowerFlagTicks[flag].StartTick = _ForbidAuraUseStartDate;
+	_PowerFlagTicks[flag].EndTick = _ForbidAuraUseEndDate;
+
 } // setAuraFlagDates //
 
 
@@ -17448,12 +17446,15 @@ void CCharacter::pvpActionMade()
 void CCharacter::setPVPFlagDatabase()
 {
 	// Fix for when negative ticks were saved
-	if (_PVPRecentActionTime > CTickEventHandler::getGameCycle() + TimeForResetPVPFlag)
+	if (   (_PVPRecentActionTime > CTickEventHandler::getGameCycle())
+		|| (_PVPFlagLastTimeChange > CTickEventHandler::getGameCycle())
+		|| (_PVPFlagTimeSettedOn > CTickEventHandler::getGameCycle() + TimeForSetPVPFlag)  )
 	{
-		_PVPRecentActionTime   = CTickEventHandler::getGameCycle() - TimeForResetPVPFlag;
-		_PVPFlagLastTimeChange = _PVPRecentActionTime;
-		_PVPFlagTimeSettedOn   = _PVPRecentActionTime;
-		_PVPSafeLastTimeChange = _PVPRecentActionTime;
+		_PVPRecentActionTime   = 0;
+		_PVPFlagLastTimeChange = 0;
+		_PVPFlagTimeSettedOn   = 0;
+		_PVPSafeLastTimeChange = 0;
+		_PVPFlag = false;
 	}
 
 	uint32 activationTime;
