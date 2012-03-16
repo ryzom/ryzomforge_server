@@ -2394,6 +2394,7 @@ public:
 	uint32 getLastConnectedDate() const;
 	uint32 getPlayedTime() const;
 	uint32 getOrganization() const;
+	uint32 getOrganizationStatus() const;
 	const std::list<TCharacterLogTime>& getLastLogStats() const;
 	void updateConnexionStat();
 	void setDisconnexionTime();		

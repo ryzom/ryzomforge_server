@@ -1399,6 +1399,7 @@ uint32 CCharacter::tickUpdate()
 		}
 	}
 
+	bool updatePVP = false;
 	{
 		H_AUTO(CharacterUpdateOutpost);
 
@@ -1410,6 +1411,7 @@ uint32 CCharacter::tickUpdate()
 			{
 				stopOutpostLeavingTimer();
 				setOutpostAlias(0);
+				updatePVP = true;
 			}
 
 			CSmartPtr<COutpost> outpost = COutpostManager::getInstance().getOutpostFromAlias( outpostAlias );
@@ -1420,10 +1422,12 @@ uint32 CCharacter::tickUpdate()
 				{
 					stopOutpostLeavingTimer();
 					setOutpostAlias(0);
+					updatePVP = true;
 				}
 				else
 				{
 					outpost->fillCharacterOutpostDB(this);
+					updatePVP = true;
 				}
 			}
 		}
@@ -1432,26 +1436,26 @@ uint32 CCharacter::tickUpdate()
 	{
 		H_AUTO(CharacterUpdatePVPMode);
 		
-		if (_PVPSafeLastTimeChange + 20 < CTickEventHandler::getGameCycle())
+		if (_PVPSafeLastTimeChange + 20 < CTickEventHandler::getGameCycle() || updatePVP)
 		{
-			bool update = false;
 			_PVPSafeLastTimeChange = CTickEventHandler::getGameCycle();
 
 			if (_PVPSafeLastTime != getSafeInPvPSafeZone())
 			{
 				_PVPSafeLastTime = !_PVPSafeLastTime;
-				update = true;
+				updatePVP = true;
 			}
 
 			if (_PVPInSafeZoneLastTime != CPVPManager2::getInstance()->inSafeZone(getPosition()))
 			{
 				_PVPInSafeZoneLastTime = !_PVPInSafeZoneLastTime;
-				update = true;
+				updatePVP = true;
 			}
 			
-			if (update) {
+			if (updatePVP) {
 				CPVPManager2::getInstance()->setPVPModeInMirror(this);
 				updatePVPClanVP();
+				_HaveToUpdatePVPMode = false;
 			}
 		}
 
@@ -1470,7 +1474,7 @@ uint32 CCharacter::tickUpdate()
 
 		if( getPvPRecentActionFlag() == false )
 		{
-			CMirrorPropValue<TYPE_PVP_MODE> propPvpMode( TheDataset, TheDataset.getDataSetRow(_Id), DSPropertyPVP_MODE );
+			CMirrorPropValue<TYPE_EVENT_FACTION_ID> propPvpMode( TheDataset, TheDataset.getDataSetRow(_Id), DSPropertyEVENT_FACTION_ID );
 			if( propPvpMode.getValue()&PVP_MODE::PvpFactionFlagged )
 			{
 				CPVPManager2::getInstance()->setPVPModeInMirror(this);
@@ -8917,14 +8921,17 @@ void CCharacter::startTradeItemSession( uint16 session )
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 		fame = MinFameToTrade;
 	}
-	else if ( fame < MinFameToTrade || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization() ))
+	
+	if ( (bot->getOrganization() == 0 && fame < MinFameToTrade) || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization()) )
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
 		uint32 txt = STRING_MANAGER::sendStringToClient( _EntityRowId,"EGS_TRADE_BAD_FAME",params );
 		npcTellToPlayerEx( bot->getEntityRowId(),_EntityRowId,txt );
 		return;
-	}
+	} else if (bot->getOrganization() != 0 && bot->getOrganization() == getOrganization())
+		fame = 0;
+
 
 	float fameFactor = 1.0f;
 	if(bot->getForm()->getFaction() != CStaticFames::INVALID_FACTION_INDEX)
@@ -9022,7 +9029,8 @@ void CCharacter::startTradePhrases(uint16 session)
 	{
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 	}
-	if ( fame < MinFameToTrade || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization() ))
+	
+	if ( (bot->getOrganization() == 0 && fame < MinFameToTrade) || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization()) )
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
@@ -9030,7 +9038,6 @@ void CCharacter::startTradePhrases(uint16 session)
 		npcTellToPlayerEx( bot->getEntityRowId(),_EntityRowId,txt );
 		return;
 	}
-
 
 	// *** Set right rolemaster flags and race in Database
 	uint8 flags = 0;
@@ -9792,7 +9799,8 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 		nlwarning("fame %u is INVALID",(uint)bot->getRace() );
 		fame = MinFameToTrade;
 	}
-	else if ( fame < MinFameToTrade || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization() ))
+
+	if ( (bot->getOrganization() == 0 && fame < MinFameToTrade) || (bot->getOrganization() != 0 && bot->getOrganization() != getOrganization()) )
 	{
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::bot);
 		params[0].setEIdAIAlias( _CurrentInterlocutor, CAIAliasTranslator::getInstance()->getAIAlias(_CurrentInterlocutor) );
@@ -9803,7 +9811,8 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 		sendDynamicSystemMessage( _Id, "TRADE_FAME_TOO_LOW", params );
 
 		return;
-	}
+	} else if (bot->getOrganization() != 0 && bot->getOrganization() == getOrganization())
+		fame = 0;
 
 	CInventoryPtr child = _Inventory[ inv ];
 	if( child->getSlotCount() > slot && child->getItem( slot ) != NULL )
@@ -17791,6 +17800,7 @@ void CCharacter::setOutpostAlias( uint32 id )
 	CBankAccessor_PLR::getCHARACTER_INFO().getPVP_OUTPOST().setRIGHT_TO_BANISH(_PropertyDatabase, hasRightToBanish );
 
 	CPVPManager2::getInstance()->setPVPModeInMirror(this);
+	updatePVPClanVP();	
 }
 
 //-----------------------------------------------------------------------------
