@@ -423,7 +423,7 @@ bool getAIInstanceFromGroupName(string& groupName, uint32& instanceNumber)
 			return false;
 		}
 		instanceNumber = nr;
-		groupName = groupName.substr(groupName.find('@'), groupName.size());
+		groupName = groupName.substr(groupName.find('@') + 1, groupName.size());
 	}
 	return true;
 }

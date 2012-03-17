@@ -2595,6 +2595,7 @@ NLMISC_COMMAND(setPriv,"set a privilege to a user using his user id, must be in 
 			else if (p->havePriv(AlwaysInvisiblePriv))
 			{
 				c->setWhoSeesMe(uint64(0));
+				c->setInvisibility(true);
 			}
 		}
 	}
