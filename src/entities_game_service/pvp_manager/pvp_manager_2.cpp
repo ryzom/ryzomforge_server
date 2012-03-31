@@ -775,7 +775,6 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 	
 	PVP_RELATION::TPVPRelation pvpRelation = getPVPRelation( actor, target, true );
 	bool actionValid;
-	nlinfo("Pvp relation = %d", pvpRelation);
 	switch( pvpRelation )
 	{
 		case PVP_RELATION::Ally :

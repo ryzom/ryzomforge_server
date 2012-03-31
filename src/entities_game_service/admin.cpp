@@ -5330,35 +5330,148 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//***************** teleport
 	//*************************************************
 
-	else if (command_args[0] == "teleport")
+	else if (command_args[0] == "teleport") // teleport![x,y,z|player name|bot name]!teleport mektoub?!check pvpflag?
 	{
-		// args: x y z [t]
-		if (command_args.size () < 4 ||
-			command_args.size () > 5 ) return false;
-
-		sint32 x;
-		sint32 y;
-		sint32 z;
-		float  t;
-		fromString(command_args[1], x);
-		fromString(command_args[2], y);
-		fromString(command_args[3], z);
-		if (command_args.size() > 4)
+		if (command_args.size () < 2) return false;
+		
+		bool pvpValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);			
+		if (command_args.size () > 3 && command_args[3] == "1" && !pvpValid)
 		{
-			fromString(command_args[4], t);
+			CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
+			return true;
+		}
+
+		string value = command_args[1];
+		
+		vector<string> res;
+		sint32 x = 0, y = 0, z = 0;
+		float h = 0;
+		if ( value.find(',') != string::npos ) // Position x,y,z,a
+		{
+			explode (value, string(","), res);
+			if (res.size() >= 2)
+			{
+				fromString(res[0], x);
+				x *= 1000;
+				fromString(res[1], y);
+				y *= 1000;
+			}
+			if (res.size() >= 3)
+			{
+				fromString(res[2], z);
+				z *= 1000;
+			}
+			if (res.size() >= 4)
+				fromString(res[3], h);
 		}
 		else
 		{
-			t = c->getState().Heading;
+			if ( value.find(".creature") != string::npos )
+			{
+				CSheetId creatureSheetId(value);
+				if( creatureSheetId != CSheetId::Unknown )
+				{
+					double minDistance = -1.;
+					CCreature * creature = NULL;
+
+					TMapCreatures::const_iterator it;
+					const TMapCreatures& creatures = CreatureManager.getCreature();
+					for( it = creatures.begin(); it != creatures.end(); ++it )
+					{
+						CSheetId sheetId = (*it).second->getType();
+						if( sheetId == creatureSheetId )
+						{
+							double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
+							if( !creature || (creature && distance < minDistance) )
+							{
+								creature = (*it).second;
+								minDistance = distance;
+							}
+						}
+					}
+					if( creature )
+					{
+						x = creature->getState().X();
+						y = creature->getState().Y();
+						z = creature->getState().Z();
+						h = creature->getState().Heading();
+					}
+				}
+				else
+				{
+					nlwarning ("<Position> '%s' is an invalid creature", value.c_str());
+				}
+			}
+			else
+			{
+
+				CEntityBase *entityBase = PlayerManager.getCharacterByName (CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), value));
+				if (entityBase == 0)
+				{
+					// try to find the bot name
+					vector<TAIAlias> aliases;
+					CAIAliasTranslator::getInstance()->getNPCAliasesFromName( value, aliases );
+					if ( aliases.empty() )
+					{
+						nldebug ("<Position> Ignoring attempt to teleport because no NPC found matching name '%s'", value.c_str());
+						return true;
+					}
+
+					TAIAlias alias = aliases[0];
+
+					const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
+					if ( botId != CEntityId::Unknown )
+					{
+						entityBase = CreatureManager.getCreature (botId);
+					}
+					else
+					{
+						nlwarning ("'%s' has no eId. Is it Spawned???", value.c_str());
+						return true;
+					}
+
+				}
+				if (entityBase != 0)
+				{
+					x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
+					y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
+					z = entityBase->getState().Z;
+					h = entityBase->getState().Heading;
+				}
+			}
 		}
 
-		NLNET::CMessage msgout( "TELEPORT_PLAYER" );
-		msgout.serial( const_cast<CEntityId &>(c->getId()) );
-		msgout.serial( const_cast<sint32 &>(x) );
-		msgout.serial( const_cast<sint32 &>(y) );		
-		msgout.serial( const_cast<sint32 &>(z) );		
-		msgout.serial( const_cast<float &>(t) );		
-		sendMessageViaMirror( "EGS", msgout );	
+		if (x == 0 && y == 0 && z == 0)
+		{
+			nlwarning ("'%s' is a bad value for position, don't change position", value.c_str());
+			return true;
+		}
+
+		CContinent * cont = CZoneManager::getInstance().getContinent(x,y);
+		
+		bool allowPetTp = false;
+		if (command_args.size () == 3 && command_args[2] == "1")
+			allowPetTp = true;
+			
+		if (allowPetTp)
+			c->allowNearPetTp();
+		else
+			c->forbidNearPetTp(); 
+		
+		// Respawn player if dead
+		if (c->isDead())
+		{
+			PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->playerRespawn(c);
+			// apply respawn effects because user is dead
+			c->applyRespawnEffects();
+		}
+		
+		c->teleportCharacter(x,y,z,allowPetTp,true,h);
+
+		if ( cont )
+		{
+			c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
+		}
 	}
 
 	//*************************************************
