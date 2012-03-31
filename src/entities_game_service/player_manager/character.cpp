@@ -6756,12 +6756,15 @@ void CCharacter::setAnimalName( uint8 petIndex, ucstring customName )
 
 	animal.setCustomName(customName);
 	sendPetCustomNameToClient(petIndex);
-	
-	TDataSetRow row = animal.SpawnedPets;
-	NLNET::CMessage	msgout("CHARACTER_NAME");
-	msgout.serial(row);
-	msgout.serial(customName);
-	sendMessageViaMirror("IOS", msgout);
+
+	if ( ! customName.empty())
+	{
+		TDataSetRow row = animal.SpawnedPets;
+		NLNET::CMessage	msgout("CHARACTER_NAME");
+		msgout.serial(row);
+		msgout.serial(customName);
+		sendMessageViaMirror("IOS", msgout);
+	}
 }
 
 //-----------------------------------------------------------------------------

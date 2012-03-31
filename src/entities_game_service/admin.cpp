@@ -2345,15 +2345,17 @@ NLMISC_COMMAND(getPetAnimalSatiety,"Get the satiety of pet animal (petIndex in 0
 	return true;
 }
 
-NLMISC_COMMAND(setPetAnimalName, "Set the name of a pet animal (petIndex in 0..3)","<eid> <petIndex> <name>")
+NLMISC_COMMAND(setPetAnimalName, "Set the name of a pet animal","<eid> <petIndex (0..3)> [<name>]")
 {
-	if (args.size () < 3) return false;
+	if (args.size () < 2) return false;
 	GET_CHARACTER
 
 	if ( c )
 	{
 		uint petIndex = atoi( args[1].c_str() );
-		ucstring customName = args[2];
+		ucstring customName;
+		if (args.size () == 3)
+			customName = args[2];
 		c->setAnimalName(petIndex, customName);
 	}
 
