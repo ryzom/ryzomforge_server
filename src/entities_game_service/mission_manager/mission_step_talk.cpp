@@ -99,6 +99,9 @@ class CMissionStepTalk : public IMissionStepTemplate
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
 		string webAppUrl;
+
+		_User = PlayerManager.getChar(getEntityIdFromRow(userRow));
+
 		vector<string> params = _User->getCustomMissionParams(_Dynamic);
 		if (params.size() < 2)
 		{
@@ -109,7 +112,6 @@ class CMissionStepTalk : public IMissionStepTemplate
 		{
 			webAppUrl = params[0];
 		}
-		_User = PlayerManager.getChar(getEntityIdFromRow(userRow));
 		// not check here : they are done befor. If a talk event comes here, the step is complete
 		if( event.Type == CMissionEvent::Talk )		
 		{
