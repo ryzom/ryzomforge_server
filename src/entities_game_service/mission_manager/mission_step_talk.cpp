@@ -102,20 +102,24 @@ class CMissionStepTalk : public IMissionStepTemplate
 
 		_User = PlayerManager.getChar(getEntityIdFromRow(userRow));
 
-		vector<string> params = _User->getCustomMissionParams(_Dynamic);
-		if (params.size() < 2)
+		if (_IsDynamic && _User != NULL)
 		{
-			LOGMISSIONSTEPERROR("talk_to : invalid npc name");
-			return 0;
+			vector<string> params = _User->getCustomMissionParams(_Dynamic);
+			if (params.size() < 2)
+			{
+				LOGMISSIONSTEPERROR("talk_to : invalid npc name");
+				return 0;
+			}
+			else
+			{
+				webAppUrl = params[0];
+			}
 		}
-		else
-		{
-			webAppUrl = params[0];
-		}
+		
 		// not check here : they are done befor. If a talk event comes here, the step is complete
 		if( event.Type == CMissionEvent::Talk )		
 		{
-			if (!webAppUrl.empty())
+			if (!webAppUrl.empty() && _User != NULL)
 				_User->validateDynamicMissionStep(webAppUrl);
 			LOGMISSIONSTEPSUCCESS("talk_to");
 			return 1;
