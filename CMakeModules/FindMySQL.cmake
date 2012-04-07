@@ -16,11 +16,12 @@ IF(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARIES)
 ELSE(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARIES)
 
   FIND_PATH(MYSQL_INCLUDE_DIR mysql.h
-      /usr/include/mysql
-      /usr/local/include/mysql
-      /opt/local/include/mysql5/mysql
+      /usr/include
+      /usr/local/include
+      /opt/local/include/mysql5
       $ENV{ProgramFiles}/MySQL/*/include
-      $ENV{SystemDrive}/MySQL/*/include)
+      $ENV{SystemDrive}/MySQL/*/include
+	  PATH_SUFFIXES mysql)
 
   IF(WIN32 AND MSVC)
     FIND_LIBRARY(MYSQL_LIBRARY_RELEASE NAMES libmysql mysqlclient
