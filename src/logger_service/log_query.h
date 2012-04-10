@@ -20,9 +20,7 @@
 
 #include "nel/misc/types_nl.h"
 
-#if defined(NL_COMP_VC8) || defined(NL_COMP_VC9)
-#	include <memory>
-#endif
+#include <memory>
 
 #include "nel/misc/common.h"
 
