@@ -6926,7 +6926,10 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 	uint32 ringCatalyserLvl = 0;
 	uint32 ringCatalyserCount = 0;
 
-	if( addXpMode != AddXpToSkillBranch )
+	// Don't take away cats if free trial limit reached and there is no DP.
+	bool bConsumeCats = ! ( bFreeTrialLimitReached && _DeathPenalties->isNull() );
+
+	if( bConsumeCats && (addXpMode != AddXpToSkillBranch) )
 	{
 		if( _XpCatalyserSlot != INVENTORIES::INVALID_INVENTORY_SLOT )
 		{
