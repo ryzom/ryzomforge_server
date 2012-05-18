@@ -2545,7 +2545,7 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 			return;
 		}
 		
-		bool havePriv = p->havePriv(":DEV:SGM:GM:");
+		bool havePriv = p->havePriv(":DEV:SGM:GM:EM:");
 		bool hasChannel = false;
 		nbAnswers = 0;
 		
@@ -2579,9 +2579,10 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 		
 		if (!playerNames.empty())
 		{
-			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_INTRO" );
-			//playerNames = "Players in channel \"" + opt + "\":" + playerNames;
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal = opt;
+			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_INTRO", params);
+			//playerNames = "Players in channel \"" + opt + "\":" + playerNames;
 			params[0].Literal = playerNames;
 			CCharacter::sendDynamicSystemMessage( id, "LITERAL", params );
 			return;
