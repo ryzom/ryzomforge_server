@@ -526,9 +526,9 @@ static void loadCommandsPrivileges(const string & fileName, bool init)
 
 		CSString fullLine = line;
 
-		// only extract the first 2 params
+		// only extract the first 3 params
 		CVectorSString params;
-		for (uint i = 0; !line.empty() && i < 2; i++)
+		for (uint i = 0; !line.empty() && i < 3; i++)
 		{
 			string param = line.strtok(" \t");
 			if (param.empty())
