@@ -1114,9 +1114,8 @@ void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serv
 		if (listOrigin == 0)
 		{
 			NLMISC::CEntityId	eid= c->getFriendByContactId(contactIdOrigin);
-			// allows the whole operation or nothing if player is not present
-			CCharacter * other = PlayerManager.getChar( eid );
-			if(other)
+			// allows the whole operation or nothing if player does not exist
+			if (eid != CEntityId::Unknown)
 			{
 				c->removePlayerFromFriendListByEntityId(eid);
 				c->addPlayerToIgnoreList(eid);
@@ -1124,15 +1123,14 @@ void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serv
 			else
 			{
 				// player not found => message
-				PHRASE_UTILITIES::sendDynamicSystemMessage( c->getEntityRowId(), "OPERATION_OFFLINE");
+				PHRASE_UTILITIES::sendDynamicSystemMessage( c->getEntityRowId(), "OPERATION_NOTEXIST");
 			}
 		}
 		else
 		{
 			NLMISC::CEntityId	eid= c->getIgnoreByContactId(contactIdOrigin);
 			// allows the whole operation or nothing if player is not present
-			CCharacter * other = PlayerManager.getChar( eid );
-			if(other)
+			if(eid != CEntityId::Unknown)
 			{
 				c->removePlayerFromIgnoreListByEntityId(eid);
 				c->addPlayerToFriendList(eid);
@@ -1140,7 +1138,7 @@ void cbClientMoveInContactLists( NLNET::CMessage& msgin, const std::string &serv
 			else
 			{
 				// player not found => message
-				PHRASE_UTILITIES::sendDynamicSystemMessage( c->getEntityRowId(), "OPERATION_OFFLINE");
+				PHRASE_UTILITIES::sendDynamicSystemMessage( c->getEntityRowId(), "OPERATION_NOTEXIST");
 			}
 		}
 	}

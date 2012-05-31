@@ -2272,6 +2272,9 @@ public:
 	// return unclamped magic resistance of a character
 	uint32 getUnclampedMagicResistance( RESISTANCE_TYPE::TResistanceType magicResistanceType ) const;
 
+	// return clamped magic resistance of a character
+	uint32 getMagicResistance(RESISTANCE_TYPE::TResistanceType magicResistanceType) const;
+
 	/// return NbNonNullClassificationTypesSkillMod
 	uint8 getNbNonNullClassificationTypesSkillMod() const;
 	
@@ -3430,6 +3433,8 @@ private:
 
 	// current resistance for each type of magic resistance
 	uint32							_MagicResistance[RESISTANCE_TYPE::NB_RESISTANCE_TYPE];
+
+	sint32							_BaseResistance;
 
 	/// currently consumed item slot
 	sint32							_ConsumedItemSlot;

@@ -597,6 +597,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_CurrentParryLevel = 1;
 	_BaseParryLevel = 1;
 
+	_BaseResistance = 1;
+
 	_SkillUsedForDodge = SKILLS::SF;
 	_CurrentParrySkill = BarehandCombatSkill;
 
@@ -1710,6 +1712,8 @@ void CCharacter::deathOccurs( void )
 	}
 
 	CPVPManager2::getInstance()->playerDies(this);
+
+	CBuildingManager::getInstance()->removeTriggerRequest(getEntityRowId());
 
 	if( _TimeDeath < CTickEventHandler::getGameTime() )
 	{
@@ -14553,28 +14557,32 @@ uint32 CCharacter::getCarriedWeight()
 }
 
 //--------------------------------------------------------------
-//	CCharacter::getResistScore()
+//	CCharacter::getMagicResistance()
+//--------------------------------------------------------------
+uint32 CCharacter::getMagicResistance(RESISTANCE_TYPE::TResistanceType magicResistanceType) const
+{
+	uint32 val = getUnclampedMagicResistance(magicResistanceType);
+	NLMISC::clamp( val, (uint32)0, (uint32)((_BaseResistance + MaxMagicResistanceBonus) * 100) );
+	return val;
+}
+
+//--------------------------------------------------------------
+//	CCharacter::getMagicResistance()
 //--------------------------------------------------------------
 uint32 CCharacter::getMagicResistance(EFFECT_FAMILIES::TEffectFamily effectFamily)
 {
 	RESISTANCE_TYPE::TResistanceType resistanceType = EFFECT_FAMILIES::getAssociatedResistanceType(effectFamily);
-	if(resistanceType==RESISTANCE_TYPE::None)
-		return 0;
-	else
-		return _MagicResistance[resistanceType];
-} // getResistScore //
+	return getMagicResistance(resistanceType);
+}
 
 //--------------------------------------------------------------
-//	CCharacter::getResistScore()
+//	CCharacter::getMagicResistance()
 //--------------------------------------------------------------
 uint32 CCharacter::getMagicResistance(DMGTYPE::EDamageType dmgType)
 {
 	RESISTANCE_TYPE::TResistanceType resistanceType = DMGTYPE::getAssociatedResistanceType(dmgType);
-	if(resistanceType==RESISTANCE_TYPE::None)
-		return 0;
-	else
-		return _MagicResistance[resistanceType];
-} // getResistScore //
+	return getMagicResistance(resistanceType);
+}
 
 //--------------------------------------------------------------
 // addPlayerToFriendList
@@ -14829,7 +14837,7 @@ void CCharacter::addPlayerToFriendList(const NLMISC::CEntityId &id)
 	// if player not found
 	if (id == CEntityId::Unknown)
 	{
-		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
+		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_NOTEXIST");
 		return;
 	}
 
@@ -14901,7 +14909,7 @@ void CCharacter::addPlayerToLeagueList(const NLMISC::CEntityId &id)
 	// if player not found
 	if (id == CEntityId::Unknown)
 	{
-		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
+		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_NOTEXIST");
 		return;
 	}
 
@@ -14970,14 +14978,12 @@ void CCharacter::addPlayerToLeagueList(const NLMISC::CEntityId &id)
 //--------------------------------------------------------------
 void CCharacter::addPlayerToIgnoreList(const NLMISC::CEntityId &id)
 {
-	// if player not found
-	// Boris 2006-09-19 : allow adding offline player to ignore list
-//	if (id == CEntityId::Unknown || PlayerManager.getChar(id)==NULL)
-//	{
-//		// player not found => message
-//		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_OFFLINE");
-//		return;
-//	}
+	if (id == CEntityId::Unknown)
+	{
+		// player not found => message
+		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "OPERATION_NOTEXIST");
+		return;
+	}
 
 	// check not already ignored
 	const uint size = _IgnoreList.size();
@@ -18558,48 +18564,49 @@ void CCharacter::updateMagicProtectionAndResistance()
 	_MaxAbsorption = (getSkillBaseValue(getBestSkill()) * MaxAbsorptionFactor) / 100;
 
 	// magic resistance
-	sint32 baseResistance = (sint32)(_Skills._Skills[SKILLS::SF].MaxLvlReached * MagicResistFactorForCombatSkills) + MagicResistSkillDelta;
-	if( baseResistance < ((sint32)(_Skills._Skills[SKILLS::SM].MaxLvlReached * MagicResistFactorForMagicSkills) + MagicResistSkillDelta) )
-		baseResistance = (sint32)(_Skills._Skills[SKILLS::SM].MaxLvlReached * MagicResistFactorForMagicSkills) + MagicResistSkillDelta;
-	if( baseResistance < ((sint32)(_Skills._Skills[SKILLS::SH].MaxLvlReached * MagicResistFactorForForageSkills) + MagicResistSkillDelta) )
-		baseResistance = (sint32)(_Skills._Skills[SKILLS::SH].MaxLvlReached * MagicResistFactorForForageSkills) + MagicResistSkillDelta;
-	clamp(baseResistance, 0, 225);
+	_BaseResistance = (sint32)(_Skills._Skills[SKILLS::SF].MaxLvlReached * MagicResistFactorForCombatSkills) + MagicResistSkillDelta;
+	
+	sint32 magicResist = ((sint32)(_Skills._Skills[SKILLS::SM].MaxLvlReached * MagicResistFactorForMagicSkills) + MagicResistSkillDelta);
+	_BaseResistance = max(_BaseResistance, magicResist);
+	
+	sint32 forageResist = ((sint32)(_Skills._Skills[SKILLS::SH].MaxLvlReached * MagicResistFactorForForageSkills) + MagicResistSkillDelta);
+	_BaseResistance = max(_BaseResistance, forageResist);
+	
+	clamp(_BaseResistance, 0, 225);
 
+	// set up base
 	for( uint32 i = 0; i < RESISTANCE_TYPE::NB_RESISTANCE_TYPE; ++i )
 	{
-		_MagicResistance[i]= (uint32)baseResistance * 100;
+		_MagicResistance[i]= (uint32)_BaseResistance * 100;
+	}
 
-		switch(i)
-		{
-		case RESISTANCE_TYPE::Desert:
-			if( _Race == EGSPD::CPeople::Fyros )
-			{
-				_MagicResistance[i] += HominRacialResistance * 100;
-			}
+	// correct for race
+	switch ( _Race)
+	{
+		case EGSPD::CPeople::Fyros:
+			_MagicResistance[RESISTANCE_TYPE::Desert] += HominRacialResistance * 100;
 			break;
-		case RESISTANCE_TYPE::Forest:
-			if( _Race == EGSPD::CPeople::Matis )
-			{
-				_MagicResistance[i] += HominRacialResistance * 100;
-			}
+
+		case EGSPD::CPeople::Matis:
+			_MagicResistance[RESISTANCE_TYPE::Forest] += HominRacialResistance * 100;
 			break;
-		case RESISTANCE_TYPE::Lacustre:
-			if( _Race == EGSPD::CPeople::Tryker )
-			{
-				_MagicResistance[i] += HominRacialResistance * 100;
-			}
+
+		case EGSPD::CPeople::Tryker:
+			_MagicResistance[RESISTANCE_TYPE::Lacustre] += HominRacialResistance * 100;
 			break;
-		case RESISTANCE_TYPE::Jungle:
-			if( _Race == EGSPD::CPeople::Zorai )
-			{
-				_MagicResistance[i] += HominRacialResistance * 100;
-			}
+
+		case EGSPD::CPeople::Zorai:
+			_MagicResistance[RESISTANCE_TYPE::Jungle] += HominRacialResistance * 100;
 			break;
+
 		default:
 			break;
-		}
+	}
+
+	// correct for current region
+	for( uint32 i = 0; i < RESISTANCE_TYPE::NB_RESISTANCE_TYPE; ++i )
+	{
 		_MagicResistance[i] = (uint32)((sint32)max( (sint32)0, ((sint32)_MagicResistance[i]) + getRegionResistanceModifier((RESISTANCE_TYPE::TResistanceType)i) * (sint32)100));
-		clamp( _MagicResistance[i], (uint32)0, (uint32)((baseResistance + MaxMagicResistanceBonus) * 100) );
 	}
 
 	// protection
@@ -18682,7 +18689,7 @@ void CCharacter::updateMagicProtectionAndResistance()
 
 	for (uint i=0; i<RESISTANCE_TYPE::NB_RESISTANCE_TYPE; ++i)
 	{
-		CBankAccessor_PLR::getCHARACTER_INFO().getMAGIC_RESISTANCE().getArray(i).setVALUE(_PropertyDatabase, checkedCast<uint16>(_MagicResistance[i]));
+		CBankAccessor_PLR::getCHARACTER_INFO().getMAGIC_RESISTANCE().getArray(i).setVALUE(_PropertyDatabase, checkedCast<uint16>(getUnclampedMagicResistance((RESISTANCE_TYPE::TResistanceType)i)));
 	}
 //	_PropertyDatabase.setProp("CHARACTER_INFO:MAGIC_RESISTANCE:Desert", _MagicResistance[RESISTANCE_TYPE::Desert]);
 //	_PropertyDatabase.setProp("CHARACTER_INFO:MAGIC_RESISTANCE:Forest", _MagicResistance[RESISTANCE_TYPE::Forest]);
@@ -20138,7 +20145,9 @@ void CCharacter::setEnterCriticalZoneProposalQueueId(uint32 queueId)
 
 uint32 CCharacter::getMagicProtection( PROTECTION_TYPE::TProtectionType magicProtectionType ) const
 {
-	uint32 val = getUnclampedMagicProtection(magicProtectionType); NLMISC::clamp( val, (uint32)0, MaxMagicProtection ); return val;
+	uint32 val = getUnclampedMagicProtection(magicProtectionType);
+	NLMISC::clamp( val, (uint32)0, MaxMagicProtection );
+	return val;
 }
 
 
