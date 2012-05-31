@@ -5188,7 +5188,7 @@ bool CCharacter::addCharacterAnimal( const CSheetId& PetTicket, uint32 Price, CG
 			pet.Slot = ptr->getInventorySlot();
 
 			// init pet inventory
-			if ( ! initPetInventory( i )
+			if ( ! initPetInventory( i ))
 			{
 				return false;
 			}
@@ -11277,7 +11277,7 @@ void CCharacter::addExchangeItems(CCharacter* trader,vector<CGameItemPtr >& item
 		sint32 i = getFreePetSlot();
 		if( i >= 0 )
 		{
-			_PlayerPets[ i ] = playerPetsAdd[ p ];
+			_PlayerPets[ i ] = playerPetsAdded[ p ];
 			_PlayerPets[ i ].OwnerId = _Id;
 
 			initPetInventory(i);
@@ -20635,7 +20635,7 @@ bool CCharacter::initPetInventory(uint8 index)
 {
 	// init pet inventory
 	const uint32 petMaxWeight = 0xFFFFFFFF; // no weight limit
-	const uint32 petMaxBulk = _PlayerPets[ i ].getAnimalMaxBulk();
+	const uint32 petMaxBulk = _PlayerPets[ index ].getAnimalMaxBulk();
 
 	const INVENTORIES::TInventory petInvId = (INVENTORIES::TInventory)(index + INVENTORIES::pet_animal);
 	CPetInventory *petInventory = dynamic_cast<CPetInventory*> ((CInventoryBase*)_Inventory[petInvId]);
