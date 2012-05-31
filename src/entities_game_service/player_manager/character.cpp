@@ -6339,7 +6339,7 @@ void CCharacter::removePetCharacterAfterDeath( uint32 index )
 {
 	TLogContext_Item_PetDespawn logContext(_Id);
 	// pet founded
-	if( index < MAX_PACK_ANIMAL )
+	if( index < MAX_INVENTORY_ANIMAL )
 	{
 		// reset despawn timer
 //		_PropertyDatabase.setProp( _DataIndexReminder->PACK_ANIMAL.BEAST[index].DESPAWN, 0 );
