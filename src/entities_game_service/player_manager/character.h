@@ -1034,14 +1034,14 @@ public:
 	// Same but nearly empty
 	void setDummyStartCharacteristics();
 
-    /**
-     * Eval Specialization for return Characteristics value
-     *
-     * \param value is the value to parse.
-     * \param result is the result to fill if the value has been succesfully parsed.
-     * \return UnkownValue if the value is not known, ValueError is the value evaluation failed or NoError 
-     * if it has been parsed.
-     */
+	/**
+	 * Eval Specialization for return Characteristics value
+	 *
+	 * \param value is the value to parse.
+	 * \param result is the result to fill if the value has been succesfully parsed.
+	 * \return UnkownValue if the value is not known, ValueError is the value evaluation failed or NoError 
+	 * if it has been parsed.
+	 */
 	virtual TReturnState evalValue (const char *value, double &result, uint32 userData);
 
 	/// Add a pact
@@ -2788,7 +2788,7 @@ private:
 	void removeExchangeItems(std::vector<CGameItemPtr>& itemRemoved, std::vector< CPetAnimal >& PlayerPetsRemoved);
 
 	// add the items gained during an exchange
-	void addExchangeItems(CCharacter* trader,std::vector<CGameItemPtr>& itemToAdd, std::vector< CPetAnimal >& PlayerPetsAdd);
+	void addExchangeItems(CCharacter* trader,std::vector<CGameItemPtr>& itemToAdd, std::vector< CPetAnimal >& PlayerPetsAdded);
 
 	/// get creator name dynamic string Id
 	uint32 getCreatorNameId( const NLMISC::CEntityId &creatorId);
@@ -2915,6 +2915,9 @@ private:
 	 *	may even be bigger than the original XpGain!
 	 */
 	double addXpToSkillInternal( double XpGain, const std::string& ContSkill, TAddXpToSkillMode addXpMode, std::map<SKILLS::ESkills,CXpProgressInfos> &gainBySkill );
+
+	/// Initialize the specified pet inventory, if it is valid
+	bool initPetInventory(uint8 index);
 
 	///////////////////
 	// Public members

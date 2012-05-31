@@ -2872,14 +2872,7 @@ void CCharacter::postLoadTreatment()
 			{
 				tickets[ slot ] =  true;
 
-				// init pet inventory
-				const uint32 petMaxWeight = 0xFFFFFFFF; // no weight limit
-				const uint32 petMaxBulk = _PlayerPets[ i ].getAnimalMaxBulk();
-
-				const INVENTORIES::TInventory petInvId = (INVENTORIES::TInventory)(i + INVENTORIES::pet_animal);
-				CPetInventory *petInventory = dynamic_cast<CPetInventory*> ((CInventoryBase*)_Inventory[petInvId]);
-				if (petInventory)
-					petInventory->initPetInventory( i, petMaxWeight, petMaxBulk );
+				initPetInventory(i);
 			}
 		}
 	}
@@ -5195,15 +5188,10 @@ bool CCharacter::addCharacterAnimal( const CSheetId& PetTicket, uint32 Price, CG
 			pet.Slot = ptr->getInventorySlot();
 
 			// init pet inventory
-			const uint32 petMaxWeight = 0xFFFFFFFF; // no weight limit
-			const uint32 petMaxBulk = _PlayerPets[ i ].getAnimalMaxBulk();
-
-			const INVENTORIES::TInventory petInvId = (INVENTORIES::TInventory)(i + INVENTORIES::pet_animal);
-			CPetInventory *petInventory = dynamic_cast<CPetInventory*> ((CInventoryBase*)_Inventory[petInvId]);
-			if (petInventory)
-				petInventory->initPetInventory( i, petMaxWeight, petMaxBulk );
-			else
+			if ( ! initPetInventory( i )
+			{
 				return false;
+			}
 
 			return spawnCharacterAnimal( i );
 		}
@@ -11277,20 +11265,22 @@ void CCharacter::removeExchangeItems(vector<CGameItemPtr >& itemRemoved, vector<
 // addExchangeItems
 //
 //-----------------------------------------------
-void CCharacter::addExchangeItems(CCharacter* trader,vector<CGameItemPtr >& itemToAdd, vector< CPetAnimal >& playerPetsAdd)
+void CCharacter::addExchangeItems(CCharacter* trader,vector<CGameItemPtr >& itemToAdd, vector< CPetAnimal >& playerPetsAdded)
 {
 	// inform AI
 	CPetSetOwner msgAI;
 
 	bool updatePetDataBase = false;
 
-	for( uint32 p = 0; p < playerPetsAdd.size(); ++p )
+	for( uint32 p = 0; p < playerPetsAdded.size(); ++p )
 	{
 		sint32 i = getFreePetSlot();
 		if( i >= 0 )
 		{
 			_PlayerPets[ i ] = playerPetsAdd[ p ];
 			_PlayerPets[ i ].OwnerId = _Id;
+
+			initPetInventory(i);
 
 			if( _PlayerPets[ i ].PetStatus == CPetAnimal::waiting_spawn )
 			{
@@ -20638,4 +20628,21 @@ void CCharacter::sendNpcMissionGiverTimer(bool force)
 		msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
 		CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(_Id.getDynamicId()), msgout );
 	}
+}
+
+//------------------------------------------------------------------------------
+bool CCharacter::initPetInventory(uint8 index)
+{
+	// init pet inventory
+	const uint32 petMaxWeight = 0xFFFFFFFF; // no weight limit
+	const uint32 petMaxBulk = _PlayerPets[ i ].getAnimalMaxBulk();
+
+	const INVENTORIES::TInventory petInvId = (INVENTORIES::TInventory)(index + INVENTORIES::pet_animal);
+	CPetInventory *petInventory = dynamic_cast<CPetInventory*> ((CInventoryBase*)_Inventory[petInvId]);
+	if (petInventory)
+	{
+		petInventory->initPetInventory( index, petMaxWeight, petMaxBulk );
+		return true;
+	}
+	return false;
 }
