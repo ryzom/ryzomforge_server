@@ -49,6 +49,7 @@
 #include "game_share/outpost.h"
 #include "game_share/visual_slot_manager.h"
 #include "game_share/shard_names.h"
+#include "game_share/http_client.h"
 #include "server_share/log_command_gen.h"
 #include "server_share/r2_vision.h"
 
@@ -461,6 +462,7 @@ void initAdmin ()
 		cmd.Name	= AdminCommandsInit[i].Name;
 		cmd.AddEId	= AdminCommandsInit[i].AddEId;
 		cmd.Priv	= DefaultPriv;
+		cmd.Audit	= false;
 
 		AdminCommands.push_back(cmd);
 	}
@@ -526,9 +528,9 @@ static void loadCommandsPrivileges(const string & fileName, bool init)
 
 		CSString fullLine = line;
 
-		// only extract the first 3 params
+		// only extract the first 4 params
 		CVectorSString params;
-		for (uint i = 0; !line.empty() && i < 3; i++)
+		for (uint i = 0; !line.empty() && i < 4; i++)
 		{
 			string param = line.strtok(" \t");
 			if (param.empty())
@@ -547,7 +549,7 @@ static void loadCommandsPrivileges(const string & fileName, bool init)
 		{
 			// this is a forward
 		}
-		else if (params.size() > 2)
+		else if (params.size() > 3)
 		{
 			nlwarning("ADMIN: invalid entry: '%s'.", fullLine.c_str());
 			continue;
@@ -564,15 +566,24 @@ static void loadCommandsPrivileges(const string & fileName, bool init)
 			params.push_back("");
 		}
 
+		if (params.size() < 4)
+		{
+			// no audit specified
+			params.push_back("");
+		}
+
+
 		const string & cmdName = params[0];
 		const string & forward = params[1];
 		const string & cmdPriv = params[2];
+		const bool & audit = (params[3] == "audit");
 
 		CAdminCommand * cmd = findAdminCommand(cmdName);
 		if (cmd)
 		{
 			cmd->Priv = cmdPriv;
 			cmd->ForwardToservice = forward.substr(1, forward.size()-2);
+			cmd->Audit = audit;
 			nlinfo("ADMIN: command '%s' forwarded to [%s] has new privileges '%s'.", cmdName.c_str(), cmd->ForwardToservice.c_str(), cmdPriv.c_str());
 		}
 		else
@@ -2885,6 +2896,29 @@ NLMISC_DYNVARIABLE (uint32, RyzomDate, "Current ryzom date")
 //
 //
 //
+void audit(const CAdminCommand *cmd, const string &rawCommand, const CEntityId &eid, const string &name, const string &targetName)
+{
+	if (cmd == NULL)
+		return;
+
+	CConfigFile::CVar *varHost = IService::getInstance()->ConfigFile.getVarPtr("AdminCommandAuditHost");
+	CConfigFile::CVar *varPage = IService::getInstance()->ConfigFile.getVarPtr("AdminCommandAuditPage");
+
+	if (varHost == NULL || varPage == NULL)
+		return;
+
+	string host = varHost->asString();
+	string page = varPage->asString();
+
+	if (host == "" || page == "")
+		return;
+
+	char params[1024];
+	sprintf(params, "action=audit&cmd=%s&raw=%s&name=(%s,%s)&target=%s", cmd->Name.c_str(), rawCommand.c_str(), eid.toString().c_str(), name.c_str(), targetName.c_str());
+
+	IThread *thread = IThread::create(new CHttpPostTask(host, page, params));
+	thread->start();
+}
 
 // all admin /a /b commands executed by the client go in this callback
 void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
@@ -3013,6 +3047,8 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		}
 		res = (string)cs_res;
 		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
+
+		audit(cmd, res, eid, csName, targetName);
 
 		CLightMemDisplayer *CmdDisplayer = new CLightMemDisplayer("CmdDisplayer");
 		CLog *CmdLogger = new CLog( CLog::LOG_NO );
