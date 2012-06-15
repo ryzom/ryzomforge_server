@@ -3573,8 +3573,11 @@ NLMISC_COMMAND( killMob, "kill a mob ( /a killMob )", "<CSR eId>" )
 	}
 	if ( !creature->getContextualProperty().directAccessForStructMembers().attackable() )
 	{
-		CCharacter::sendDynamicSystemMessage( eid, "CSR_NOT_ATTACKABLE" );
-		return true;
+		if ( ! creature->checkFactionAttackable(c->getId()))
+		{
+			CCharacter::sendDynamicSystemMessage( eid, "CSR_NOT_ATTACKABLE" );
+			return true;
+		}
 	}
 	creature->getScores()._PhysicalScores[SCORES::hit_points].Current = 0;
 	return true;

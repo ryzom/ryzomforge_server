@@ -150,6 +150,7 @@ void setOupostMode_ss_(CStateInstance* entity, CScriptStack& stack)
 	}
 	
 	npcGroup->setOutpostSide(side);
+	npcGroup->setOutpostFactions(side);
 	FOREACH(botIt, CCont<CBot>, npcGroup->bots())
 	{
 		CBot* bot = *botIt;
