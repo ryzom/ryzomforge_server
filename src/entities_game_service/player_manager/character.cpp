@@ -11141,14 +11141,14 @@ bool CCharacter::validateExchange()
 		sint32 ticketDelta = c->_ExchangeView->getPetTicketExchanged( ITEM_TYPE::MEKTOUB_PACKER_TICKET ) - _ExchangeView->getPetTicketExchanged( ITEM_TYPE::MEKTOUB_PACKER_TICKET );
 		if( !checkAnimalCount( packerSheet, false, ticketDelta ) )
 		{
-			sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX()");
+			sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX");
 			c->sendDynamicSystemMessage(c->getId(), "ANIMAL_INTERLOCUTOR_HAVE_MAX");
 			invalidateExchange();
 			return false;
 		}
 		if( !c->checkAnimalCount( packerSheet, false, -ticketDelta ) )
 		{
-			c->sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX()");
+			c->sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX");
 			sendDynamicSystemMessage(c->getId(), "ANIMAL_INTERLOCUTOR_HAVE_MAX");
 			invalidateExchange();
 			return false;
@@ -11160,14 +11160,14 @@ bool CCharacter::validateExchange()
 		sint32 ticketDelta = c->_ExchangeView->getPetTicketExchanged(ITEM_TYPE::MEKTOUB_MOUNT_TICKET) - _ExchangeView->getPetTicketExchanged(ITEM_TYPE::MEKTOUB_MOUNT_TICKET);
 		if( !checkAnimalCount( mountSheet, false, ticketDelta ) )
 		{
-			sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX()");
+			sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX");
 			c->sendDynamicSystemMessage(c->getId(), "ANIMAL_INTERLOCUTOR_HAVE_MAX");
 			invalidateExchange();
 			return false;
 		}
 		if( !c->checkAnimalCount( mountSheet, false, -ticketDelta ) )
 		{
-			c->sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX()");
+			c->sendDynamicSystemMessage(getId(), "ANIMAL_PLAYER_HAVE_MAX");
 			sendDynamicSystemMessage(c->getId(), "ANIMAL_INTERLOCUTOR_HAVE_MAX");
 			invalidateExchange();
 			return false;
