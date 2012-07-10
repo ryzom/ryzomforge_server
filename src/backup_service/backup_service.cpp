@@ -475,7 +475,6 @@ static CMessage getFileClassImp( CMessage& msgin)
 
 		std::vector<std::string>	files;
 		NLMISC::CPath::getPathContent(getBackupFileName(inMsg.Directory), false, false, true, files); // caution: it returns full path names
-
 		for (uint i=0; i<files.size(); ++i)
 		{
 			uint32		fstamp = CFile::getFileModificationDate(files[i]);
