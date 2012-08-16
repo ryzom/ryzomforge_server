@@ -2987,6 +2987,13 @@ void CCharacter::postLoadTreatment()
 	computeMiscBonus();
 	}
 
+	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( getId() ));
+	if (!p->isTrialPlayer())
+	{
+		CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setLevel(_PropertyDatabase, 250);
+		CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(_PropertyDatabase, 999);
+	}
+
 	{
 	H_AUTO(CItemServiceManager);
 	CItemServiceManager::getInstance()->initPersistentServices(this);
@@ -6917,7 +6924,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 	uint32 ringStackSizeToRemove = 0;
 	uint32 ringCatalyserLvl = 0;
 	uint32 ringCatalyserCount = 0;
-
+	
 	// Don't take away cats if free trial limit reached and there is no DP.
 	bool bConsumeCats = ! ( bFreeTrialLimitReached && _DeathPenalties->isNull() );
 
@@ -6931,7 +6938,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 				CBankAccessor_PLR::getCHARACTER_INFO().getXP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(catalyserCount) );
 			}
 		}
-
+	
 		if( _RingXpCatalyserSlot != INVENTORIES::INVALID_INVENTORY_SLOT )
 		{
 			if( addCatalyserXpBonus( _RingXpCatalyserSlot, skill, XpGain, ringXpBonus, ringStackSizeToRemove, ringCatalyserLvl, ringCatalyserCount ) )
@@ -6941,6 +6948,11 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 			}
 		}
 	}
+	
+	if (!p->isTrialPlayer()) {
+		xpBonus = XpGain;
+	}
+	
 	XpGain += xpBonus + ringXpBonus;
 
 	// update death penalty
@@ -7018,6 +7030,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 //	log_Character_XPGain(_Id, skillName, skill->Base, float(XpGain));
 
 	// bufferize xp gain, store it in paramet map
+
 	if (addXpMode==AddXpToSkillBuffer)
 	{
 		map<SKILLS::ESkills,CXpProgressInfos>::iterator itGainSkill = gainBySkill.find( skillEnum );
@@ -20631,6 +20644,7 @@ void CCharacter::sendNpcMissionGiverTimer(bool force)
 }
 
 //------------------------------------------------------------------------------
+
 bool CCharacter::initPetInventory(uint8 index)
 {
 	// init pet inventory
