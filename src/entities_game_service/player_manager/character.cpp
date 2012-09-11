@@ -9859,6 +9859,13 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 			return;
 		}
 
+		// You cannot exchange genesis named items
+		if (item->getPhraseId().find("genesis_") == 0)
+		{
+			nlwarning("Character %s tries to sell '%s'", _Id.toString().c_str(), item->getPhraseId().c_str() );
+			return;
+		}
+
 		if( ! ITEMFAMILY::isSellableByPlayer( itemForm->Family ) )
 		{
 			nlwarning("<CCharacter sellItem> character %s try to sell an unsealable item %s, must not permited by client", _Id.toString().c_str(), sheet.toString().c_str() );
