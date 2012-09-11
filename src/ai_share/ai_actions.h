@@ -100,6 +100,7 @@ public:
 			case TypeFloat:		return NLMISC::toString(_f);
 //			case TypeAliasTree:	return _a->treeToString();
 //			case TypeEventTree: return _e->toString();
+			default:			break;
 			}
 			return "<Invalid Argument Type>";
 		}
@@ -115,6 +116,7 @@ public:
 				case TypeFloat:		f.serial(_f);	break;
 //				case TypeAliasTree:	f.serial(_a);	break;
 //				case TypeEventTree: f.serial(_e);	break;
+				default:			break;
 			}
 		}
 
@@ -267,7 +269,7 @@ public:
 						if (index>=data.size())
 						{
 							nlwarning("Unexpected end of input data in serialFromString()");
-							index=data.size()+1;
+							index=(uint)data.size()+1;
 							return CArg();
 						}
 					}
@@ -279,7 +281,7 @@ public:
 					if (index>data.size())
 					{
 						nlwarning("Unexpected end of input data in serialFromString()");
-						index=data.size()+1;
+						index=(uint)data.size()+1;
 						return CArg();
 					}
 					return CArg(bool(data[index] == 1));
@@ -289,7 +291,7 @@ public:
 					if (index>data.size())
 					{
 						nlwarning("Unexpected end of input data in serialFromString()");
-						index=data.size()+1;
+						index=(uint)data.size()+1;
 						return CArg();
 					}
 					return CArg(((sint32 *)&data[index])[-1]);
@@ -299,7 +301,7 @@ public:
 					if (index>data.size())
 					{
 						nlwarning("Unexpected end of input data in serialFromString()");
-						index=data.size()+1;
+						index=(uint)data.size()+1;
 						return CArg();
 					}
 					return CArg(((float *)&data[index])[-1]);
@@ -315,7 +317,7 @@ public:
 					break;
 			}
 			nlwarning("Unexpected type in serialFromString()");
-			index=data.size()+1;
+			index=(uint)data.size()+1;
 			return CArg();
 		}
 

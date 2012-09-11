@@ -598,7 +598,7 @@ void	CPDSLib::update()
 		// setup update logs with full timestamp
 		if (!_DbMessageQueue.empty())
 		{
-			i = _UpdateLogs.size();
+			i = (uint)_UpdateLogs.size();
 			_UpdateLogs.resize(_DbMessageQueue.size());
 
 			for (; i<_UpdateLogs.size(); ++i)
@@ -1025,7 +1025,7 @@ std::string	CPDSLib::getPDSRootDirectory(const std::string& shard, bool wantRemo
 	}
 
 	std::string	findstr("$shard");
-	uint		p = dir.find(findstr);
+	std::string::size_type p = dir.find(findstr);
 
 	if (p != std::string::npos)
 		dir.replace(p, findstr.size(), shard);
@@ -1108,7 +1108,8 @@ NLMISC_DYNVARIABLE(uint, EnqueuedPDMessages, "Tells number of messages enqueued 
 //	if (args.size() != 2)
 //		return false;
 //
-//	uint	databaseId = atoi(args[0].c_str());
+//	uint	databaseId;
+//	NLMISC::fromString(args[0], databaseId);
 //	string	filename = args[1];
 //
 //	CPDSLib*	lib = (databaseId < CPDSLib::_Libs.size() ? CPDSLib::_Libs[databaseId] : NULL);
@@ -1144,7 +1145,7 @@ NLMISC_DYNVARIABLE(uint, EnqueuedPDMessages, "Tells number of messages enqueued 
 //	{
 //		updateLog.serial(ifile);
 //	}
-//	catch (Exception& e)
+//	catch (const Exception& e)
 //	{
 //		nlwarning("Failed to load file '%s': %s", filename.c_str(), e.what());
 //		return false;

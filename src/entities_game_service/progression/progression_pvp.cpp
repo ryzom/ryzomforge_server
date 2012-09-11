@@ -201,7 +201,7 @@ void CDamageScoreTable::changeAllDamageEquitably(sint32 damageDelta)
 	if (damageDelta == 0)
 		return;
 
-	const uint32 nbEntities = _TeamDamageScores.size() + _PlayerDamageScores.size() + _CreatureDamageScores.size();
+	const uint32 nbEntities = (uint32)(_TeamDamageScores.size() + _PlayerDamageScores.size() + _CreatureDamageScores.size());
 	if (nbEntities == 0)
 		return;
 
@@ -336,7 +336,7 @@ void CDamageScoreTable::playerLeavesTeam(TDataSetRow playerRowId, TTeamId teamId
 		return;
 
 	vector<TDataSetRow> & beneficiaries = teamScore->Beneficiaries;
-	const uint32 nbBeneficiaries = beneficiaries.size();
+	const uint32 nbBeneficiaries = (uint32)beneficiaries.size();
 
 	// remove player from beneficiaries
 	const bool isBeneficiary = removeElementFromVector(playerRowId, beneficiaries);
@@ -1207,10 +1207,9 @@ void CDamageScoreManager::playerDeath(CCharacter * victimChar, const CCharacter 
 			PVP_CLAN::TPVPClan winnerFaction = PVP_CLAN::None;
 			bool winnerGainFactionPoints = true;
 
-			
 			if (!canPlayerWinPoints(winnerChar, victimChar))
 				continue;
-			
+
 			//if(!playerInFactionPvP(winnerChar, &winnerFaction, &winnerGainFactionPoints))
 			//	continue; // can be in Duel or in other pvp mode.
 
@@ -1239,18 +1238,18 @@ void CDamageScoreManager::playerDeath(CCharacter * victimChar, const CCharacter 
 				{
 					sint32 victimFame = CFameInterface::getInstance().getFameIndexed(victimChar->getId(), fameIdx);
 					sint32 winnerFame = CFameInterface::getInstance().getFameIndexed(winnerChar->getId(), fameIdx);
-					
+
 					if ( (victimFame >= 25*6000 && winnerFame <= -25*6000) || 
 						 (winnerFame >= 25*6000 && victimFame <= -25*6000) )
 						fameFactor++;
-						
+
 					if ( (victimFame >= 25*6000 && winnerFame >= 25*6000) || 
 						 (victimFame <= -25*6000 && winnerFame <= -25*6000) )
 						fameFactor--;						
 				}
 				clamp(fameFactor, 0, 3);
 				nlinfo("points = %d * %d", fpPerPlayer, fameFactor);
-				
+
 				// player gains faction points
 				changePlayerPvpPoints(winnerChar, sint32(fpPerPlayer) * fameFactor);
 				winnerChar->sendFactionPointGainKillMessage(winnerFaction, fpPerPlayer * fameFactor, victimChar->getId());
@@ -1465,7 +1464,7 @@ void CDamageScoreManager::playerRespawn(CCharacter * victimChar)
 	// victim loses HoF points
 	changePlayerHoFPoints(victimChar, -sint32(pointLoss.HoFPointLoss));
 	*/
-	
+
 	// remove the applied entry
 	_PointLossByPlayer.erase(it);
 }
@@ -1737,11 +1736,10 @@ bool CDamageScoreManager::playerInFactionPvP(const CCharacter * playerChar, PVP_
 
 bool CDamageScoreManager::canPlayerWinPoints(const CCharacter * winnerChar,  CCharacter * victimeChar) const
 {
-	
 	// Don't win points if in duel
 	if ( winnerChar->getDuelOpponent() && (winnerChar->getDuelOpponent()->getId() == victimeChar->getId()) )
 		return false;
-	
+
 	if (victimeChar->getPVPRecentActionFlag())
 		nlinfo("PVP recent flag");
 	// Only win points if victime is Flag
@@ -1753,20 +1751,20 @@ bool CDamageScoreManager::canPlayerWinPoints(const CCharacter * winnerChar,  CCh
 			// Don't win points if in same Team
 			if ( winnerChar->getTeamId() != CTEAM::InvalidTeamId && victimeChar->getTeamId() != CTEAM::InvalidTeamId && (winnerChar->getTeamId() == victimeChar->getTeamId()) )
 				return false;
-				
+
 			// Don't win points if in same Guild
 			nlinfo("Guild : %d, %d", winnerChar->getGuildId(), victimeChar->getGuildId());
 			if ( winnerChar->getGuildId() != 0 && victimeChar->getGuildId() != 0 && (winnerChar->getGuildId() == victimeChar->getGuildId()) )
 				return false;
-				
+
 			// Don't win points if in same League
 			if ( winnerChar->getLeagueId() != DYN_CHAT_INVALID_CHAN && victimeChar->getLeagueId() != DYN_CHAT_INVALID_CHAN && (winnerChar->getLeagueId() == victimeChar->getLeagueId()) )
 				return false;
-			
+
 			return true;
 		 }
 	}
-	
+
 	return false;
 }
 

@@ -77,6 +77,6 @@ void	CVisualPropertiesInterface::setName(const TDataSetRow&	dataSetRow, ucstring
 	NLNET::CMessage	msgout("CHARACTER_NAME");
 	CEntityId		eid=CMirrors::DataSet->getEntityId(dataSetRow);
 	msgout.serial	(const_cast<TDataSetRow&>(dataSetRow));
-	msgout.serial	(name);	// Daniel: TODO update all name dependencies to ucstring in your service.	
+	msgout.serial	(name);
 	sendMessageViaMirror("IOS",msgout);
 }

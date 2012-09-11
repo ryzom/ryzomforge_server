@@ -119,7 +119,7 @@ public:
 
 	uint8							Index; // index of the phrase in the player memorized phrase interface if != 0xff
 
-	CEGSExecuteMsg() : Index(0xff), Cyclic(false)
+	CEGSExecuteMsg() : Cyclic(false), Index(0xff)
 	{}
 
 	virtual void description ()
@@ -159,8 +159,8 @@ public:
 	//void pushBack( const TDataSetRow& originator, const TDataSetRow& target, const CAiEventReport &report)
 	void pushBack( const CAiEventReport &report)
 	{
-		const uint size = Originator.size();
-		const uint nbElts = report.AffectedStats.empty() ? 1 : report.AffectedStats.size();
+		const uint size = (uint)Originator.size();
+		const uint nbElts = report.AffectedStats.empty() ? 1 : (uint)report.AffectedStats.size();
 
 		Originator.resize(size+nbElts);
 		Target.resize(size+nbElts);

@@ -81,7 +81,7 @@ static bool s_attack(CAIEntityPhysical const& target, float const& dist,
 					if (action->SelfAction() == self)
 						phraseList.push_back(action);
 				}
-				uint32 const size = phraseList.size();
+				uint32 const size = (uint32)phraseList.size();
 				if (size>0)
 				{
 					nlassert(target.getRyzomType()!=debugCheckedType);
@@ -261,13 +261,18 @@ static void s_calcRanges(
 	_RangeMax = CBotProfileFightHeal::fightDefaultMaxRange;
 	if (_UseFightConfig)
 	{
-		if (useFightMelee && (useFightRange || useFightNuke || useFightHeal)) {
+		if (useFightMelee && (useFightRange || useFightNuke || useFightHeal))
+		{
 			_RangeMin = CBotProfileFightHeal::fightMixedMinRange;
 			_RangeMax = CBotProfileFightHeal::fightMixedMaxRange;
-		} else if (useFightMelee) {
+		}
+		else if (useFightMelee)
+		{
 			_RangeMin = CBotProfileFightHeal::fightMeleeMinRange;
 			_RangeMax = CBotProfileFightHeal::fightMeleeMaxRange;
-		} else {
+		}
+		else
+		{
 			_RangeMin = CBotProfileFightHeal::fightRangeMinRange;
 			_RangeMax = CBotProfileFightHeal::fightRangeMaxRange;
 		}

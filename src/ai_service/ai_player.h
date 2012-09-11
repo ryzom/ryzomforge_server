@@ -29,7 +29,9 @@ class CFauna;
 
 
 
+#ifdef NL_OS_WINDOWS
 #pragma warning (disable : 4355)
+#endif // NL_OS_WINDOWS
 
 //////////////////////////////////////////////////////////////////////////////
 // CBotPlayer                                                               //
@@ -173,7 +175,7 @@ public:
 	}
 	
 private:
-	TPlayerMap _spawnedPlayers; // hum .. still usefull ?
+	TPlayerMap _spawnedPlayers; // hum .. still useful ?
 	/// Team composition.
 	typedef CHashMap<int, std::set<TDataSetRow> > TTeamMap;
 	TTeamMap _teams;

@@ -291,7 +291,7 @@ void CPetSpawnMsgImp::callback(std::string const& name, NLNET::TServiceId id)
 			
 			botPet->setSheet(sheet);
 
-			if (CustomName != ucstring(""))
+			if (!CustomName.empty())
 			{
 				botPet->setCustomName(CustomName);
 			}

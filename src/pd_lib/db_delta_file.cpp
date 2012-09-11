@@ -101,7 +101,7 @@ bool	CDBDeltaFile::write(uint32 index, const uint8* rowdata)
 				return false;
 			}
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			nlwarning("CDBDeltaFile::write(): failed, cannot write file '%s' header, exception '%s'", filepath.c_str(), e.what());
 			return false;
@@ -113,7 +113,7 @@ bool	CDBDeltaFile::write(uint32 index, const uint8* rowdata)
 	if (it == _IndexMap.end())
 	{
 		// seek to end (should be after last row)
-		uint32	rowSeek = _DataStart + _Header.FullRowSize*_IndexMap.size();
+		uint32	rowSeek = _DataStart + _Header.FullRowSize*(uint32)_IndexMap.size();
 
 		// a little check
 		if (fseek(_File, 0, SEEK_END) != 0)
@@ -221,7 +221,7 @@ bool	CDBDeltaFile::preload()
 	// check file exists
 	if (!CFile::fileExists(filepath))
 	{
-		nlwarning("CDBDeltaFile::read(): failed, file '%s' doesn't exists", filepath.c_str());
+		nlwarning("CDBDeltaFile::read(): failed, file '%s' doesn't exist", filepath.c_str());
 		return false;
 	}
 
@@ -243,7 +243,7 @@ bool	CDBDeltaFile::preload()
 			return false;
 		}
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		nlwarning("CDBDeltaFile::read(): failed, cannot write file '%s' header, exception '%s'", filepath.c_str(), e.what());
 		return false;

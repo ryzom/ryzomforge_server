@@ -27,6 +27,7 @@
 #include "nel/misc/variable.h"
 
 using namespace std;
+using namespace NLMISC;
 using namespace	PHRASE_UTILITIES;
 
 CVariable<bool> ResPawnPVPInSameRegionForbiden("egs","ResPawnPVPInSameRegionForbiden", "When character dead in PvP Faction, it can't respawn in same same region of it's death", true, 0, true );
@@ -44,7 +45,7 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 	bool actorSafe = false;
 	bool targetInSafeZone = false;
 	bool actorInSafeZone = false;
-	
+
 	// Check actor and target validity
 	if (actor == 0 || target == 0)
 	{
@@ -55,7 +56,7 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
 	if (pTarget == 0)
 		return PVP_RELATION::Unknown;
-	
+
 	if (CPVPManager2::getInstance()->inSafeZone(pTarget->getPosition()))
 	{
 		targetInSafeZone = true;
@@ -88,24 +89,26 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 	// In same Team => Ally
 	if ((pTarget->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() != CTEAM::InvalidTeamId) && (actor->getTeamId() == pTarget->getTeamId()))
 	{
-			isAlly = true;		
+		isAlly = true;
 	}
 
 	// In Same League => Ally
 	if ((pTarget->getLeagueId() != DYN_CHAT_INVALID_CHAN) && (actor->getLeagueId() != DYN_CHAT_INVALID_CHAN) && (actor->getLeagueId() == pTarget->getLeagueId()))
 	{
-		isAlly = true;		
+		isAlly = true;
 	}
 
 	// In same Guild and not Leagued => Ally
 	if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() == pTarget->getGuildId()) && (pTarget->getLeagueId() == DYN_CHAT_INVALID_CHAN) && (actor->getLeagueId() == DYN_CHAT_INVALID_CHAN))
 	{
-		isAlly = true;		
-	}	
+		isAlly = true;
+	}
 
-	if (isAlly) {
+	if (isAlly)
+	{
 		// One is in safe zone but not other => NeutralPVP
-		if ((targetInSafeZone && !actorInSafeZone) || (actorInSafeZone && !targetInSafeZone)) {
+		if ((targetInSafeZone && !actorInSafeZone) || (actorInSafeZone && !targetInSafeZone))
+		{
 			return PVP_RELATION::NeutralPVP;
 		}
 		
@@ -114,7 +117,7 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 		{
 			return PVP_RELATION::NeutralPVP;
 		}
-		
+
 		CPVPManager2::getInstance()->setPVPFactionAllyReminder(true);
 		return PVP_RELATION::Ally;
 	}
@@ -130,7 +133,7 @@ PVP_RELATION::TPVPRelation CPVPFaction::getPVPRelation( CCharacter * actor, CEnt
 	{
 		return PVP_RELATION::NeutralPVP;
 	}
-	
+
 	CPVPManager2::getInstance()->setPVPFactionEnemyReminder(true);
 	return PVP_RELATION::Ennemy;
 }
