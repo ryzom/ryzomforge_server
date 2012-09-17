@@ -3727,7 +3727,7 @@ NLMISC_COMMAND( monitorMissions, "monitor a player missions", "<CSR id><player n
 	CHECK_RIGHT( c,target );
 
 	// CSR must have no missions to monitor a player
-	if ( c->getMissionsBegin() ==  c->getMissionsEnd() )
+	if ( c->getMissionsBegin() !=  c->getMissionsEnd() )
 	{
 		CCharacter::sendDynamicSystemMessage( c->getEntityRowId() , "CSR_HAS_MISSION" );
 		return true;

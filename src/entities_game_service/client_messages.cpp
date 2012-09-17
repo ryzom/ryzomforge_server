@@ -2078,7 +2078,7 @@ void cbClientSit( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 }
 
 
-// client send a command to chang guild motd
+// client send a command to change guild motd
 void cbClientGuildMotd( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientGuildMotd);
