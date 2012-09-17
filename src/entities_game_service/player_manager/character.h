@@ -892,6 +892,9 @@ public:
 	// Set skill tree of character to max value of each skill
 	void setSkillsToMaxValue();
 
+	// Set skill tree of character to specified value
+	void setSkillsToValue(const sint32& value);
+
 	// for respawn management, need to modify _TimeDeath in cbTpAcknownledge callback
 	NLMISC::TGameTime& getTimeOfDeath();
 	void setTimeOfDeath( NLMISC::TGameTime t);

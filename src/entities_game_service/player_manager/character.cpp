@@ -7313,11 +7313,18 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 	return XpGainRemainder;
 }
 
-
 //-----------------------------------------------
 // CCharacter::setSkillTreeToMaxValue Set skill tree of character to max value of each skill
 //-----------------------------------------------
 void CCharacter::setSkillsToMaxValue()
+{
+	setSkillsToValue(-1);
+}
+
+//-----------------------------------------------
+// CCharacter::setSkillTreeToMaxValue Set skill tree of character to max value of each skill
+//-----------------------------------------------
+void CCharacter::setSkillsToValue(const sint32& value)
 {
 	// get pointer on static skills tree definition
 	CSheetId sheet("skills.skill_tree");
@@ -7326,15 +7333,31 @@ void CCharacter::setSkillsToMaxValue()
 
 	for( uint i = 0; i < SKILLS::NUM_SKILLS; ++i )
 	{
-		_Skills._Skills[ i ].Base = SkillsTree->SkillsTree[ i ].MaxSkillValue;
+		_Skills._Skills[ i ].Base = (value < 0) ? SkillsTree->SkillsTree[ i ].MaxSkillValue : min( value, (sint32)SkillsTree->SkillsTree[ i ].MaxSkillValue );
 		_Skills._Skills[ i ].Current = SkillsTree->SkillsTree[ i ].MaxSkillValue + _Skills._Skills[ i ].Modifier;
-//		_PropertyDatabase.setProp( _DataIndexReminder->CHARACTER_INFO.SKILLS.Skill[i], _Skills._Skills[ i ].Current );
-		CBankAccessor_PLR::getCHARACTER_INFO().getSKILLS().getArray(i).setSKILL(_PropertyDatabase, checkedCast<uint16>(_Skills._Skills[ i ].Current) );
-//		_PropertyDatabase.setProp( _DataIndexReminder->CHARACTER_INFO.SKILLS.BaseSkill[i], _Skills._Skills[ i ].Base );
+		_Skills._Skills[ i ].MaxLvlReached = _Skills._Skills[ i ].Current;
+
 		CBankAccessor_PLR::getCHARACTER_INFO().getSKILLS().getArray(i).setBaseSKILL(_PropertyDatabase, checkedCast<uint16>(_Skills._Skills[ i ].Base) );
+		CBankAccessor_PLR::getCHARACTER_INFO().getSKILLS().getArray(i).setSKILL(_PropertyDatabase, checkedCast<uint16>(_Skills._Skills[ i ].Current) );
+
+		// update all parent skill with new max children
+		SKILLS::ESkills skillUpdated = (SKILLS::ESkills)i;
+		while( SkillsTree->SkillsTree[ skillUpdated ].ParentSkill != SKILLS::unknown )
+		{
+			if( _Skills._Skills[ i ].Base > _Skills._Skills[ SkillsTree->SkillsTree[ skillUpdated ].ParentSkill ].MaxLvlReached )
+			{
+				_Skills._Skills[ SkillsTree->SkillsTree[ skillUpdated ].ParentSkill ].MaxLvlReached = _Skills._Skills[ i ].Base;
+				_Skills._Skills[ SkillsTree->SkillsTree[ skillUpdated ].ParentSkill ].Base = min( _Skills._Skills[ skillUpdated ].Base, (sint32)SkillsTree->SkillsTree[ SkillsTree->SkillsTree[ skillUpdated ].ParentSkill ].MaxSkillValue );
+				skillUpdated = SkillsTree->SkillsTree[ skillUpdated ].ParentSkill;
+			}
+			else
+			{
+				break;
+			}
+		}
+
 	}
 }
-
 
 //-----------------------------------------------
 // CCharacter::sendDynamicSystemMessage
