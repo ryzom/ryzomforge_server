@@ -7065,7 +7065,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 			SM_STATIC_PARAMS_3(paramsP, STRING_MANAGER::skill, STRING_MANAGER::integer, STRING_MANAGER::integer);
 			paramsP[0].Enum = skillEnum;
 			paramsP[1].Int = max((sint32)1, sint32(100*XpGain) );
-			paramsP[2].Int = max((sint32)1, sint32(100*(XpGain - (xpBonus+ringXpBonus))) );
+			paramsP[2].Int = max((sint32)1, sint32(100*(XpGain - xpBonus - ringXpBonus)));
 			PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "XP_CATALYSER_PROGRESS_NORMAL_GAIN", paramsP);
 
 			if( xpBonus > 0 )
@@ -9792,7 +9792,7 @@ bool CCharacter::queryItemPrice( const CGameItemPtr item, uint32& price )
 	quality = theItem->quality();
 	if ( theItem->maxDurability() )
 		wornFactor = float(theItem->durability()) / float(theItem->maxDurability());
-	price = (uint32) ( CShopTypeManager::computeBasePrice( theItem, quality ) * wornFactor );
+	price = (uint32) ( CShopTypeManager::computeBasePrice( theItem, quality ) * wornFactor * 0.02 );
 	return true;
 }
 
@@ -10218,6 +10218,36 @@ void CCharacter::initPvpPointDb()
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(0).setVALUE(_PropertyDatabase, _PvpPoint );
 }
 
+//-----------------------------------------------------------------------------
+void CCharacter::setLangChannel(const string &lang) {
+	_LangChannel = lang;
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::setNewTitle(const string &title) {
+	_NewTitle = title;
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::setTagPvPA(const string &tag) {
+	_TagPvPA = tag;
+}
+
+
+//-----------------------------------------------------------------------------
+void CCharacter::setTagPvPB(const string &tag) {
+	_TagPvPB = tag;
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::setTagA(const string &tag) {
+	_TagA = tag;
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::setTagB(const string &tag) {
+	_TagB = tag;
+}
 
 //-----------------------------------------------------------------------------
 void CCharacter::setOrganization(uint32 org)
@@ -12857,7 +12887,8 @@ void CCharacter::registerName(const ucstring &newName)
 	CMessage msgName("CHARACTER_NAME_LANG");
 	msgName.serial(_EntityRowId);
 
-	string sTitle = CHARACTER_TITLE::toString(_Title);
+	//string sTitle = CHARACTER_TITLE::toString(_Title);
+	string sTitle = getFullTitle();
 	ucstring RegisteredName;
 	if (newName.empty())
 		RegisteredName = getName() + string("$") + sTitle + string("$");
@@ -16108,6 +16139,7 @@ void CCharacter::applyGooDamage( float gooDistance )
 				{
 					_LastTickSufferGooDamage = CTickEventHandler::getGameCycle();
 
+					
 					// Apply damage corresponding to distance from goo if not dead
 					if( _PhysScores._PhysicalScores[ SCORES::hit_points ].Current > 0 )
 					{
@@ -16115,15 +16147,31 @@ void CCharacter::applyGooDamage( float gooDistance )
 						if (hpLost < 1) hpLost = 1;
 						if( hpLost > _PhysScores._PhysicalScores[ SCORES::hit_points ].Current )
 						{
-							_PhysScores._PhysicalScores[ SCORES::hit_points ].Current = 0;
-							// send message to player for inform is dead by goo
-							sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_GOO");
+							_PhysScores._PhysicalScores[ SCORES::hit_points ].Current = 0;	
+							
+							// send message to player for inform is dead by goo or other
+							if (_CurrentContinent == CONTINENT::FYROS)
+								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_FIRE");
+							else if (_CurrentContinent == CONTINENT::TRYKER)
+								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_STEAM");
+							else if (_CurrentContinent == CONTINENT::MATIS)
+								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_POISON");
+							else
+								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_GOO");
+							
 						}
 						else
 						{
 							_PhysScores._PhysicalScores[ SCORES::hit_points ].Current = _PhysScores._PhysicalScores[ SCORES::hit_points ].Current - hpLost;
 							// send message to player for inform is suffer goo damage
-							sendDynamicSystemMessage(_EntityRowId, "SUFFER_GOO_DAMAGE");
+							if (_CurrentContinent == CONTINENT::FYROS)
+								sendDynamicSystemMessage(_EntityRowId, "SUFFER_FIRE_DAMAGE");
+							else if (_CurrentContinent == CONTINENT::TRYKER)
+								sendDynamicSystemMessage(_EntityRowId, "SUFFER_STEAM_DAMAGE");
+							else if (_CurrentContinent == CONTINENT::MATIS)
+								sendDynamicSystemMessage(_EntityRowId, "SUFFER_POISON_DAMAGE");
+							else
+								sendDynamicSystemMessage(_EntityRowId, "SUFFER_GOO_DAMAGE");
 						}
 					}
 				}

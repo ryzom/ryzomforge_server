@@ -414,6 +414,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PVP_CLAN::TPVPClan k=PVP_CLAN::fromString(key); if ((k>=PVP_CLAN::BeginClans) && (k<=PVP_CLAN::EndClans)) _FactionPoint[k-PVP_CLAN::BeginClans]=val)\
 \
 	PROP(uint32,_PvpPoint)\
+	PROP2(_LangChannel,string,_LangChannel,_LangChannel=val)\
 	PROP(uint32,_Organization)\
 	PROP(uint32,_OrganizationStatus)\
 	PROP(uint32,_OrganizationPoints)\
@@ -437,6 +438,11 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP_GAME_CYCLE_COMP(_ForbidAuraUseStartDate)\
 	PROP_GAME_CYCLE_COMP(_ForbidAuraUseEndDate)\
 	PROP2(_Title, string, CHARACTER_TITLE::toString(getTitle()), setTitle(CHARACTER_TITLE::toCharacterTitle(val)))\
+	PROP2(_NewTitle, string, _NewTitle, _NewTitle=val)\
+	PROP2(_TagPvPA, string, _TagPvPA, _TagPvPA=val)\
+	PROP2(_TagPvPB, string, _TagPvPB, _TagPvPB=val)\
+	PROP2(_TagA, string, _TagA, _TagA=val)\
+	PROP2(_TagB, string, _TagB, _TagB=val)\
 \
 	/* Visual Properties */\
 	PROP2(HairType,				uint8, _VisualPropertyA().PropertySubData.HatModel,			SET_STRUCT_MEMBER(_VisualPropertyA,PropertySubData.HatModel,val))\

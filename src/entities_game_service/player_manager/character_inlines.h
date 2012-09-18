@@ -895,6 +895,64 @@ inline uint32 CCharacter::getPlayedTime() const
 }
 
 //------------------------------------------------------------------------------
+inline const std::string& CCharacter::getLangChannel() const
+
+{
+	return _LangChannel; 
+}
+
+//------------------------------------------------------------------------------
+inline const std::string& CCharacter::getNewTitle() const
+
+{
+	return _NewTitle;
+}
+
+//------------------------------------------------------------------------------
+inline std::string CCharacter::getTagA() const
+
+{
+	if (_TagA.empty())
+		return "_";
+	return _TagA;
+}
+
+//------------------------------------------------------------------------------
+inline std::string CCharacter::getTagB() const
+
+{
+	if (_TagB.empty())
+		return "_";
+	return _TagB;
+}
+
+
+//------------------------------------------------------------------------------
+inline std::string CCharacter::getTagPvPA() const
+
+{
+	if (_TagPvPA.empty())
+		return "_";
+	return _TagPvPA;
+}
+
+//------------------------------------------------------------------------------
+inline std::string CCharacter::getTagPvPB() const
+
+{
+	if (_TagPvPB.empty())
+		return "_";
+	return _TagPvPB;
+}
+
+
+//------------------------------------------------------------------------------
+inline std::string CCharacter::getFullTitle() const
+{		
+	return _NewTitle+"#"+getTagPvPA()+"#"+getTagPvPB()+"#"+getTagA()+"#"+getTagB();
+}
+
+//------------------------------------------------------------------------------
 
 inline uint32 CCharacter::getOrganization() const
 {

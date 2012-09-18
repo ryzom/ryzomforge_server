@@ -249,6 +249,14 @@ bool CFaberPhrase::validate()
 		return false;
 	}
 
+
+	// check quality of right hand item (need be >= Recommended (level of item))
+	if (rightHandItem->recommended()+49 < _Recommended)
+	{
+		PHRASE_UTILITIES::sendDynamicSystemMessage(_ActorRowId, "CRAFT_NEED_RECOMMENDED_CRAFTING_TOOL");
+		return false;
+	}
+
 	// entities cant craft if in combat
 	/* commented as test of right hand item is now made... 
 	TDataSetRow entityRowId = CPhraseManager::getInstance().getEntityEngagedMeleeBy( _ActorRowId );
@@ -697,7 +705,7 @@ void CFaberPhrase::stop()
 } // stop //
 
 
-NLMISC_COMMAND(simuCraft, "Simulation de craft pour verifier les probabilitÈs de reusir un item","<Nb simulations><level skill><item quality>")
+NLMISC_COMMAND(simuCraft, "Simulation de craft pour verifier les probabilit√©s de reusir un item","<Nb simulations><level skill><item quality>")
 {
 	if (args.size() != 3)
 		return false;

@@ -2399,6 +2399,27 @@ public:
 	uint32 getLastConnectedTime() const;
 	uint32 getLastConnectedDate() const;
 	uint32 getPlayedTime() const;
+
+	const std::string& getLangChannel() const;
+	void setLangChannel(const std::string &lang);
+	
+	const std::string& getNewTitle() const;
+	void setNewTitle(const std::string &title);
+
+	std::string getFullTitle() const;
+
+	std::string getTagA() const;
+	void setTagA(const std::string &tag);
+
+	std::string getTagB() const;
+	void setTagB(const std::string &tag);
+
+	std::string getTagPvPA() const;
+	void setTagPvPA(const std::string &tag);
+
+	std::string getTagPvPB() const;
+	void setTagPvPB(const std::string &tag);
+
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
 	const std::list<TCharacterLogTime>& getLastLogStats() const;
@@ -3038,6 +3059,14 @@ private:
 	uint32								_Organization;
 	uint32								_OrganizationStatus;
 	uint32								_OrganizationPoints;
+
+	std::string							_LangChannel;
+
+	std::string							_NewTitle;
+	std::string							_TagPvPA;
+	std::string							_TagPvPB;
+	std::string							_TagA;
+	std::string							_TagB;
 
 	/// SDB path where player wins HoF points in PvP (if not empty)
 	std::string							_SDBPvPPath;
