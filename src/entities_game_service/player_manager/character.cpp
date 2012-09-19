@@ -676,6 +676,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 
 	_FriendVisibility = VisibleToAll;
 
+	_LangChannel = "en";
+	
 	initDatabase();
 } // CCharacter  //
 
@@ -6947,10 +6949,10 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 				CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(ringCatalyserCount) );
 			}
 		}
-	}
-	
-	if (!p->isTrialPlayer()) {
-		xpBonus = XpGain;
+
+		if (!p->isTrialPlayer()) {
+			xpBonus = XpGain;
+		}
 	}
 	
 	XpGain += xpBonus + ringXpBonus;

@@ -237,6 +237,12 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 		{
 			result.push_back((*it).second);
 		}
+	} else {
+		TMAPExtraFactionChannel::iterator it = _ExtraFactionChannel.find("en");
+		if (it != _ExtraFactionChannel.end())
+		{
+			result.push_back((*it).second);
+		}		
 	}
 
 	/*
