@@ -677,6 +677,7 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_FriendVisibility = VisibleToAll;
 
 	_LangChannel = "en";
+	_NewTitle = "Refugee";
 	
 	initDatabase();
 } // CCharacter  //
@@ -702,6 +703,7 @@ void CCharacter::clear()
 	_ForbidAuraUseStartDate=0;
 	_ForbidAuraUseEndDate=0;
 	_Title= CHARACTER_TITLE::Refugee;
+	_NewTitle = "Refugee";
 
 	SET_STRUCT_MEMBER(_VisualPropertyA,PropertySubData.HatModel,0);
 	SET_STRUCT_MEMBER(_VisualPropertyA,PropertySubData.HatColor,0);
@@ -3837,9 +3839,15 @@ void CCharacter::sendBetaTesterStatus()
 
 	sendReservedTitleStatus( CHARACTER_TITLE::FBT, p->isBetaTester() );
 
-	if (!p->isBetaTester() && _Title == CHARACTER_TITLE::FBT)
+	/*if (!p->isBetaTester() && _Title == CHARACTER_TITLE::FBT)
 	{
 		_Title = CHARACTER_TITLE::Refugee;
+		registerName();
+	}*/
+	
+	if (!p->isBetaTester() && _NewTitle == "FBT")
+	{
+		_NewTitle = "Refugee";
 		registerName();
 	}
 }
@@ -3855,9 +3863,15 @@ void CCharacter::sendWindermeerStatus()
 
 	sendReservedTitleStatus( CHARACTER_TITLE::WIND, p->isWindermeerCommunity() );
 
-	if ( !p->isWindermeerCommunity() && _Title == CHARACTER_TITLE::WIND)
+	/*if ( !p->isWindermeerCommunity() && _Title == CHARACTER_TITLE::WIND)
 	{
 		_Title = CHARACTER_TITLE::Refugee;
+		registerName();
+	}*/
+	
+	if ( !p->isWindermeerCommunity() && _NewTitle == "WIND")
+	{
+		_NewTitle = "Refugee";
 		registerName();
 	}
 }
@@ -6949,7 +6963,6 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 				CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(ringCatalyserCount) );
 			}
 		}
-
 		if (!p->isTrialPlayer()) {
 			xpBonus = XpGain;
 		}
@@ -7958,6 +7971,7 @@ void CCharacter::setStartStatistics( const CCreateCharMsg& createCharMsg )
 	_Race				= (EGSPD::CPeople::TPeople) createCharMsg.People;
 	_Gender				= createCharMsg.Sex;
 	_Title				= CHARACTER_TITLE::Refugee;
+	_NewTitle			= "Refugee";
 
 	// fame information
 	// Players start out as Neutral in their declared clans
@@ -19061,7 +19075,8 @@ void CCharacter::setStartupInstance(uint32 instanceId)
 
 void CCharacter::setTitle( CHARACTER_TITLE::ECharacterTitle title )
 {
-	_Title = title;
+	//_Title = title;
+	setNewTitle(CHARACTER_TITLE::toString(title));
 }
 
 
