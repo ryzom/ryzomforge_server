@@ -512,8 +512,9 @@ static CMessage getFileClassImp( CMessage& msgin)
 			{
 				string	file = CPath::standardizePath(inMsg.Directory)+fclass.Patterns[k]; // relative filename
 				string	rfile = getBackupFileName(file); // full filename
-				if (CFile::isExists(rfile))
+				if (CFile::isExists(rfile)) {
 					classes[j].push_back(CClassResult(file, CFile::getFileModificationDate(rfile)));
+				}
 			}
 		}
 	}
@@ -526,7 +527,10 @@ static CMessage getFileClassImp( CMessage& msgin)
 
 		for (uint j=0; j<classes[i].size(); ++j)
 		{
-			std::string	rfile = getBackupFileName(classes[i][j].File);
+			std::string	rfile = classes[i][j].File;
+			// if there s wildcard, the file is already full so we don't need to add again the backup path or we ll have "save_shard/save_shard/..." that is not valid
+			if (!CFile::isExists(rfile))
+				rfile = getBackupFileName(classes[i][j].File);
 			fdc.addFile(classes[i][j].File, CFile::getFileModificationDate(rfile),CFile::getFileSize(rfile));
 		}
 	}
