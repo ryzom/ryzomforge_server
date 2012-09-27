@@ -948,8 +948,11 @@ inline std::string CCharacter::getTagPvPB() const
 
 //------------------------------------------------------------------------------
 inline std::string CCharacter::getFullTitle() const
-{		
-	return _NewTitle+"#"+getTagPvPA()+"#"+getTagPvPB()+"#"+getTagA()+"#"+getTagB();
+{
+	if (!_TagA.empty() || !_TagB.empty() || !_TagPvPA.empty() || !_TagPvPB.empty())
+		return _NewTitle+"#"+getTagPvPA()+"#"+getTagPvPB()+"#"+getTagA()+"#"+getTagB();
+	else
+		return _NewTitle;
 }
 
 //------------------------------------------------------------------------------
