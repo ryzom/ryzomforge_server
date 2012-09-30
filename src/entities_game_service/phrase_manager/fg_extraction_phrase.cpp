@@ -543,14 +543,14 @@ bool CFgExtractionPhrase::validate()
 		//_StopEndsForageSession = true; // this was the only case to allow player to take RM and get XP!
 		return false; // has disappeared
 	}
-
+/*
 	// test if tool have enougtht quality
 	sint depositQ = (sint)harvestSource->forageSite()->deposit()->maxQuality();
 	if ((depositQ > 0) && (item->recommended()+49  < depositQ)) {
 		PHRASE_UTILITIES::sendDynamicSystemMessage(_ActorRowId, "FORAGE_TOOL_QUALITY_TOO_LOW");
 		return false;
 	}
-
+*/
 	// Check the distance from the player to the source (ignoring Z because for tunnel case, player couldn't target the source)
 	const CEntityState& state = player->getState();
 	CVector2f playerPos( (float)state.X / 1000.0f, (float)state.Y / 1000.0f );
