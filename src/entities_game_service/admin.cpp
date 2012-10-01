@@ -1367,6 +1367,7 @@ NLMISC_COMMAND (createItemInBag, "Create an item and put it in the player bag", 
 	if( sheetName.find("banner") != -1 )
 	{
 		CPlayer * player = PlayerManager.getPlayer( PlayerManager.getPlayerId(eid) );
+//		if (player != NULL && !player->havePriv(":DEV:") )
 		if (player != NULL && player->havePriv(BannerPriv) )
 		{
 			if( sheetName.find("_gu") != -1 && !player->havePriv(":G:") )	return false;
@@ -1374,10 +1375,6 @@ NLMISC_COMMAND (createItemInBag, "Create an item and put it in the player bag", 
 			if( sheetName.find("_vgu") != -1 && !player->havePriv(":VG:") )	return false;
 			if( sheetName.find("_gm") != -1 && !player->havePriv(":GM:") )	return false;
 			if( sheetName.find("_sgm") != -1 && !player->havePriv(":SGM:") )	return false;
-		}
-		else
-		{
-			return false;
 		}
 	}
 
@@ -1466,10 +1463,6 @@ NLMISC_COMMAND (createItemInTmpInv, "Create an item and put it in the player tem
 			if( sheetName.find("_gm") != -1 && !player->havePriv(":GM:") )	return false;
 			if( sheetName.find("_sgm") != -1 && !player->havePriv(":SGM:") )	return false;
 		}
-		else
-		{
-			return false;
-		}
 	}
 
 	const CStaticItem *form = CSheets::getForm (sheet);
@@ -1539,10 +1532,6 @@ NLMISC_COMMAND (createItemInInv, "Create items and put them in the given invento
 			if( sheetName.find("_vgu") != -1 && !player->havePriv(":VG:") )	return false;
 			if( sheetName.find("_gm") != -1 && !player->havePriv(":GM:") )	return false;
 			if( sheetName.find("_sgm") != -1 && !player->havePriv(":SGM:") )	return false;
-		}
-		else
-		{
-			return false;
 		}
 	}
 
