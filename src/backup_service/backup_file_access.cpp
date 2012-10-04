@@ -220,7 +220,7 @@ IFileAccess::TReturnCode	CLoadFile::execute(CFileAccessManager& manager)
 			fileRead = true;
 			f.close();
 		}
-		catch(NLMISC::Exception &)
+		catch(const NLMISC::Exception &)
 		{
 		}
 	}
@@ -383,13 +383,13 @@ IFileAccess::TReturnCode	CWriteFile::execute(CFileAccessManager& manager)
 
 	try
 	{
-		f.serialBuffer(&(Data[0]), Data.size());
+		f.serialBuffer(&(Data[0]), (uint)Data.size());
 		fileSaved = true;
 
 		if (VerboseLog)
 			nlinfo("%s %u octets to file '%s'", Append ? "Append" : "Save", Data.size(), Filename.c_str());
 	}
-	catch(NLMISC::Exception &)
+	catch(const NLMISC::Exception &)
 	{
 	}
 

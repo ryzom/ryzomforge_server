@@ -19,6 +19,11 @@
 #include <nel/misc/log.h>
 #include <nel/misc/variable.h>
 
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
+
 using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
@@ -242,12 +247,12 @@ bool	CLogAnalyserService::getQueryResult(uint32 queryId, std::string& result, si
 
 			if (filter.empty())
 			{
-				numpage = (_Finished[i]->Result.size()+linePerPage-1) / linePerPage;
+				numpage = ((uint)_Finished[i]->Result.size()+linePerPage-1) / linePerPage;
 				if (page >= (sint)numpage)
 					page = numpage-1;
 
 				uint	lmin = page*linePerPage;
-				uint	lmax = std::min((uint)(lmin+linePerPage), _Finished[i]->Result.size());
+				uint	lmax = std::min((uint)(lmin+linePerPage), (uint)_Finished[i]->Result.size());
 				uint	l;
 
 				result.clear();
@@ -324,12 +329,12 @@ bool	CLogAnalyserService::getQueryResult(uint32 queryId, std::string& result, si
 				}
 
 				// refresh numpage
-				numpage = (matchingLines.size()+linePerPage-1) / linePerPage;
+				numpage = ((uint)matchingLines.size()+linePerPage-1) / linePerPage;
 				if (page >= (sint)numpage)
 					page = numpage-1;
 
 				uint	lmin = page*linePerPage;
-				uint	lmax = std::min((uint)(lmin+linePerPage), matchingLines.size());
+				uint	lmax = std::min((uint)(lmin+linePerPage), (uint)matchingLines.size());
 
 				result.clear();
 
@@ -369,7 +374,7 @@ void	CLogAnalyserService::getQueryList(std::vector<CQuery*>& queries)
 {
 	_Mutex.enter();
 	sint	i;
-	for (i=_Requests.size()-1; i>=0; --i)
+	for (i=(sint)_Requests.size()-1; i>=0; --i)
 	{
 		CQuery*	q = _Requests[i];
 		q->State = QueryAwaiting;
@@ -382,7 +387,7 @@ void	CLogAnalyserService::getQueryList(std::vector<CQuery*>& queries)
 		queries.push_back(_Current);
 	}
 
-	for (i=_Finished.size()-1; i>=0; --i)
+	for (i=(sint)_Finished.size()-1; i>=0; --i)
 	{
 		CQuery*	q = _Finished[i];
 		q->State = QueryTreated;
@@ -450,7 +455,7 @@ void	cbResult(CMemStream &msgin, TSockId host)
 
 	//nlinfo("received query '%s'", idStr.c_str());
 
-	uint		pos = idStr.find("%!");
+	string::size_type		pos = idStr.find("%!");
 	if (pos != std::string::npos)
 	{
 		// parse input
@@ -478,8 +483,8 @@ void	cbResult(CMemStream &msgin, TSockId host)
 
 			//nlinfo("param=%s value=%s", param.c_str(), value.c_str());
 
-			if (param == "id")				queryId = atoi(value.c_str());
-			else if (param == "page")		page = atoi(value.c_str());
+			if (param == "id")				NLMISC::fromString(value, queryId);
+			else if (param == "page")		NLMISC::fromString(value, page);
 			else if (param == "filter")		filter = value;
 			else if (param == "fmode")		filter_exclusive = (value == "exclusive");
 		}
@@ -492,8 +497,12 @@ void	cbResult(CMemStream &msgin, TSockId host)
 
 		if (res.size() >= 1)
 		{
-			page = (res.size() >= 2 ? atoi(res[1].c_str()) : 0);
-			queryId = atoi(res[0].c_str());
+			if (res.size() >= 2)
+				NLMISC::fromString(res[1], page);
+			else
+				page = 0;
+
+			NLMISC::fromString(res[0], queryId);
 		}
 	}
 
@@ -543,7 +552,8 @@ void	cbCancelQuery(CMemStream &msgin, TSockId host)
 	std::string	idStr;
 	msgin.serial(idStr);
 
-	uint32	queryId = atoi(idStr.c_str());
+	uint32	queryId;
+	NLMISC::fromString(idStr, queryId);
 
 	CLogAnalyserService::getInstance()->cancelQuery(queryId);
 
@@ -602,7 +612,7 @@ void	CLogAnalyserService::updateWebConnection()
 					reason = "unknown command "+toString(messageType);
 				}
 			}
-			catch (Exception &e)
+			catch (const Exception &e)
 			{
 				nlwarning ("Error during receiving: '%s'", e.what ());
 				reason = e.what();
@@ -624,7 +634,7 @@ void	CLogAnalyserService::updateWebConnection()
 			}
 		}
 	}
-	catch (Exception &e)
+	catch (const Exception &e)
 	{
 		nlwarning ("Error during update: '%s'", e.what ());
 	}

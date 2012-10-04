@@ -29,6 +29,11 @@
 #include "backup_service.h"
 #include "web_connection.h"
 
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
+
 // force admin module to link in
 extern void admin_modules_forceLink();
 void foo()
@@ -379,7 +384,7 @@ static void	cbSaveCheckFile( CMessage& msgin, const std::string &serviceName, NL
 	{
 		NLMISC::CFile::copyFile( ( msg.FileName + string(".backup") ).c_str(), msg.FileName.c_str() );
 	}
-	catch( Exception &e )
+	catch(const Exception &e)
 	{
 		nlwarning("Can't write file '%s' size %u : '%s', shard stalled until problem are resolved !!!", ( msg.FileName + string(".backup") ).c_str(), msg.Data.length(), e.what() );
 		// stall shard
@@ -406,7 +411,7 @@ static void	cbSaveCheckFile( CMessage& msgin, const std::string &serviceName, NL
 
 		DirStats.writeFile(msg.FileName, msg.Data.length());
 	}
-	catch( Exception &e )
+	catch(const Exception &e)
 	{
 		nlwarning("Can't write file '%s' size %u : '%s', shard stalled until problem are resolved !!!", msg.FileName.c_str(), msg.Data.length(), e.what());
 		// stall shard
@@ -475,6 +480,7 @@ static CMessage getFileClassImp( CMessage& msgin)
 
 		std::vector<std::string>	files;
 		NLMISC::CPath::getPathContent(getBackupFileName(inMsg.Directory), false, false, true, files); // caution: it returns full path names
+
 		for (uint i=0; i<files.size(); ++i)
 		{
 			uint32		fstamp = CFile::getFileModificationDate(files[i]);
@@ -512,9 +518,8 @@ static CMessage getFileClassImp( CMessage& msgin)
 			{
 				string	file = CPath::standardizePath(inMsg.Directory)+fclass.Patterns[k]; // relative filename
 				string	rfile = getBackupFileName(file); // full filename
-				if (CFile::isExists(rfile)) {
+				if (CFile::isExists(rfile))
 					classes[j].push_back(CClassResult(file, CFile::getFileModificationDate(rfile)));
-				}
 			}
 		}
 	}
@@ -581,7 +586,7 @@ static void cbAppend( CMessage& msgin, const std::string &serviceName, NLNET::TS
 
 		std::string	append = inMsg.Append+'\n';
 		uint8*		data = (uint8*)(const_cast<char*>(append.c_str()));
-		uint		dataSize = append.size();
+		uint		dataSize = (uint)append.size();
 
 		CWriteFile*	access = new CWriteFile(inMsg.FileName, serviceId, 0, data, dataSize);
 
@@ -835,7 +840,7 @@ void	CDirectoryRateStat::display(NLMISC::CLog& log)
 	TDirectoryMap::iterator	first = _DirectoryMap.begin(), last = _DirectoryMap.end();
 	for (; first != last; ++first)
 		if ((*first).first.size() > pathsize)
-			pathsize = (*first).first.size();
+			pathsize = (uint)(*first).first.size();
 
 	NLMISC::TTime	limit = NLMISC::CTime::getLocalTime()-60*1000;
 

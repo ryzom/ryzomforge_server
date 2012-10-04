@@ -200,9 +200,9 @@ void CHoFGenerator::setNextStep()
 			static const string phpHeader = "<?php\n";
 			static const string phpFooter = "?>\n";
 			
-			ofile.serialBuffer((uint8*)(&phpHeader[0]), phpHeader.size());
-			ofile.serialBuffer((uint8*)(&_GeneratedScript[0]), _GeneratedScript.size());
-			ofile.serialBuffer((uint8*)(&phpFooter[0]), phpFooter.size());
+			ofile.serialBuffer((uint8*)(&phpHeader[0]), (uint)phpHeader.size());
+			ofile.serialBuffer((uint8*)(&_GeneratedScript[0]), (uint)_GeneratedScript.size());
+			ofile.serialBuffer((uint8*)(&phpFooter[0]), (uint)phpFooter.size());
 
 			if (HoFVerbose.get())
 			{
@@ -291,7 +291,7 @@ bool CHoFGenerator::parseHDTFile(const std::string & fileName, CParsedData & par
 		H_AUTO(CHoFGenerator_parseHDTFile_1);
 		cfgFile.load(fileName);
 	}
-	catch (Exception & e)
+	catch (const Exception & e)
 	{
 		nlwarning("cannot load file '%s' : %s", fileName.c_str(), e.what());
 		return false;
@@ -405,7 +405,7 @@ bool CHoFGenerator::parseHDTFile(const std::string & fileName, CParsedData & par
 			if (sMaxRows == "*")
 				tableVar.MaxRows = 0xffffFFFF;
 			else
-				tableVar.MaxRows = uint32(atoi(sMaxRows.c_str()));
+				NLMISC::fromString(sMaxRows, tableVar.MaxRows);
 
 			parsedData.TableVars.push_back(tableVar);
 			i += nbParams;
@@ -449,7 +449,7 @@ bool CHoFGenerator::parseHDTFile(const std::string & fileName, CParsedData & par
 			if (sMaxRows == "*")
 				wTableVar.MaxRows = 0xffffFFFF;
 			else
-				wTableVar.MaxRows = uint32(atoi(sMaxRows.c_str()));
+				NLMISC::fromString(sMaxRows, wTableVar.MaxRows);
 
 			string sOp = cfgVar->asString(i+4);
 			wTableVar.Op = toWildcardOp(sOp);
@@ -706,7 +706,7 @@ void CHoFGenerator::generatePHPArray(const std::string & varName, const CTable &
 	phpArray.clear();
 	phpArray += toString("$%s = array(", varName.c_str());
 
-	uint32 nbRows = tableRows->size();
+	uint32 nbRows = (uint32)tableRows->size();
 	if (maxRows < nbRows)
 		nbRows = maxRows;
 

@@ -35,6 +35,11 @@
 #include "log_query.h"
 #include "log_storage.h"
 
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
+
 using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
@@ -502,10 +507,10 @@ public:
 			// counter is used to track the state of the current result writing
 			// between module update.
 
-			// the query thread has posted a result, send it the the BS
+			// the query thread has posted a result, send it to the BS
 			const TThreadResult &threadResult = _QueryResult.peek();
 
-			uint32 nbLog = threadResult.Lines->size();
+			uint32 nbLog = (uint32)threadResult.Lines->size();
 
 			if( _WriteLineCounter != nbLog)
 			{
@@ -529,7 +534,7 @@ public:
 						continue;
 					}
 
-					saveFile.DataMsg.serialBuffer((uint8*)&(*first->begin()), first->size());
+					saveFile.DataMsg.serialBuffer((uint8*)&(*first->begin()), (uint)first->size());
 					saveFile.DataMsg.serialBuffer((uint8*)newLine, 1);
 
 					++_WriteLineCounter;
@@ -776,9 +781,9 @@ public:
 
 		if (pr.QueryTree.get() != NULL)
 		{
-			totalLogParsed += ls._DiskLogEntries.size();
+			totalLogParsed += (uint32)ls._DiskLogEntries.size();
 			TLogEntries logs = pr.QueryTree->evalNode(ls);
-			totalLogSelected += logs.size();
+			totalLogSelected += (uint32)logs.size();
 
 			// add the context log to the selection
 			vector<uint32> contextLogs;
@@ -843,7 +848,7 @@ public:
 			// insert the selected context
 			logs.insert(contextLogs.begin(), contextLogs.end());
 
-			totalLogOutput += logs.size();
+			totalLogOutput += (uint32)logs.size();
 
 			// output the final log selection
 			first = logs.begin();
@@ -1021,7 +1026,7 @@ public:
 					// let the CRunt time compute the daylight saving offset
 					fileDate.tm_isdst  = -1;
 
-					uint32 date = mktime(&fileDate);
+					uint32 date = (uint32)mktime(&fileDate);
 
 					// check that the date is within a selected time slice
 					for (uint j=0; j<timeLine.size(); ++j)
@@ -1056,7 +1061,7 @@ public:
 				}
 			}
 
-			totalFileSelected = selectedFile.size();
+			totalFileSelected = (uint32)selectedFile.size();
 			// now, do the real job, query inside each selected file in ascending date order
 			map<uint32, uint32>::iterator first(selectedFile.begin()), last(selectedFile.end());
 			for (uint counter=0; first != last; ++first, ++counter)
@@ -1145,9 +1150,9 @@ public:
 			_QueryStatus.write(TThreadStatus(qs_lql_state, toString("Finished query %u", queryNumber)));
 
 		}
-		catch (CQueryParser::EInvalidQuery iq)
+		catch (const CQueryParser::EInvalidQuery &iq)
 		{
-			uint index= iq.It - query.begin();
+			uint index= (uint)(iq.It - query.begin());
 			_QueryStatus.write(TThreadStatus(qs_log, toString("Error will parsing query near char %u : %s", index+1, iq.ErrorStr)));
 			_QueryStatus.write(TThreadStatus(qs_log, query));
 			CSString err;
@@ -1196,8 +1201,9 @@ endQuery:
 			return true;
 		}
 		
-		uint32 nbLogs = atoi(args[0].c_str());
-		uint32 nbFiles = atoi(args[1].c_str());
+		uint32 nbLogs, nbFiles;
+		NLMISC::fromString(args[0], nbLogs);
+		NLMISC::fromString(args[1], nbFiles);
 
 		if (nbLogs == 0 || nbFiles == 0)
 		{
@@ -1225,7 +1231,7 @@ endQuery:
 		vector<CSheetId> sheetIds;
 		for (uint i=0; i<3000; ++i)
 		{
-			sheetIds.push_back(allSheets[randu32(rand, allSheets.size())]);
+			sheetIds.push_back(allSheets[randu32(rand, (uint32)allSheets.size())]);
 		}
 
 
@@ -1255,7 +1261,7 @@ endQuery:
 				else
 				{
 					// select a random log type
-					uint32 logType = randu32(rand, _LogDefs.size());
+					uint32 logType = randu32(rand, (uint32)_LogDefs.size());
 
 					LGS::TLogDefinition &ld = _LogDefs[logType];
 
@@ -1307,13 +1313,13 @@ endQuery:
 								}
 								break;
 							case LGS::TSupportedParamType::spt_entityId:
-								le.LogInfo.getParams().push_back(TParamValue(entityIds[randu32(rand, entityIds.size())]));
+								le.LogInfo.getParams().push_back(TParamValue(entityIds[randu32(rand, (uint32)entityIds.size())]));
 								break;
 							case LGS::TSupportedParamType::spt_sheetId:
-								le.LogInfo.getParams().push_back(TParamValue(sheetIds[randu32(rand, sheetIds.size())]));
+								le.LogInfo.getParams().push_back(TParamValue(sheetIds[randu32(rand, (uint32)sheetIds.size())]));
 								break;
 							case LGS::TSupportedParamType::spt_itemId:
-								le.LogInfo.getParams().push_back(TParamValue(itemIds[randu32(rand, itemIds.size())]));
+								le.LogInfo.getParams().push_back(TParamValue(itemIds[randu32(rand, (uint32)itemIds.size())]));
 								break;
 							}
 						}
@@ -1351,13 +1357,13 @@ endQuery:
 									}
 									break;
 								case LGS::TSupportedParamType::spt_entityId:
-									lpv.getParams().push_back(TParamValue(entityIds[randu32(rand, entityIds.size())]));
+									lpv.getParams().push_back(TParamValue(entityIds[randu32(rand, (uint32)entityIds.size())]));
 									break;
 								case LGS::TSupportedParamType::spt_sheetId:
-									lpv.getParams().push_back(TParamValue(sheetIds[randu32(rand, sheetIds.size())]));
+									lpv.getParams().push_back(TParamValue(sheetIds[randu32(rand, (uint32)sheetIds.size())]));
 									break;
 								case LGS::TSupportedParamType::spt_itemId:
-									lpv.getParams().push_back(TParamValue(itemIds[randu32(rand, itemIds.size())]));
+									lpv.getParams().push_back(TParamValue(itemIds[randu32(rand, (uint32)itemIds.size())]));
 									break;
 								}
 							}
@@ -1558,7 +1564,7 @@ endQuery:
 		uint32 now = CTime::getSecondsSince1970();
 		uint32 nbSec = 10;
 		if (args.size() > 0)
-			nbSec = atoi(args[0].c_str());
+			NLMISC::fromString(args[0], nbSec);
 
 		std::string tabs;
 

@@ -81,7 +81,7 @@ public:
 		TRowData			data()					{ return (*_MapIt).second + (_Mapped ? sizeof(CMappedHeader) : sizeof(CHeader)); }
 
 		/// Get row data
-		const TRowData		data() const			{ return (*_MapIt).second + (_Mapped ? sizeof(CMappedHeader) : sizeof(CHeader)); }
+		TRowData			data() const			{ return (*_MapIt).second + (_Mapped ? sizeof(CMappedHeader) : sizeof(CHeader)); }
 
 		/// Default Constructor, should never be used
 		explicit CAccessor()						{ }
@@ -104,7 +104,7 @@ public:
 		uint64				key() const				{ return mapped() ? ((CMappedHeader*)fullRow())->getKey() : 0; }
 
 		/// Get Full Row Data
-		const TRowData		fullRow() const			{ return (*_MapIt).second; }
+		TRowData			fullRow() const			{ return (*_MapIt).second; }
 
 
 		/// Equals
@@ -301,12 +301,12 @@ public:
 	/**
 	 * Get the number of actually loaded rows
 	 */
-	uint32				getLoadedRows() const							{ return _RowMap.size(); }
+	uint32				getLoadedRows() const							{ return (uint32)_RowMap.size(); }
 
 	/**
 	 * Get memory load
 	 */
-	uint32				getMemoryLoad() const							{ return _RowMap.size()*_InternalRowSize; }
+	uint32				getMemoryLoad() const							{ return (uint32)_RowMap.size()*_InternalRowSize; }
 
 
 

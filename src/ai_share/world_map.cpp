@@ -16,11 +16,6 @@
 
 
 #include "stdpch.h"
-#include "nel/misc/algo.h"
-#include "nel/misc/hierarchical_timer.h"
-#include "nel/misc/random.h"
-#include "nel/misc/string_conversion.h"
-#include "nel/misc/command.h"
 #include "game_share/utils.h"
 #include "world_map.h"
 
@@ -125,8 +120,8 @@ private:
 
 inline
 CAStarHeapNode::CAStarHeapNode(CTopology::TTopologyRef Ref, uint Father, float Distance, bool Open)
-: _Ref(Ref)
-, CABaseStarNode(Father, Distance, Open)
+: CABaseStarNode(Father, Distance, Open)
+, _Ref(Ref)
 {
 }
 
@@ -197,7 +192,7 @@ class	CInsideAStarHeapNode	:	public	CABaseStarNode
 public:
 	friend	class	CAStarNode;
 
-	explicit	CInsideAStarHeapNode(const	CAStarNode	&node, uint Father, CDirection Direction, float Distance, bool Open) : _Node(node),	_Direction(Direction), CABaseStarNode(Father,Distance,Open)
+	explicit	CInsideAStarHeapNode(const	CAStarNode	&node, uint Father, CDirection Direction, float Distance, bool Open) : CABaseStarNode(Father,Distance,Open), _Direction(Direction), _Node(node)
 	{
 	}
 
@@ -623,7 +618,7 @@ void	CWorldMap::serial(NLMISC::IStream &f)
 						{
 #ifdef NL_DEBUG
 							nlassert(wpos.getRootCell()==rootCell);
-							nlassert(wpos.y()<=0 && wpos.x()>=0)
+							nlassert(wpos.y()<=0 && wpos.x()>=0);
 #endif
 							rootCell->setWorldPosition(wpos, ind);
 							ind++;
@@ -924,6 +919,9 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 				}
 				return	true;
 			}
+			break;
+		default:
+			break;
 
 		}
 		return	false;
@@ -1126,6 +1124,8 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 				}
 				return	false;
 			}
+		default:
+			break;
 
 		}
 		return	false;
@@ -1205,7 +1205,8 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 				}
 				break;
 			}
-
+		default:
+			break;
 		}
 		return	false;
 	}
@@ -1319,7 +1320,8 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 				temp.setPosS(pos);
 				return	true;
 			}
-
+		default:
+			break;
 		}
 		return	false;
 	}
@@ -1461,7 +1463,7 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 	// Push it in the node list
 	nodes.push_back(hnode);
 	// Take it as first father
-	uint father = nodes.size()-1;
+	uint father = (uint)nodes.size()-1;
 
 	// Add start topology to visited nodes (father holds start topo node index for the moment)
 	visited.insert(make_pair<CTopology::TTopologyId,uint>(startTopo, father));
@@ -1550,7 +1552,7 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 				visited.erase(itv);
 			}
 			// Create a new node for that cell
-			child = nodes.size();
+			child = (uint)nodes.size();
 			nodes.push_back(CAStarHeapNode(next, father, distance, true));
 			// Compute h(n) as an euclidian distance heuristic
 			float heuristic = (endPoint-next.getCstTopologyNode().Position).norm();
@@ -1625,7 +1627,7 @@ bool	CWorldMap::findAStarPath(const CTopology::TTopologyId &start, const CTopolo
 	CAStarHeapNode	hnode(startTopo,0xffffffff,0.0f,true);
 
 	nodes.push_back(hnode);
-	uint	father = nodes.size()-1;
+	uint	father = (uint)nodes.size()-1;
 
 	// add current to visited nodes
 	visited.insert(make_pair<CTopology::TTopologyId,uint>(startTopo, father));
@@ -1682,7 +1684,7 @@ bool	CWorldMap::findAStarPath(const CTopology::TTopologyId &start, const CTopolo
 			if (itv == visited.end())
 			{
 				// if node is not open nor closed, create an entry
-				child = nodes.size();
+				child = (uint)nodes.size();
 				nodes.push_back(cnode);
 			}
 			else
@@ -1759,7 +1761,7 @@ bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition 
 	// Create a heap node for the start point and push it in the node list
 	nodes.push_back(CInsideAStarHeapNode(startNode, 0xffffffff, CDirection(), 0.f, true));
 	// Take it as first father
-	uint father = nodes.size()-1;
+	uint father = (uint)nodes.size()-1;
 
 	// Add start node to visited nodes (father holds start node index for the moment)
 	visited.insert(make_pair<CAStarNode, uint>(startNode, father));
@@ -1841,7 +1843,7 @@ bool CWorldMap::findInsideAStarPath(CWorldPosition const& start, CWorldPosition 
 			// Else create a new node
 			else
 			{
-				child = nodes.size();
+				child = (uint)nodes.size();
 				nodes.push_back(CInsideAStarHeapNode(next, father, dir, distance, true));
 			}
 			// Compute h(n) as an euclidian distance heuristic
@@ -2236,7 +2238,7 @@ bool	CWorldMap::setWorldPosition(sint32 z, CWorldPosition	&wpos,	const CAIVector
 
 	sint32 minDistZ = INT_MAX;
 	CSlot bestSlot;
-	sint32 bestZ;
+	sint32 bestZ = 0;
 	// Find best slot
 	for (uint32	s=0; s<3; ++s)
 	{

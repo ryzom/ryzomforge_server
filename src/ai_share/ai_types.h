@@ -16,15 +16,14 @@
 
 
 
+#ifndef RYAI_TYPES_H
+#define RYAI_TYPES_H
 
 #include <string.h>
 
 #include "nel/misc/common.h"
 #include "nel/misc/string_mapper.h"
 #include "nel/misc/algo.h"
-
-#ifndef RYAI_TYPES_H
-#define RYAI_TYPES_H
 
 //	Be carefull when implementing new types :
 //	always create a badtype at the end of lists ( see others implementations as examples ).
@@ -50,8 +49,8 @@ namespace AITYPES
 		class	CDescTypeEntry	
 		{
 		public:
-			CDescTypeEntry(char *name, T value)	: _name(name), _value(value)	{}
-			char	*_name;
+			CDescTypeEntry(const char *name, T value)	: _name(name), _value(value)	{}
+			const char	*_name;
 			T		_value;
 		};
 		static	CDescTypeEntry	_entries[];
@@ -492,7 +491,7 @@ namespace AITYPES
 //			if	(FamilyTag < other.FamilyTag)
 //				return	true;
 //			if	(	FamilyTag==other.FamilyTag
-//				&&	FamilyTag==family_tribe	)	//	usefull ?
+//				&&	FamilyTag==family_tribe	)	//	useful ?
 //				return	TribeName < other.TribeName;			
 //			return	false;
 //		}

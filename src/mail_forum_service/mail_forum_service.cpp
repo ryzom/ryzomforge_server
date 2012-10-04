@@ -24,6 +24,10 @@
 #include "shard_stat_db_manager.h"
 #include "hof_generator.h"
 
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
 
 using namespace NLNET;
 using namespace NLMISC;
@@ -238,7 +242,7 @@ void	CMailForumService::openSession( uint32 shardid, string username, string coo
 	if (ofile.open(sessionfile))
 	{
 		cookie += "\n";
-		ofile.serialBuffer((uint8*)(&cookie[0]), cookie.size());
+		ofile.serialBuffer((uint8*)(&cookie[0]), (uint)cookie.size());
 	}
 
 	if (CFile::fileExists(checkmailfile))
@@ -289,7 +293,7 @@ void	CMailForumService::cbOpenSession( CMessage& msgin, const std::string &servi
 
 		openSession(shardId, userName, cookie);
 	}
-	catch(Exception& e)
+	catch(const Exception& e)
 	{
 		nlwarning("Failed to open session: %s", e.what());
 	}
@@ -307,7 +311,7 @@ void	CMailForumService::cbCloseSession( CMessage& msgin, const std::string &serv
 
 		closeSession(shardId, userName);
 	}
-	catch(Exception& e)
+	catch(const Exception& e)
 	{
 		nlwarning("Failed to close session: %s", e.what());
 	}
@@ -326,7 +330,7 @@ void CMailForumService::cbRemoveUser( CMessage& msgin, const std::string &servic
 
 		removeUser(shardId, userName);
 	}
-	catch(Exception& e)
+	catch(const Exception& e)
 	{
 		nlwarning("Failed to remove user: %s", e.what());
 	}
@@ -345,7 +349,7 @@ void CMailForumService::cbRemoveGuild( CMessage& msgin, const std::string &servi
 
 		removeGuild(shardId, guildName);
 	}
-	catch(Exception& e)
+	catch(const Exception& e)
 	{
 		nlwarning("Failed to remove guild: %s", e.what());
 	}
@@ -404,7 +408,7 @@ void	CMailForumService::cbChangeUserName( CMessage& msgin, const std::string &se
 
 		changeUserName(shardId, oldName, newName);
 	}
-	catch(Exception& e)
+	catch(const Exception& e)
 	{
 		nlwarning("Failed to close session: %s", e.what());
 	}
@@ -417,7 +421,10 @@ NLMISC_COMMAND(openSession,"open a mail/forum session for a player", "shardid us
 	if (args.size() != 3)
 		return false;
 
-	CMailForumService::openSession( atoi(args[0].c_str()), args[1], args[2] );
+	uint32 shardId;
+	NLMISC::fromString(args[0], shardId);
+
+	CMailForumService::openSession(shardId, args[1], args[2]);
 
 	return true;
 }
@@ -427,7 +434,10 @@ NLMISC_COMMAND(closeSession, "close a mail/forum session for a player", "shardid
 	if (args.size() != 2)
 		return false;
 
-	CMailForumService::closeSession( atoi(args[0].c_str()), args[1] );
+	uint32 shardId;
+	NLMISC::fromString(args[0], shardId);
+
+	CMailForumService::closeSession(shardId, args[1]);
 
 	return true;
 }
@@ -437,7 +447,10 @@ NLMISC_COMMAND(changeUserName, "change a user's name (guild or player)", "shardi
 	if (args.size() != 3)
 		return false;
 
-	CMailForumService::changeUserName( atoi(args[0].c_str()), args[1], args[2] );
+	uint32 shardId;
+	NLMISC::fromString(args[0], shardId);
+
+	CMailForumService::changeUserName( shardId, args[1], args[2] );
 
 	return true;
 }

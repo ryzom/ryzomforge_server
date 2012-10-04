@@ -53,16 +53,16 @@ std::string	decodeDbPathId(const std::string& pathid)
 	std::string	shard("");
 	uint		id;
 
-	uint		p = pathid.find(':');
+	string::size_type		p = pathid.find(':');
 
 	if (p == std::string::npos)
 	{
-		id = atoi(pathid.c_str());
+		NLMISC::fromString(pathid, id);
 	}
 	else
 	{
 		shard = pathid.substr(0, p);
-		id = atoi(&(*(pathid.begin()+p+1)));
+		NLMISC::fromString(pathid.substr(p+1), id);
 	}
 
 	return CPDSLib::getLogDirectory(id, shard);
@@ -192,7 +192,7 @@ NLMISC_CATEGORISED_COMMAND(pd_log, displayLogFile, "display pd_log file human re
 		{
 			ifile.serialCont(updateLog);
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			log.displayNL("#! Failed to load file '%s': %s", filename.c_str(), e.what());
 			return false;
@@ -212,7 +212,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, displayLog, "display pd_log file human readab
 	if (args.size() != 2)
 		return false;
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);
@@ -256,7 +257,7 @@ NLMISC_CATEGORISED_COMMAND(pd_log, displayLog, "display pd_log file human readab
 		{
 			ifile.serialCont(updateLog);
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			log.displayNL("#! Failed to load file '%s': %s", filename.c_str(), e.what());
 			return false;
@@ -279,7 +280,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, displayLogs,
 		return false;
 
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);
@@ -315,7 +317,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, searchEId,
 		return false;
 
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);
@@ -354,7 +357,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, searchString,
 		return false;
 
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);
@@ -392,7 +396,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, searchEIds,
 		return false;
 
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);
@@ -445,7 +450,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, searchValueByEId,
 		return false;
 
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);
@@ -488,7 +494,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, displayDescription,
 		return false;
 
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);
@@ -551,7 +558,8 @@ NLMISC_CATEGORISED_COMMAND(pd_log, displayTableDescription,
 		return false;
 
 /*
-	uint	databaseId = atoi(args[0].c_str());
+	uint	databaseId;
+	NLMISC::fromString(args[0], databaseId);
 	string	logpath = CPDSLib::getLogDirectory(databaseId);
 */
 	string	logpath = decodeDbPathId(args[0]);

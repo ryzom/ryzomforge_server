@@ -116,7 +116,7 @@ void	updateWebConnection()
 					success = true;
 				}
 			}
-			catch (Exception &e)
+			catch (const Exception &e)
 			{
 				nlwarning ("Error during receiving: '%s'", e.what ());
 				reason = e.what();
@@ -138,7 +138,7 @@ void	updateWebConnection()
 			}
 		}
 	}
-	catch (Exception &e)
+	catch (const Exception &e)
 	{
 		nlwarning ("Error during update: '%s'", e.what ());
 	}
@@ -262,7 +262,7 @@ void	cbGetSaveList(CMemStream &msgin, TSockId host)
 	{
 		std::sort(incrementalDirectories.begin(), incrementalDirectories.end());
 
-		for (i=incrementalDirectories.size()-1; (sint)i>=0; --i)
+		for (i=(uint)incrementalDirectories.size()-1; (sint)i>=0; --i)
 		{
 			string	p = CPath::standardizePath(incrementalDirectories[i], true);
 			// avoid double / inside path

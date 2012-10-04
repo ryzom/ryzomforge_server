@@ -49,7 +49,8 @@ std::string	CDbMessage::buildLogString(const CDBDescriptionParser& description) 
 		if (logmsg[i] == '$')
 		{
 			++i;
-			uint	param = atoi(logmsg.c_str()+i);
+			uint	param;
+			NLMISC::fromString(logmsg.substr(i), param);
 			while (i<logmsg.size() && logmsg[i]>='0' && logmsg[i]<='9')
 				++i;
 
@@ -103,6 +104,8 @@ std::string	CDbMessage::buildLogString(const CDBDescriptionParser& description) 
 						else if (typenode.ByteSize == 2)	result += NLMISC::toString(*(uint16*)dataptr);
 						else if (typenode.ByteSize == 4)	result += NLMISC::toString(*(uint32*)dataptr);
 					}
+					break;
+				default:
 					break;
 				}
 			}
@@ -165,6 +168,8 @@ void	CDbMessage::getHRContent(const CDBDescriptionParser& description, std::stri
 					else if (column.ByteSize == 2)	strValue = NLMISC::toString(asUint16());
 					else if (column.ByteSize == 4)	strValue = NLMISC::toString(asUint32());
 				}
+				break;
+			default:
 				break;
 			}
 
@@ -301,7 +306,7 @@ void	CDbMessage::getHRContent(const CDBDescriptionParser& description, std::stri
 				if (_LogBuffer.empty())
 					return;
 				const NLMISC::CEntityId*	ptr = (const NLMISC::CEntityId*)(&(_LogBuffer[0]));
-				uint	num = _LogBuffer.size()/sizeof(NLMISC::CEntityId);
+				uint	num = (uint)_LogBuffer.size()/sizeof(NLMISC::CEntityId);
 				uint	i;
 				for (i=0; i<num; ++i)
 				{
@@ -408,7 +413,7 @@ bool	CDbMessage::contains(const CDBDescriptionParser& description, const NLMISC:
 					break;
 
 				const NLMISC::CEntityId*	ptr = (const NLMISC::CEntityId*)(&(_LogBuffer[0]));
-				uint	num = _LogBuffer.size()/sizeof(NLMISC::CEntityId);
+				uint	num = (uint)_LogBuffer.size()/sizeof(NLMISC::CEntityId);
 				uint	i;
 				for (i=0; i<num; ++i)
 					if (compareEId(ptr[i], id))
@@ -605,7 +610,7 @@ bool	CUpdateLog::selectMessages(const CDBDescriptionParser& description, const N
 {
 	bool	selected = false;
 
-	uint	pos = valuePath.find('.');
+	std::string::size_type pos = valuePath.find('.');
 	if (pos == std::string::npos)
 		return false;
 
@@ -893,7 +898,7 @@ void	CUpdateLog::displayLogs(const CDBDescriptionParser& description,
 			{
 				file.serialCont(logs);
 			}
-			catch (NLMISC::Exception&)
+			catch (const NLMISC::Exception&)
 			{
 				break;
 			}
@@ -1027,7 +1032,7 @@ void	CUpdateLog::processLogs(const std::string& path,
 			{
 				file.serialCont(logs);
 			}
-			catch (NLMISC::Exception&)
+			catch (const NLMISC::Exception&)
 			{
 				break;
 			}

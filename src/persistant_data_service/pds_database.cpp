@@ -858,7 +858,8 @@ bool	CDatabase::set(RY_PDS::TTableIndex table, RY_PDS::TRowIndex row, RY_PDS::TC
 	case PDS_uint8:
 	case PDS_sint8:
 		{
-			uint8	data = (uint8)atoi(value.c_str());
+			uint8	data;
+			NLMISC::fromString(value, data);
 			return set(table, row, column, sizeof(data), &data);
 		}
 		break;
@@ -867,7 +868,8 @@ bool	CDatabase::set(RY_PDS::TTableIndex table, RY_PDS::TRowIndex row, RY_PDS::TC
 	case PDS_uint16:
 	case PDS_sint16:
 		{
-			uint16	data = (uint16)atoi(value.c_str());
+			uint16	data;
+			NLMISC::fromString(value, data);
 			return set(table, row, column, sizeof(data), &data);
 		}
 		break;
@@ -878,7 +880,8 @@ bool	CDatabase::set(RY_PDS::TTableIndex table, RY_PDS::TRowIndex row, RY_PDS::TC
 	case PDS_CSheetId:
 	case PDS_CNodeId:
 		{
-			uint32	data = (uint32)atoi(value.c_str());
+			uint32	data;
+			NLMISC::fromString(value, data);
 			return set(table, row, column, sizeof(data), &data);
 		}
 		break;
@@ -924,7 +927,8 @@ bool	CDatabase::set(RY_PDS::TTableIndex table, RY_PDS::TRowIndex row, RY_PDS::TC
 
 	case PDS_dimension:
 		{
-			uint32	data = (uint32)atoi(value.c_str());
+			uint32	data;
+			NLMISC::fromString(value, data);
 			return set(table, row, column, sizeof(data), &data);
 		}
 		break;
@@ -1179,7 +1183,7 @@ CDatabase*	CDatabase::adapt(const string& description)
 	// get 'From' HashKey
 	CHashKey	hash1 = _Description.getHashKey();
 	// get 'Into' HashKey
-	CHashKey	hash2 = getSHA1((const uint8*)(description.c_str()), description.size());
+	CHashKey	hash2 = getSHA1((const uint8*)(description.c_str()), (uint32)description.size());
 
 	// same hash, ok go on
 	if (hash1 == hash2)
@@ -1579,7 +1583,7 @@ bool	CDatabase::buildDelta(const CTimestamp& starttime, const CTimestamp& endtim
 //			{
 //				logf.serialCont(_LogQueue);
 //			}
-//			catch (Exception& e)
+//			catch (const Exception& e)
 //			{
 //				PDS_WARNING("buildDelta(): exception occured while saving straight log : %s", e.what());
 //			}

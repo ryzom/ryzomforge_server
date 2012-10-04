@@ -137,7 +137,7 @@ uint32 nodeAlias(const IPrimitive *prim, bool canFail = false)
 //	// for legacy reasons the field may be called 'unique_id' instead of 'alias'
 //	if (s.empty())
 //		prim->getPropertyByName("unique_id",s);
-//	alias=atoi(s.c_str());
+//	alias=NLMISC::fromString(s.c_str());
 
 //	// if we haven't found a sensible alias value use the prim node address
 //	if (alias==0 && s!="0")
@@ -518,7 +518,7 @@ static CAIEventActionNode::TSmartPtr parsePrimEventAction(const CAIAliasDescript
 	prim->getPropertyByName("action",result->Action);
 	prim->getPropertyByName("weight",weightStr);
 	prim->getPropertyByName("parameters",parameters);
-	result->Weight=atoi(weightStr.c_str());
+	NLMISC::fromString(weightStr, result->Weight);
 	result->Args=*parameters;
 	
 	for (uint i=0;i<prim->getNumChildren();++i)	
@@ -671,7 +671,7 @@ static void addGroupDescriptionToEventAction(const CAIAliasDescriptionNode *tree
 			case AITypeFolder:
 			{
 				string cname = nodeClass(child);
-				// parse optionnal group descriptions			
+				// parse optional group descriptions			
 				if (cname == "group_descriptions")
 				{										
 					CAIActions::exec("SETACTN", treeNode?treeNode->getAlias():uniqueId);
@@ -1134,7 +1134,8 @@ static void parsePrimPlaces(const CAIAliasDescriptionNode *treeNode,const IPrimi
 					// read the radius
 					std::string radiusString;
 					child->getPropertyByName("radius",radiusString);
-					uint radius=atoi(radiusString.c_str());
+					uint radius;
+					NLMISC::fromString(radiusString, radius);
 					if (radius == 0)
 					{
 						nlwarning("Ignoring place '%s' because bad radius: '%s' (converted to int as %u)",
@@ -1180,15 +1181,15 @@ static void parsePrimPlaces(const CAIAliasDescriptionNode *treeNode,const IPrimi
 						//
 						if (child->getPropertyByName("visit_time_min", tmpStr))
 						{
-							stayTimeMin = atoi(tmpStr.c_str());
+							NLMISC::fromString(tmpStr, stayTimeMin);
 						}
 						if (child->getPropertyByName("visit_time_max", tmpStr))
 						{
-							stayTimeMax = atoi(tmpStr.c_str());
+							NLMISC::fromString(tmpStr, stayTimeMax);
 						}
 						if (child->getPropertyByName("index", tmpStr))
 						{
-							index = atoi(tmpStr.c_str());
+							NLMISC::fromString(tmpStr, index);
 						}
 						child->getPropertyByName("index_next", indexNext);
 						if (child->getPropertyByName("flag_spawn", tmpStr))
@@ -1283,7 +1284,7 @@ static void	parsePopulation(const IPrimitive *prim, std::string &sheet, uint &co
 			sheet = s+".creature";
 	}
 		
-	count=atoi(countStr.c_str());
+	NLMISC::fromString(countStr, count);
 	if (count<=0)
 	{
 		throw	parsePopException(std::string("FAUNA_SPAWN_ATOM property 'count' invalid: ")+countStr);
@@ -1313,10 +1314,10 @@ static void parsePrimGrpFaunaSpawn(const CAIAliasDescriptionNode *treeNode,const
 	
 	// deal with the weight
 	std::string s;
-	uint32 weight;
+	uint32 weight = 0;
 	if (prim->getPropertyByName("weight",s))
 	{
-		weight=atoi(s.c_str());
+		NLMISC::fromString(s, weight);
 		if	(toString(weight)!=s)
 		{
 		nlwarning("weight invalid value: %s");
@@ -1347,7 +1348,7 @@ static void parsePrimGrpFaunaSpawn(const CAIAliasDescriptionNode *treeNode,const
 			executeArgs.push_back(CAIActions::CArg(theSheet));
 			executeArgs.push_back(count);
 		}
-		catch (parsePopException	e)
+		catch (const parsePopException &e)
 		{
 			nlwarning("FaunaGroup: %s of %s : %s", nodeName(child).c_str(), treeNode->fullName().c_str(), e.what());
 		}
@@ -1886,7 +1887,8 @@ static void parsePrimGrpNpc(const CAIAliasDescriptionNode *treeNode,const IPrimi
 	}
 
 	prim->getPropertyByName("count",s);
-	uint botCount=atoi(s.c_str());
+	uint botCount;
+	NLMISC::fromString(s, botCount);
 
 	if (foundBots && botCount != 0)
 	{
@@ -2409,7 +2411,9 @@ static void parsePrimDynNpcZoneShape(const CAIAliasDescriptionNode *aliasNode, c
 static void parsePrimRoadTrigger(const CAIAliasDescriptionNode *aliasNode, const IPrimitive *prim)
 {
 	CPrimVector t1, t2, sp;
-	float t1r, t2r, spr;
+	float t1r = 0.f;
+	float t2r = 0.f;
+	float spr = 0.f;
 	string s;
 
 	for (uint i=0; i<prim->getNumChildren(); ++i)
@@ -2494,6 +2498,8 @@ static void parsePrimDynRoad(const CAIAliasDescriptionNode *aliasNode, const IPr
 			case AITypeRoadTrigger:
 				parsePrimRoadTrigger(nextTreeNode(aliasNode,child),child);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -2526,6 +2532,8 @@ static void parsePrimGeomItems(const CAIAliasDescriptionNode *aliasNode, const I
 				break;
 			case AITypeDynRoad:
 				parsePrimDynRoad(nextTreeNode(aliasNode,child),child);
+				break;
+			default:
 				break;
 			}
 		}
@@ -2643,6 +2651,8 @@ static void parsePrimCellZones(const CAIAliasDescriptionNode *aliasNode, const I
 			case AITypeCellZone:
 				parsePrimCellZone(nextTreeNode(aliasNode,child),child);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -2671,7 +2681,7 @@ static void parsePrimBotTemplate(const CAIAliasDescriptionNode *aliasNode, const
 		prim->getPropertyByName("sheet_look", lookSheet);
 		multiLevel = true;
 		prim->getPropertyByName("level_delta", s);
-		levelDelta = atoi(s.c_str());
+		NLMISC::fromString(s, levelDelta);
 	}
 	else
 	{
@@ -2721,7 +2731,7 @@ static void parsePrimGroupTemplate(const CAIAliasDescriptionNode *aliasNode, con
 	sint32			levelDelta = 0;
 
 	prim->getPropertyByName("count", s);
-	botCount = atoi(s.c_str());
+	NLMISC::fromString(s, botCount);
 
 	prim->getPropertyByName("count_multiplied_by_sheet", s);
 	countMultipliedBySheet = (s == "true");
@@ -2740,7 +2750,7 @@ static void parsePrimGroupTemplate(const CAIAliasDescriptionNode *aliasNode, con
 		prim->getPropertyByName("bot_sheet_look", lookSheet);
 		multiLevel = true;
 		prim->getPropertyByName("level_delta", s);
-		levelDelta = atoi(s.c_str());
+		NLMISC::fromString(s, levelDelta);
 	}
 	else
 	{
@@ -2765,13 +2775,13 @@ static void parsePrimGroupTemplate(const CAIAliasDescriptionNode *aliasNode, con
 	seasons[3] = (s == "true");
 	
 	prim->getPropertyByName("weight_0_25", s);
-	weights[0] = atoi(s.c_str());
+	NLMISC::fromString(s, weights[0]);
 	prim->getPropertyByName("weight_25_50", s);
-	weights[1] = atoi(s.c_str());
+	NLMISC::fromString(s, weights[1]);
 	prim->getPropertyByName("weight_50_75", s);
-	weights[2] = atoi(s.c_str());
+	NLMISC::fromString(s, weights[2]);
 	prim->getPropertyByName("weight_75_100", s);
-	weights[3] = atoi(s.c_str());
+	NLMISC::fromString(s, weights[3]);
 
 	vector<string>	*actParams = &EmptyStringVector;
 	
@@ -2840,12 +2850,14 @@ static void parsePrimGroupTemplate(const CAIAliasDescriptionNode *aliasNode, con
 						executeArgs.push_back(CAIActions::CArg(theSheet));
 						executeArgs.push_back(count);
 					}
-					catch (parsePopException	e)
+					catch (const parsePopException &e)
 					{
 						nlwarning("FaunaGroup: %s of %s : %s", nodeName(child).c_str(), aliasNode->fullName().c_str(), e.what());
 					}
 					
 				}
+				break;
+			default:
 				break;
 			}
 
@@ -2895,6 +2907,8 @@ static	void	parsePrimGroupFamilyProfileFaunaContent(const CAIAliasDescriptionNod
 			case AITypeGroupTemplateFauna:
 				parsePrimGroupTemplate(nextTreeNode(aliasNode,child),child,"C");
 				break;
+			default:
+				break;
 			}
 			
 		}
@@ -2942,6 +2956,8 @@ static	void	parsePrimGroupFamilyProfileTribeContent(const CAIAliasDescriptionNod
 			case AITypeGroupTemplateMultiLevel:
 				parsePrimGroupTemplate(nextTreeNode(aliasNode,child),child,"C");
 				break;
+			default:
+				break;
 			}
 			
 		}
@@ -2979,6 +2995,8 @@ static	void	parsePrimGroupFamilyProfileNpcContent(const CAIAliasDescriptionNode 
 			case AITypeGroupTemplate:
 			case AITypeGroupTemplateMultiLevel:
 				parsePrimGroupTemplate(nextTreeNode(aliasNode,child),child,"C");
+				break;
+			default:
 				break;
 			}
 			
@@ -3047,6 +3065,8 @@ static void parsePrimGroupDescriptions(const CAIAliasDescriptionNode *aliasNode,
 //			case AITypeGroupFamilyProfileGeneric:
 //				parsePrimGroupFamilyProfileGeneric(nextTreeNode(aliasNode,child),child, GroupFamilyTribe);
 //				break;			
+			default:
+				break;
 			}
 		}
 	}
@@ -3232,6 +3252,8 @@ static void parsePrimSquadTemplate(const IPrimitive *prim, const std::string &ma
 			case AITypeSquadTemplateVariant:
 				parsePrimSquadTemplateVariant(nextTreeNode(aliasNode,child), child, name);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -3261,7 +3283,7 @@ static void parsePrimOutpost(const IPrimitive *prim, const std::string &mapName,
 	CAIActions::exec("OUTPOST", aliasNode, continent, filename, familyName);
 
 	// link squads
-	char* props[] = { "tribe_squads", "tribe_squads2", "default_squads", "buyable_squads" };
+	const char* props[] = { "tribe_squads", "tribe_squads2", "default_squads", "buyable_squads" };
 	size_t nprops = sizeof(props)/sizeof(props[0]);
 	for (size_t i=0; i!=nprops; ++i)
 	{
@@ -3311,6 +3333,8 @@ static void parsePrimOutpost(const IPrimitive *prim, const std::string &mapName,
 			case AITypeManager:
 				parsePrimMgr(child, mapName, filename);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -3352,6 +3376,8 @@ static void parsePrimDynSystem(const IPrimitive *prim, const std::string &mapNam
 			case AITypeOutpost:
 				parsePrimOutpost(child, mapName, filename);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -3386,6 +3412,8 @@ static void parsePrimNogoPointList(const IPrimitive *prim, const std::string &ma
 					CAIActions::exec("SETNOGO", x, y);
 				}
 				break;
+			default:
+				break;
 			}
 
 		}
@@ -3419,7 +3447,8 @@ static void parsePrimScript(const IPrimitive *prim, const std::string &mapName, 
 		std::vector<std::string>::const_iterator it = pcode->begin(), itEnd = pcode->end();
 		code = *it;
 		++it;
-		for(; it!=itEnd; ++it) {
+		for(; it!=itEnd; ++it)
+		{
 			code += "\n";
 			code += *it;
 		}
@@ -4047,7 +4076,7 @@ NLMISC_COMMAND(loadMapsFromCommon,"load all primitive defined in usedPrimitives 
 
 		const vector<string>	&basePrim = CPrimitiveCfg::getMap(args[0]);
 		set<string> filter(basePrim.begin(), basePrim.end());
-		for ( uint i = 0; (sint)i<usedPrimitives.size(); ++i)
+		for ( uint i = 0; i < usedPrimitives.size(); ++i)
 		{
 			const vector<string> &prims = CPrimitiveCfg::getMap(usedPrimitives.asString(i));
 			for (uint j=0; j<prims.size(); ++j)

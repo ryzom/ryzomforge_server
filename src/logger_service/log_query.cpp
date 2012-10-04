@@ -157,7 +157,7 @@ CQueryParser::TParserResult CQueryParser::parseQuery(const std::string &queryStr
 
 		return pr;
 	}
-	catch (EInvalidQuery &iq)
+	catch (const EInvalidQuery &iq)
 	{
 		nlwarning("Error will parsing query near char %u : %s", iq.It - queryStr.begin(), iq.ErrorStr);
 
@@ -302,7 +302,10 @@ sint32 CQueryParser::parseSint(CQueryParser::iterator &it, CQueryParser::iterato
 	if (tok.TokenType != tt_INT)
 		throw EInvalidQuery(rew, "Invalid content for sint, must be an int value");
 
-	return atoi(string(start, it).c_str());
+	sint32 val;
+	NLMISC::fromString(string(start, it), val);
+
+	return val;
 }
 
 
@@ -427,7 +430,8 @@ LGS::TParamValue CQueryParser::parseConstant(CQueryParser::iterator &it, CQueryP
 	{
 	case tt_INT:
 		{
-			uint32 num = uint32(atoi(constantTok.Text.c_str()));
+			uint32 num;
+			NLMISC::fromString(constantTok.Text, num);
 			rew = it;
 			TToken dateTag = getNextToken(it, end);
 			switch (dateTag.TokenType)
@@ -748,7 +752,7 @@ bool CQueryParser::parseDATE(CQueryParser::iterator &it, CQueryParser::iterator 
 			goto noHour;
 		if (!parseINT(it, end))
 			goto noHour;
-		// optionnal sec
+		// optional sec
 		rew = it;
 		if (getNextToken(it, end).TokenType != tt_COLON)
 			goto noHour;

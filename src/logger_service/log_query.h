@@ -21,6 +21,7 @@
 #include "nel/misc/types_nl.h"
 
 #include <memory>
+#include <iterator>
 
 #include "nel/misc/common.h"
 
@@ -274,11 +275,19 @@ inline LGS::TParamValue convertParam(const LGS::TParamValue &value, LGS::TSuppor
 		switch (type.getValue())
 		{
 		case LGS::TSupportedParamType::spt_uint32:
-			return LGS::TParamValue((uint32)atoi(value.get_string().c_str()));
+		{
+			uint32 tmp;
+			NLMISC::fromString(value.get_string(), tmp);
+			return LGS::TParamValue(tmp);
+		}
 		case LGS::TSupportedParamType::spt_uint64:
 			return LGS::TParamValue((uint64)atol(value.get_string().c_str()));
 		case LGS::TSupportedParamType::spt_sint32:
-			return LGS::TParamValue((sint32)atoi(value.get_string().c_str()));
+		{
+			sint32 tmp;
+			NLMISC::fromString(value.get_string(), tmp);
+			return LGS::TParamValue(tmp);
+		}
 		case LGS::TSupportedParamType::spt_float:
 			return LGS::TParamValue((float)atof(value.get_string().c_str()));
 		case LGS::TSupportedParamType::spt_string:
@@ -788,6 +797,8 @@ struct TPredicateNode : public TQueryNode
 					ts.EndDate = ~0;
 					tl.push_back(ts);
 					break;
+				default:
+					break;
 				}
 
 				return tl;
@@ -861,7 +872,7 @@ struct TPredicateNode : public TQueryNode
 				}
 			}
 			else
-				nlstop
+				nlstop;
 		}
 		else
 		{
@@ -1163,8 +1174,8 @@ public:
 		/// The iterator in the string where the error is detected
 		iterator	It;
 		/// The error string
-		char		*ErrorStr;
-		EInvalidQuery(iterator it, char *erroStr)
+		const char		*ErrorStr;
+		EInvalidQuery(iterator it, const char *erroStr)
 			:	It(it),
 				ErrorStr(erroStr)
 		{}

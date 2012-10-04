@@ -966,7 +966,8 @@ inline CTable::CDataAccessor	CTable::getAccessor(CLocatePath &path)
 	if (path.end())
 		return CDataAccessor();
 
-	RY_PDS::TRowIndex	row = atoi(path.node().Name.c_str());
+	RY_PDS::TRowIndex	row;
+	NLMISC::fromString(path.node().Name, row);
 	path.next();
 
 	const CColumn*	column = getColumn(path);
@@ -1097,7 +1098,7 @@ inline const CColumn*	CTable::getColumn(CLocatePath &path, bool verbose) const
 					}
 				}
 
-				indexValue *= table->getColumns().size();
+				indexValue *= (TEnumValue)table->getColumns().size();
 
 				if (indexValue >= attr->getColumns())
 				{

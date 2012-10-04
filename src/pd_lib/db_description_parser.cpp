@@ -74,7 +74,7 @@ bool	CDBDescriptionParser::loadDescriptionFile(const string& filename)
  */
 bool	CDBDescriptionParser::loadDescription(const uint8* description)
 {
-	uint	sz = strlen((const char*)description);
+	uint	sz = (uint)strlen((const char*)description);
 
 	// set description and compute hashkey
 	_Description = (const char*)description;
@@ -93,7 +93,7 @@ bool	CDBDescriptionParser::loadDescription(const uint8* description)
 		if (xmlStream.init(stream))
 			xmlParsed = true;
 	}
-	catch (EXmlParsingError &e)
+	catch (const EXmlParsingError &e)
 	{
 		nlwarning("CDBDescriptionParser::loadDescription(): failed, parse error in xml: %s", e.what());
 		return false;
@@ -418,6 +418,8 @@ bool	CDBDescriptionParser::loadAttribute(xmlNodePtr node, CTableNode& table)
 			return false;
 		}
 		break;
+	default:
+		break;
 	}
 
 	return true;
@@ -471,7 +473,7 @@ bool	CDBDescriptionParser::loadLog(xmlNodePtr node)
 			}
 			else
 			{
-				log.Parameters[id].TypeId = atoi(logType.c_str());
+				NLMISC::fromString(logType, log.Parameters[id].TypeId);
 			}
 		}
 		else
@@ -566,7 +568,7 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 					return false;
 				}
 
-				column.Index = table.Columns.size();
+				column.Index = (uint)table.Columns.size();
 				column.Name = attribute.Name;
 				column.TypeId = attribute.TypeId;
 				column.DataType = _Database.Types[attribute.TypeId].DataType;
@@ -595,7 +597,7 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 				for (j=0; j<subtable.Columns.size(); ++j)
 				{
 					CColumnNode&	copy = subtable.Columns[j];
-					column.Index = table.Columns.size();
+					column.Index = (uint)table.Columns.size();
 					column.Name = attribute.Name+"."+copy.Name;
 					column.TypeId = copy.TypeId;
 					column.DataType = copy.DataType;
@@ -607,7 +609,7 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 
 		case PDS_BackRef:
 			{
-				column.Index = table.Columns.size();
+				column.Index = (uint)table.Columns.size();
 				column.Name = attribute.Name;
 				column.TypeId = attribute.TypeId;
 				column.DataType = PDS_Index;
@@ -618,7 +620,7 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 
 		case PDS_ForwardRef:
 			{
-				column.Index = table.Columns.size();
+				column.Index = (uint)table.Columns.size();
 				column.Name = attribute.Name;
 				column.TypeId = attribute.TypeId;
 				column.DataType = PDS_Index;
@@ -645,7 +647,7 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 				uint	j;
 				for (j=0; j<index.Dimension; ++j)
 				{
-					column.Index = table.Columns.size();
+					column.Index = (uint)table.Columns.size();
 					column.Name = attribute.Name + '[' + (index.Type == CTypeNode::TypeDimension ? toString(j) : index.getEnumName(j)) + ']';
 					column.TypeId = attribute.TypeId;
 					column.DataType = _Database.Types[attribute.TypeId].DataType;
@@ -683,7 +685,7 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 					for (k=0; k<subtable.Columns.size(); ++k)
 					{
 						CColumnNode&	copy = subtable.Columns[k];
-						column.Index = table.Columns.size();
+						column.Index = (uint)table.Columns.size();
 						column.Name = attribute.Name + '[' + (index.Type == CTypeNode::TypeDimension ? toString(j) : index.getEnumName(j)) + ']' + '.' + copy.Name;
 						column.TypeId = copy.TypeId;
 						column.DataType = copy.DataType;
@@ -707,7 +709,7 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 				uint	j;
 				for (j=0; j<index.Dimension; ++j)
 				{
-					column.Index = table.Columns.size();
+					column.Index = (uint)table.Columns.size();
 					column.Name = attribute.Name + '[' + (index.Type == CTypeNode::TypeDimension ? toString(j) : index.getEnumName(j)) + ']';
 					column.TypeId = attribute.TypeId;
 					column.DataType = PDS_Index;
@@ -719,13 +721,15 @@ bool	CDBDescriptionParser::buildColumns(uint tableIndex)
 
 		case PDS_Set:
 			{
-				column.Index = table.Columns.size();
+				column.Index = (uint)table.Columns.size();
 				column.Name = attribute.Name;
 				column.TypeId = attribute.TypeId;
 				column.DataType = PDS_List;
 				column.ByteSize = 4;	/// \todo remove hardcoded value
 				table.Columns.push_back(column);
 			}
+			break;
+		default:
 			break;
 		}
 	}

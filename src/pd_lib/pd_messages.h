@@ -447,7 +447,7 @@ public:
 	{
 		nlassertex(byteOffset+sizeof(uint16) <= _LogBuffer.size(), ("Internal error! failed to push parameter at %d (size=%d), beyond buffer limit (%d)", byteOffset, sizeof(uint16), _LogBuffer.size()));
 		// get current string index
-		uint16	bo = _ExtLogBuffer.size();
+		uint16	bo = (uint16)_ExtLogBuffer.size();
 		_ExtLogBuffer.resize(bo+parameter.size()+1);
 		memcpy(&(_ExtLogBuffer[bo]), parameter.c_str(), parameter.size()+1);
 		memcpy(&(_LogBuffer[byteOffset]), &bo, sizeof(uint16));
@@ -475,7 +475,7 @@ public:
 		_String = sentence;
 		*(NLMISC::CEntityId*)(&(_Value3[0])) = sender;
 
-		uint	bufferSize = receivers.size()*sizeof(NLMISC::CEntityId);
+		uint	bufferSize = (uint)receivers.size()*sizeof(NLMISC::CEntityId);
 		if (bufferSize > 0)
 		{
 			_LogBuffer.resize(bufferSize);
@@ -771,7 +771,7 @@ public:
 	 */
 	uint32			getNumMessages() const
 	{
-		return _Messages.size();
+		return (uint32)_Messages.size();
 	}
 
 	/**
@@ -796,8 +796,8 @@ public:
 			buildFolders();
 		}
 
-		uint32	numFolders = _Folders.size();
-		uint32	numMessages = _Messages.size();
+		uint32	numFolders = (uint32)_Folders.size();
+		uint32	numMessages = (uint32)_Messages.size();
 
 		f.serial(numFolders);
 		f.serial(numMessages);
@@ -987,7 +987,7 @@ public:
 	/**
 	 * size()
 	 */
-	uint									size() const	{ return _Queues.size(); }
+	uint									size() const	{ return (uint)_Queues.size(); }
 
 	/**
 	 * get()
@@ -1016,7 +1016,7 @@ class CUpdateLog
 {
 public:
 
-	CUpdateLog() : UpdateId(0xffffffff), _Updates(NULL), _OwnUpdates(false)		{ }
+	CUpdateLog() : UpdateId(0xffffffff), _OwnUpdates(false), _Updates(NULL)		{ }
 
 	~CUpdateLog();
 
@@ -1373,12 +1373,6 @@ inline uint32	CDbMessage::getMessageHeaderSize()
 		size += sizeof(_Value3[0]);
 		break;
 
-	case AddString:
-		break;
-
-	case UnmapString:
-		break;
-
 	case ReleaseRow:
 		size += sizeof(_ObjectIndex.Table)+sizeof(_ObjectIndex.Row);
 		break;
@@ -1388,10 +1382,7 @@ inline uint32	CDbMessage::getMessageHeaderSize()
 		size += 2;
 		break;
 
-	case PushContext:
-		break;
-
-	case PopContext:
+	default:
 		break;
 	}
 
