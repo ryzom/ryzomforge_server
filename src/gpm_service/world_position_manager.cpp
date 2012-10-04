@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "stdpch.h"
+
 // Nel Misc
 #include "nel/misc/types_nl.h"
 #include "nel/misc/file.h"
@@ -410,7 +412,7 @@ void	CWorldPositionManager::loadPatatsInFile(const string &file)
 	{
 		_PatatSubscribeManager.usePrim(file);
 	}
-	catch (NLMISC::EStream &e)
+	catch (const NLMISC::EStream &e)
 	{
 		nlwarning("Couldn't load '%s' : %s", file.c_str(), e.what());
 	}
@@ -468,7 +470,7 @@ void	CWorldPositionManager::loadPatatManagerFile(const string &file)
 		f.serial(_PatatSubscribeManager);
 		_PatatSubscribeManager.displayPatatGridInfo();
 	}
-	catch (Exception &e)
+	catch (const Exception &e)
 	{
 		nlwarning("Couldn't load manager file '%s': %s", file.c_str(), e.what());
 	}
@@ -488,7 +490,7 @@ void	CWorldPositionManager::savePatatManagerFile(const string &file)
 		f.serial(_PatatSubscribeManager);
 		_PatatSubscribeManager.displayPatatGridInfo();
 	}
-	catch (Exception &e)
+	catch (const Exception &e)
 	{
 		nlwarning("Couldn't save manager file '%s': %s", file.c_str(), e.what());
 	}
@@ -1660,7 +1662,7 @@ void	CWorldPositionManager::computeCellVision( CCell *cell, CVisionEntry* entiti
 	if (!cell->isIndoor())
 	{
 
-		uint					numOffsets = _ObjectVisionCellOffsets.size();
+		uint					numOffsets = (uint)_ObjectVisionCellOffsets.size();
 		CCellOffset*			offsetPtr = &(_ObjectVisionCellOffsets[0]);					// warning!! _VisionCellOffsets must be filled
 		CCellOffset*			offsetEnd = &(_ObjectVisionCellOffsets[numOffsets-1]);			// warning!! _VisionCellOffsets must be filled
 		//pair<sint32, uint32>	*offsetPtr = &(_ObjectVisionCellOffsets[0]);					// warning!! _VisionCellOffsets must be filled
@@ -1709,7 +1711,7 @@ void	CWorldPositionManager::computeCellVision( CCell *cell, CVisionEntry* entiti
 	// if the cell has vision on other cells
 	if (!cell->isIndoor())
 	{
-		uint					numOffsets = _VisionCellOffsets.size();
+		uint					numOffsets = (uint)_VisionCellOffsets.size();
 		CCellOffset*			offsetPtr = &(_VisionCellOffsets[0]);								// warning!! _VisionCellOffsets must be filled
 		CCellOffset*			offsetEnd = &(_VisionCellOffsets[_VisionCellOffsets.size()-1]);	// warning!! _VisionCellOffsets must be filled
 		//pair<sint32, uint32>	*offsetPtr = &(_VisionCellOffsets[0]);								// warning!! _VisionCellOffsets must be filled
@@ -1750,7 +1752,7 @@ void	CWorldPositionManager::computeCellVision( CCell *cell, CVisionEntry* entiti
 		while (offsetPtr <= offsetEnd);
 	}
 
-	numEntities = fillPtr-entitiesSeenFromCell;
+	numEntities = (uint)(fillPtr-entitiesSeenFromCell);
 }
 
 /****************************************************************\
@@ -1796,8 +1798,8 @@ void	CWorldPositionManager::setCellVisionToEntity( CWorldEntity *entity, CVision
 			return;
 		}
 		
-		(*itFE).second.VisionIn += visionDelta.EntitiesIn.size();
-		(*itFE).second.VisionOut += visionDelta.EntitiesOut.size();
+		(*itFE).second.VisionIn += (sint32)visionDelta.EntitiesIn.size();
+		(*itFE).second.VisionOut += (sint32)visionDelta.EntitiesOut.size();
 		//(*itFE).second.VisionReplace += visionDelta.EntitiesReplace.size();
 		
 		(*itFE).second.Message.serial(visionDelta);

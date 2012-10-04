@@ -32,6 +32,7 @@
 #include <nel/misc/variable.h>
 #endif
 
+using namespace std;
 using namespace CLFECOMMON;
 using namespace NLMISC;
 using namespace NLNET;
@@ -230,7 +231,7 @@ void		CDistancePrioritizer::fillOutBox( CClientHost& client, TOutBox& outbox )
 			{
 				// Exit when the size limit has been reached before all the pairs have been filled
 #ifdef NL_DEBUG
-				uint nbRemainingPairs = _PrioritizedEntitiesByClient[clientId].size() - _CurrentEntitiesToStudy[clientId];
+				uint nbRemainingPairs = (uint)_PrioritizedEntitiesByClient[clientId].size() - _CurrentEntitiesToStudy[clientId];
 				if ( nbRemainingPairs > 0 )
 					LOG_WHAT_IS_SENT( "%u: C%hu S%hu: %u pairs remaining", CTickEventHandler::getGameCycle(), clientId, (uint16)slot, nbRemainingPairs );
 				LOG_WHAT_IS_SENT( "C%hu: outbox full (%d bits)", clientId, currentPosInBit );
@@ -247,7 +248,7 @@ void		CDistancePrioritizer::fillOutBox( CClientHost& client, TOutBox& outbox )
 			}
 		}
 
-		// Get the entity corresponding to the the client/slot pair
+		// Get the entity corresponding to the client/slot pair
 		TPairState&	pairState = _VisionArray->getPairState( clientId, slot );
 		CEntity*	sentity = NULL;
 
@@ -1131,7 +1132,7 @@ void		fillTARGET_LIST( TOutBox& outbox, TPropIndex )
 	outbox.serialBitAndLog(payLoad);
 
 	// restricts to 256 entities
-	uint	longListSize = TargetSlotsList.size();
+	uint	longListSize = (uint)TargetSlotsList.size();
 	if (longListSize > 32)
 		longListSize = 32;
 
@@ -1531,7 +1532,7 @@ void	TVPNodeServer::initSortedFlatVPTree()
 
 void	TVPNodeServer::initSortedFlatVPTreeFill()
 {
-	uint	thisItem = SortedFlatVPTreeFill.size();
+	uint	thisItem = (uint)SortedFlatVPTreeFill.size();
 	SortedFlatVPTreeFill.push_back(CSortedFlatVPTreeFillItem());
 
 	SortedFlatVPTreeFill[thisItem].Node = this;
@@ -1539,7 +1540,7 @@ void	TVPNodeServer::initSortedFlatVPTreeFill()
 	if (a())	a()->initSortedFlatVPTreeFill();
 	if (b())	b()->initSortedFlatVPTreeFill();
 
-	SortedFlatVPTreeFill[thisItem].NextIfNoPayload = SortedFlatVPTreeFill.size();
+	SortedFlatVPTreeFill[thisItem].NextIfNoPayload = (uint)SortedFlatVPTreeFill.size();
 }
 
 
@@ -1588,7 +1589,7 @@ NLMISC_COMMAND(verbosePropertiesSent,"Turn on or off or check the state of verbo
 		else if ( args[0] == string("off") )
 			verbosePropertiesSent = INVALID_CLIENT;
 		else
-			verbosePropertiesSent = atoi(args[0].c_str());
+			NLMISC::fromString(args[0], verbosePropertiesSent);
 	}
 
 	log.displayNL( "verbosePropertiesSent is %s", (verbosePropertiesSent==INVALID_CLIENT)?"off":((verbosePropertiesSent==0)?"all":toString("C%hu", verbosePropertiesSent).c_str()) );

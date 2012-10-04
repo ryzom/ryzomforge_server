@@ -56,6 +56,12 @@
 #include "id_impulsions.h"
 #include "uid_impulsions.h"
 
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
+
+using namespace std;
 using namespace NLNET;
 using namespace NLMISC;
 using namespace CLFECOMMON;
@@ -964,7 +970,7 @@ void cbServiceUp( const string& serviceName, NLNET::TServiceId serviceId, void *
 
 		// send number of players on FS
 		CMessage			msgPlr("NBPLAYERS2");
-		uint32				nbClients = CFrontEndService::instance()->receiveSub()->clientMap().size();
+		uint32				nbClients = (uint32)CFrontEndService::instance()->receiveSub()->clientMap().size();
 		uint32				nbPendingClients = CLoginServer::getNbPendingUsers();
 		
 		msgPlr.serial(nbClients);
@@ -1019,7 +1025,7 @@ void cbServiceDown( const string& serviceName, NLNET::TServiceId serviceId, void
 			nlinfo( "Entering SERVER_DOWN mode" );
 
 			// remove all limbo clients
-			uint	clientsInLimbo = CFrontEndService::instance()->receiveSub()->LimboClients.size();
+			uint	clientsInLimbo = (uint)CFrontEndService::instance()->receiveSub()->LimboClients.size();
 			CFrontEndService::instance()->receiveSub()->LimboClients.clear();
 			nlinfo("Removed %d clients in limbo mode", clientsInLimbo);
 		}
@@ -1211,7 +1217,7 @@ void CFrontEndService::init()
 //		if (IService::getInstance()->haveArg('p'))
 //		{
 //			// use the command line param if set
-//			frontendPort = atoi(IService::getInstance()->getArg('p').c_str());
+//			frontendPort = NLMISC::fromString(IService::getInstance()->getArg('p').c_str());
 //		}
 //		else
 //		{
@@ -1328,7 +1334,7 @@ void CFrontEndService::init()
 
 		CActionGeneric::ServerSide = true;
 	}
-	catch ( Exception& e )
+	catch (const Exception &e)
 	{
 		nlerror( "Error: %s", e.what() );
 	}
@@ -1729,7 +1735,8 @@ NLMISC_COMMAND( switchStats, "Switch stats", "" )
 NLMISC_COMMAND( monitorClient, "Set the client id to monitor", "<clientid>" )
 {
 	if (args.size() != 1) return false;
-	TClientId clientid = atoi(args[0].c_str());
+	TClientId clientid;
+	NLMISC::fromString(args[0], clientid);
 	if ( clientid <= MAX_NB_CLIENTS )
 		CFrontEndService::instance()->monitorClient( clientid );
 	return true;
@@ -1740,7 +1747,8 @@ NLMISC_COMMAND( disconnectClient, "Disconnect a client", "<clientid>" )
 {
 	if (args.size() != 1) return false;
 	
-	TClientId clientid = atoi(args[0].c_str());
+	TClientId clientid;
+	NLMISC::fromString(args[0], clientid);
 	
 	CClientHost *clienthost;
 	if ( (clientid <= MaxNbClients) && ((clienthost = CFrontEndService::instance()->sendSub()->clientIdCont()[clientid]) != NULL) )
@@ -1774,8 +1782,10 @@ NLMISC_COMMAND( getTargetPosAtTick, "Get the last target entity position that wa
 {
 	if ( args.size() < 2 )
 		return false;
-	TClientId clientId = atoi(args[0].c_str());
-	NLMISC::TGameCycle tick = atoi(args[1].c_str());
+	TClientId clientId;
+	NLMISC::fromString(args[0], clientId);
+	NLMISC::TGameCycle tick;
+	NLMISC::fromString(args[1], tick);
 
 	// Search
 	bool found = false;
@@ -1813,7 +1823,10 @@ NLMISC_COMMAND( dumpImpulseStats, "Dump Impulse stat to XML log", "<logfile> [[-
 
 	sint	maxdump = -1;
 	if (args.size() >= 2)
-		maxdump = abs(atoi(args[1].c_str()));
+	{
+		NLMISC::fromString(args[1], maxdump);
+		maxdump = abs(maxdump);
+	}
 
 	bool	reverse = (args.size() >= 2 && args[1][0] == '-');
 

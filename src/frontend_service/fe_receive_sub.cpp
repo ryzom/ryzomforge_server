@@ -854,7 +854,7 @@ void CFeReceiveSub::handleReceivedMsg( CClientHost *clienthost )
 						sint v = file.serialVersion( 0 );
 						file.serialCont( _AutoUidMap );
 					}
-					catch ( Exception& )
+					catch (const Exception&)
 					{
 						nlinfo( "No AutoAllocUserid data found yet" );
 					}
@@ -898,7 +898,7 @@ void CFeReceiveSub::handleReceivedMsg( CClientHost *clienthost )
 					file.serialVersion( 0 );
 					file.serialCont( _AutoUidMap );
 				}
-				catch ( Exception& e )
+				catch (const Exception &e)
 				{
 					nlwarning( "Could not save AutoAllocUserid data: %s", e.what() );
 				}
@@ -1394,17 +1394,17 @@ void CFeReceiveSub::handleReceivedMsg( CClientHost *clienthost )
 			}
 		}
 	}
-	catch( EStreamOverflow& )
+	catch(const EStreamOverflow& )
 	{
 		TUid userId = clienthost ? clienthost->Uid : 0;
 		rejectReceivedMessage( InsufficientSize, userId );
 	}
-	catch( EInvalidDataStream& )
+	catch(const EInvalidDataStream& )
 	{
 		TUid userId = clienthost ? clienthost->Uid : 0;
 		rejectReceivedMessage( HackedSizeInBuffer, userId );
 	}
-	catch ( Exception& )
+	catch (const Exception& )
 	{
 		TUid userId = clienthost ? clienthost->Uid : 0;
 		rejectReceivedMessage( UnknownExceptionType, userId );
@@ -1527,7 +1527,7 @@ void		CFeReceiveSub::removeFromRemoveList( TClientId clientid )
 
 uint32	 CFeReceiveSub::getNbClient()
 {
-	return _ClientMap.size();
+	return (uint32)_ClientMap.size();
 }
 
 
@@ -1583,7 +1583,7 @@ NLMISC_COMMAND( displayPlayerInfo, "Display the properties of a player", "[<clie
 		TClientId clientid;
 		/*if ( entityId.isUnknownId() )
 		{*/
-			 clientid = atoi(args[0].c_str());
+			 NLMISC::fromString(args[0], clientid);
 		/*}
 		else
 		{
@@ -1629,10 +1629,12 @@ NLMISC_COMMAND( slotToEntityId, "Get the entityid of a slot of a client (and pos
 	if ( args.size() < 2 )
 		return false;
 
-	TClientId clientid = atoi(args[0].c_str());
+	TClientId clientid;
+	NLMISC::fromString(args[0], clientid);
 	if ( clientid <= MaxNbClients )
 	{
-		TCLEntityId slot = atoi(args[1].c_str());
+		TCLEntityId slot;
+		NLMISC::fromString(args[1], slot);
 		TEntityIndex entityIndex = CFrontEndService::instance()->PrioSub.VisionArray.getEntityIndex( clientid, slot );
 		if ( entityIndex.getIndex() < (uint32)TheDataset.maxNbRows() )
 		{
@@ -1685,7 +1687,7 @@ NLMISC_DYNVARIABLE( uint32, NbPlayers, "Number of connected players" )
 {
 	// We can only read the value
 	if ( get )
-		*pointer = CFrontEndService::instance()->receiveSub()->clientMap().size();
+		*pointer = (uint32)CFrontEndService::instance()->receiveSub()->clientMap().size();
 }
 
 
@@ -1734,7 +1736,7 @@ NLMISC_COMMAND( clientByUserId, "Get a client id by user id", "<userId>" )
 	if ( args.empty() )
 		return false;
 	else
-		userId = atoi(args[0].c_str());
+		NLMISC::fromString(args[0], userId);
 
 	CClientHost *clienthost = CFrontEndService::instance()->receiveSub()->findClientHostByUid( userId );
 	if ( clienthost )
@@ -1759,7 +1761,7 @@ NLMISC_COMMAND( dumpClientInfo, "Dump all client info into a file", "<fileName> 
 	else
 	{
 		filename = args[0];
-		clientid = atoi(args[1].c_str());
+		NLMISC::fromString(args[1], clientid);
 		if ( args.size() > 2 )
 			sbd = (args[2]==string("1"));
 	}

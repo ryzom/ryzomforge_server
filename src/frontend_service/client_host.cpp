@@ -26,6 +26,7 @@
 #include "id_impulsions.h"
 #include "uid_impulsions.h"
 
+using namespace std;
 using namespace NLMISC;
 using namespace CLFECOMMON;
 
@@ -476,7 +477,7 @@ void				CClientHost::CGenericMultiPartTemp::set (CActionGenericMultiPart *agmp, 
 	BlockReceived[agmp->Part] = true;
 
 	NbCurrentBlock++;
-	TempSize += agmp->PartCont.size();
+	TempSize += (uint32)agmp->PartCont.size();
 
 	if (NbCurrentBlock == NbBlock)
 	{

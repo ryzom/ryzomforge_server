@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "stdpch.h"
+
 #include "nel/misc/common.h"
 
 #include "game_share/utils.h"
@@ -46,7 +48,7 @@ public:
 		_X=0;
 		_Y=0;
 		_MaxDist=0;
-		_MaxDistTime=_Distances.size()/2;
+		_MaxDistTime=(uint32)_Distances.size()/2;
 	}
 
 	void start(TDataSetRow entityIndex, sint32 x, sint32 y, uint32 tick)
@@ -58,7 +60,7 @@ public:
 		_X=x;
 		_Y=y;
 		_MaxDist=0;
-		_MaxDistTime=_Distances.size()/2;
+		_MaxDistTime=(uint32)_Distances.size()/2;
 	}
 
 	void add(TDataSetRow entityIndex, sint32 x, sint32 y, uint32 tick)
@@ -99,7 +101,7 @@ public:
 		if ( (_Counter-_MaxDistTime) == (_Distances.size()/2) )
 		{
 			std::string s;
-			for (uint32 i=_Distances.size();i!=0;--i)
+			for (uint32 i=(uint32)_Distances.size();i!=0;--i)
 			{
 				s+=NLMISC::toString(" %d",_Distances[(_Counter-i)%_Distances.size()]);
 			}

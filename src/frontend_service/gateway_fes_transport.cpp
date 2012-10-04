@@ -26,6 +26,7 @@
 using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
+using namespace CLFECOMMON;
 
 extern CGenericXmlMsgHeaderManager GenericXmlMsgHeaderMngr;
 
@@ -139,7 +140,7 @@ public:
 
 	virtual uint32 getRouteCount() const
 	{
-		return _Routes.size();
+		return (uint32)_Routes.size();
 	}
 
 	void dump(NLMISC::CLog &log) const
