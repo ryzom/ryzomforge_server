@@ -1277,7 +1277,7 @@ void CChatManager::sendEmoteTextToAudience(  const TDataSetRow& sender,const std
 			// ignore users in the excluded vector
 			if ( std::find( excluded.begin(),excluded.end(), (*itA) ) == excluded.end() )
 			{
-				// the the phrase
+				// the phrase
 				uint32 sentId = STRING_MANAGER::sendStringToClient( *itA,phraseId.c_str(),params,&IosLocalSender );
 				// send phrase id with an invalid sender, so that client dont display "toto says : toto bows"
 				sendChat2Ex( CChatGroup::say, *itA, sentId, TDataSetRow::createFromRawIndex( INVALID_DATASET_ROW ) );
@@ -1576,7 +1576,7 @@ void CChatManager::sendChatParam( CChatGroup::TGroupType senderChatMode, const T
 	// send the chat phrase to the client	
 	params2[0].Type = STRING_MANAGER::bot;
 	params2[0].setEId(  TheDataset.getEntityId(sender) );
-	uint32 first = 0, last = params.size();
+	uint32 first = 0, last = (uint32)params.size();
 	for ( ; first != last ; ++first)
 	{
 		params2[first + 1] = params[first];
@@ -2337,17 +2337,20 @@ ucstring CChatManager::filterClientInput(ucstring &text)
 			{
 				// Special case if there is <NEW> or <CHG> at the beginning
 				bool hasBrackets = false;
-				if (pos >= 5) {
+				if (pos >= 5)
+				{
 					hasBrackets = (text[pos-1] == '>') &&
 						(text[pos-5] == '<');
 				}
 				// Filter out '&' at the first non-whitespace position to remove 
 				// system color code (like '&SYS&' )
 				bool disallowAmpersand = (result.size() == 0) || hasBrackets;
-				if (disallowAmpersand) {
+				if (disallowAmpersand)
+				{
 					result += '.';
 				}
-				else {
+				else
+				{
 					// authorized ampersand
 					result += '&';
 				}

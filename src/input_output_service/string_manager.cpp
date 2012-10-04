@@ -265,7 +265,9 @@ void CStringManager::TSheetInfo::readGeorges (const NLMISC::CSmartPtr<NLGEORGES:
 		if (sheetId.getSheetType() == NLMISC::CSheetId::typeFromFileExtension("creature"))
 		{
 			form->getRootNode ().getValueByName (gender, "Basics.Gender");
-			Gender = GSGENDER::EGender(atoi(gender.c_str()));
+			sint genderId;
+			NLMISC::fromString(gender, genderId);
+			Gender = GSGENDER::EGender(genderId);
 
 			form->getRootNode ().getValueByName (Race, "Basics.Race");
 
@@ -707,7 +709,7 @@ void CStringManager::broadcastSystemMessage(NLNET::CMessage &message, bool debug
 			}
 		}
 	}
-	catch(CChatManager::EChatClient e)
+	catch(const CChatManager::EChatClient &e)
 	{
 		nlwarning("%s", e.what());
 	}
@@ -902,7 +904,7 @@ uint32	CStringManager::storeString(const ucstring &str)
 	{
 		// create a new entry
 		std::pair<TMappedUStringContainer::iterator, bool> ret;
-		ret = _StringIdx.insert(std::make_pair(str, _StringBase.size()));
+		ret = _StringIdx.insert(std::make_pair(str, (uint32)_StringBase.size()));
 		nlassert(ret.second);
 		_StringBase.push_back(str);
 
@@ -1082,7 +1084,7 @@ void CStringManager::updateUserLanguage( uint32 userId, TServiceId frontEndId, c
 	{
 		CUnifiedNetwork::getInstance()->send( frontEndId, msgout);
 	}
-	catch( Exception& e )
+	catch(const Exception& e)
 	{
 		nlwarning( "CStringManager::updateUserLanguage : Error : %s", e.what() );
 	}
@@ -1100,7 +1102,7 @@ void CStringManager::setPhrase(NLNET::CMessage &message)
 		message.serial(phraseName);
 		message.serial(phraseContent);
 	}
-	catch( Exception& e )
+	catch(const Exception& e)
 	{
 		nlwarning("<setPhrase> %s",e.what());
 		return;
@@ -1376,7 +1378,7 @@ NLMISC_CATEGORISED_COMMAND(stringmanager, loadBotNames, "load a bot names file",
 		filename = args[0];
 
 	if (args.size() > 1)
-		resetBotnames = (atoi(args[1].c_str()) != 0);
+		NLMISC::fromString(args[1], resetBotnames);
 
 	SM->loadBotNames(filename, resetBotnames, &log);
 	return true;

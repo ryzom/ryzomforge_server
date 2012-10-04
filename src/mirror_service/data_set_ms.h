@@ -27,7 +27,7 @@
 #include <nel/net/service.h>
 
 //#include <slist>
-#define slist list
+#define slist std::list
 
 #undef DISPLAY_DELTAS
 
@@ -491,7 +491,7 @@ public:
 	const std::vector<NLNET::TServiceId8>& remoteClientServicesToSync() const { return _RemoteClientServicesToSync; }
 
 	/// Return the number of acknowledges still expected
-	NLNET::TServiceId8::size_type		nbAcksExpected() const { return _LocalClientsDueToSendATEAck.size(); }
+	NLNET::TServiceId8::size_type		nbAcksExpected() const { return (NLNET::TServiceId8::size_type)_LocalClientsDueToSendATEAck.size(); }
 
 protected:
 
@@ -989,7 +989,7 @@ public:
 
 	/// Set a property list. Must be preceded by setupDestPropTrackersInterestedByDelta()
 	template <class T>
-	void							applyListPropChange( TDataSetIndex entityIndex, TPropertyIndex propIndex, NLNET::TServiceId srcServiceId, std::slist<T>& tempList, NLMISC::TGameCycle timestamp )
+	void							applyListPropChange( TDataSetIndex entityIndex, TPropertyIndex propIndex, NLNET::TServiceId srcServiceId, slist<T>& tempList, NLMISC::TGameCycle timestamp )
 	{
 		// Set if the received timestamp is newer than the stored timestamp
 		NLMISC::TGameCycle& localTimestamp = _PropertyContainer.PropertyValueArrays[propIndex].ChangeTimestamps[entityIndex];
@@ -1033,14 +1033,14 @@ public:
 
 	/// Erase a list and set the new one instead
 	template <class T>
-	void							replaceList( TDataSetIndex entityIndex, TPropertyIndex propIndex, std::slist<T>& tempList )
+	void							replaceList( TDataSetIndex entityIndex, TPropertyIndex propIndex, slist<T>& tempList )
 	{
 		// Clear old list
 		CMirrorPropValueListMS<T> theList( *this, TDataSetRow(entityIndex), propIndex );
 		theList.clear();
 
 		// Paste new list
-		typename std::slist<T>::iterator it;
+		typename slist<T>::iterator it;
 		for ( it=tempList.begin(); it!=tempList.end(); ++it )
 		{
 			theList.push_front( *it ); // re-reverse ordering

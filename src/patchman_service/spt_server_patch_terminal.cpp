@@ -783,7 +783,7 @@ NLMISC_CLASS_COMMAND_IMPL(CServerPatchTerminal, depDevCfg)
 		CSString batch;
 		// hack the cmd line
 		CVectorSString cmdParams;
-		explode(appDesc.CmdLine, " ", reinterpret_cast<vector<string>&>(cmdParams), true);
+		explode(string(appDesc.CmdLine), string(" "), reinterpret_cast<vector<string>&>(cmdParams), true);
 		for (uint i=0; i<cmdParams.size(); ++i)
 		{
 			string &p = cmdParams[i];

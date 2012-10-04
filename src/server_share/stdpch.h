@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <math.h>
 #include <time.h>
 
@@ -32,6 +33,7 @@
 #include <utility>
 #include <deque>
 #include <memory>
+#include <limits>
 
 #include <nel/misc/common.h>
 #include <nel/misc/debug.h>

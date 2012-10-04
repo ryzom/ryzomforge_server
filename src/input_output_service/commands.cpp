@@ -78,9 +78,12 @@ NLMISC_COMMAND(smString, "display a string from the string manager <string_id>",
 		return false;
 	}
 
-	const ucstring &str = SM->getString(atoi(args[0].c_str()));
+	uint32 stringId;
+	NLMISC::fromString(args[0], stringId);
 
-	log.displayNL("String id %u = [%s]", atoi(args[0].c_str()), str.toString().c_str());
+	const ucstring &str = SM->getString(stringId);
+
+	log.displayNL("String id %u = [%s]", stringId, str.toString().c_str());
 
 	return true;
 }
@@ -373,7 +376,8 @@ NLMISC_COMMAND(smTest, "Send a test dyn string to a client (look at first phrase
 		}
 		else if (args[1] == "TEST_DYN_STRING")
 		{
-			uint32 id = atoi(args[2].c_str());
+			uint32 id;
+			NLMISC::fromString(args[2], id);
 			p.Type = STRING_MANAGER::dyn_string_id;
 			p.StringId = id;
 			params.push_back(p);
@@ -381,7 +385,8 @@ NLMISC_COMMAND(smTest, "Send a test dyn string to a client (look at first phrase
 		}
 		else if (args[1] == "TEST_STRING")
 		{
-			uint32 id = atoi(args[2].c_str());
+			uint32 id;
+			NLMISC::fromString(args[2], id);
 			p.Type = STRING_MANAGER::string_id;
 			p.StringId = id;
 			params.push_back(p);
@@ -523,7 +528,7 @@ NLMISC_COMMAND(mute,"Mute or unmute a player. the player can be muted for a fixe
 	sint32 delay = -1;
 	if( args.size() > 1 )
 	{
-		delay = atoi(args[1].c_str());
+		NLMISC::fromString(args[1], delay);
 	}
 
 	CCharacterInfos * charInfos = IOS->getCharInfos( args[0] );
@@ -533,7 +538,7 @@ NLMISC_COMMAND(mute,"Mute or unmute a player. the player can be muted for a fixe
 		{
 			IOS->getChatManager().getClient(charInfos->DataSetIndex).mute( delay );
 		}
-		catch( Exception& e )
+		catch(const Exception &e)
 		{
 			nlwarning("<mite> %s",e.what());
 		}
@@ -588,8 +593,10 @@ NLMISC_COMMAND(genImpulsion,"generate a fake impulsion, used to debug the CActio
 	
 	CBitMemStream stream;
 
+	uint count;
+	NLMISC::fromString(args[0], count);
 	uint8 val = 0xAC;
-	for (uint i = 0; i < atoi(args[0].c_str()); i++)
+	for (uint i = 0; i < count; i++)
 		stream.serial (val);
 
 	//vector<uint8> &v = stream.bufferAsVector();
@@ -615,7 +622,7 @@ NLMISC_COMMAND( displayChatClients, "Display the list of clients", "" )
 	return true;
 }
 
-NLMISC_COMMAND( displayChatGroups, "Display the list of chat groups, optionnaly, display universe chat group and/or player audience groups", "[universe] [player]" )
+NLMISC_COMMAND( displayChatGroups, "Display the list of chat groups, optionally, display universe chat group and/or player audience groups", "[universe] [player]" )
 {
 	bool displayUniverse = false;
 	bool playerAudience = false;
@@ -638,7 +645,7 @@ NLMISC_COMMAND( displayChatGroups, "Display the list of chat groups, optionnaly,
 	return true;
 }
 
-NLMISC_COMMAND( displayChatAudience, "Display the current chat dynamic audience for a player, optionnaly, force the update", "<playerId> [update]" )
+NLMISC_COMMAND( displayChatAudience, "Display the current chat dynamic audience for a player, optionally, force the update", "<playerId> [update]" )
 {
 	bool update = false;
 	if (args.size() < 1)

@@ -46,6 +46,11 @@
 #endif
 */
 
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
+
 // force admin module to link in
 extern void admin_modules_forceLink();
 void foo()
@@ -341,7 +346,7 @@ void CInputOutputService::init()
 //		CConfigFile::CVar& cvDynamicDB = ConfigFile.getVar("DynamicDB");
 //		dynamicDBFileName = cvDynamicDB.asString();
 //	}
-//	catch(EUnknownVar &) 
+//	catch(const EUnknownVar &) 
 //	{
 //		nlwarning("<CInputOutputService::init> using default chat files");
 //	}
@@ -353,7 +358,7 @@ void CInputOutputService::init()
 		CConfigFile::CVar& cvMaxDistShout = ConfigFile.getVar("MaxDistShout");
 		MaxDistShout = cvMaxDistShout.asInt();
 	}
-	catch(EUnknownVar &) 
+	catch(const EUnknownVar &) 
 	{
 		nlinfo("<CInputOutputService::init> using default chat max distance values");
 	}
@@ -598,7 +603,7 @@ void CInputOutputService::addCharacterName( const TDataSetRow& chId, const ucstr
 		}
 
 		// See if an existing player was renamed
-		if (oldname != ucstring(""))
+		if (!oldname.empty())
 		{
 			TSessionId sessionid;
 			string name = charInfos->ShortName.toUtf8();
