@@ -290,7 +290,7 @@ NLMISC_COMMAND(dumpRoadCon, "dump road/cell connectivity graph","<continentName>
 	uint instanceIndex = 0;
 
 	if (args.size() == 2)
-		instanceIndex = atoi(args[1].c_str());
+		NLMISC::fromString(args[1], instanceIndex);
 
 	if (instanceIndex >= CAIS::instance().AIList().size())
 	{
@@ -399,7 +399,7 @@ NLMISC_COMMAND(dumpContinent, "dump the structure of a continent","<continentNam
 	uint instanceIndex = 0;
 
 	if (args.size() == 2)
-		instanceIndex = atoi(args[1].c_str());
+		NLMISC::fromString(args[1], instanceIndex);
 
 	if (instanceIndex >= CAIS::instance().AIList().size())
 	{
@@ -552,7 +552,8 @@ NLMISC_COMMAND(createDynamicAIInstance, "Create a new dynamic AIInstance","")
 		return false;
 
 	// find an unused continent id
-	uint32 in=atoi(args[0].c_str());
+	uint32 in;
+	NLMISC::fromString(args[0], in);
 	if( !CAIS::instance().getAIInstance(in) )
 	{	
 		std::string name= NLMISC::toString("ring_%d",in);
@@ -813,7 +814,7 @@ public:
 			const	std::string	&str=args[i];
 			string	res;			
 			if (getParameter(str,"index-",res))
-				_index=uint32(atoi(res.c_str()));
+				NLMISC::fromString(res, _index);
 			if (getParameter(str,"value-",res))
 				_value=float(atof(res.c_str()));
 			_detailled|=getParameter(str,"detailled",res);
@@ -833,7 +834,7 @@ public:
 				fb->setModifier	(_value, nrjIndex);
 			return;
 		}
-		fb->setModifier	(_value, _index);
+		fb->setModifier	(_value, (uint32)_index);
 	}
 	
 	virtual	void	doOnCellZone(CCellZone	*cz)	const
@@ -843,7 +844,7 @@ public:
 	}
 protected:	
 private:
-	size_t	_index;
+	uint32	_index;
 	float	_value;
 	bool	_detailled;
 	mutable	CLogStringWriter	_stringWriter;
@@ -1811,7 +1812,8 @@ bool execLoadScript(CStringWriter& stringWriter, vector<string> const& args)
 		NLMISC::CIFile file(NLMISC::CPath::lookup(args[2]));
 		
 		vector<string> lines;
-		while (!file.eof()) {
+		while (!file.eof())
+		{
 			const size_t bufferSize = 4*1024;
 			char buffer[bufferSize];
 			file.getline(buffer, bufferSize);
@@ -1824,7 +1826,7 @@ bool execLoadScript(CStringWriter& stringWriter, vector<string> const& args)
 		FOREACHC(itGrp, vector<CGroup*>, grps)
 			(*itGrp)->getPersistentStateInstance()->interpretCode(NULL, codePtr);
 	}
-	catch (EPathNotFound e)
+	catch (const EPathNotFound &)
 	{
 		nlwarning("Path not found while loading AIS script %s", args[2].c_str());
 		return false;
@@ -1843,7 +1845,8 @@ NLMISC_COMMAND(getInfo,"display returned values of buffered commands","")
 {
 	CLogStringWriter	stringWriter(&log);
 	
-	FOREACHC(strIt, vector<string>, bufferedRetStrings) {
+	FOREACHC(strIt, vector<string>, bufferedRetStrings)
+	{
 		stringWriter.append(*strIt);
 	}
 	
@@ -1938,7 +1941,7 @@ NLMISC_COMMAND(displayTarget,"display bot target status for given bot(s) or play
 
 		if	(!found)
 		{
-			log.displayNL("=> can't display informations for the target of: %s", args[i].c_str());		
+			log.displayNL("=> can't display information for the target of: %s", args[i].c_str());		
 		}
 		
 	}
@@ -2039,7 +2042,7 @@ NLMISC_COMMAND(displayVisionRadius,"display roughly 'radius' cell vision centred
 	x=atof(args[1].c_str());
 	y=atof(args[2].c_str());
 	if (args.size()==4)
-		dist=atoi(args[3].c_str());
+		NLMISC::fromString(args[3], dist);
 	log.displayNL("%dm Vision around (%.3f,%.3f)", dist, x.asDouble(), y.asDouble());
 
 	uint32 botCount=0;
@@ -2230,7 +2233,8 @@ NLMISC_COMMAND(setWatch,"setup one of the watch variables","<watch id> <mgr, grp
 	if (args.size()!=2 && args.size()!=3)
 		return false;
 
-	uint	idx=atoi(args[0].c_str());
+	uint	idx;
+	NLMISC::fromString(args[0], idx);
 	if	(	toString(idx)!=args[0]
 		||	idx>=sizeof(watchStrings)/sizeof(watchStrings[0]))
 		return false;
@@ -2243,7 +2247,7 @@ NLMISC_COMMAND(setWatch,"setup one of the watch variables","<watch id> <mgr, grp
 	watchEntity[idx]=CAIEntityPtr;
 	
 	if	(args.size()==3)
-		watchIdx[idx]=atoi(args[2].c_str());
+		NLMISC::fromString(args[2], watchIdx[idx]);
 	else
 		watchIdx[idx]=0;
 	return	true;
@@ -2414,14 +2418,18 @@ NLMISC_COMMAND(setGrpTimers,"set the timer values for a given group","<grp id> <
 		return true;
 	}
 
-	if (atoi(args[1].c_str())<1 || atoi(args[2].c_str())<1)
+	uint32 eatTime, restTime;
+	NLMISC::fromString(args[1], eatTime);
+	NLMISC::fromString(args[2], restTime);
+
+	if (eatTime<1 || restTime<1)
 	{
 		log.displayNL("Invalid time parameters");
 		return true;
 	}
 
-	grp->setTimer(CGrpFauna::EAT_TIME,(uint32)atoi(args[1].c_str())*10);
-	grp->setTimer(CGrpFauna::REST_TIME,(uint32)atoi(args[2].c_str())*10);
+	grp->setTimer(CGrpFauna::EAT_TIME, eatTime*10);
+	grp->setTimer(CGrpFauna::REST_TIME, restTime*10);
 	return true;
 }
 
@@ -2431,19 +2439,24 @@ NLMISC_COMMAND(setGrpTimers,"set the timer values for a given group","<grp id> <
 void cbTick();
 extern uint ForceTicks;
 
-NLMISC_COMMAND(updateAI,"call CAIS::update() (simulate a tick off-line)","")
+NLMISC_COMMAND(updateAI,"call CAIS::update() (simulate a tick off-line)","[tick]")
 {
 	if(args.size() >1)
 		return false;
 
 	// if there's an argument make sure its a positive integer
-	if (args.size()==1 && (atoi(args[0].c_str())<1 || toString(atoi(args[0].c_str()))!=args[0]))
-		return false;
+	if (args.size()==1)
+	{
+		uint tick;
+		NLMISC::fromString(args[0], tick);
+		if ((tick < 1) || (toString(tick)!=args[0]))
+			return false;
 
-	if (args.size()==0)
-		cbTick();
-	else
-		ForceTicks=atoi(args[0].c_str());
+		ForceTicks = tick;
+		return true;
+	}
+
+	cbTick();
 
 	return true;
 }
@@ -2720,7 +2733,7 @@ NLMISC_COMMAND(botSetPosition,"set the position of one or several bots","<eid> [
 		x = (float)atof(args[1].c_str());
 		y = (float)atof(args[2].c_str());
 		if (args.size()==4)
-			z = (uint)atoi(args[3].c_str());
+			NLMISC::fromString(args[3], z);
 	}
 	
 	// For each bot
@@ -2883,8 +2896,8 @@ NLMISC_COMMAND(unloadPrimitiveFile,"unload a primitive file","<file name>")
 static int const MULTI_LINE_FORMATER_maxn = 78;
 void MULTI_LINE_FORMATER::pushTitle(std::vector<std::string>& container, std::string const& text)
 {
-	int const maxn = MULTI_LINE_FORMATER_maxn;
-	int n = maxn - text.length() - 4;
+	const sint maxn = MULTI_LINE_FORMATER_maxn;
+	sint n = maxn - (sint)text.length() - 4;
 	container.push_back(" _/");
 	container.back() += text;
 	container.back() += "\\" + std::string(n, '_');
@@ -2984,7 +2997,8 @@ NLMISC_COMMAND(simulateBug, "simulate an old AIS bug; command is one of 'list', 
 				initBugSimulationTexts();
 				log.displayNL("Bug simulations");
 				log.displayNL("Id|Description                              |State");
-				for (int i=0; i<bugSimulationCount; ++i) {
+				for (int i=0; i<bugSimulationCount; ++i)
+				{
 					log.displayNL("%02d|%s|%s", i, simulateBugText(i), simulateBugs[i]?"on":"off");
 				}
 				return true;
@@ -3002,7 +3016,8 @@ NLMISC_COMMAND(simulateBug, "simulate an old AIS bug; command is one of 'list', 
 				}
 				else
 				{
-					int i = atoi(args[1].c_str());
+					sint i;
+					NLMISC::fromString(args[1], i);
 					if (i>=0 && i<bugSimulationCount)
 						simulateBugs[i] = true;
 					else
@@ -3018,12 +3033,13 @@ NLMISC_COMMAND(simulateBug, "simulate an old AIS bug; command is one of 'list', 
 				initBugSimulations();
 				if (args[1]=="all")
 				{
-					for (int i=0; i<bugSimulationCount; ++i)
+					for (sint i=0; i<bugSimulationCount; ++i)
 						simulateBugs[i] = false;
 				}
 				else
 				{
-					int i = atoi(args[1].c_str());
+					sint i;
+					NLMISC::fromString(args[1], i);
 					if (i>=0 && i<bugSimulationCount)
 						simulateBugs[i] = false;
 					else

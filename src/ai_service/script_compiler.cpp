@@ -895,7 +895,8 @@ CCompiler::CCompiler()
 		const int bufferSize = 256;
 		char buffer[bufferSize];
 		
-		while (!file.eof()) {
+		while (!file.eof())
+		{
 			file.getline(buffer, bufferSize);
 			if (buffer[0]=='#' || buffer[0]=='\0') // Skip lines begining with a # and empty lines
 				continue;
@@ -905,12 +906,15 @@ CCompiler::CCompiler()
 			string part1, part2, part3;
 			
 			string::size_type pos1 = line.find(sep1);
-			if (pos1!=string::npos) {
+			if (pos1!=string::npos)
+			{
 				pos1+=sep1.size();
 				string::size_type pos2 = line.find(sep2, pos1);
-				if (pos2!=string::npos) {
+				if (pos2!=string::npos)
+				{
 					pos2+=sep2.size();
-					if (pos1!=string::npos && pos2!=string::npos) {
+					if (pos1!=string::npos && pos2!=string::npos)
+					{
 						part1 = line.substr(0, pos1-sep1.size()); // begin to sep1
 						part2 = line.substr(pos1, pos2-pos1-sep2.size()); // sep1 to sep2
 						part3 = line.substr(pos2); // sep2 to end
@@ -918,13 +922,19 @@ CCompiler::CCompiler()
 				}
 			}
 			
-			if (part1.size()!=0 && part2.size()!=0 && part3.size()!=0) {
-				if (part1=="token") {
+			if (part1.size()!=0 && part2.size()!=0 && part3.size()!=0)
+			{
+				if (part1=="token")
+				{
 					addToken(part2, part3);
-				} else if (part1=="rule") {
+				}
+				else if (part1=="rule")
+				{
 					addRule(part2, part3);
 				}
-			} else {
+			}
+			else
+			{
 				nlwarning("Invalid script line: \"%s\"", line.c_str());
 			}
 		}
@@ -1026,7 +1036,7 @@ CSmartPtr<CSubRuleTracer> CCompiler::buildCodeTree (const string &code) const
 	CSmartPtr<CSubRuleTracer> lastInsertedTracer;
 	CSmartPtr<CSubRuleTracer> firstInsertedTracer;
 	
-	// For each token the the code.
+	// For each token of the code.
 	while (index<code.size())
 	{
 		std::string tokenName;
@@ -1125,7 +1135,7 @@ void CCompiler::dumpByteCode (const string &sourceCode, const string &fullName, 
 {
 	// Build a valid filename
 	string tmp = fullName;
-	int pos;
+	string::size_type pos;
 	while ((pos=tmp.find (':')) != string::npos)
 		tmp[pos] = '-';
 
@@ -1190,7 +1200,7 @@ CSmartPtr<const AIVM::CByteCode> CCompiler::compileCodeOld (const string &source
 
 		return tmp;
 	}
-	catch (Exception &e)
+	catch (const Exception &e)
 	{
 		nlwarning("compilation failed for %s", fullName.c_str());
 		nlwarning(e.what());
@@ -1923,7 +1933,9 @@ void CSubRuleTracer::generateCode(CSmartPtr<AIVM::CByteCode> &cByteCode) const
 				case CScriptVM::JUMP:
 					byteCode.push_back(op); // + Jump offset.
 
-					jumpTable.add(CJumpRememberer(atoi(param.c_str())));
+					uint32 index;
+					NLMISC::fromString(param, index);
+					jumpTable.add(CJumpRememberer(index));
 					byteCode.push_back(0); // Invalid
 					break;
 				default:
@@ -1938,7 +1950,9 @@ void CSubRuleTracer::generateCode(CSmartPtr<AIVM::CByteCode> &cByteCode) const
 			{
 				if (str.find("Atof")!=string::npos)
 				{
-					const size_t index=atoi(param.c_str())-1;
+					uint32 index;
+					NLMISC::fromString(param, index);
+					--index;
 					string &strRef=_childTracers[index]->_TextValue;
 					const float f=(float)atof(strRef.c_str());
 					byteCode.push_back(*((size_t*)&f));
@@ -1948,7 +1962,9 @@ void CSubRuleTracer::generateCode(CSmartPtr<AIVM::CByteCode> &cByteCode) const
 				
 				if (str.find("String")!=string::npos)
 				{
-					const size_t index=atoi(param.c_str())-1;
+					uint32 index;
+					NLMISC::fromString(param, index);
+					--index;
 					string &strRef=_childTracers[index]->_TextValue;
 					TStringId strId;
 					if ( strRef.at(0)=='"'
@@ -2005,7 +2021,9 @@ void CSubRuleTracer::generateCode(CSmartPtr<AIVM::CByteCode> &cByteCode) const
 				
 				if (str.find("Code")!=string::npos)
 				{
-					const size_t index=atoi(param.c_str())-1;
+					uint32 index;
+					NLMISC::fromString(param, index);
+					--index;
 					if (byteCode.size()==0)
 						byteCode=codePieces[index]->_opcodes;
 					else
@@ -2176,7 +2194,7 @@ bool compileExternalScript (const char *filename, const char *outputFilename)
 		string content;
 		char buffer[512];
 		int read;
-		while ((read = fread (buffer, 1, sizeof(buffer)-1, file)) == sizeof(buffer)-1)
+		while ((read = (int)fread (buffer, 1, sizeof(buffer)-1, file)) == sizeof(buffer)-1)
 		{
 			buffer[read] = 0;
 			content += buffer;

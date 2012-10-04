@@ -501,7 +501,7 @@ void CBotNpc::calcSpawnPos(RYAI_MAP_CRUNCH::CWorldMap const& worldMap)
 		std::vector<CShape::TPosition> const& posList = state->shape().getGeometry();		
 		do
 		{
-			const	uint32 a=CAIS::rand16(posList.size());
+			const	uint32 a=CAIS::rand16((uint32)posList.size());
 			const	uint32 b=(a+1)%posList.size();
 			const	double weight=CAIS::frand();
 			_StartPos.setXY(posList[a].toAIVector()+(posList[b].toAIVector()-posList[a].toAIVector())*weight);
@@ -917,7 +917,8 @@ void CBotNpc::setColours(std::string input)
 				{
 					// split succeeded so verify that idxStr contains anumber in range 0..7 and add
 					// the name to the list of valid names for the given slot
-					uint32 idx=(uint32)atoi(idxStr.c_str());
+					uint32 idx;
+					NLMISC::fromString(idxStr, idx);
 					if (NLMISC::toString(idx)==idxStr && idx<numColours)
 						colourNames[idx].push_back(name);
 				}
@@ -953,10 +954,11 @@ void CBotNpc::setColours(std::string input)
 			// extract the next word from the tail
 			AI_SHARE::stringToWordAndTail(tail,colour,tail);
 			// if the colour string is a number then treat it directly
-			if (NLMISC::toString(atoi(colour.c_str()))==colour)
+			uint32 idx;
+			NLMISC::fromString(colour, idx);
+			if (NLMISC::toString(idx)==colour)
 			{
 				// we've got a number so make sue it's in valid range and add to results vector
-				uint32 idx = atoi(colour.c_str());
 				if (idx<numColours)
 					results.push_back(idx);
 				else
@@ -978,7 +980,7 @@ void CBotNpc::setColours(std::string input)
 						if (NLMISC::nlstricmp(colour,colourNames[i][j])==0)
 						{
 							// found an entry so add to the results vector
-							results.push_back(i);
+							results.push_back((uint32)i);
 							done=true;
 						}
 					}
@@ -1008,7 +1010,7 @@ void CBotNpc::setColours(std::string input)
 		{
 			// upper body colour
  			generator.srand(seed+975*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorArms(val);
 			_Sheet->setColorHands(val);
 			_Sheet->setColorBody(val);
@@ -1017,7 +1019,7 @@ void CBotNpc::setColours(std::string input)
 		{
 			// lower body colour
  			generator.srand(seed+977*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorLegs(val);
 			_Sheet->setColorFeets(val);
 		}
@@ -1025,49 +1027,49 @@ void CBotNpc::setColours(std::string input)
 		{
 			// hair colour, mapped to head
  			generator.srand(seed+976*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorHead(val);
 		}
 		else if ( NLMISC::nlstricmp(keyword,"CHEAD")==0)
 		{
 			// head color
  			generator.srand(seed+979*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorHead(val);
 		}
 		else if ( NLMISC::nlstricmp(keyword,"CARMS")==0)
 		{
 			// arms color
  			generator.srand(seed+981*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorArms(val);
 		}
 		else if ( NLMISC::nlstricmp(keyword,"CHANDS")==0)
 		{
 			// arms color
  			generator.srand(seed+983*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorHands(val);
 		}
 		else if ( NLMISC::nlstricmp(keyword,"CBODY")==0)
 		{
 			// arms color
  			generator.srand(seed+985*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorBody(val);
 		}
 		else if ( NLMISC::nlstricmp(keyword,"CLEGS")==0)
 		{
 			// arms color
  			generator.srand(seed+987*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorLegs(val);
 		}
 		else if ( NLMISC::nlstricmp(keyword,"CFEETS")==0)
 		{
 			// arms color
  			generator.srand(seed+989*0x10000);
-			uint8 val = (uint8)results[generator.rand(results.size()-1)];
+			uint8 val = (uint8)results[generator.rand((uint16)results.size()-1)];
 			_Sheet->setColorFeets(val);
 		}
 	}

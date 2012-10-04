@@ -928,7 +928,7 @@ void getGroupTemplateWithFlags_sss_s(CStateInstance* entity, CScriptStack& stack
 		return;
 	}
 	
-	CGroupDesc<CGroupFamily> const* groupDesc = groupDescs[CAIS::rand16(groupDescs.size())];
+	CGroupDesc<CGroupFamily> const* groupDesc = groupDescs[CAIS::rand16((uint32)groupDescs.size())];
 	stack.push(groupDesc->getFullName());
 	return;
 }
@@ -1940,7 +1940,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to add
 
 @code
-()addProfileParameter("running"); // équivalent à un parameter "running" dans la primitive du groupe
+()addProfileParameter("running"); // equivalent to "running" parameter in group primitive
 @endcode
 
 */
@@ -1968,7 +1968,7 @@ Arguments: s(parameterName),s(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addProfileParameter("foo", "bar"); // équivalent à un parameter "foo:bar" dans la primitive du groupe
+()addProfileParameter("foo", "bar"); // equivalent to "foo:bar" parameter in group primitive
 @endcode
 
 */
@@ -1997,7 +1997,7 @@ Arguments: s(parameterName),f(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addProfileParameter("foo", 0.5); // équivalent à un parameter "foo:0.5" dans la primitive du groupe
+()addProfileParameter("foo", 0.5); // equivalent to "foo:0.5" parameter in group primitive
 @endcode
 
 */
@@ -2025,7 +2025,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to remove
 
 @code
-()removeProfileParameter("running"); // retire le paramètre "running" ou "running:<*>" du groupe
+()removeProfileParameter("running"); // remove "running" or "running:<*>" parameter from group
 @endcode
 
 */
@@ -2051,7 +2051,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to add
 
 @code
-()addProfileParameter("running"); // équivalent à un parameter "running" dans la primitive du groupe
+()addProfileParameter("running"); // equivalent to "running" parameter in group primitive
 @endcode
 
 */
@@ -2080,7 +2080,7 @@ Arguments: s(parameterName),s(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addPersistentProfileParameter("foo", "bar"); // équivalent à un parameter "foo:bar" dans la primitive du groupe
+()addPersistentProfileParameter("foo", "bar"); // equivalent to "foo:bar" parameter in group primitive
 @endcode
 
 */
@@ -2111,7 +2111,7 @@ Arguments: s(parameterName),f(parameterContent) ->
 @param[in] parameterContent is the value of the parameter
 
 @code
-()addPersistentProfileParameter("foo", 0.5); // équivalent à un parameter "foo:0.5" dans la primitive du groupe
+()addPersistentProfileParameter("foo", 0.5); // equivalent to "foo:0.5" parameter in group primitive
 @endcode
 
 */
@@ -2140,7 +2140,7 @@ Arguments: s(parameterName) ->
 @param[in] parameterName is a the id of the parameter to remove
 
 @code
-()removeProfileParameter("running"); // retire le paramètre "running" ou "running:<*>" du groupe
+()removeProfileParameter("running"); // remove "running" or "running:<*>" parameters from group
 @endcode
 
 */
@@ -3112,7 +3112,7 @@ void setManagerAggroListTarget_ss_(CStateInstance* entity, CScriptStack& stack)
 
 @subsection getBotIndexByName_s_f
 
-Get the index of a bot of a group by its name (or return -1). Mainly usefull for scripted boss.
+Get the index of a bot of a group by its name (or return -1). Mainly useful for scripted boss.
 
 botIndex begins at zero for the first member of the group, -1 if the bot is not found.
 
@@ -3298,7 +3298,7 @@ void isPlayerAlived_s_f(CStateInstance* entity, CScriptStack& stack)
 @subsection getServerTimeStr__s
 
 Gets the server time as string "eg 21:17:14 the x"
-This function is usefull for stat purpose or debug (to know when a boss is down)
+This function is useful for stat purpose or debug (to know when a boss is down)
 
 Arguments: > s(serverTime) 
 
@@ -3627,7 +3627,7 @@ void phrasePushString_ss_(CStateInstance* entity, CScriptStack& stack )
 		
 		case STRING_MANAGER::money:
 		{
-			param.Money = static_cast<uint64>(atoi( s.c_str() ));
+			NLMISC::fromString(s, param.Money);
 			break;
 		}
 	
@@ -3663,13 +3663,13 @@ void phrasePushString_ss_(CStateInstance* entity, CScriptStack& stack )
 				
 		case STRING_MANAGER::integer:
 		{
-			param.Int = atoi( s.c_str());
+			NLMISC::fromString(s, param.Int);
 			break;
 		}
 
 		case STRING_MANAGER::time:
 		{
-			param.Time = atoi( s.c_str());
+			NLMISC::fromString(s, param.Time);
 			break;
 		}
 		
@@ -3712,7 +3712,7 @@ void phrasePushString_ss_(CStateInstance* entity, CScriptStack& stack )
 		case STRING_MANAGER::score:
 		case STRING_MANAGER::body_part:	
 		{		
-			param.Enum = static_cast<uint32>( atoi( s.c_str()) );	
+			NLMISC::fromString(s, param.Enum);
 			break;
 		}
 
@@ -3721,8 +3721,8 @@ void phrasePushString_ss_(CStateInstance* entity, CScriptStack& stack )
 			break;
 
 		case STRING_MANAGER::dyn_string_id:
-		case STRING_MANAGER::string_id:			
-			param.StringId = static_cast<uint32>( atoi( s.c_str()) );	
+		case STRING_MANAGER::string_id:
+			NLMISC::fromString(s, param.StringId);
 			break;
 
 		case STRING_MANAGER::self:
@@ -4354,7 +4354,7 @@ void getBotEid_f_s(CStateInstance* entity, CScriptStack& stack)
 @subsection getBotIndex_s_f
 Get the bot Index by its entityId.
 Entity Id of a bot can be given via getCurrentSpeackerEid().
-It can be usefull to Known the index of the bot in the group with the EntityId.
+It can be useful to Known the index of the bot in the group with the EntityId.
 
 Arguments:  s(botEid) -> f(botIndex),
 
@@ -4737,8 +4737,6 @@ void facing_f_(CStateInstance* entity, CScriptStack& stack)
 			}
 		}
 	}
-
-	return;
 }
 
 std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
@@ -4860,7 +4858,7 @@ std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, teleportPlayer_sffff_);
 	REGISTER_NATIVE_FUNC(functions, summonPlayer_fs_);
 
-		
+
 #undef REGISTER_NATIVE_FUNC
 	
 	return functions;

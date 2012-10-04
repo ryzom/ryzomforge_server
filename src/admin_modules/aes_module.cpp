@@ -741,7 +741,8 @@ namespace ADMIN
 				NLMISC::CFile::deleteFile(ShutdownRequestFileName);
 				fileContents= fileContents.strip().splitToOneOfSeparators(" \t\n\r\x1a");
 
-				_ShutdownForPatch = atoi(fileContents.c_str()) == 0;
+				NLMISC::fromString(fileContents, _ShutdownForPatch);
+				_ShutdownForPatch = !_ShutdownForPatch;
 			}
 		}
 
@@ -809,7 +810,7 @@ namespace ADMIN
 
 			// read the text from the file - note that the number of bytes read may be less than the
 			// number of bytes requested because we've opened the file in text mode and not binary mode
-			uint32 bytesRead= fread(&txt[0],1,fileSize,f);
+			uint32 bytesRead= (uint32)fread(&txt[0],1,fileSize,f);
 			txt.resize(bytesRead);
 			fclose(f);
 
@@ -833,12 +834,15 @@ namespace ADMIN
 
 			// read the text from the file - note that the number of bytes read may be less than the
 			// number of bytes requested because we've opened the file in text mode and not binary mode
-			uint32 bytesRead= fread(&txt[0],1,fileSize,f);
+			uint32 bytesRead= (uint32)fread(&txt[0],1,fileSize,f);
 			txt.resize(bytesRead);
 			fclose(f);
 
 			// return the pid read from the file
-			return atoi(txt.c_str());
+			uint32 pid;
+			NLMISC::fromString(txt, pid);
+
+			return pid;
 		}
 
 
@@ -859,12 +863,15 @@ namespace ADMIN
 
 			// read the text from the file - note that the number of bytes read may be less than the
 			// number of bytes requested because we've opened the file in text mode and not binary mode
-			uint32 bytesRead= fread(&txt[0],1,fileSize,f);
+			uint32 bytesRead= (uint32)fread(&txt[0],1,fileSize,f);
 			txt.resize(bytesRead);
 			fclose(f);
 
 			// parse the text in the buffer
-			return uint32(atoi(txt.c_str()));
+			uint32 counter;
+			NLMISC::fromString(txt, counter);
+
+			return counter;
 		}
 
 		// retrieve service launch info in the config file
@@ -1045,12 +1052,21 @@ namespace ADMIN
 			// update the service state
 			ss.RunningState = TRunningState::rs_online;
 			if (pclDontUseShardOrders)
-				ss.DontUseShardOrders = atoi(pclDontUseShardOrders->ParamValue.c_str()) != 0;
+				NLMISC::fromString(pclDontUseShardOrders->ParamValue, ss.DontUseShardOrders);
 			else
 				ss.DontUseShardOrders = false;
 			ss.LongName = pclLongName != NULL ? pclLongName->ParamValue : "unknown";
 			ss.ShortName = pclShortName != NULL ? pclShortName->ParamValue : "unknown";
-			ss.PID = pclPID!= NULL ? uint32(atoi(pclPID->ParamValue.c_str())) : 0;
+
+			if (pclPID!= NULL)
+			{
+				NLMISC::fromString(pclPID->ParamValue, ss.PID);
+			}
+			else
+			{
+				ss.PID = 0;
+			}
+
 			ss.State = "";
 			ss.LastStateDate = NLMISC::CTime::getSecondsSince1970();
 			ss.ServiceModule = moduleProxy;
@@ -1362,7 +1378,8 @@ retry_pending_command_loop:
 				return false;
 
 			string shardName = args[0];
-			uint32 delay = atoi(args[1].c_str());
+			uint32 delay;
+			NLMISC::fromString(args[1], delay);
 
 			log.displayNL("Received command to stop all service of shard %s in %us", shardName.c_str(), delay);
 

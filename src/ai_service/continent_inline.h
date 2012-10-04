@@ -126,8 +126,8 @@ bool CAICircle::isInside(V const& pos)
 
 inline
 CAabb::CAabb()
-: _VMax(INT_MIN/CAICoord::UNITS_PER_METER, INT_MIN/CAICoord::UNITS_PER_METER)
-, _VMin(INT_MAX/CAICoord::UNITS_PER_METER, INT_MAX/CAICoord::UNITS_PER_METER)
+: _VMin(INT_MAX/CAICoord::UNITS_PER_METER, INT_MAX/CAICoord::UNITS_PER_METER)
+, _VMax(INT_MIN/CAICoord::UNITS_PER_METER, INT_MIN/CAICoord::UNITS_PER_METER)
 {
 }
 /*
@@ -339,9 +339,9 @@ inline
 CNpcZone* CCell::npcZone(size_t index)
 {
 	if (index<_NpcZonePlaces.size())
-		return _NpcZonePlaces[index];
+		return _NpcZonePlaces[(uint32)index];
 	else
-		return _NpcZoneShapes[index];
+		return _NpcZoneShapes[(uint32)index];
 }
 
 inline
@@ -455,7 +455,7 @@ bool CGroupDesc<FamilyT>::setSheet(std::string const& sheetName)
 		{
 			for (size_t i=0; i<_MultiLevelSheetCount; ++i)
 			{
-				char letter = (i/4) + 'b';
+				char letter = char(i/4) + 'b';
 				char number = (i%4) + '1';
 				std::string sheetNameLevel = sheetName+letter+number;
 				// Compute sheet id
@@ -775,11 +775,13 @@ CGroupNpc* CGroupDesc<FamilyT>::createNpcGroup(CMgrNpc* mgr, CAIVector const& po
 					RYAI_MAP_CRUNCH::CWorldMap const& worldMap = CWorldContainer::getWorldMap();
 					RYAI_MAP_CRUNCH::CWorldPosition	wp;
 					uint32 maxTries = 100;
-					do {
+					do
+					{
 						rpos = pos;
 						rpos += randomPos(dispersionRadius);
 						--maxTries;
-					} while (!worldMap.setWorldPosition(AITYPES::vp_auto, wp, rpos) && maxTries>0);
+					}
+					while (!worldMap.setWorldPosition(AITYPES::vp_auto, wp, rpos) && maxTries>0);
 					if (maxTries<=0)
 						rpos = pos;
 				}
@@ -804,11 +806,13 @@ CGroupNpc* CGroupDesc<FamilyT>::createNpcGroup(CMgrNpc* mgr, CAIVector const& po
 				RYAI_MAP_CRUNCH::CWorldMap const& worldMap = CWorldContainer::getWorldMap();
 				RYAI_MAP_CRUNCH::CWorldPosition	wp;
 				uint32 maxTries = 100;
-				do {
+				do
+				{
 					rpos = pos;
 					rpos += randomPos(dispersionRadius);
 					--maxTries;
-				} while (!worldMap.setWorldPosition(AITYPES::vp_auto, wp, rpos) && maxTries>0);
+				}
+				while (!worldMap.setWorldPosition(AITYPES::vp_auto, wp, rpos) && maxTries>0);
 				if (maxTries<=0)
 					rpos = pos;
 			}
@@ -898,6 +902,8 @@ CAliasTreeOwner	*CGroupDesc<FamilyT>::createChild(IAliasCont	*cont, CAIAliasDesc
 	case AITYPES::AITypeBotTemplate:
 	case AITYPES::AITypeBotTemplateMultiLevel:
 		child = new CBotDesc<FamilyT>(this, aliasTree->getAlias(), aliasTree->getName());
+		break;
+	default:
 		break;
 	}
 	
@@ -1047,7 +1053,7 @@ DEFINE_ACTION_TEMPLATE1(ContextGroupDesc,GT_GPRM,FamilyT)
 		std::string param;
 		args[i].get(param);
 		
-		param = NLMISC::strlwr(param);
+		param = NLMISC::toLower(param);
 		
 		if	(	param == "contact camp"
 			||	param == "contact outpost"
@@ -1238,7 +1244,7 @@ void CBotDesc<FamilyT>::setSheet(std::string const& sheetName)
 		{
 			for (size_t i=0; i<_MultiLevelSheetCount; ++i)
 			{
-				char letter = (i/4) + 'b';
+				char letter = char(i/4) + 'b';
 				char number = (i%4) + '1';
 				std::string sheetNameLevel = sheetName+letter+number;
 				// Compute sheet id

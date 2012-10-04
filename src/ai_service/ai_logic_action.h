@@ -46,7 +46,7 @@ public:
 
 	// note that actions are NOT responsible for deleting child actions
 	virtual	~IAILogicAction()
-	{};
+	{}
 
 	// this is the execute 'callback' for the action type.
 	// NOTE: This code should be fast and compact as it may be called very large numbers of times
@@ -58,7 +58,7 @@ public:
 	{}
 
 	// attach a group family to the action if it supports it (assert otherwise)
-	virtual void addGroupFamily(CGroupFamily *gf) { nlassert(0) }
+	virtual void addGroupFamily(CGroupFamily *gf) { nlassert(0); }
 };
 
 // Code use by native functions and LogicAction

@@ -117,9 +117,9 @@ namespace ADMIN
 
 		CAdminExecutorServiceClient()
 			:	_DontUseShardOrders(false),
-				_ProcessUsedMemory(0),
 				_LastStateReport(0),
-				_LastStatusStringReport(0)
+				_LastStatusStringReport(0),
+				_ProcessUsedMemory(0)
 		{
 			CAdminExecutorServiceClientSkel::init(this);
 
@@ -183,10 +183,10 @@ namespace ADMIN
 			// precompute the service name
 			_ServiceAlias = makeServiceAlias();
 
-			// loop for an optionnal 'dontUseShardOrders' flag in init params
+			// loop for an optional 'dontUseShardOrders' flag in init params
 			const TParsedCommandLine *duso = pcl.getParam("dontUseShardOrders");
 			if (duso != NULL)
-				_DontUseShardOrders = (duso->ParamValue == "true" | duso->ParamName == "1");
+				_DontUseShardOrders = (duso->ParamValue == "true" || duso->ParamName == "1");
 
 			return true;
 		}
@@ -272,7 +272,7 @@ namespace ADMIN
 					// every 16 seconds because very slow
 					IVariable *var = dynamic_cast<IVariable*>(ICommand::getCommand("ProcessUsedMemory"));
 					if (var != NULL)
-						_ProcessUsedMemory = uint32(atoi(var->toString().c_str()));
+						NLMISC::fromString(var->toString(), _ProcessUsedMemory);
 				}
 
 				// at least one second as passed, check for updates to send to 

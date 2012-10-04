@@ -676,7 +676,8 @@ void CGrpProfileBandit::beginProfile()
 	else
 	{
 		// look for aggro range parameter or set a default value
-		float aggroRangeFloat;
+		float aggroRangeFloat = 0.f;
+
 		if (!_Grp->getProfileParameter("aggro range", aggroRangeFloat))
 			_AggroRange =static_cast<uint32>( CGrpProfileBanditFactory::getDefaultBanditAggroRange() );
 		else
@@ -946,7 +947,7 @@ void CGrpProfileGuard::updateProfile(uint ticksSinceLastUpdate)
 	static uint32 s_maxBotsVisible = 0;
 	static double s_maxBotsVisionTime = 0.0;
 	
-	uint32 numBotsVisible = GuardVision.bots().size();
+	uint32 numBotsVisible = (uint32)GuardVision.bots().size();
 	double deltaVisionTime = CTime::ticksToSecond(endVisionTime-startVisionTime);
 	bool bTellUs = false;
 	if( s_maxBotsVisible < numBotsVisible )
@@ -991,7 +992,7 @@ void CGrpProfileGuard::updateProfile(uint ticksSinceLastUpdate)
 	}
 	
 	string s;
-	float f;
+	float f = 0.f;
 	if (_Grp->getProfileParameter("faction", s) && !s.empty())
 	{
 		factionIndex = CStaticFames::getInstance().getFactionIndex(s);
@@ -1443,7 +1444,7 @@ void CGrpProfileGoToPoint::calcRatios()
 	if (_Shape!=SHAPE_RECTANGLE)
 		return;
 	
-	const	uint32	nbbots=_NpcList.size();
+	const	uint32	nbbots=(uint32)_NpcList.size();
 	
 	_NbRange	= (uint32)	sqrt(_Ratio*nbbots);
 	if (_NbRange==0)
@@ -1561,7 +1562,7 @@ void CGrpProfileGoToPoint::updateProfile(uint ticksSinceLastUpdate)
 			dx+=dir.x;
 			dy+=dir.y;
 			
-			// 4 rangées.
+			// 4 rows
 			CAIVector	idealPos=groupPosition;
 			if (botIndex>=_NbBotInNormalShape)
 			{
@@ -1703,10 +1704,10 @@ CGrpProfileFollowRoute::CGrpProfileFollowRoute(CProfileOwner *owner)
 
 CGrpProfileFollowRoute::CGrpProfileFollowRoute(CProfileOwner *owner,const std::vector<CShape::TPosition>	&geometry,const	TVerticalPos	&verticalPos, bool dontSendEvent)
 : CMoveProfile(owner)
-, _Geometry(&geometry)
-, _GeometryComeFromState(false)
-, _VerticalPos(verticalPos)
 , _PathCont(NLMISC::safe_cast<CSpawnGroup*>(owner)->getPersistent().getAStarFlag())
+, _GeometryComeFromState(false)
+, _Geometry(&geometry)
+, _VerticalPos(verticalPos)
 , _DontSendEvent(dontSendEvent)
 {
 	PROFILE_LOG("group", "follow_route", "ctor2", "");
@@ -1922,7 +1923,7 @@ void	CGrpProfileFollowRoute::calcRatios	()
 	if	(_Shape!=SHAPE_RECTANGLE)
 		return;
 
-	const	uint32	nbbots=_NpcList.size();
+	const	uint32	nbbots=(uint32)_NpcList.size();
 
 	_NbRange	= (uint32)	sqrt(_Ratio*nbbots);
 	if (_NbRange==0)
@@ -2053,7 +2054,7 @@ void CGrpProfileFollowRoute::updateProfile(uint ticksSinceLastUpdate)
 			dx+=dir.x;
 			dy+=dir.y;
 			
-			// 4 rangées.
+			// 4 rows
 			CAIVector	idealPos=groupPosition;
 			if (botIndex>=_NbBotInNormalShape)
 			{
@@ -2490,8 +2491,8 @@ std::string CGrpProfileIdle::getOneLineInfoString() const
 
 CGrpProfileWander::CGrpProfileWander(CProfileOwner* owner, CNpcZone const* npcZone)
 : CMoveProfile(owner)
-, _NpcZone(npcZone)
 , _Social(false)
+, _NpcZone(npcZone)
 {
 	PROFILE_LOG("group", "wander", "ctor", "");
 	_BotStandProfileType = BOT_STAND_AT_POS;
@@ -2662,8 +2663,8 @@ void CGrpProfileWander::updateProfile(uint ticksSinceLastUpdate)
 				if (!_DestinationReachedAll)
 				{
 					
-					uint32 npcSize =  pgrp.bots().size();
-					uint32 reachedSize = _NpcDestinationReached.size();
+					uint32 npcSize =  (uint32)pgrp.bots().size();
+					uint32 reachedSize = (uint32)_NpcDestinationReached.size();
 					if (reachedSize!= npcSize)
 					{
 						_NpcDestinationReached.resize(npcSize);
@@ -2688,7 +2689,7 @@ void CGrpProfileWander::updateProfile(uint ticksSinceLastUpdate)
 				if (!vision.players().empty())
 				{
 					// there are some player near, look at one if it is not behin us
-					uint index = CAIS::rand16(vision.players().size());
+					uint index = CAIS::rand16((uint32)vision.players().size());
 					CAngle angle(CAngle::pi());
 
 					while (index < vision.players().size() && !target)
@@ -2707,7 +2708,7 @@ void CGrpProfileWander::updateProfile(uint ticksSinceLastUpdate)
 				if (!target && !vision.bots().empty())
 				{
 					// there are some bots near, look at one if it is not behin us
-					uint index = CAIS::rand16(vision.bots().size());
+					uint index = CAIS::rand16((uint32)vision.bots().size());
 					CAngle angle(CAngle::pi());
 
 					while (index < vision.bots().size() && !target)
@@ -2814,7 +2815,7 @@ void CGrpProfileWander::updateProfile(uint ticksSinceLastUpdate)
 			pgrp.processStateEvent(pgrp.mgr().EventDestinationReachedFirst);
 		}
 
-		uint32 first=0, last=_NpcDestinationReached.size();
+		uint32 first=0, last=(uint32)_NpcDestinationReached.size();
 		for ( ; first != last && _NpcDestinationReached[first]; ++first) {}
 		
 		if (first == last)
@@ -2836,8 +2837,8 @@ std::string CGrpProfileWander::getOneLineInfoString() const
 
 CGrpProfileWanderNoPrim::CGrpProfileWanderNoPrim(CProfileOwner* owner, NLMISC::CSmartPtr<CNpcZonePlaceNoPrim> const& npcZone)
 : CMoveProfile(owner)
-, _NpcZone(npcZone)
 , _Social(false)
+, _NpcZone(npcZone)
 {
 	PROFILE_LOG("group", "wander", "ctor", "");
 	_BotStandProfileType = BOT_STAND_AT_POS;
@@ -3000,7 +3001,7 @@ void CGrpProfileWanderNoPrim::updateProfile(uint ticksSinceLastUpdate)
 				if (!vision.players().empty())
 				{
 					// there are some player near, look at one if it is not behin us
-					uint index = CAIS::rand16(vision.players().size());
+					uint index = CAIS::rand16((uint32)vision.players().size());
 					CAngle angle(CAngle::pi());
 
 					while (index < vision.players().size() && !target)
@@ -3019,7 +3020,7 @@ void CGrpProfileWanderNoPrim::updateProfile(uint ticksSinceLastUpdate)
 				if (!target && !vision.bots().empty())
 				{
 					// there are some bots near, look at one if it is not behin us
-					uint index = CAIS::rand16(vision.bots().size());
+					uint index = CAIS::rand16((uint32)vision.bots().size());
 					CAngle angle(CAngle::pi());
 
 					while (index < vision.bots().size() && !target)
@@ -3131,10 +3132,10 @@ CGrpProfileStandAtStartPoint::CBotPositionner::CBotPositionner(RYAI_MAP_CRUNCH::
 }
 
 CGrpProfileStandAtStartPoint::CBotPositionner::CBotPositionner(TVerticalPos verticalPos, CAIPos position, RYAI_MAP_CRUNCH::TAStarFlag	flag) 
-: _BotAtDest(false)
+: _PathCont(flag)
 , _Position(position)
 , _VerticalPos(verticalPos)
-, _PathCont(flag)
+, _BotAtDest(false)
 {
 	_PathCont.setDestination(verticalPos, position);
 }
@@ -3825,8 +3826,11 @@ std::string CGrpProfileFaction::scriptFactionToFameFaction(std::string name)
 		else if  (name[i] == '>' || name[i] == '<')
 		{
 			return ret;
-		} else
+		}
+		else
+		{
 			ret += name[i];
+		}
 	}
 	return ret;
 }
@@ -3849,10 +3853,10 @@ sint32 CGrpProfileFaction::scriptFactionToFameFactionValue(string name)
 			return 0;
 	}
 
-	sint32 value = atoi(name.substr(start+1).c_str());
+	sint32 value;
+	NLMISC::fromString(name.substr(start+1), value);
 	return value*6000;
 }
-
 
 std::string CGrpProfileFaction::fameFactionToScriptFaction(std::string name)
 {
@@ -4137,9 +4141,9 @@ CBotProfileMoveTo::CBotProfileMoveTo(AITYPES::TVerticalPos verticalPos, RYAI_MAP
 : CAIBaseProfile()
 , _VerticalPos(verticalPos)
 , _Dest(dest)
-, _Bot(NLMISC::safe_cast<CSpawnBotNpc*>(owner))
-, _PathPos(NLMISC::safe_cast<CSpawnBotNpc*>(owner)->theta())
 , _PathCont(NLMISC::safe_cast<CSpawnBotNpc*>(owner)->getAStarFlag())
+, _PathPos(NLMISC::safe_cast<CSpawnBotNpc*>(owner)->theta())
+, _Bot(NLMISC::safe_cast<CSpawnBotNpc*>(owner))
 {
 	PROFILE_LOG("bot", "move_to", "ctor", "");
 #ifdef NL_DEBUG_PTR
@@ -4213,11 +4217,11 @@ std::string CBotProfileMoveTo::getOneLineInfoString() const
 
 CBotProfileFollowPos::CBotProfileFollowPos(CBotProfileFollowPos const& other)
 : CAIBaseProfile()
-, _PathCont(const_cast<CBotProfileFollowPos&>(other)._PathCont)
+, _PathPos(const_cast<CBotProfileFollowPos&>(other)._PathPos._Angle) // Just to debug...
 , _Bot(const_cast<CBotProfileFollowPos&>(other)._Bot)
+, _PathCont(const_cast<CBotProfileFollowPos&>(other)._PathCont)
 , _MaxWalkSpeed(FLT_MAX)
 , _MaxRunSpeed(FLT_MAX)
-, _PathPos(const_cast<CBotProfileFollowPos&>(other)._PathPos._Angle) // Just to debug...
 , _Stop(false)
 {
 	PROFILE_LOG("bot", "follow_pos", "ctor", "");
@@ -4228,16 +4232,16 @@ CBotProfileFollowPos::CBotProfileFollowPos(CBotProfileFollowPos const& other)
 
 CBotProfileFollowPos::CBotProfileFollowPos(CPathCont* pathCont, CProfileOwner* owner)
 : CAIBaseProfile()
-, _PathCont(pathCont)
+, _PathPos(NLMISC::safe_cast<CSpawnBotNpc*>(owner)->theta())
 , _Bot(NLMISC::safe_cast<CSpawnBotNpc*>(owner))
+, _PathCont(pathCont)
 , _MaxWalkSpeed(FLT_MAX)
 , _MaxRunSpeed(FLT_MAX)
-, _PathPos(NLMISC::safe_cast<CSpawnBotNpc*>(owner)->theta())
 , _Stop(false)
 {
 	PROFILE_LOG("bot", "follow_pos", "ctor", "");
 #ifdef NL_DEBUG
-	nlassert(pathCont)
+	nlassert(pathCont);
 #endif
 }
 
@@ -4648,9 +4652,9 @@ CGrpProfileStandOnVertices::CBotPositionner::CBotPositionner(RYAI_MAP_CRUNCH::TA
 }
 
 CGrpProfileStandOnVertices::CBotPositionner::CBotPositionner(uint32 geomIndex, RYAI_MAP_CRUNCH::TAStarFlag flags)
-: _BotAtDest(false)
+: _PathCont(flags)
 , _GeomIndex(geomIndex)
-, _PathCont(flags)
+, _BotAtDest(false)
 {
 }
 

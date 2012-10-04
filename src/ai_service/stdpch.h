@@ -34,6 +34,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <math.h>
 
 
@@ -50,6 +51,8 @@
 #include <exception>
 #include <utility>
 #include <deque>
+#include <limits>
+#include <iterator>
 
 
 //----------------------------------------------------------------
@@ -186,5 +189,10 @@ namespace MULTI_LINE_FORMATER {
 #include "ai_share/ai_vector.h"
 #include "ai_share/angle.h"
 #include "ai_share/world_map.h"
+
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
 
 #endif /*STDPCH_H*/

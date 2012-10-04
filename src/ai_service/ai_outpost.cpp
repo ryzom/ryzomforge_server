@@ -837,7 +837,7 @@ void COutpost::createSquad(CGroupDesc<COutpostSquadFamily> const* groupDesc, COu
 	//	FOREACH(itState, CCont<CAIState>, stateMachine->states())
 		for (size_t i=0; i<stateMachine->cstStates().size(); ++i)
 		{
-			CAIState* state = stateMachine->cstStates()[i];
+			CAIState* state = stateMachine->cstStates()[(uint32)i];
 			if (state->getName()==initialStateName)
 				initialState = state;
 		}
@@ -1244,7 +1244,10 @@ NLMISC_COMMAND(outpostSpawnSquad, "Spawns a squad in an outpost", "<instance_num
 	string zoneName = args[5];
 	uint32 respawnTimeGC = 5*60*10;
 	if ( args.size() > 6 )
-		respawnTimeGC = atoi( args[6].c_str() ) * 10;
+	{
+		NLMISC::fromString(args[6], respawnTimeGC);
+		respawnTimeGC *= 10;
+	}
 	
 	for (size_t i=0; i<5; ++i)
 		if (args[i]=="")

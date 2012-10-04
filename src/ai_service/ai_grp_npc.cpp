@@ -103,7 +103,7 @@ void CSpawnGroupNpc::resetSlowUpdateCycle()
 	// Find the lowest bucket
 	vector<uint32>::iterator it = std::min_element(_SlowUpdateBuckets.begin(), _SlowUpdateBuckets.end());
 	// Assign it to the group
-	_SlowUpdateCycle = it - _SlowUpdateBuckets.begin();
+	_SlowUpdateCycle = (uint32)(it - _SlowUpdateBuckets.begin());
 	// Fill the bucket with the group
 	*it += bots().size();
 }
@@ -586,7 +586,7 @@ void CGroupNpc::addParameter(std::string const& parameter)
 	std::string key, tail;
 	
 	// force lowercase
-	std::string p = NLMISC::strlwr(parameter);
+	std::string p = NLMISC::toLower(parameter);
 	AI_SHARE::stringToKeywordAndTail(p, key, tail);
 	
 	breakable
@@ -619,7 +619,7 @@ void CGroupNpc::addParameter(std::string const& parameter)
 			// the bots are bad guys! they will attack players in their aggro range.
 			if (!tail.empty())
 			{
-				_AggroDist = atoi(tail.c_str());
+				NLMISC::fromString(tail, _AggroDist);
 				// bad guy imply attackable!
 				_PlayerAttackable = true;
 				// bad guy imply vulnerable!
@@ -636,7 +636,7 @@ void CGroupNpc::addParameter(std::string const& parameter)
 		{
 			if (!tail.empty())
 			{
-				_AggroDist = atoi(tail.c_str());
+				NLMISC::fromString(tail, _AggroDist);
 
 			}
 			else
@@ -874,7 +874,8 @@ void CGroupNpc::delNamedEntityListener(std::string const& name, std::string cons
 	last = _namedEntityListeners.upper_bound(std::make_pair(name, prop));
 	while (listener!=last)
 	{
-		if (listener->second==event) {
+		if (listener->second==event)
+		{
 			_namedEntityListeners.erase(listener);
 			CNamedEntityManager::getInstance()->get(name).delListenerGroup(prop, this);
 			break;
@@ -896,7 +897,8 @@ void CGroupNpc::delNamedEntityListener(std::string const& name, std::string cons
 	last = _namedEntityListeners2.upper_bound(std::make_pair(name, prop));
 	while (listener!=last)
 	{
-		if (listener->second==functionName) {
+		if (listener->second==functionName)
+		{
 			_namedEntityListeners2.erase(listener);
 			CNamedEntityManager::getInstance()->get(name).delListenerGroup(prop, this);
 			break;
@@ -920,7 +922,8 @@ void CGroupNpc::namedEntityListenerCb(std::string const& name, std::string const
 	std::queue<NLMISC::TStringId> listeners;
 	for (listener2=first2; listener2!=last2; ++listener2)
 		listeners.push(NLMISC::CStringMapper::map(listener2->second));
-	while(!listeners.empty()) {
+	while(!listeners.empty())
+	{
 		callScriptCallBack(this, listeners.front());
 		listeners.pop();
 	}
@@ -1200,7 +1203,8 @@ NLMISC_COMMAND(NpcGroupSlowUpdatePeriod, "Slow update period of the NPC groups",
 	{
 		if (args.size()==1)
 		{
-			uint32 ticks = (uint32)atoi(args[0].c_str());
+			uint32 ticks;
+			NLMISC::fromString(args[0], ticks);
 			if (ticks>0)
 				CSpawnGroupNpc::setSlowUpdatePeriod(ticks);
 			else

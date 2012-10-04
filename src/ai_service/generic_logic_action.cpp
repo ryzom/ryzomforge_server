@@ -78,7 +78,8 @@ public:
 		{
 			std::string weightStr, stateStr;
 			AI_SHARE::stringToWordAndTail(args[i],weightStr, stateStr);
-			sint16 weight=atoi(weightStr.c_str());
+			sint16 weight;
+			NLMISC::fromString(weightStr, weight);
 			if	(	weight<=0
 				||	NLMISC::toString(weight)!=weightStr)
 			{
@@ -195,7 +196,7 @@ public:
 			nlwarning("begin_state failed because state list is empty");
 			return false;
 		}
-		uint i=CAIS::rand16(_states.size());
+		uint i=CAIS::rand16((uint32)_states.size());
 
 		entity->getDebugHistory()->addHistory("GRP State Change: %s => %s",
 			entity->getState()->getAliasNode()->fullName().c_str(),
@@ -458,7 +459,7 @@ public:
 
 		bool result=true;
 
-		const	uint32 nbActions=_subActions.size();
+		const	uint32 nbActions=(uint32)_subActions.size();
 		for (uint32 i=0;i<nbActions;i++)
 		{
 			if(_subActions[i]==NULL)
@@ -513,7 +514,7 @@ public:
 			nlwarning("begin_punctual_state failed because state list is empty");
 			return false;
 		}
-		entity->setNextPunctualState(_states[CAIS::rand16(_states.size())]);
+		entity->setNextPunctualState(_states[CAIS::rand16((uint32)_states.size())]);
 		entity->getDebugHistory()->addHistory("GRP BeginPunctual State: %s",
 					entity->getNextPunctualState()->getAliasNode()->fullName().c_str());
 		return true;
@@ -587,7 +588,7 @@ public:
 			nlwarning("random_select failed because sub-action list is empty");
 			return false;
 		}
-		_subActions[CAIS::rand16(_subActions.size())]->executeAction(entity,event);
+		_subActions[CAIS::rand16((uint32)_subActions.size())]->executeAction(entity,event);
 
 		return true;
 	}
@@ -613,10 +614,10 @@ public:
 
 		switch (args.size())
 		{
-		case 2:	_min=atoi(args[0].c_str()); if (args[0]!=NLMISC::toString(_min)) goto BadArgs;
-				_max=atoi(args[1].c_str()); if (args[1]!=NLMISC::toString(_max)) goto BadArgs;
+		case 2:	NLMISC::fromString(args[0], _min); if (args[0]!=NLMISC::toString(_min)) goto BadArgs;
+				NLMISC::fromString(args[1], _max); if (args[1]!=NLMISC::toString(_max)) goto BadArgs;
 				break;
-		case 1:	_min=atoi(args[0].c_str()); if (args[0]!=NLMISC::toString(_min)) goto BadArgs;
+		case 1:	NLMISC::fromString(args[0], _min); if (args[0]!=NLMISC::toString(_min)) goto BadArgs;
 				_max=_min;
 				break;
 		default: 
@@ -758,10 +759,10 @@ public:
 			_Mode = tm_timer;
 			switch (args.size())
 			{
-			case 2:	_Min=atoi(args[0].c_str()); if (args[0]!=NLMISC::toString(_Min)) goto BadArgs;
-					_Max=atoi(args[1].c_str()); if (args[1]!=NLMISC::toString(_Max)) goto BadArgs;
+			case 2:	NLMISC::fromString(args[0], _Min); if (args[0]!=NLMISC::toString(_Min)) goto BadArgs;
+					NLMISC::fromString(args[1], _Max); if (args[1]!=NLMISC::toString(_Max)) goto BadArgs;
 					break;
-			case 1:	_Min=atoi(args[0].c_str()); if (args[0]!=NLMISC::toString(_Min)) goto BadArgs;
+			case 1:	NLMISC::fromString(args[0], _Min); if (args[0]!=NLMISC::toString(_Min)) goto BadArgs;
 					_Max=_Min;
 					break;
 			default: 
@@ -1193,7 +1194,7 @@ static	CGroup* findGroup(const std::string& groupName,CStateMachine *stateMachin
 			{
 				CGroup	*igroup=NULL;
 				//	Check if theres a group with the good name in the same stateMachine (and only one).
-				for		(sint32	grpIndex=grps.size()-1;grpIndex>=0;grpIndex--)
+				for		(sint32	grpIndex=(sint32)grps.size()-1;grpIndex>=0;grpIndex--)
 				{
 					if	(grps[grpIndex]->getManager().getStateMachine()!=stateMachine)
 						continue;
@@ -1376,7 +1377,7 @@ public:
 			{
 				CGroup	*igroup=NULL;
 				//	Check if theres a group with the good name in the same stateMachine (and only one).
-				for		(sint32	grpIndex=grps.size()-1;grpIndex>=0;grpIndex--)
+				for		(sint32	grpIndex=(sint32)grps.size()-1;grpIndex>=0;grpIndex--)
 				{
 					if	(grps[grpIndex]->getManager().getStateMachine()!=stateMachine)
 						continue;
@@ -1822,7 +1823,7 @@ public:
 			// r2 mode groupename:botname
 			if (_R2)
 			{
-				uint first(0), last(_Groups.size());
+				uint first = 0, last = (uint)_Groups.size();
 				for (; first != last; ++first)
 				{
 					CGroup	*grp = _Groups[first];
@@ -2165,7 +2166,7 @@ public:
 	{
 		// this line treated first ... in case we bomb out in one of the if(...) { ... return; } cases
 
-		uint32 nbArgs = args.size();
+		uint32 nbArgs = (uint32)args.size();
 		if (nbArgs==0)
 		{
 			nlwarning("switch_actions (%s) need an argument !", eventNode->fullName().c_str());
@@ -2206,7 +2207,8 @@ public:
 					}
 					else
 					{
-						sint32 value =  atoi(label.c_str());
+						sint32 value;
+						NLMISC::fromString(label, value);
 						_Labels[i] = value ; // the other case eg "case 4:" -> _Label[?] = 4;
 					}
 				}
@@ -2943,9 +2945,9 @@ public:
 		if(cstring=="DSS_")
 		{
 			_Id=true;
-			NLMISC::CSString tmp = NLMISC::CSString (_Sentence).right(_Sentence.length()-4);
+			NLMISC::CSString tmp = NLMISC::CSString (_Sentence).right((uint)_Sentence.length()-4);
 			NLMISC::CSString tmp2 = tmp.strtok(" ",false,false,false,false);
-			_ScenarioId = atoi(tmp2.c_str());
+			_ScenarioId = tmp2.atoui();
 			_Sentence = tmp;
 			nlwarning("<npc_say> scenario id : %d string id : %s ",_ScenarioId,_Sentence.c_str());
 		}
@@ -3024,7 +3026,7 @@ public:
 			else
 			{
 				float val;
-				uint32 size=_Vars.size(),i=0;
+				uint32 size=(uint32)_Vars.size(),i=0;
 				std::vector<float> values;
 				for(;i<size;++i)
 				{

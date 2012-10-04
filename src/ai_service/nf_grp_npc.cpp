@@ -1726,7 +1726,7 @@ void receiveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 				}
 			}
 
-			// A npc give a mission to take an item given by an other npc
+			// A npc give a mission to take an item given by another npc
 			// but the item instead of being a r2_plot_item is a normal item like system_mp or big armor
 			if ( r2PlotItemSheetId.find(sheetId) ==  r2PlotItemSheetId.end())
 			{
@@ -1742,7 +1742,8 @@ void receiveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 
 		}
 
-		const uint32 quantity = (uint32)atoi(itemAndQty[1].c_str());
+		uint32 quantity;
+		NLMISC::fromString(itemAndQty[1], quantity);
 		if (quantity == 0)
 		{
 			nlwarning("receiveMissionItems failed: invalid quantity '%s'", itemAndQty[1].c_str());
@@ -1891,7 +1892,7 @@ void giveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 				}
 			}
 
-			// A npc give a mission to give a item to an other npc
+			// A npc give a mission to give a item to another npc
 			// but the item instead of being a r2_plot_item is a normal item like system_mp or big armor
 			if ( r2PlotItemSheetId.find(sheetId) ==  r2PlotItemSheetId.end())
 			{
@@ -1907,7 +1908,8 @@ void giveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 
 		}
 
-		const uint32 quantity = (uint32)atoi(itemAndQty[1].c_str());
+		uint32 quantity;
+		NLMISC::fromString(itemAndQty[1], quantity);
 		if (quantity == 0)
 		{
 			nlwarning("giveMissionItems failed: invalid quantity '%s'", itemAndQty[1].c_str());
@@ -2343,7 +2345,6 @@ void npcSay_css_(CStateInstance* entity, CScriptStack& stack)
 	if (!spawnBot) { return; }
 
 	execSayHelper(spawnBot, text);
-	return;
 }
 
 //----------------------------------------------------------------------------
@@ -2395,8 +2396,6 @@ void npcSay_ss_(CStateInstance* entity, CScriptStack& stack)
 			}
 		}
 	}
-
-	return;
 }
 
 
@@ -2622,7 +2621,7 @@ void emote_s_(CStateInstance* entity, CScriptStack& stack)
 				{
 					CSpawnBot *spawnBot = bot->getSpawnObj();
 					if (spawnBot)
-						{
+					{
 						CEntityId	botId = spawnBot->getEntityId();
 						NLNET::CMessage msgout("SET_BEHAVIOUR");
 						msgout.serial(botId);

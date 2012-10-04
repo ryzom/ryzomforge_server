@@ -464,7 +464,7 @@ uint32 CCont<TChld>::getFirstFreeChild()
 		if (!_Childs[index])
 			break;
 	}
-	return index;
+	return (uint32)index;
 }
 
 template <class TChld>
@@ -493,7 +493,7 @@ uint32 CAliasCont<TChld>::getChildIndexByAlias(uint32 alias) const
 	{
 		TChld* child = this->_Childs[i];
 		if (child!=NULL && child->getAlias()==alias)
-			return i;
+			return (uint32)i;
 	}
 	return ~0;
 }
@@ -546,13 +546,13 @@ CAliasTreeOwner* CAliasCont<TChld>::getAliasChildByAlias(uint32 alias) const
 template <class TChld>
 CAliasTreeOwner* CAliasCont<TChld>::addAliasChild(CAliasTreeOwner* child)
 {
-	return NLMISC::type_cast<CAliasTreeOwner*>(addChild(static_cast<TChld*>(child)));
+	return NLMISC::type_cast<CAliasTreeOwner*>(this->addChild(static_cast<TChld*>(child)));
 }
 
 template <class TChld>
 CAliasTreeOwner* CAliasCont<TChld>::addAliasChild(CAliasTreeOwner* child, uint32 index)
 {
-	return NLMISC::type_cast<CAliasTreeOwner*>(addChild(static_cast<TChld*>(child), index));
+	return NLMISC::type_cast<CAliasTreeOwner*>(this->addChild(static_cast<TChld*>(child), index));
 }
 
 template <class TChld>
