@@ -122,7 +122,8 @@ public:
 		const TParsedCommandLine *lp = initInfo.getParam("listenPort");
 		BOMB_IF(lp == NULL, "Failed to find param 'listenPort' in init param", return false);
 
-		uint16 port = atoi(lp->ParamValue.c_str());
+		uint16 port;
+		NLMISC::fromString(lp->ParamValue, port);
 		BOMB_IF(port == 0, "Invalid listen port '"<<lp->ParamValue<<"'", return false);
 
 		// open the server
@@ -245,7 +246,7 @@ public:
 	}
 
 
-	// Update the informations of a planned or running session
+	// Update the information of a planned or running session
 	// Return 'invokeResult' : 0 : ok, session updated
 	//                         1 : unknown character
 	//                         2 : unknown session
@@ -883,7 +884,7 @@ public:
 			accessType = TAccessType(s);
 			autoInvite = (accessType == TAccessType::at_public);
 			result2->getField(14, s);
-			subscriptionClosed = atoi(s.c_str()) != 0;
+			NLMISC::fromString(s, subscriptionClosed);
 
 			result2->getField(15, nbRating);
 			sd.setNbRating(nbRating);

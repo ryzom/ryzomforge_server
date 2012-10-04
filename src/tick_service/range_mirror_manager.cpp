@@ -400,7 +400,7 @@ void				CRangeMirrorManager::saveRanges()
 		else
 			throw EFileNotOpened( RANGE_MANAGER_BACKUP_FILE );
 	}
-	catch ( Exception& e )
+	catch (const Exception &e)
 	{
 		nlwarning( "Can't save ranges: %s", e.what() );
 	}
@@ -428,7 +428,7 @@ void				CRangeMirrorManager::loadRanges()
 			throw EFileNotOpened( RANGE_MANAGER_BACKUP_FILE );
 		nlinfo( "RangeMirrorManager: successfully loaded ranges" );
 	}
-	catch ( Exception& e )
+	catch (const Exception &e)
 	{
 		nlinfo( "Can't load ranges: %s", e.what() ); // Info because not a problem
 	}
@@ -608,7 +608,10 @@ NLMISC_COMMAND( releaseRangesForService, "RMM: Release range owned by a specifie
 {
 	if ( args.size() < 1 )
 		return false;
-	RMMInstance->releaseRangesByService( NLNET::TServiceId(atoi( args[0].c_str() )) );
+	uint16 serviceId;
+	NLMISC::fromString(args[0], serviceId);
+
+	RMMInstance->releaseRangesByService( NLNET::TServiceId(serviceId) );
 	return true;
 }
 

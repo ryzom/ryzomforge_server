@@ -135,7 +135,9 @@ namespace LS
 			}
 
 			// open the web interface
-			openItf(atoi(webPort->ParamValue.c_str()));
+			uint16 port = 0;
+			NLMISC::fromString(webPort->ParamValue, port);
+			openItf(port);
 
 			return true;
 		}
@@ -483,7 +485,7 @@ namespace LS
 
 			if (!args.empty())
 			{
-				_LoggedUserTimeout = atoi(args[0].c_str());
+				NLMISC::fromString(args[0], _LoggedUserTimeout);
 			}
 
 			// output the value
@@ -506,7 +508,8 @@ namespace LS
 			if (args.size() != 1)
 				return false;
 
-			uint16 port = atoi(args[0].c_str());
+			uint16 port;
+			NLMISC::fromString(args[0], port);
 			log.displayNL("Opening web interface on port %u", port);
 			openItf(port);
 

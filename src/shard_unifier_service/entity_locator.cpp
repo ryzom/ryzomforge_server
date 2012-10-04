@@ -222,7 +222,8 @@ namespace ENTITYLOC
 			}
 
 			// ok, we have a valid client, add it to the list
-			uint32 shardId = atoi(shardIdParam->ParamValue.c_str());
+			uint32 shardId;
+			NLMISC::fromString(shardIdParam->ParamValue, shardId);
 
 			// check that we don't have conflict
 			TLocatorIndex::iterator locIt(_LocatorIndex.find(shardId));
@@ -330,7 +331,7 @@ namespace ENTITYLOC
 		void onModuleUpdate()
 		{
 			// update the Total concurent user varialb
-			TotalConcurentUser.set(_ConnectedUsers.size());
+			TotalConcurentUser.set((uint32)_ConnectedUsers.size());
 		}
 
 		/////////////////////////////////////////////////////////////
@@ -739,10 +740,11 @@ namespace ENTITYLOC
 			else
 			{
 				// parse a char id
-				charId = atoi(args[0].c_str());
+				NLMISC::fromString(args[0], charId);
 			}
 
-			uint32 shardId = atoi(args[1].c_str());
+			uint32 shardId;
+			NLMISC::fromString(args[1], shardId);
 
 
 			log.displayNL("Simulate character %u / %s disconnection from shard %u", charId, CEntityId(RYZOMID::player, charId).toString().c_str(), shardId);
@@ -774,10 +776,11 @@ namespace ENTITYLOC
 			else
 			{
 				// parse a char id
-				charId = atoi(args[0].c_str());
+				NLMISC::fromString(args[0], charId);
 			}
 
-			uint32 shardId = atoi(args[1].c_str());
+			uint32 shardId;
+			NLMISC::fromString(args[1], shardId);
 
 
 			log.displayNL("Simulate character %u / %s connection from shard %u", charId, CEntityId(RYZOMID::player, charId).toString().c_str(), shardId);
@@ -799,7 +802,8 @@ namespace ENTITYLOC
 			if (args.size() != 1)
 				return false;
 
-			uint32 userId = atoi(args[0].c_str());
+			uint32 userId;
+			NLMISC::fromString(args[0], userId);
 
 			log.displayNL("Simulate user %u disconnection", userId);
 
@@ -820,7 +824,8 @@ namespace ENTITYLOC
 			if (args.size() != 1)
 				return false;
 
-			uint32 userId = atoi(args[0].c_str());
+			uint32 userId;
+			NLMISC::fromString(args[0], userId);
 
 			log.displayNL("Simulate user %u connection", userId);
 
