@@ -21,15 +21,12 @@
 #include "game_share/effect_families.h"
 #include "creature_manager/creature.h"
 
-using namespace std;
-using namespace NLMISC;
-
 class CSEffect;
 class CCharacter;
 class CTotemEffect;
 class CFileDescription;
 
-extern CVariable<uint32> TotemBuildTime;
+extern NLMISC::CVariable<uint32> TotemBuildTime;
 
 /**
  * A Totem Base with its effects on faction PVP
@@ -46,7 +43,7 @@ public :
 	CTotemBase( std::string const& name );
 	
 	/// Return all effects a given character gets on this totem
-	void	getTotemEffect( CCharacter* user, vector<CSEffect*>& outEffects ) const;
+	void	getTotemEffect( CCharacter* user, std::vector<CSEffect*>& outEffects ) const;
 	
 	/// Start building this totem
 	void	startBuilding( CCharacter* builder );
@@ -73,7 +70,7 @@ public :
 	inline void		addNeighbour( TAIAlias neighbour )	{ _Neighbours.push_back( neighbour ); }
 
 	/// Get the number of neighbours
-	inline uint		getNumNeighbours() const			{ return _Neighbours.size(); }
+	inline uint		getNumNeighbours() const			{ return (uint)_Neighbours.size(); }
 
 	/// Get the list of neighbours
 	inline TAIAlias	getNeighbour( uint index ) const	{ return _Neighbours[index]; }
@@ -127,13 +124,13 @@ private :
 	PVP_CLAN::TPVPClan	_OwnerFaction;
 	
 	/// Neighbor regions
-	vector<TAIAlias>	_Neighbours;
+	std::vector<TAIAlias>	_Neighbours;
 
 	/// Effect of the totem base
 	EFFECT_FAMILIES::TEffectFamily	_TotemEffect;
 
 	/// Used BotObject
-	CRefPtr<CCreature>	_BotObject;
+	NLMISC::CRefPtr<CCreature>	_BotObject;
 
 	/// Is the building finished ? True if no totem
 	bool				_IsBuildingFinished;
@@ -150,7 +147,7 @@ private :
 	/// Tick when last time attack message for totem has sended
 	NLMISC::TGameCycle	_LastTickAttackMessageSended;
 
-	// these informations must be kept or they will be lost
+	// these information must be kept or they will be lost
 	// while changing the bot object sheetId
 	/// HP Gained during building
 	float	_BuildHpGain;

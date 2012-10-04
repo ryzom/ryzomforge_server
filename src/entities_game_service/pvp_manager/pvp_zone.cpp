@@ -385,7 +385,7 @@ PVP_RELATION::TPVPRelation CPVPFreeZone::getPVPRelation( CCharacter * user, CEnt
 
 	bool targetSafe = false;
 	bool actorSafe = false;
-	
+
 	if (target->getId().getType() != RYZOMID::player)
 	{
 		return PVP_RELATION::Unknown;
@@ -415,7 +415,7 @@ PVP_RELATION::TPVPRelation CPVPFreeZone::getPVPRelation( CCharacter * user, CEnt
 		{
 			return PVP_RELATION::Ally;
 		}
-				
+
 		// If both not in safe zone => Ennemy
 		if (!targetSafe && !actorSafe)
 			return PVP_RELATION::Ennemy;
@@ -1160,7 +1160,7 @@ PVP_RELATION::TPVPRelation CPVPGuildZone::getPVPRelation( CCharacter * user, CEn
 
 	bool targetSafe = false;
 	bool actorSafe = false;
-	
+
 	if( target->getId().getType() != RYZOMID::player )
 	{
 		return PVP_RELATION::Unknown;
@@ -1196,13 +1196,13 @@ PVP_RELATION::TPVPRelation CPVPGuildZone::getPVPRelation( CCharacter * user, CEn
 		{
 			return PVP_RELATION::Ally;
 		}
-		
+
 		// If both not in safe zone => Ennemy
 		if (!targetSafe && !actorSafe)
 			return PVP_RELATION::Ennemy;
 	}
 
-	return PVP_RELATION::NeutralPVP;	 
+	return PVP_RELATION::NeutralPVP;
 }
 	
 /*

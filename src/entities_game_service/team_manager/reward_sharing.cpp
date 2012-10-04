@@ -378,7 +378,7 @@ void CRewardSharing::setUsersDb()
 				}
 				// set generic property
 //				user->_PropertyDatabase.setProp( NLMISC::toString("INVENTORY:SHARE:%u:NB_MEMBER",j), _Rewards[j].Candidates.size() );
-				shareItem.setNB_MEMBER(user->_PropertyDatabase, _Rewards[j].Candidates.size());
+				shareItem.setNB_MEMBER(user->_PropertyDatabase, (uint8)_Rewards[j].Candidates.size());
 				
 				uint p = 0;
 				for (; p < _Rewards[j].Candidates.size();p++)
@@ -433,7 +433,7 @@ void CRewardSharing::setUsersDb()
 				shareItem.setPREREQUISIT_VALID(user->_PropertyDatabase, 0);
 			}
 		}
-		catch( NLMISC::Exception & e)
+		catch(const NLMISC::Exception &e)
 		{
 			nlwarning("exception in <CRewardSharing setUsersDb> :'%s'",e.what());
 		}

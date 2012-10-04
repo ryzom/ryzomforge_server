@@ -109,7 +109,7 @@ public:
 	 * \param bMessage whether to show the message
 	 */
 	void setSuccessor( uint8 memberIdx, bool bMessage = true );
-	
+
 	/**
 	 * get the leader of the team
 	 * \return team leader Id
@@ -151,7 +151,7 @@ public:
 
 	///\return the League id
 	inline void setLeagueId(TChanID id) { _LeagueId = id; }
-	
+
 	/// send a message to the team
 	void sendDynamicMessageToMembers(const std::string &msgName, const TVectorParamCheck &params, const std::set<NLMISC::CEntityId> &excluded) const;
 	inline void sendDynamicMessageToMembers(const std::string &msgName, const TVectorParamCheck &params) const
@@ -216,7 +216,7 @@ public:
 	CMissionTeam* getMissionByAlias( TAIAlias missionAlias );
 	
 	void updateMembersDb();
-		/*
+/*
 	bool processMissionStepEvent(std::list< const CMissionEvent* > & eventList, uint missionIndex, uint32 stepIndex );
 	bool processMissionEvent( std::list< const CMissionEvent* > & eventList, uint missionIndex, uint32 stepIndex );
 */
@@ -251,8 +251,7 @@ private:
 	
 	///\id of the League (it's id of channel)
 	TChanID							_LeagueId;
-	
-	
+
 	/// Team Members. The index of an entity in the container is its position
 	std::list<NLMISC::CEntityId>		_TeamMembers;
 
@@ -261,7 +260,7 @@ private:
 
 	/// id of the team leader
 	NLMISC::CEntityId					_LeaderId;
-	
+
 	/// successor id
 	NLMISC::CEntityId					_SuccessorId;
 

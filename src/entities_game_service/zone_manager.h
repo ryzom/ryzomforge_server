@@ -318,7 +318,7 @@ public:
 	};
 
 	// default constructor
-	CZoneManager() 	: DepositSearchTime(50) {};
+	CZoneManager() 	: DepositSearchTime(50) {}
 
 	~CZoneManager();
 
@@ -504,7 +504,7 @@ public:
 			nlwarning("bad start point index %u: no spawn point in vector",startPointIdx );
 			return NULL;
 		}
-		uint16 idx = (uint16)RandomGenerator.rand( _StartPoints[startPointIdx].size() - 1 );
+		uint16 idx = (uint16)RandomGenerator.rand( (uint16)_StartPoints[startPointIdx].size() - 1 );
 		mission = _StartPoints[startPointIdx][idx].Mission;
 		bot = _StartPoints[startPointIdx][idx].Welcomer;
 		return getTpSpawnZone( _StartPoints[startPointIdx][idx].SpawnZoneId );

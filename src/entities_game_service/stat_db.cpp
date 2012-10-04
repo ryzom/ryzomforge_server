@@ -1070,7 +1070,7 @@ void CStatDB::saveValueLeaves(const CStatDBValueLeavesPD & valueLeavesPD)
 	{
 		string s;
 		pdr.toString(s);
-		msg.DataMsg.serialBuffer((uint8*)&s[0], s.size());
+		msg.DataMsg.serialBuffer((uint8*)&s[0], (uint)s.size());
 	}
 	else
 	{
@@ -1098,7 +1098,7 @@ void CStatDB::saveTableLeaf(const CStatDBTableLeafPD & tableLeafPD)
 	{
 		string s;
 		pdr.toString(s);
-		msg.DataMsg.serialBuffer((uint8*)&s[0], s.size());
+		msg.DataMsg.serialBuffer((uint8*)&s[0], (uint)s.size());
 	}
 	else
 	{
@@ -1127,7 +1127,7 @@ NLMISC_COMMAND (sdbCreateValue, "create a value leaf in SDB", "<path> [<value>]"
 	if (args.size() < 2)
 		val = 0;
 	else
-		val = atoi(args[1].c_str());
+		NLMISC::fromString(args[1], val);
 
 	if (!CStatDB::getInstance()->createValue(path, val))
 	{
@@ -1176,7 +1176,8 @@ NLMISC_COMMAND (sdbValueSet, "set a value leaf in SDB", "<path> <value>")
 		return false;
 
 	const string & path = args[0];
-	sint32 val = atoi(args[1].c_str());
+	sint32 val;
+	NLMISC::fromString(args[1], val);
 
 	if (!CStatDB::getInstance()->valueSet(path, val))
 	{
@@ -1193,7 +1194,8 @@ NLMISC_COMMAND (sdbValueAdd, "add a value to a value leaf in SDB", "<path> <valu
 		return false;
 
 	const string & path = args[0];
-	sint32 val = atoi(args[1].c_str());
+	sint32 val;
+	NLMISC::fromString(args[1], val);
 
 	if (!CStatDB::getInstance()->valueAdd(path, val))
 	{
@@ -1210,7 +1212,8 @@ NLMISC_COMMAND (sdbTableAdd, "add a value to a table leaf in SDB", "<path> <valu
 		return false;
 
 	const string & path = args[0];
-	sint32 val = atoi(args[1].c_str());
+	sint32 val;
+	NLMISC::fromString(args[1], val);
 	const string & targetType = args[2];
 
 	if (targetType == "guild")

@@ -30,7 +30,7 @@
 #include "phrase_manager/phrase_utilities_functions.h"
 //#include "creature_manager/creature_manager.h"
 
-
+using namespace std;
 using namespace EFFECT_FAMILIES;
 using namespace NLLIGO;
 using namespace NLMISC;
@@ -66,8 +66,8 @@ CPVPFactionRewardManager::CPVPFactionRewardManager()
 //----------------------------------------------------------------------------
 
 void CPVPFactionRewardManager::_BuildTotemBasesRec( const IPrimitive* prim,
-												   map<CTotemBase*, set<string> >& neighboursNames,
-													map<std::string, CTotemBase*>& totemBasesPerName )
+													std::map<CTotemBase*, set<string> >& neighboursNames,
+													std::map<std::string, CTotemBase*>& totemBasesPerName )
 {
 	if ( !prim )
 		return;
@@ -1222,7 +1222,7 @@ NLMISC_COMMAND(setSpireEffectValue, "change base value of a spire effect","<effe
 			return false;
 		}
 
-		CPVPFactionRewardManager::EffectValues[ family ] = atoi( args[1].c_str() );
+		NLMISC::fromString(args[1], CPVPFactionRewardManager::EffectValues[ family ]);
 	}
 
 	// update effects for everyone
@@ -1341,7 +1341,8 @@ NLMISC_COMMAND(addFactionPoint, "add (or substract) faction point in faction poo
 		return false;
 	else
 	{
-		sint32 deltaFactionPoint = atoi(args[0].c_str());
+		sint32 deltaFactionPoint;
+		NLMISC::fromString(args[0], deltaFactionPoint);
 		PVP_CLAN::TPVPClan faction = PVP_CLAN::fromString(args[1].c_str());
 
 		if(faction == PVP_CLAN::Unknown)

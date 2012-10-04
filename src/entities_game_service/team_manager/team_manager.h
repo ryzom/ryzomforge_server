@@ -31,7 +31,7 @@ class CCharacter;
 
 ///\todo: avoid team reallocation problems?
 ///\todo: check if we have to remove team from IOS if crash/shutdown
-///\todo successor index sert à rien???
+///\todo successor index is useful ?
 
 /**
  * CTeamManager
@@ -68,7 +68,6 @@ public:
 	/// player charId accepts an invitation
 	void joinLeagueAccept( const NLMISC::CEntityId &charId );
 
-	
 	/// player leaderId invites plyer targetId to join his team. Only leaders can invite
 	void joinProposal( CCharacter * leader, const NLMISC::CEntityId &targetId );
 

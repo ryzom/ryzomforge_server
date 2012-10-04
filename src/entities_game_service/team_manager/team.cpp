@@ -108,7 +108,7 @@ void CTeam::release()
 		delete _RewardSharing;
 		_RewardSharing = NULL;		
 	}
-	const uint size = _Missions.size();
+	const uint size = (uint)_Missions.size();
 	for ( uint i = 0; i < size; i++ )
 	{
 		_Missions[i]->clearUsersJournalEntry();
@@ -125,7 +125,7 @@ void CTeam::release()
 	{
 		DynChatEGS.removeChan(_LeagueId);
 	}
-	
+
 	_LeagueId = DYN_CHAT_INVALID_CHAN;
 	_TeamId = CTEAM::InvalidTeamId;
 	_TeamMembers.clear();
@@ -180,7 +180,7 @@ void CTeam::addCharacter(CCharacter *newCharacter)
 	
 	// update all member's DB
 //	char buffer[256];
-	uint position = _TeamMembers.size()-1;
+	uint position = (uint)_TeamMembers.size()-1;
 	uint i =0;
 	for (std::list<CEntityId>::const_iterator it = _TeamMembers.begin() ; it != _TeamMembers.end() ; ++it)
 	{
@@ -290,7 +290,7 @@ void CTeam::addCharacter(CCharacter *newCharacter)
 	
 	// set the character team
 	newCharacter->setTeamId(_TeamId);
-	
+
 	// set the character alliance
 	newCharacter->setLeagueId(_LeagueId);
 
@@ -407,7 +407,7 @@ void CTeam::removeCharacter( CCharacter * player )
 	// check if the team must be removed
 	if ( _NbMembers == 1 )
 	{
-		const uint size = _Missions.size();
+		const uint size = (uint)_Missions.size();
 		uint count = 0;
 		while ( !_Missions.empty() && count < size )
 		{
@@ -434,7 +434,7 @@ void CTeam::removeCharacter( CCharacter * player )
 
 		// remove league
 		setLeague("");
-		
+
 		// remove the team chat group
 		TGroupId idGroupe = CHAT_GROUPS_IDS::getTeamChatGroupId(_TeamId);
 		CMessage msgRemoveGroup("REMOVE_GROUP");
@@ -584,7 +584,7 @@ void CTeam::setLeague(const string &leagueName)
 		if (!DynChatEGS.getPlayersInChan(chanId, players))
 			DynChatEGS.removeChan(chanId);
 	}
-		
+
 	if (!leagueName.empty())
 	{
 		_LeagueId = DynChatEGS.addChan("league_"+toString(DynChatEGS.getNextChanID()), leagueName);
@@ -600,17 +600,19 @@ void CTeam::setLeague(const string &leagueName)
 	updateLeague();
 }
 
-void CTeam::updateLeague() {
+void CTeam::updateLeague()
+{
 	for (list<CEntityId>::iterator it = _TeamMembers.begin() ; it != _TeamMembers.end() ; ++it)
 	{
 		CCharacter * ch = PlayerManager.getOnlineChar((*it));
-		if (ch != NULL && ch->getLeagueId() != _LeagueId) {
+		if (ch != NULL && ch->getLeagueId() != _LeagueId)
+		{
 			ch->setLeagueId(_LeagueId);
 		}
 	}
 }
 
-uint8 CTeam::getSuccessorIndex(void)
+uint8 CTeam::getSuccessorIndex()
 {
 	list<CEntityId>::const_iterator it = _TeamMembers.begin();
 	uint8 i = 0;
@@ -665,7 +667,6 @@ void CTeam::setLeader(CEntityId id, bool bMessage)
 	}
 	else
 		nlwarning("<CTeam setLeader> invalid new leader %s", _LeaderId.toString().c_str() );
-
 }
 
 void CTeam::setLeader(uint8 memberIdx, bool bMessage)
@@ -689,7 +690,6 @@ void CTeam::setLeader(uint8 memberIdx, bool bMessage)
 
 void CTeam::setSuccessor( uint8 memberIdx, bool bMessage)
 {
-	
 	list<CEntityId>::const_iterator it = _TeamMembers.begin();
 	uint8 i = 0;
 	for (; it != _TeamMembers.end(); ++it)
@@ -1142,7 +1142,7 @@ void CTeam::updateMembersPositions(bool forceUpdate)
 
 CMissionTeam* CTeam::getMissionByAlias( TAIAlias missionAlias )
 {
-	const uint size = _Missions.size();
+	const uint size = (uint)_Missions.size();
 	for ( uint i = 0; i < size; i++ )
 	{
 		if ( _Missions[i] && _Missions[i]->getTemplateId() == missionAlias )

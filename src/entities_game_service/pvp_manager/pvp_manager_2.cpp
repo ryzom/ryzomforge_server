@@ -25,6 +25,8 @@
 
 #include "game_share/utils.h"
 #include "game_share/msg_client_server.h"
+#include "game_share/fame.h"
+#include "game_share/send_chat.h"
 
 #include "pvp_manager/pvp_manager_2.h"
 #include "pvp_manager/pvp_manager.h"
@@ -38,8 +40,6 @@
 #include "egs_globals.h"
 #include "stat_db.h"
 #include "admin.h"
-#include "game_share/fame.h"
-#include "game_share/send_chat.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -394,7 +394,7 @@ void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user, bool out
 	if(it != _UserChannelCharacters.end())
 	{
 		lst = (*it).second;
-		ucstring players("");
+		ucstring players;
 		uint32 shardId = CEntityIdTranslator::getInstance()->getEntityShardId(user->getId());
 		for (uint i = 0; i < lst.size(); i++)
 		{
@@ -429,7 +429,6 @@ void CPVPManager2::sendChannelUsers(TChanID channel, CCharacter * user, bool out
 
 			sendMessageViaMirror("IOS", msgout);
 		}
-		
 	}
 }
 
@@ -488,10 +487,10 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 		}
 	}
 
-	if (userChannel) {
+	if (userChannel)
+	{
 		const string playerName = CEntityIdTranslator::getInstance()->getByEntity(user->getId()).toString();
 		broadcastMessage(channel, string("<INFO>"), playerName+" -->[]");
-
 	}
 
 	currentChannels = getCharacterRegisteredChannels(user);
@@ -550,7 +549,6 @@ void CPVPManager2::removeFactionChannelForCharacter(TChanID channel, CCharacter 
 			lst.erase(find(lst.begin(), lst.end(), user->getId()));
 			_UserChannelCharacters[channel] = lst;
 		}
-
 	}
 }
 
@@ -652,7 +650,7 @@ void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 				pvpMode |= PVP_MODE::PvpSafe;
 		}
 	}
-	
+
 	// pvp session (i.e everything else)
 	{
 		if ( user->getPVPInterface().isValid() )
@@ -661,7 +659,7 @@ void CPVPManager2::setPVPModeInMirror( const CCharacter * user ) const
 			pvpMode |= interf.getPVPSession()->getPVPMode();
 		}
 	}
-		
+
 	//CMirrorPropValue<TYPE_PVP_MODE> propPvpMode( TheDataset, user->getEntityRowId(), DSPropertyPVP_MODE );
 	CMirrorPropValue<TYPE_EVENT_FACTION_ID> propPvpMode( TheDataset, user->getEntityRowId(), DSPropertyEVENT_FACTION_ID );
 	if (propPvpMode.getValue() != pvpMode)
@@ -790,7 +788,7 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 {
 	nlassert(actor);
 	nlassert(target);
-	
+
 	PVP_RELATION::TPVPRelation pvpRelation = getPVPRelation( actor, target, true );
 	bool actionValid;
 	switch( pvpRelation )
@@ -823,7 +821,7 @@ bool CPVPManager2::isCurativeActionValid( CCharacter * actor, CEntityBase * targ
 	
 		//if(pTarget)
 		//	actor->clearSafeInPvPSafeZone();
-		
+
 		// propagate faction pvp flag
 		if( pvpRelation == PVP_RELATION::Ally)
 		{
@@ -891,13 +889,15 @@ bool CPVPManager2::isOffensiveActionValid( CCharacter * actor, CEntityBase * tar
 	if( actionValid && !checkMode )
 	{
 		CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
-		if(pTarget) {
+		if(pTarget)
+		{
 			if (actor->getDuelOpponent() == pTarget) // No _PVPFactionEnemyReminder when in duel
 				CPVPManager2::getInstance()->setPVPFactionAllyReminder(false);
 			else
 				actor->clearSafeInPvPSafeZone();
 		}
-		if( _PVPFactionEnemyReminder)
+
+		if( _PVPFactionEnemyReminder )
 		{
 			actor->setPVPRecentActionFlag();
 			if( pTarget )
@@ -950,16 +950,15 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 	
 	if( actionValid )
 	{
-		
-		
 		/*	if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() != pTarget->getGuildId()))
 				return false;
 		*/
-		
+
 		if( areaTarget->getId().getType() == RYZOMID::player )
 		{
 			CCharacter * pTarget = dynamic_cast<CCharacter*>(areaTarget);
-			if (!offensive) {
+			if (!offensive)
+			{
 				if (actor->getTeamId() != pTarget->getTeamId() && actor->getLeagueId() != pTarget->getLeagueId() )
 					return false;
 			}
@@ -1057,7 +1056,7 @@ void CPVPManager2::characterKilledInPvPFaction( CCharacter * character, PVP_CLAN
 //----------------------------------------------------------------------------
 bool CPVPManager2::addFactionWar( PVP_CLAN::TPVPClan clan1, PVP_CLAN::TPVPClan clan2 )
 {
-	uint32 factionWarOccursSize = _FactionWarOccurs.size();
+	uint32 factionWarOccursSize = (uint32)_FactionWarOccurs.size();
 	for( uint32 i = 0; i < factionWarOccursSize; ++i )
 	{
 		if( _FactionWarOccurs[ i ].inPvPFaction( clan1, clan2 ) )
@@ -1151,7 +1150,6 @@ bool CPVPManager2::stopFactionWar( PVP_CLAN::TPVPClan clan1, PVP_CLAN::TPVPClan 
 //----------------------------------------------------------------------------
 void CPVPManager2::createFactionChannel(PVP_CLAN::TPVPClan clan)
 {
-
 	TMAPFactionChannel::iterator it = _FactionChannel.find(clan);
 	if( it == _FactionChannel.end() )
 	{
@@ -1209,7 +1207,6 @@ TChanID CPVPManager2::createUserChannel(const std::string & channelName, const s
 
 void CPVPManager2::deleteUserChannel(const std::string & channelName)
 {
-
 	TMAPExtraFactionChannel::iterator it = _UserChannel.find(channelName);
 	if( it != _UserChannel.end() )
 	{
@@ -1258,6 +1255,7 @@ void CPVPManager2::sendFactionWarsToClient( CCharacter * user )
 {
 /** Old Pvp
 	nlassert(user);
+
 	CMessage msgout( "IMPULSION_ID" );
 	CEntityId id = user->getId();
 	msgout.serial( id );
@@ -1604,7 +1602,8 @@ NLMISC_COMMAND(setFactionWar, "Start/stop current wars between faction", "<Facti
 
 	PVP_CLAN::TPVPClan faction1 = PVP_CLAN::fromString( args[ 0 ] );
 	PVP_CLAN::TPVPClan faction2 = PVP_CLAN::fromString( args[ 1 ] );
-	uint32 war = (uint32)atoi(args[ 2 ].c_str());
+	uint32 war;
+	NLMISC::fromString(args[ 2 ], war);
 
 	if( faction1 < PVP_CLAN::BeginClans || faction1 > PVP_CLAN::EndClans )
 	{
@@ -1612,7 +1611,7 @@ NLMISC_COMMAND(setFactionWar, "Start/stop current wars between faction", "<Facti
 		return false;
 	}
 
-	if( faction1 < PVP_CLAN::BeginClans || faction1 > PVP_CLAN::EndClans )
+	if( faction2 < PVP_CLAN::BeginClans || faction2 > PVP_CLAN::EndClans )
 	{
 		log.displayNL("Invalid Faction2 name: '%s'", args[1].c_str());
 		return false;

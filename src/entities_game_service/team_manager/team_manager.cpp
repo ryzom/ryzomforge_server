@@ -750,7 +750,7 @@ CTeamManager::TInviteRetCode CTeamManager::isInvitableBy(CCharacter * invited, C
 	{
 		return AlreadyInvited;
 	}
-	
+
 	// get the target team, which must be fake
 	CTeam * team = getRealTeam( invited->getTeamId() );
 	if( team )
@@ -765,7 +765,7 @@ CTeamManager::TInviteRetCode CTeamManager::isInvitableBy(CCharacter * invited, C
 	{
 		return CantInvite;
 	}
-		
+
 	// check faction of invitor  and invited, player can't invite an enemy in team.
 	if ( !TheDataset.isAccessible(invited->getEntityRowId()) || !TheDataset.isAccessible(invitor->getEntityRowId()))
 		return CantInvite;
@@ -869,7 +869,7 @@ void CTeamManager::update()
 	const TGameCycle time = CTickEventHandler::getGameCycle();
 
 	// update team members position every 5s
-	const uint size = _Teams.size();
+	const uint size = (uint)_Teams.size();
 	for ( uint i = 0 ; i < size ; ++i)
 	{
 		if ( (time + _Teams[i].getTeamId()) % 30 == 0)
