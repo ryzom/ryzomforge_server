@@ -210,7 +210,7 @@ CVariable<uint32>			SpawnedDeadMektoubDelay("egs","SpawnedDeadMektoubDelay", "nb
 CVariable<bool>				ForceQuarteringRight("egs","ForceQuarteringRight", "Allow anyone to quarter a dead creature", false, 0, true );
 CVariable<bool>				AllowAnimalInventoryAccessFromAnyStable("egs", "AllowAnimalInventoryAccessFromAnyStable", "If true a player can access to his animal inventory (if the animal is inside a stable) from any stable over the world", true, 0, true );
 CVariable<uint32>			FreeTrialSkillLimit("egs", "FreeTrialSkillLimit", "Level limit for characters belonging to free trial accounts", 125,0,true);
-CVariable<uint32>			CraftFailureProbaMpLost("egs", "CraftFailureProbaMpLost", "Probabilité de destruction de chaque MP en cas d'echec du craft", 50,0,true);
+CVariable<uint32>			CraftFailureProbaMpLost("egs", "CraftFailureProbaMpLost", "Probability de destruction de chaque MP en cas d'echec du craft", 50,0,true);
 
 
 // Number of login stats kept for a character
@@ -347,7 +347,6 @@ CCharacter::CCharacter():	CEntityBase(false),
 							_AggroableSave(true),
 							_GodModeSave(false)
 {
-
 	// todo : uncomment that when sadge item api is plugged
 	_AggroCount = 0;
 //	_Bulk = 0;
@@ -657,7 +656,7 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_PVPSafeLastTimeChange = CTickEventHandler::getGameCycle();
 	_PVPSafeLastTime = false;
 	_PVPInSafeZoneLastTime = false;
-	
+
 	// For client/server contact list communication
 	_ContactIdPool= 0;
 
@@ -678,7 +677,7 @@ CCharacter::CCharacter():	CEntityBase(false),
 
 	_LangChannel = "en";
 	_NewTitle = "Refugee";
-	
+
 	initDatabase();
 } // CCharacter  //
 
@@ -751,12 +750,12 @@ void CCharacter::clear()
 	_Pact.clear();
 	_KnownPhrases.clear();
 	_MissionHistories.clear();
-	uint32 petCount= _PlayerPets.size();	_PlayerPets.clear();	_PlayerPets.resize(petCount);
+	uint32 petCount= (uint32)_PlayerPets.size();	_PlayerPets.clear();	_PlayerPets.resize(petCount);
 
 	for(uint32 i=0;i<EGSPD::CSPType::EndSPType;++i)
 		_SpType[i]=0.0;
 
-	sint32 startingCharacteristicValuesSize= _StartingCharacteristicValues.size();
+	sint32 startingCharacteristicValuesSize= (sint32)_StartingCharacteristicValues.size();
 	_StartingCharacteristicValues.clear();
 	_StartingCharacteristicValues.resize(startingCharacteristicValuesSize);
 
@@ -920,9 +919,9 @@ bool CCharacter::setValue( string var, string value )
 		try
 		{
 			sint32 &temp = lookupStat(var);
-			temp = atoi( value.c_str() );
+			NLMISC::fromString(value, temp);
 		}
-		catch( CCharacter::EInvalidStat &e)
+		catch(const CCharacter::EInvalidStat &e)
 		{
 			nlwarning("<CCharacter::setValue> Exception : %s",e.what( var ) );
 			return false;
@@ -943,9 +942,11 @@ bool CCharacter::modifyValue( string var, string value )
 		try
 		{
 			sint32 &temp = lookupStat(var);
-			temp = temp + atoi( value.c_str() );
+			sint32 valueInt;
+			NLMISC::fromString(value, valueInt);
+			temp = temp + valueInt;
 		}
-		catch( CCharacter::EInvalidStat &e)
+		catch(const CCharacter::EInvalidStat &e)
 		{
 			nlwarning("<CCharacter::modifyValue> Exception : %s",e.what( var ) );
 			return false;
@@ -964,7 +965,7 @@ bool CCharacter::getValue( string var, string& value )
 	{
 		CEntityBase::getValue( var, value );
 	}
-	catch( CCharacter::EInvalidStat &e)
+	catch(const CCharacter::EInvalidStat &e)
 	{
 		nlwarning("<CCharacter::getValue> Exception : %s",e.what( var ) );
 		return false;
@@ -1324,7 +1325,7 @@ uint32 CCharacter::tickUpdate()
 				CTeam * team = TeamManager.getRealTeam( _TeamId );
 				if ( team )
 				{
-					const uint size = team->getMissions().size();
+					const uint size = (uint)team->getMissions().size();
 					for ( uint i =  0; i < size; i++ )
 					{
 						nlassert(team->getMissions()[i]);
@@ -1336,7 +1337,7 @@ uint32 CCharacter::tickUpdate()
 
 			{
 				H_AUTO(CharacterUpdateTargetCoordinatesCompass);
-				// update compass coordinates informations
+				// update compass coordinates information
 				compassDatabaseUpdate();
 			}
 			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after compassDatabaseUpdate() !!!") )
@@ -1441,7 +1442,7 @@ uint32 CCharacter::tickUpdate()
 
 	{
 		H_AUTO(CharacterUpdatePVPMode);
-		
+
 		if (_PVPSafeLastTimeChange + 20 < CTickEventHandler::getGameCycle() || updatePVP)
 		{
 			_PVPSafeLastTimeChange = CTickEventHandler::getGameCycle();
@@ -1458,13 +1459,13 @@ uint32 CCharacter::tickUpdate()
 				updatePVP = true;
 			}
 			
-			if (updatePVP) {
+			if (updatePVP)
+			{
 				CPVPManager2::getInstance()->setPVPModeInMirror(this);
 				updatePVPClanVP();
 				_HaveToUpdatePVPMode = false;
 			}
 		}
-
 
 		if( _HaveToUpdatePVPMode )
 		{
@@ -2546,7 +2547,7 @@ void CCharacter::processStaticAction()
 
 
 //---------------------------------------------------
-// update compass coordinates informations
+// update compass coordinates information
 //---------------------------------------------------
 void CCharacter::compassDatabaseUpdate()
 {
@@ -2843,7 +2844,7 @@ void CCharacter::postLoadTreatment()
 		_GuildId = 0;
 	}
 
-	_NbSurvivePact = _Pact.size();
+	_NbSurvivePact = (uint8)_Pact.size();
 
 	{
 	H_AUTO(FixPetTicket);
@@ -2912,83 +2913,83 @@ void CCharacter::postLoadTreatment()
 	}
 
 	{
-	H_AUTO(LockTicketInInventory);
-	lockTicketInInventory();
+		H_AUTO(LockTicketInInventory);
+		lockTicketInInventory();
 	}
 
 	// if EId translator has been initialized by SU, check contact list
 	{
-	H_AUTO(ValidateContactList);
-	validateContactList();
+		H_AUTO(ValidateContactList);
+		validateContactList();
 	}
 
 	{
-	H_AUTO(UpdateFlagForActiveEffect);
-	/* update flags for active effects */
-	if( _ForbidAuraUseEndDate>0 && _ForbidAuraUseStartDate==0 )
-	{
-		// thus timer won't look like infinte on client(can happen due to old save file where startDate didn't exist)
-		_ForbidAuraUseStartDate = CTickEventHandler::getGameCycle();
-	}
-	setPowerFlagDates();
-	setAuraFlagDates();
-	updateBrickFlagsDBEntry();
-	_ModifiersInDB.writeInDatabase(_PropertyDatabase);
-	}
-
-	{
-	H_AUTO(AddCreationBricks);
-	/* add starting bricks if any modification has been done */
-	addCreationBricks();
+		H_AUTO(UpdateFlagForActiveEffect);
+		/* update flags for active effects */
+		if( _ForbidAuraUseEndDate>0 && _ForbidAuraUseStartDate==0 )
+		{
+			// thus timer won't look like infinte on client(can happen due to old save file where startDate didn't exist)
+			_ForbidAuraUseStartDate = CTickEventHandler::getGameCycle();
+		}
+		setPowerFlagDates();
+		setAuraFlagDates();
+		updateBrickFlagsDBEntry();
+		_ModifiersInDB.writeInDatabase(_PropertyDatabase);
 	}
 
 	{
-	H_AUTO(CheckCharacterAndScoresValues);
-	/* check character and scores are as they are supposed to be according to bricks possessed */
-	checkCharacAndScoresValues();
+		H_AUTO(AddCreationBricks);
+		/* add starting bricks if any modification has been done */
+		addCreationBricks();
 	}
 
 	{
-	H_AUTO(ComputeBestSkill);
-	/* compute player best skill */
-	computeBestSkill();
+		H_AUTO(CheckCharacterAndScoresValues);
+		/* check character and scores are as they are supposed to be according to bricks possessed */
+		checkCharacAndScoresValues();
 	}
 
 	{
-	H_AUTO(ComputeSkillUsedForDodge);
-	/* compute player best skill to use for dodge */
-	computeSkillUsedForDodge();
+		H_AUTO(ComputeBestSkill);
+		/* compute player best skill */
+		computeBestSkill();
 	}
 
 	{
-	H_AUTO(UpdateMagicProtectionAndResistance);
-	/* compute resists scores*/
-	updateMagicProtectionAndResistance();
+		H_AUTO(ComputeSkillUsedForDodge);
+		/* compute player best skill to use for dodge */
+		computeSkillUsedForDodge();
 	}
 
 	{
-	H_AUTO(LoadedMissionPostLoad);
-	/* Call the postLoad methods for the loaded missions */
-	for ( map<TAIAlias, CMission*>::iterator it = getMissionsBegin(); it != getMissionsEnd(); ++it )
-	{
-		BOMB_IF( (*it).second == NULL, "Mission is NULL after load", continue );
-		(*it).second->onLoad();
+		H_AUTO(UpdateMagicProtectionAndResistance);
+		/* compute resists scores*/
+		updateMagicProtectionAndResistance();
 	}
+
+	{
+		H_AUTO(LoadedMissionPostLoad);
+		/* Call the postLoad methods for the loaded missions */
+		for ( map<TAIAlias, CMission*>::iterator it = getMissionsBegin(); it != getMissionsEnd(); ++it )
+		{
+			BOMB_IF( (*it).second == NULL, "Mission is NULL after load", continue );
+			(*it).second->onLoad();
+		}
 	}
 
 	/* setup the implicit visual property fields */
 	SET_STRUCT_MEMBER(_VisualPropertyA,PropertySubData.Sex,getGender());
 
 	{
-	H_AUTO(ComputeForageBonus);
-	/* compute the forage bonuses */
-	computeForageBonus();
+		H_AUTO(ComputeForageBonus);
+		/* compute the forage bonuses */
+		computeForageBonus();
 	}
 
 	{
-	H_AUTO(ComputeMiscBonus);
-	/* compute misc bonuses */
-	computeMiscBonus();
+		H_AUTO(ComputeMiscBonus);
+		/* compute misc bonuses */
+		computeMiscBonus();
 	}
 
 	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( getId() ));
@@ -2999,15 +3000,14 @@ void CCharacter::postLoadTreatment()
 	}
 
 	{
-	H_AUTO(CItemServiceManager);
-	CItemServiceManager::getInstance()->initPersistentServices(this);
+		H_AUTO(CItemServiceManager);
+		CItemServiceManager::getInstance()->initPersistentServices(this);
 	}
 
 	{
-	H_AUTO(CheckPvPTagValidity);
+		H_AUTO(CheckPvPTagValidity);
 
-	_HaveToUpdatePVPMode = true;
-
+		_HaveToUpdatePVPMode = true;
 	}
 
 }
@@ -3811,7 +3811,7 @@ void CCharacter::enableAppropriateFiltersForSeller( CCreature * c )
 //-----------------------------------------------------------------------------
 void CCharacter::updateTargetingChars()
 {
-	const uint size = _TargetingChars.size();
+	const uint size = (uint)_TargetingChars.size();
 	for ( uint i = 0; i < size; i++ )
 	{
 		CCharacter* user = PlayerManager.getChar( _TargetingChars[i] );
@@ -4327,7 +4327,7 @@ void CCharacter::addKnownBrick( const CSheetId& brickId )
 			break;
 		};
 
-		_InterfacesFlagsBitField |= (sint64)(1 << uint8(flag));
+		_InterfacesFlagsBitField |= SINT64_CONSTANT(1) << uint8(flag);
 //		_PropertyDatabase.setProp( "INTERFACES:FLAGS", _InterfacesFlagsBitField);
 		CBankAccessor_PLR::getINTERFACES().setFLAGS(_PropertyDatabase, _InterfacesFlagsBitField);
 	}
@@ -4405,7 +4405,7 @@ void CCharacter::removeKnownBrick( const CSheetId& brickId )
 			break;
 		};
 
-		_InterfacesFlagsBitField |= (sint64)(1 << uint8(flag));
+		_InterfacesFlagsBitField |= SINT64_CONSTANT(1) << uint8(flag);
 //		_PropertyDatabase.setProp( "INTERFACES:FLAGS", _InterfacesFlagsBitField);
 		CBankAccessor_PLR::getINTERFACES().setFLAGS(_PropertyDatabase, _InterfacesFlagsBitField);
 	}
@@ -4423,7 +4423,7 @@ void CCharacter::processTrainingBrick( const CStaticBrick *brick, bool sendChatM
 	if (!brick)
 		return;
 
-	const uint nbParams = brick->Params.size();
+	const uint nbParams = (uint)brick->Params.size();
 	for ( uint i = 0 ; i < nbParams ; ++i )
 	{
 		const TBrickParam::IId* param = brick->Params[i];
@@ -4485,7 +4485,7 @@ void CCharacter::unprocessTrainingBrick( const CStaticBrick *brick, bool sendCha
 	if (!brick)
 		return;
 
-	const uint nbParams = brick->Params.size();
+	const uint nbParams = (uint)brick->Params.size();
 	for ( uint i = 0 ; i < nbParams ; ++i )
 	{
 		const TBrickParam::IId* param = brick->Params[i];
@@ -4691,7 +4691,7 @@ bool CCharacter::getFillFaberRms( std::vector< const CStaticItem * >& rms, std::
 //-----------------------------------------------
 bool CCharacter::lockFaberRms()
 {
-	uint size = _RmSelectedForFaber.size();
+	uint size = (uint)_RmSelectedForFaber.size();
 
 	for( uint i = 0; i < size; ++i )
 	{
@@ -4710,7 +4710,7 @@ bool CCharacter::lockFaberRms()
 		}
 	}
 
-	size = _RmFormulaSelectedForFaber.size();
+	size = (uint)_RmFormulaSelectedForFaber.size();
 
 	for( uint i = 0; i < size; ++i )
 	{
@@ -4738,14 +4738,14 @@ bool CCharacter::lockFaberRms()
 //-----------------------------------------------
 void CCharacter::unlockFaberRms()
 {
-	uint size = _RmSelectedForFaber.size();
+	uint size = (uint)_RmSelectedForFaber.size();
 
 	for( uint i = 0; i < size; ++i )
 	{
 		unLockItem( (INVENTORIES::TInventory)_RmSelectedForFaber[ i ].getInvId(), _RmSelectedForFaber[ i ].IndexInInv, _RmSelectedForFaber[ i ].Quantity );
 	}
 
-	size = _RmFormulaSelectedForFaber.size();
+	size = (uint)_RmFormulaSelectedForFaber.size();
 
 	for( uint i = 0; i < size; ++i )
 	{
@@ -4761,7 +4761,7 @@ void CCharacter::consumeFaberRms(bool failed)
 {
 	TLogContext_Item_ConsumeFaberMp logContext(_Id);
 	unlockFaberRms();
-	uint size = _RmSelectedForFaber.size();
+	uint size = (uint)_RmSelectedForFaber.size();
 
 	for( uint i = 0; i < size; ++i )
 	{
@@ -4769,7 +4769,7 @@ void CCharacter::consumeFaberRms(bool failed)
 			destroyItem( _RmSelectedForFaber[ i ].getInvId(), _RmSelectedForFaber[ i ].IndexInInv, _RmSelectedForFaber[ i ].Quantity );
 	}
 
-	size = _RmFormulaSelectedForFaber.size();
+	size = (uint)_RmFormulaSelectedForFaber.size();
 
 	for( uint i = 0; i < size; ++i )
 	{
@@ -5784,7 +5784,7 @@ bool CCharacter::onAnimalHungry( uint petIndex, bool justBecameHungry )
 			{
 				// Consume to full satiety (last useful unit is entirely consumed)
 				animal.Satiety = animal.MaxSatiety;
-				nbUnits = (sint)((caloriesNeeded / caloriesPerUnit) + 1);
+				nbUnits = (sint)ceil(caloriesNeeded / caloriesPerUnit);
 			}
 			nbItemsLeftToConsume -= nbUnits;
 
@@ -5999,7 +5999,7 @@ void CCharacter::removeSpawnedPet(NLNET::TServiceId aiServiceId)
  */
 uint CCharacter::getAnimalByTicket( CGameItemPtr item )
 {
-	uint32 PlayerPetsSize = _PlayerPets.size();
+	uint32 PlayerPetsSize = (uint32)_PlayerPets.size();
 	for( uint i=0; i!=PlayerPetsSize; ++i )
 	{
 		if( _PlayerPets[ i ].TicketPetSheetId != CSheetId::Unknown )
@@ -6121,7 +6121,7 @@ bool CCharacter::petInventoryDistance( uint32 beastIndex )
 //-----------------------------------------------
 void CCharacter::removeAnimal( CGameItemPtr item, CPetCommandMsg::TCommand mode )
 {
-	uint32 PlayerPetsSize = _PlayerPets.size();
+	uint32 PlayerPetsSize = (uint32)_PlayerPets.size();
 	sint32 PackAnimalIndex = -1;
 	for( uint i = 0; i < PlayerPetsSize; ++i )
 	{
@@ -6645,7 +6645,7 @@ void CCharacter::sendAnimalCommand( uint8 petIndexCode, uint8 command )
 	DROP_IF( !PackAnimalSystemEnabled, "Ignoring action on pack animals because pack animal suystem is not enabled: "<<_Id.toString(), return );
 
 	// calculate the size of the pets container for future use
-	uint32 numPets= _PlayerPets.size();
+	uint32 numPets= (uint32)_PlayerPets.size();
 
 	// make sure the petIndexCode is valid (should be >=0 and <= _PlayerPets.size())
 	BOMB_IF(petIndexCode>numPets,"Ignoring action by player "<<_Id.toString()<<" on pet with invalid index",return);
@@ -6940,7 +6940,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 	uint32 ringStackSizeToRemove = 0;
 	uint32 ringCatalyserLvl = 0;
 	uint32 ringCatalyserCount = 0;
-	
+
 	// Don't take away cats if free trial limit reached and there is no DP.
 	bool bConsumeCats = ! ( bFreeTrialLimitReached && _DeathPenalties->isNull() );
 
@@ -6954,7 +6954,7 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 				CBankAccessor_PLR::getCHARACTER_INFO().getXP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(catalyserCount) );
 			}
 		}
-	
+
 		if( _RingXpCatalyserSlot != INVENTORIES::INVALID_INVENTORY_SLOT )
 		{
 			if( addCatalyserXpBonus( _RingXpCatalyserSlot, skill, XpGain, ringXpBonus, ringStackSizeToRemove, ringCatalyserLvl, ringCatalyserCount ) )
@@ -6963,11 +6963,13 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 				CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(ringCatalyserCount) );
 			}
 		}
-		if (!p->isTrialPlayer()) {
+
+		if (!p->isTrialPlayer())
+		{
 			xpBonus = XpGain;
 		}
 	}
-	
+
 	XpGain += xpBonus + ringXpBonus;
 
 	// update death penalty
@@ -7045,7 +7047,6 @@ double CCharacter::addXpToSkillInternal( double XpGain, const std::string& ContS
 //	log_Character_XPGain(_Id, skillName, skill->Base, float(XpGain));
 
 	// bufferize xp gain, store it in paramet map
-
 	if (addXpMode==AddXpToSkillBuffer)
 	{
 		map<SKILLS::ESkills,CXpProgressInfos>::iterator itGainSkill = gainBySkill.find( skillEnum );
@@ -8037,7 +8038,8 @@ void CCharacter::setStartStatistics( const CCreateCharMsg& createCharMsg )
 			if( valueString.size() > 0 )
 			{
 				SKILLS::ESkills skillEnum = SKILLS::toSkill(skillString);
-				sint32 skillPoint = (sint32) atoi(valueString.c_str());
+				sint32 skillPoint;
+				NLMISC::fromString(valueString, skillPoint);
 				if( skillEnum != SKILLS::unknown )
 				{
 					_Skills._Skills[ skillEnum ].Base = min( skillPoint, (sint32)SkillsTree->SkillsTree[ skillEnum ].MaxSkillValue );
@@ -8841,7 +8843,7 @@ void CCharacter::setDatabase()
 				break;
 			};
 
-			_InterfacesFlagsBitField |= (sint64)(1 << uint8(flag));
+			_InterfacesFlagsBitField |= SINT64_CONSTANT(1) << uint8(flag);
 		}
 		else
 		{
@@ -8979,7 +8981,8 @@ void CCharacter::startTradeItemSession( uint16 session )
 		uint32 txt = STRING_MANAGER::sendStringToClient( _EntityRowId,"EGS_TRADE_BAD_FAME",params );
 		npcTellToPlayerEx( bot->getEntityRowId(),_EntityRowId,txt );
 		return;
-	} else if (bot->getOrganization() != 0 && bot->getOrganization() == getOrganization())
+	}
+	else if (bot->getOrganization() != 0 && bot->getOrganization() == getOrganization())
 		fame = 0;
 
 
@@ -9144,7 +9147,7 @@ void CCharacter::startTradePhrases(uint16 session)
 		{
 			// get nb of pages for trade list
 			nlassert(NB_SLOT_PER_PAGE > 0);
-			const uint totalNbElts = _CurrentPhrasesTradeList.size();
+			const uint totalNbElts = (uint)_CurrentPhrasesTradeList.size();
 
 			const uint nbPagesItems = 0;
 			const uint nbPagesTotal = (uint16)ceil( double(totalNbElts) / NB_SLOT_PER_PAGE );
@@ -9295,7 +9298,7 @@ void CCharacter::fillTradePage(uint16 session, bool enableBuildingLossWarning)
 	uint end;
 	bool hasNext;
 
-	const uint totalNbElts = _CurrentPhrasesTradeList.size();
+	const uint totalNbElts = (uint)_CurrentPhrasesTradeList.size();
 
 	if ( begin + NB_SLOT_PER_PAGE < totalNbElts )
 	{
@@ -9640,8 +9643,8 @@ void CCharacter::buyPhraseByIndex( uint8 botChatIndex, uint16 knownPhraseIndex )
 		vector<CTradePhrase> phraseRemoved;
 
 		// get new phrases if any
-		const uint newSize = newPhrases.size();
-		const uint oldSize = oldPhrases.size();
+		const uint newSize = (uint)newPhrases.size();
+		const uint oldSize = (uint)oldPhrases.size();
 		uint oldI = 0;
 		for (uint newI = 0 ; newI < newSize ; ++newI)
 		{
@@ -9861,7 +9864,8 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 		sendDynamicSystemMessage( _Id, "TRADE_FAME_TOO_LOW", params );
 
 		return;
-	} else if (bot->getOrganization() != 0 && bot->getOrganization() == getOrganization())
+	}
+	else if (bot->getOrganization() != 0 && bot->getOrganization() == getOrganization())
 		fame = 0;
 
 	CInventoryPtr child = _Inventory[ inv ];
@@ -10079,7 +10083,7 @@ void CCharacter::addPact( uint8 PactNature, uint8 PactType )
 	{
 		CPact NewPact( PactNature, PactType );
 		_Pact.push_back( NewPact );
-		_NbSurvivePact = _Pact.size();
+		_NbSurvivePact = (uint8)_Pact.size();
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
 		params[0].Int = PactType+1;
 		sendDynamicSystemMessage(_Id, "OPS_PACT_GAIN_U", params);
@@ -10288,7 +10292,7 @@ void CCharacter::setOrganizationStatus(uint32 status)
 //-----------------------------------------------------------------------------
 void CCharacter::changeOrganizationStatus(sint32 status)
 {
-	if (status < 0 && abs(status) > _OrganizationStatus)
+	if (status < 0 && abs(status) > (sint32)_OrganizationStatus)
 		_OrganizationStatus = 0;
 	else
 		_OrganizationStatus += status;
@@ -10298,7 +10302,7 @@ void CCharacter::changeOrganizationStatus(sint32 status)
 //-----------------------------------------------------------------------------
 void CCharacter::changeOrganizationPoints(sint32 points)
 {
-	if (points < 0 && abs(points) > _OrganizationPoints)
+	if (points < 0 && abs(points) > (sint32)_OrganizationPoints)
 		_OrganizationPoints = 0;
 	else
 		_OrganizationPoints += points;
@@ -10413,7 +10417,6 @@ void CCharacter::exchangeProposal()
 			CCharacter::sendDynamicSystemMessage(_EntityRowId, "EXCHANGE_DECLINE", params);
 			return;
 		}
-
 
 		//set the target's exchange asker, and inform the target
 		c->_ExchangeAsker = _Id;
@@ -10875,7 +10878,7 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 			return;
 		}
 
-		//if the client had the good trade informations
+		//if the client had the good trade information
 		if (isExchanging() && c->isExchanging() && exchangeId == c->_ExchangeId)
 		{
 			if (!tempInventoryEmpty())
@@ -11692,7 +11695,7 @@ void CCharacter::fillMissionPage(uint16 sessionId)
 	}
 	else
 	{
-		end = _CurrentMissionList.size();
+		end = (uint)_CurrentMissionList.size();
 		hasNext = false;
 	}
 //	_PropertyDatabase.setProp( "CHOOSE_MISSIONS:SESSION", sessionId );
@@ -11962,7 +11965,7 @@ bool CCharacter::processMissionEventWithTeamMate( CMissionEvent & event, TAIAlia
 				while (!vMembers.empty())
 				{
 					// Pick up a member (in a random order)
-					uint idx = RandomGenerator.rand(vMembers.size() - 1);
+					uint idx = RandomGenerator.rand((uint16)vMembers.size() - 1);
 					CCharacter * c = PlayerManager.getChar( vMembers[idx] );
 					if ((c != NULL) && c->getEnterFlag() && (c != this))
 					{
@@ -12957,8 +12960,8 @@ void CCharacter::clearBeastTrain()
 	commandMsg.Command = (uint16) CPetCommandMsg::FOLLOW;
 	commandMsg.CharacterMirrorRow = TheDataset.getDataSetRow(_Id);
 
-	const uint size = _BeastTrain.size();
-	const uint nbPets = _PlayerPets.size();
+	const uint size = (uint)_BeastTrain.size();
+	const uint nbPets = (uint)_PlayerPets.size();
 	for ( uint i = 0 ; i < size ; ++i )
 	{
 		/// \todo Malkav: optimize this !!!!!
@@ -13007,7 +13010,7 @@ void CCharacter::addBeast( uint16 petIndex )
 		return;
 	}
 
-	const uint size = _BeastTrain.size();
+	const uint size = (uint)_BeastTrain.size();
 
 	// check there is room in the train
 	if (size == _TrainMaxSize)
@@ -13070,7 +13073,7 @@ void CCharacter::setCurrentRegion(uint16 region)
 void CCharacter::setPlaces(const std::vector<const CPlace*> & places)
 {
 	nldebug("CCharacter_setPlaces(%u)",places.size());
-	const uint size = places.size();
+	const uint size = (uint)places.size();
 	_Places.resize(places.size());
 	for ( uint i = 0; i < size; i++ )
 		_Places[i] = places[i]->getId();
@@ -13082,7 +13085,7 @@ void CCharacter::setPlaces(const std::vector<const CPlace*> & places)
 void CCharacter::memorize(uint8 memorizationSet, uint8 index, uint16 phraseId, const vector<CSheetId> &bricks)
 {
 	// check all used bricks are known
-	const uint size = bricks.size();
+	const uint size = (uint)bricks.size();
 	for ( uint i = 0 ; i < size ; ++i)
 	{
 		if (_KnownBricks.find(bricks[i]) == _KnownBricks.end())
@@ -13114,7 +13117,7 @@ void CCharacter::addLink( CSLinkEffect * effect)
 	// set the static action flag
 	staticActionInProgress(true,STATIC_ACT_TYPES::Casting);
 
-	const uint8 size = _SEffectLinks.size();
+	const uint8 size = (uint8)_SEffectLinks.size();
 
 	CEntityBase::addLink(effect);
 
@@ -13276,7 +13279,7 @@ float CCharacter::getActualDamageFromExplosionWithArmor( float dmg ) const
 void CCharacter::checkPhrases()
 {
 	// Re-build pre-built phrases (in case bricks changed) and remove phrases with still unknown bricks after.
-	const uint nbKnownPhrases = _KnownPhrases.size();
+	const uint nbKnownPhrases = (uint)_KnownPhrases.size();
 	for(uint phraseIndex=0; phraseIndex<nbKnownPhrases; ++phraseIndex)
 	{
 		// if it's a preset phrase Re-build the phrase from sheet in case bricks changed.
@@ -13289,7 +13292,7 @@ void CCharacter::checkPhrases()
 		CKnownPhrase &phrase = _KnownPhrases[phraseIndex];
 
 		// Parse all bricks in the current phrase.
-		const uint nbBricks = phrase.PhraseDesc.Bricks.size();
+		const uint nbBricks = (uint)phrase.PhraseDesc.Bricks.size();
 		for(uint brickIndex=0; brickIndex<nbBricks; ++brickIndex)
 		{
 			// Get a reference on the current phrase (just easier to code).
@@ -13462,7 +13465,7 @@ void CCharacter::learnPhrase(const vector<CSheetId> &bricks, uint16 phraseId, co
 
 	_KnownPhrases[phraseId].clear();
 
-	const uint size = bricks.size();
+	const uint size = (uint)bricks.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		if (bricks[i] != NLMISC::CSheetId::Unknown)
@@ -13565,7 +13568,7 @@ bool CCharacter::learnPrebuiltPhrase( const CSheetId &phraseId, uint16 knownPhra
 	_BoughtPhrases.insert( phraseId );
 
 	// Set bricks in the phrase as known bricks.
-	const uint size = phrase->Bricks.size();
+	const uint size = (uint)phrase->Bricks.size();
 	for ( uint i = 0; i < size ; ++i)
 	{
 		if(phrase->Bricks[i] != CSheetId::Unknown)
@@ -13588,7 +13591,7 @@ bool CCharacter::learnPrebuiltPhrase( const CSheetId &phraseId, uint16 knownPhra
 //-----------------------------------------------
 uint16 CCharacter::getFirstFreeSlotInKnownPhrase()
 {
-	const uint size = _KnownPhrases.size();
+	const uint size = (uint)_KnownPhrases.size();
 	for (uint i = 2 ; i < size ; ++i)
 	{
 		if (_KnownPhrases[i].empty())
@@ -13600,16 +13603,17 @@ uint16 CCharacter::getFirstFreeSlotInKnownPhrase()
 		_KnownPhrases.resize(3);
 	else
 		_KnownPhrases.resize(size+1);
-	return _KnownPhrases.size()-1;
+	return (uint16)_KnownPhrases.size()-1;
 } // getFirstFreeSlotInKnownPhrase //
 
 
 void CCharacter::sendUrl(const string &url, const string &salt)
 {
 	string control;
-	if (!salt.empty()) {
+	if (!salt.empty())
+	{
 		string checksum = salt+url;
-		control = "&hmac="+getHMacSHA1((uint8*)&url[0], url.size(), (uint8*)&salt[0], salt.size()).toString();;
+		control = "&hmac="+getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 	}
 
 	nlinfo(url.c_str());
@@ -13672,7 +13676,8 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 	uint webCommand = getWebCommandCheck(url);
 	string randomString;
 
-	for (uint8 i = 0; i < 8; i++) {
+	for (uint8 i = 0; i < 8; i++)
+	{
 		uint32 r = (uint32)((double)rand()/((double)RAND_MAX)*62);
 		randomString += randomStrings[r];
 	}
@@ -13682,12 +13687,15 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 		CGameItemPtr item = createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, CSheetId("web_transaction.sitem"));
 		if (item != 0)
 		{
-			if (data.empty()) {
+			if (data.empty())
+			{
 				item->setCustomText(ucstring(url));
 				vector<string> infos;
 				NLMISC::splitString(url, "\n", infos);
 				sendUrl(infos[0]+"&player_eid="+getId().toString()+"&event=command_added", salt);
-			} else {
+			}
+			else
+			{
 				vector<string> infos;
 				NLMISC::splitString(data, ",", infos);
 				string finalData = randomString+infos[0];
@@ -13747,7 +13755,8 @@ uint CCharacter::getWebCommandCheck(const string &url)
 						NLMISC::splitString(cText, "\n", infos);
 						if (infos.size() == 2)
 						{
-							if (infos[0] == url) {
+							if (infos[0] == url)
+							{
 								return i;
 							}
 						}
@@ -13769,7 +13778,7 @@ uint CCharacter::checkWebCommand(const string &url, const string &data, const st
 	if (slot == INVENTORIES::NbBagSlots)
 		return slot;
 	string checksum = url + data + getId().toString();
-	string realhmac = getHMacSHA1((uint8*)&checksum[0], checksum.size(), (uint8*)&salt[0], salt.size()).toString();
+	string realhmac = getHMacSHA1((uint8*)&checksum[0], (uint32)checksum.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 	if (realhmac == hmac)
 		return slot;
 	return INVENTORIES::NbBagSlots;
@@ -13783,7 +13792,7 @@ void CCharacter::getAvailablePhrasesList( const string &brickFilter, vector<CShe
 {
 	H_AUTO(CCharacterGetAvailablePhrasesList);
 
-	const uint nbSkills = _Skills._Skills.size();
+	const uint nbSkills = (uint)_Skills._Skills.size();
 
 	buildAvailablePhrasesList( _Id, brickFilter, _KnownBricks, _BoughtPhrases, _Skills._Skills, selectedPhrases, 250, people, bypassBrickRequirements, includeNonRolemasterBricks );
 } // getAvailablePhrasesList //
@@ -13817,7 +13826,7 @@ void CCharacter::harvestCorpseResult( const vector<uint16> &qualities )
 	nlassert(invTemp != NULL);
 	uint32 usedSlot = creature->getLootSlotCount();
 
-	const uint8 size = creature->getMps().size();
+	const uint8 size = (uint8)creature->getMps().size();
 	for (uint i = 0; i < size ; ++i)
 	{
 		const CCreatureRawMaterial *mp = creature->getCreatureRawMaterial(i);
@@ -13902,7 +13911,7 @@ void	CCharacter::getMatchingMissionLootRequirements( uint16 itemLevel, const std
 							{
 								// Matching OK
 								CAutoQuarterItemDescription desc;
-								uint itemIndex = icm - materials.begin();
+								uint itemIndex = (uint)(icm - materials.begin());
 #ifdef NL_DEBUG
 								nlassert( itemIndex <= (uint16)~0 );
 #endif
@@ -14127,7 +14136,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	uint32 firstTribeFameIndex = CStaticFames::getInstance().getFirstTribeFameIndex();
 	uint32 firstTribeDbIndex = CStaticFames::getInstance().getDatabaseIndex( firstTribeFameIndex );
 	uint32 fameIndexInDatabase = CStaticFames::getInstance().getDatabaseIndex( factionIndex );
-	
+
 	if( factionIndex >= firstTribeFameIndex )
 	{
 		if (playerFame != NO_FAME)
@@ -14173,9 +14182,12 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	{
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
 
-		if (fame >= PVPFameRequired*6000) {
+		if (fame >= PVPFameRequired*6000)
+		{
 			canPvp = true;
-		} else if (fame <= -PVPFameRequired*6000) {
+		}
+		else if (fame <= -PVPFameRequired*6000)
+		{
 			canPvp = true;
 		}
 	}
@@ -14795,7 +14807,7 @@ void CCharacter::sendContactListInit()
 
 	// send to client
 	bms.serialCont(friendStringIds);
-	uint32 nbState = friendOnlineStatus.size();
+	uint32 nbState = (uint32)friendOnlineStatus.size();
 	bms.serial(nbState);
 	for (uint i=0; i<nbState; ++i)
 	{
@@ -14869,7 +14881,7 @@ const NLMISC::CEntityId& CCharacter::getInRoomOfPlayer()
 
 bool CCharacter::playerHaveRoomAccess(const NLMISC::CEntityId &id)
 {	
-	const uint size = _RoomersList.size();
+	const uint size = (uint)_RoomersList.size();
 	for ( uint i =0 ; i < size ; ++i)
 	{
 		if ( _RoomersList[i].getShortId() == id.getShortId())
@@ -14896,7 +14908,7 @@ void CCharacter::addRoomAccessToPlayer(const NLMISC::CEntityId &id)
 	}
 
 	// check not already in list
-	const uint size = _RoomersList.size();
+	const uint size = (uint)_RoomersList.size();
 	for ( uint i =0 ; i < size ; ++i)
 	{
 		if ( _RoomersList[i].getShortId() == id.getShortId())
@@ -14922,7 +14934,7 @@ void CCharacter::addPlayerToFriendList(const NLMISC::CEntityId &id)
 	}
 
 	// check not already in list
-	const uint size = _FriendsList.size();
+	const uint size = (uint)_FriendsList.size();
 	for ( uint i =0 ; i < size ; ++i)
 	{
 		if ( _FriendsList[i].EntityId.getShortId() == id.getShortId())
@@ -14994,7 +15006,7 @@ void CCharacter::addPlayerToLeagueList(const NLMISC::CEntityId &id)
 	}
 
 	// check not already in list
-	const uint size = _LeagueList.size();
+	const uint size = (uint)_LeagueList.size();
 	for ( uint i =0 ; i < size ; ++i)
 	{
 		if ( _LeagueList[i].EntityId.getShortId() == id.getShortId())
@@ -15066,7 +15078,7 @@ void CCharacter::addPlayerToIgnoreList(const NLMISC::CEntityId &id)
 	}
 
 	// check not already ignored
-	const uint size = _IgnoreList.size();
+	const uint size = (uint)_IgnoreList.size();
 	for ( uint i =0 ; i < size ; ++i)
 	{
 		if ( _IgnoreList[i].EntityId.getShortId() == id.getShortId())
@@ -15487,7 +15499,7 @@ void CCharacter::contactListRefChange(const NLMISC::CEntityId &id, TConctactList
 //--------------------------------------------------------------
 bool CCharacter::isIgnoredBy(const NLMISC::CEntityId &id)
 {
-	const uint size = _IsIgnoredBy.size();
+	const uint size = (uint)_IsIgnoredBy.size();
 	for (uint i = 0; i < size; ++i)
 	{
 		if (_IsIgnoredBy[i].getShortId() == id.getShortId())
@@ -15503,7 +15515,7 @@ bool CCharacter::isIgnoredBy(const NLMISC::CEntityId &id)
 //--------------------------------------------------------------
 bool CCharacter::isFriendOf(const NLMISC::CEntityId &id)
 {
-	const uint size = _IsFriendOf.size();
+	const uint size = (uint)_IsFriendOf.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		if (_IsFriendOf[i].getShortId() == id.getShortId())
@@ -15550,7 +15562,7 @@ void CCharacter::unreferencedAsFriendBy( const NLMISC::CEntityId &id)
 void CCharacter::addedInIgnoreListBy( const NLMISC::CEntityId &id)
 {
 	// check this entity isn't already in the list
-	const uint size = _IsIgnoredBy.size();
+	const uint size = (uint)_IsIgnoredBy.size();
 	for ( uint i =0 ; i < size ; ++i)
 	{
 		if ( _IsIgnoredBy[i].getShortId() == id.getShortId())
@@ -15637,7 +15649,7 @@ void CCharacter::setContactOnlineStatus( const NLMISC::CEntityId &id, bool onlin
 //--------------------------------------------------------------
 void CCharacter::clearFriendList()
 {
-	const uint size = _FriendsList.size();
+	const uint size = (uint)_FriendsList.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		removePlayerFromFriendListByIndex(0);
@@ -15649,7 +15661,7 @@ void CCharacter::clearFriendList()
 //--------------------------------------------------------------
 void CCharacter::clearIgnoreList()
 {
-	const uint size = _IgnoreList.size();
+	const uint size = (uint)_IgnoreList.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		removePlayerFromIgnoreListByIndex(0);
@@ -15759,13 +15771,13 @@ void CCharacter::destroyCharacter()
 	clearIgnoreList();
 
 	// tell all players referencing this char he doesn't exist anymore
-	uint size = _IsFriendOf.size();
+	uint size = (uint)_IsFriendOf.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		contactListRefChange( _IsFriendOf[i], RemoveFriend);
 	}
 
-	size = _IsIgnoredBy.size();
+	size = (uint)_IsIgnoredBy.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		contactListRefChange( _IsIgnoredBy[i], RemoveIgnored);
@@ -15905,7 +15917,6 @@ void CCharacter::onConnection()
 //--------------------------------------------------------------
 void CCharacter::onDisconnection(bool bCrashed)
 {
-	nlinfo("deco");
 	// indicate to the char that it's going offline
 	online(false);
 	// remove dyn chats before saving
@@ -16328,7 +16339,7 @@ void CCharacter::sendEmote( const NLMISC::CEntityId& id, MBEHAV::EBehaviour beha
 	msgout2.serial( const_cast<TDataSetRow&>(getEntityRowId()) );
 	msgout2.serial(const_cast<string&>(*crowd));
 
-	uint32 size = params.size();
+	uint32 size = (uint32)params.size();
 	msgout2.serial(size);
 	for ( uint i = 0; i < size; i++ )
 	{
@@ -16665,7 +16676,7 @@ NLMISC::TGameCycle CCharacter::getMissionLastSuccess(const CMissionTemplate & te
 
 		if (lastSuccessDate > CTickEventHandler::getGameCycle())
 			return 0;
-			
+
 		return it->second.LastSuccessDate;
 	}
 	return 0;
@@ -16851,7 +16862,7 @@ void CCharacter::checkCharacAndScoresValues()
 			// phrase = abppXZZ.sphrase with X = characteristic code and ZZ = brick level (CharacteristicBrickStep*ZZ)
 			code = phraseStr.substr(4,1); //string( text[4] );
 			txt = phraseStr.substr(5,2);
-			lvl = atoi( txt.c_str() );
+			NLMISC::fromString(txt, lvl);
 
 			CHARACTERISTICS::TCharacteristics charac = CHARACTERISTICS::getCharacteristicFromCode(code);
 			if (charac < CHARACTERISTICS::NUM_CHARACTERISTICS)
@@ -17492,7 +17503,7 @@ void CCharacter::setPVPFlag( bool pvpFlag )
 		{
 			if (_PVPFlagTimeSettedOn > CTickEventHandler::getGameCycle())
 				_PVPFlagTimeSettedOn = CTickEventHandler::getGameCycle() - TimeForResetPVPFlag;
-				
+
 			if( _PVPFlagTimeSettedOn + TimeForResetPVPFlag > CTickEventHandler::getGameCycle() )
 			{
 				// we need wait a minimal of time before reset your pvp tag
@@ -18668,7 +18679,7 @@ void CCharacter::updateMagicProtectionAndResistance()
 	
 	sint32 forageResist = ((sint32)(_Skills._Skills[SKILLS::SH].MaxLvlReached * MagicResistFactorForForageSkills) + MagicResistSkillDelta);
 	_BaseResistance = max(_BaseResistance, forageResist);
-	
+
 	clamp(_BaseResistance, 0, 225);
 
 	// set up base
@@ -18863,7 +18874,7 @@ sint32 CCharacter::getSkillModifierForRace(EGSPD::CPeople::TPeople people) const
 	EGSPD::getMatchingClassificationType(people, types);
 
 	sint32 max = 0;
-	const uint nbTypes = types.size();
+	const uint nbTypes = (uint)types.size();
 	for (uint i = 0 ; i < nbTypes ; ++i)
 	{
 		if (types[i] >=0  && types[i] < EGSPD::CClassificationType::EndClassificationType)
@@ -18886,7 +18897,7 @@ void CCharacter::updateConnexionStat()
 	_LastLogStats.begin()->LogoffTime = 0;
 	_LastLogStats.begin()->Duration = 0;
 
-	uint32 size = _LastLogStats.size();
+	uint32 size = (uint32)_LastLogStats.size();
 	if( size > NBLoginStats )
 	{
 		for( uint i = 0; i < size - NBLoginStats; ++i )
@@ -19164,7 +19175,6 @@ void CCharacter::setLeagueId(TChanID id, bool removeIfEmpty)
 	// Remove old dynamic channel
 	if (_LeagueId != DYN_CHAT_INVALID_CHAN)
 	{
-		
 		CPVPManager2::getInstance()->broadcastMessage(_LeagueId, string("<INFO>"), name+" -->[]");
 		PHRASE_UTILITIES::sendDynamicSystemMessage(getEntityRowId(), "TEAM_QUIT_LEAGUE");
 		DynChatEGS.removeSession(_LeagueId, getEntityRowId());		
@@ -19178,17 +19188,18 @@ void CCharacter::setLeagueId(TChanID id, bool removeIfEmpty)
 				DynChatEGS.removeChan(_LeagueId);
 		}
 	}
-	
+
 	if (id != DYN_CHAT_INVALID_CHAN)
 	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage(getEntityRowId(), "TEAM_JOIN_LEAGUE");
 		DynChatEGS.addSession(id, getEntityRowId(), true);
 		CPVPManager2::getInstance()->broadcastMessage(id, string("<INFO>"), "<-- "+name);
 	}
-	
+
 	_LeagueId = id;
 	updatePVPClanVP();
 }
+
 //------------------------------------------------------------------------------
 
 void CCharacter::setTeamInvitor(const NLMISC::CEntityId & invitorId)
@@ -19945,6 +19956,7 @@ void CCharacter::setLastPosYInDB(sint32 y)
 	_LastPosYInDB = y;
 }
 
+
 //------------------------------------------------------------------------------
 
 void CCharacter::clearFriendOfList()
@@ -19968,7 +19980,7 @@ const NLMISC::CEntityId &CCharacter::getFriend(uint16 index) const
 
 uint	CCharacter::getNumIgnored() const
 {
-	return _IgnoreList.size();
+	return (uint)_IgnoreList.size();
 }
 
 
@@ -20218,7 +20230,7 @@ void CCharacter::addInQueue(uint32 id)
 
 void CCharacter::removeFromQueue(uint32 id)
 {
-	const uint size = _MissionsQueues.size();
+	const uint size = (uint)_MissionsQueues.size();
 	for ( uint i = 0 ; i < size ; ++i )
 	{
 		if (_MissionsQueues[i] == id)
@@ -20328,9 +20340,9 @@ void CCharacter::disableConsumableFamily(uint16 family, NLMISC::TGameCycle date)
 	if( _ConsumableOverdoseEndDates.Dates.size() <= MaxBonusMalusDisplayed )
 	{
 //		_PropertyDatabase.setProp( _DataIndexReminder->DisableConsumable.Family[_ConsumableOverdoseEndDates.Dates.size()-1], family );
-		CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray(_ConsumableOverdoseEndDates.Dates.size()-1).setFAMILY(_PropertyDatabase, family );
+		CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray((uint32)_ConsumableOverdoseEndDates.Dates.size()-1).setFAMILY(_PropertyDatabase, family );
 //		_PropertyDatabase.setProp( _DataIndexReminder->DisableConsumable.DisableTime[_ConsumableOverdoseEndDates.Dates.size()-1], date );
-		CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray(_ConsumableOverdoseEndDates.Dates.size()-1).setDISABLE_TIME(_PropertyDatabase, date );
+		CBankAccessor_PLR::getDISABLE_CONSUMABLE().getArray((uint32)_ConsumableOverdoseEndDates.Dates.size()-1).setDISABLE_TIME(_PropertyDatabase, date );
 	}
 }
 
@@ -20609,7 +20621,7 @@ void CCharacter::sendNpcMissionGiverIconDesc( const std::vector<uint32>& npcKeys
 	//H_AUTO(SendNpcMissionGiverIconDesc); see USRCB_CLIENT:NPC_ICON:GET_DESC
 	CBitMemStream bms;
 	GenericMsgManager.pushNameToStream("NPC_ICON:SET_DESC", bms);
-	uint8 nb8 = npcKeys.size();
+	uint8 nb8 = (uint8)npcKeys.size();
 	bms.serial( nb8 );
 
 	for ( std::vector<uint32>::const_iterator ink=npcKeys.begin(); ink!=npcKeys.end(); ++ink )
