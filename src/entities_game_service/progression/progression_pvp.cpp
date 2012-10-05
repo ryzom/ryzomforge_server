@@ -1093,7 +1093,6 @@ void CDamageScoreManager::playerDeath(CCharacter * victimChar, const CCharacter 
 {
 	H_AUTO(CDamageScoreManager_playerDeath);
 
-	nlinfo("ok");
 	nlassert(victimChar != NULL);
 
 //	PVP_CLAN::TPVPClan victimFaction;

@@ -260,7 +260,6 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 	bool akami = CFameInterface::getInstance().getFameIndexed(user->getId(), 4) <= -PVPFameRequired*6000;
 	bool akara = CFameInterface::getInstance().getFameIndexed(user->getId(), 6) <= -PVPFameRequired*6000;
 
-	
 	if (matis && fyros && tryker && zorai)
 	{
 		TMAPExtraFactionChannel::iterator it = _ExtraFactionChannel.find("hominists");
@@ -1111,14 +1110,14 @@ void CPVPManager2::onIOSMirrorUp()
 	createExtraFactionChannel("marauders");
 	createExtraFactionChannel("agnos");
 	*/
-	
+
 	// Community Channels
 	createExtraFactionChannel("en");
 	createExtraFactionChannel("fr");
 	createExtraFactionChannel("de");
 	createExtraFactionChannel("ru");
 	createExtraFactionChannel("es");
-	
+
 	for (uint i = PVP_CLAN::BeginClans; i <= PVP_CLAN::EndClans; i++)
 	{
 		//createFactionChannel(PVP_CLAN::getClanFromIndex(i));

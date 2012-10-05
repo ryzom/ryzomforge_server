@@ -7371,7 +7371,6 @@ void CCharacter::setSkillsToValue(const sint32& value)
 				break;
 			}
 		}
-
 	}
 }
 
@@ -16166,7 +16165,6 @@ void CCharacter::applyGooDamage( float gooDistance )
 				{
 					_LastTickSufferGooDamage = CTickEventHandler::getGameCycle();
 
-					
 					// Apply damage corresponding to distance from goo if not dead
 					if( _PhysScores._PhysicalScores[ SCORES::hit_points ].Current > 0 )
 					{
@@ -16185,7 +16183,6 @@ void CCharacter::applyGooDamage( float gooDistance )
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_POISON");
 							else
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_GOO");
-							
 						}
 						else
 						{

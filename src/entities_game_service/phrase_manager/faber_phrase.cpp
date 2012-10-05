@@ -257,7 +257,6 @@ bool CFaberPhrase::validate()
 		return false;
 	}
 
-
 	// entities cant craft if in combat
 	/* commented as test of right hand item is now made...
 	TDataSetRow entityRowId = CPhraseManager::getInstance().getEntityEngagedMeleeBy( _ActorRowId );

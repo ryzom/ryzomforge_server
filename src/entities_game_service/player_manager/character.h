@@ -2399,7 +2399,7 @@ public:
 
 	const std::string& getLangChannel() const;
 	void setLangChannel(const std::string &lang);
-	
+
 	const std::string& getNewTitle() const;
 	void setNewTitle(const std::string &title);
 

@@ -4515,7 +4515,7 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 	string lang = args[1];
 	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es")
 		return false;
-	
+
 	TChanID channel = inst->getFactionDynChannel(lang);
 
 	if (channel != DYN_CHAT_INVALID_CHAN)
@@ -4533,7 +4533,6 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 	params[0].Literal = lang;
 	CCharacter::sendDynamicSystemMessage( eid, "EGS_CHANNEL_INVALID_NAME", params );
 	return false;
-
 }
 
 NLMISC_COMMAND (updateTarget, "Update current target", "<user id>")
@@ -5530,11 +5529,11 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial(name);
 		sendMessageViaMirror("IOS", msgout);
 	}
-	
+
 	//*************************************************
 	//***************** set_tag
 	//*************************************************
-	
+
 	else if (command_args[0] == "set_tag") {
 		if (command_args.size () != 3) return false;
 		TDataSetRow row = c->getEntityRowId();
@@ -6077,9 +6076,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				msgout.serial(lang);
 			sendMessageViaMirror("IOS", msgout);
 			return true;
-		}		
+		}
 	}
-	
+
 	//*************************************************
 	//***************** missions
 	//*************************************************

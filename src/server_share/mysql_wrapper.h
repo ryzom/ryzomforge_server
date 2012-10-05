@@ -28,6 +28,7 @@
 #ifdef NL_OS_WINDOWS
 # include <windows.h>
 #endif
+
 #include <mysql.h>
 #include <time.h>
 

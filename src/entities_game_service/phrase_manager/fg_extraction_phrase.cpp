@@ -546,7 +546,9 @@ bool CFgExtractionPhrase::validate()
 
 	// test if tool have enough quality
 	sint depositQ = (sint)harvestSource->forageSite()->deposit()->maxQuality();
-	if ((depositQ > 0) && (item->recommended()+49  < depositQ)) {
+
+	if ((depositQ > 0) && (item->recommended()+49  < depositQ))
+	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage(_ActorRowId, "FORAGE_TOOL_QUALITY_TOO_LOW");
 		return false;
 	}
