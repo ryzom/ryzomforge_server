@@ -50,7 +50,7 @@ void CGuildLeaderModule::setLeader( uint16 index,uint8 session)
 		nlwarning("<GUILD>%s set invalid member idx %u as leader",proxy.getId().toString().c_str(),index );
 		return;
 	}
-	
+
 	_GuildMemberCore->setMemberGrade(memberPD->getGrade());
 	memberPD->setMemberGrade(EGSPD::CGuildGrade::Leader);
 

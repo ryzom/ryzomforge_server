@@ -21,9 +21,7 @@
 #ifndef GUILD_UNIFIER_ITF
 #define GUILD_UNIFIER_ITF
 #include "nel/misc/types_nl.h"
-#if defined(NL_COMP_VC8) || defined(NL_COMP_VC9)
-#	include <memory>
-#endif
+#include <memory>
 #include "nel/misc/hierarchical_timer.h"
 #include "nel/misc/string_conversion.h"
 #include "nel/net/message.h"
@@ -492,9 +490,9 @@ namespace GU
 
 		// unused interceptors 
 		std::string			fwdBuildModuleManifest() const	{ return std::string(); }
-		void				fwdOnModuleUp(NLNET::IModuleProxy *moduleProxy)  {};
-		void				fwdOnModuleDown(NLNET::IModuleProxy *moduleProxy) {};
-		void				fwdOnModuleSecurityChange(NLNET::IModuleProxy *moduleProxy) {};
+		void				fwdOnModuleUp(NLNET::IModuleProxy *moduleProxy)  {}
+		void				fwdOnModuleDown(NLNET::IModuleProxy *moduleProxy) {}
+		void				fwdOnModuleSecurityChange(NLNET::IModuleProxy *moduleProxy) {}
 	
 		// process module message interceptor
 		bool fwdOnProcessModuleMessage(NLNET::IModuleProxy *sender, const NLNET::CMessage &message);

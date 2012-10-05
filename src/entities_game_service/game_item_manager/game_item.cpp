@@ -926,7 +926,7 @@ void CGameItem::computeRequiredLevel()
 
 
 //-----------------------------------------------
-// Compute wether item has a skill/charac prerequisit
+// Compute whether item has a skill/charac prerequisit
 //-----------------------------------------------
 void CGameItem::computeHasPrerequisit()
 {
@@ -2468,7 +2468,7 @@ void CGameItem::deleteItem(CGameItem *item)
 //			//NLMEMORY::CheckHeap (true);
 //		}
 ////	}
-////	catch( Exception& e )
+////	catch(const Exception &e)
 ////	{
 ////		nlwarning("<CGameItem::load> %s",e.what());
 ////	}
@@ -2705,7 +2705,7 @@ void CGameItem::addHp( double hpGain )
 //-----------------------------------------------
 // changes the custom text of an item
 //-----------------------------------------------
-void CGameItem::setCustomText(ucstring val)
+void CGameItem::setCustomText(const ucstring &val)
 {
 	_CustomText = val;
 //	getInventory()->onItemChanged(getInventorySlot(), INVENTORIES::TItemChangeFlags(INVENTORIES::itc_custom_text));
@@ -4836,7 +4836,9 @@ NLMISC_COMMAND(testParanoidItemSystem,"run some test code that should provoke a 
 //	if (args.size()!=1)
 //		return false;
 //
-//	switch (atoi(args[0].c_str()))
+//	sint test;
+//	NLMISC::fromString(args[0], test);
+//	switch (test)
 //	{
 //	case 0:
 //		{

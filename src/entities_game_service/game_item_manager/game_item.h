@@ -705,9 +705,9 @@ public :
 	const CItemCraftParameters * getCraftParameters() const { return _CraftParameters; }
 
 	/// get custom string (for scroll-like items)
-	ucstring getCustomText() const { return _CustomText; }
+	const ucstring& getCustomText() const { return _CustomText; }
 	/// set custom string (for scroll-like items)
-	void setCustomText(ucstring val);
+	void setCustomText(const ucstring &val);
 
 	uint8 getPetIndex() const { return _PetIndex; }
 	void setPetIndex(uint8 val) { _PetIndex = val; }
@@ -850,7 +850,7 @@ private:
 	// Compute required level (skills and charac) for wearing item
 	void computeRequiredLevel();
 
-	// Compute wether item has a skill/charac prerequisit
+	// Compute whether item has a skill/charac prerequisit
 	void computeHasPrerequisit();
 
 	// has item prerequisit
@@ -1001,7 +1001,7 @@ inline CGameItemVector::~CGameItemVector()
 
 inline uint32 CGameItemVector::size() const
 {
-	return _Data.size()<<LOG_QUANTUM;
+	return (uint32)_Data.size()<<LOG_QUANTUM;
 }
 
 inline CGameItem& CGameItemVector::operator[](uint32 idx)
@@ -1022,7 +1022,7 @@ inline uint32 CGameItemVector::getUniqueIndex(const CGameItem& item)
 {
 	for (uint32 i=0;i<_Data.size();++i)
 	{
-		uint32 lowidx= &item-_Data[i];
+		uint32 lowidx= (uint32)(&item-_Data[i]);
 		if (lowidx<QUANTUM)
 		{
 			uint32 idx= lowidx+(i<<LOG_QUANTUM);

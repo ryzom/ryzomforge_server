@@ -167,7 +167,6 @@ void CGuildManager::release()
 #ifndef USE_PDS
 		if(_Instance->_Container)
 		{
-			
 			for ( map<EGSPD::TGuildId, EGSPD::CGuildPD*>::iterator it = _Instance->_Container->getGuildsBegin(); it != _Instance->_Container->getGuildsEnd();++it )
 			{
 				CGuild * guild = EGS_PD_CAST<CGuild*>( (*it).second );
@@ -175,7 +174,7 @@ void CGuildManager::release()
 				_Instance->saveGuild(guild);
 			}
 		}
-#endif	
+#endif
 		delete _Instance;
 		_Instance = NULL;
 	}
@@ -311,7 +310,7 @@ void CGuildManager::saveGuild( CGuild* guild )
 	EGS_PD_AST( guild );
 	if (guild->isProxy())
 		return;
-	
+
 	uint32 id = guild->getId();
 	{
 		H_AUTO( CGuildManagerSaveGUILD_FAME )
@@ -333,7 +332,6 @@ void CGuildManager::saveGuild( CGuild* guild )
 	}
 	else
 	{
-		
 		string fileName = NLMISC::toString("guilds/guild_%05u.bin", id & 0x000fffff);
 		if( UseBS )
 		{
@@ -350,10 +348,10 @@ void CGuildManager::saveGuild( CGuild* guild )
 				}
 				// serial it to file
 				CBackupMsgSaveFile msg( fileName, CBackupMsgSaveFile::SaveFile, Bsi );
-				msg.DataMsg.serialBuffer((uint8*)&buffer.front(), buffer.size());
+				msg.DataMsg.serialBuffer((uint8*)&buffer.front(), (uint)buffer.size());
 				Bsi.sendFile( msg );
 			}
-			catch( Exception& )
+			catch(const Exception &)
 			{
 				nlwarning("<guilds>  :  Can't serial file %s",fileName.c_str());
 				return;
@@ -429,7 +427,7 @@ CGuild *CGuildManager::createGuildProxy(uint32 guildId, const ucstring & guildNa
 
 	EGSPD::CGuildFameContainerPD * fameCont = EGSPD::CGuildFameContainerPD::create(CEntityId(RYZOMID::guild,guildId));
 	EGS_PD_AST(fameCont);
-	guild->setFameContainer( fameCont );	
+	guild->setFameContainer( fameCont );
 
 	/// register guild in other system
 	guild->registerGuild();
@@ -449,7 +447,7 @@ CGuild *CGuildManager::createGuildProxy(uint32 guildId, const ucstring & guildNa
 //	{
 //		guild->setRolemastersValid( (EGSPD::CSPType::TSPType)i, false );
 //	}
-	
+
 	// init the guild strings
 	guild->setName(guildName);
 	guild->setDescription(description);
@@ -485,7 +483,7 @@ void CGuildManager::dumpGuilds( bool onlyLocal, NLMISC::CLog & log )const
 		count++;
 		const ucstring & name = guild->getName();
 		log.displayNL("  id = %s %s %s, name = '%s', %u members",
-			guildIdToString(it->first).c_str(), 
+			guildIdToString(it->first).c_str(),
 			(it->first)>>20 == IService::getInstance()->getShardId() ? "(Local)" : "(Foreign)",
 			guild->getEId().toString().c_str(),
 			name.toString().c_str(),
@@ -568,7 +566,7 @@ CGuild * CGuildManager::getGuildFromId( EGSPD::TGuildId id )
 //	std::pair< std::map<ucstring,EGSPD::TGuildId>::iterator, std::map<ucstring,EGSPD::TGuildId>::iterator > thePair = _GuildsAwaitingString.equal_range( str );
 //	if ( thePair.first == thePair.second )
 //		return false;
-//	
+//
 //	for ( std::map<ucstring,EGSPD::TGuildId>::iterator it = thePair.first; it != thePair.second;++it )
 //	{
 //		TGuildId guildId = it->second;
@@ -586,7 +584,7 @@ bool CGuildManager::checkGuildMemberShip( const EGSPD::TCharacterId & userId, co
 	// if we have no container, it means that the shard is not initialized yet and that players are loaded for check purpose
 	if ( !_Container )
 		return true;
-	
+
 	EGSPD::CGuildPD * guild = _Container->getGuilds( guildId );
 	if ( ! guild )
 		return false;
@@ -636,7 +634,7 @@ void CGuildManager::playerConnection( CGuildCharProxy & proxy )
 void CGuildManager::removeInvitation(CGuildInvitation* invitation)
 {
 	nlassert(invitation);
-	const uint size = _Invitations.size();
+	const uint size = (uint)_Invitations.size();
 	for ( uint i = 0; i < size; ++i )
 	{
 		if ( _Invitations[i] == invitation )
@@ -733,7 +731,7 @@ void CGuildManager::createGuild(CGuildCharProxy & proxy,const ucstring & guildNa
 	uint32 guildId = getFreeGuildId();
 
 	// boris 2006 : validate the name with the Shard unifier and store guild creation info when SU returns
-	// store the creation data 	
+	// store the creation data
 	TPendingGuildCreate pgc;
 	pgc.CreatorChar = proxy.getId();
 	pgc.GuildName = guildName;
@@ -754,7 +752,7 @@ void CGuildManager::createGuildStep2(uint32 guildId, const ucstring &guildName, 
 	BOMB_IF(it == _PendingGuildCreates.end(), "CGuildManager::createGuildStep2 : can't find guild "<<guildId<<" in the pending guild creation", return);
 	TPendingGuildCreate pgc = it->second;
 	_PendingGuildCreates.erase(it);
-	
+
 	if (result != CHARSYNC::TCharacterNameResult::cnr_ok)
 	{
 		// no valid name
@@ -790,7 +788,7 @@ void CGuildManager::createGuildStep2(uint32 guildId, const ucstring &guildName, 
 
 	proxy.sendSystemMessage( "GUILD_CREATED" );
 	proxy.spendMoney( GuildCreationCost.get() );
-	
+
 	// create the guild through PDS
 	CGuild * guild = EGS_PD_CAST<CGuild*>( EGSPD::CGuildPD::create(guildId) );
 	EGS_PD_AST( guild );
@@ -800,7 +798,7 @@ void CGuildManager::createGuildStep2(uint32 guildId, const ucstring &guildName, 
 
 	EGSPD::CGuildFameContainerPD * fameCont = EGSPD::CGuildFameContainerPD::create(CEntityId(RYZOMID::guild,guildId));
 	EGS_PD_AST(fameCont);
-	guild->setFameContainer( fameCont );	
+	guild->setFameContainer( fameCont );
 
 	/// register guild in other system
 	guild->registerGuild();
@@ -808,7 +806,7 @@ void CGuildManager::createGuildStep2(uint32 guildId, const ucstring &guildName, 
 	// inform the SU that a new guild now exist (to update the ring database).
 	if (IShardUnifierEvent::getInstance())
 		IShardUnifierEvent::getInstance()->addGuild(guildId, guildName);
-	
+
 	// set initial guild fames
 	guild->setStartFameAndAllegiance( proxy.getId() );
 
@@ -824,7 +822,7 @@ void CGuildManager::createGuildStep2(uint32 guildId, const ucstring &guildName, 
 //	{
 //		guild->setRolemastersValid( (EGSPD::CSPType::TSPType)i, false );
 //	}
-	
+
 	// init the guild strings
 	guild->setName(guildName);
 	guild->setDescription(pgc.Description);
@@ -835,7 +833,6 @@ void CGuildManager::createGuildStep2(uint32 guildId, const ucstring &guildName, 
 //	EGSPD::PDSLib.getStringManager().addString( stringEId, guildName );
 //	stringEId.setType( RYZOMID::guildDescription );
 //	EGSPD::PDSLib.getStringManager().addString( stringEId, pgc.Description );
-	
 
 	// create a new guild member
 	CGuildMember * memberCore = guild->newMember( proxy.getId() );
@@ -845,21 +842,21 @@ void CGuildManager::createGuildStep2(uint32 guildId, const ucstring &guildName, 
 	memberCore->setEnterTime( CTickEventHandler::getGameCycle() );
 	STOP_IF(!guild->setMemberGrade(memberCore, EGSPD::CGuildGrade::Leader), "Failed to set grade to leader for new guild"<<guildId<<" creator "<<character->getId().toString());
 //	memberCore->setMemberGrade( EGSPD::CGuildGrade::Leader );
-	
+
 	// create the leader module to init properties
 //	CGuildLeaderModule * leader = new CGuildLeaderModule( proxy, memberCore );
 //	guild->setMemberOnline( memberCore, proxy.getId().getDynamicId()  );
 
 	// broadcast the new guild info
 	IGuildUnifier::getInstance()->guildCreated(guild);
-	
+
 	// close guild creation interface
 	PlayerManager.sendImpulseToClient( proxy.getId(),"GUILD:ABORT_CREATION" );
-	
+
 	/// end current bot chat
 	proxy.endBotChat();
 	proxy.updateTarget();
-	_ExistingGuildNames.insert( NLMISC::toLower( guild->getName().toString().c_str() ) );
+	_ExistingGuildNames.insert( NLMISC::toLower( guild->getName().toString() ) );
 
 	// ask the client to open it's guild interface
 	PlayerManager.sendImpulseToClient( proxy.getId(),"GUILD:OPEN_GUILD_WINDOW" );
@@ -902,11 +899,11 @@ void CGuildManager::deleteGuild(uint32 id)
 	if (!guild->isProxy())
 	{
 		CMailForumValidator::removeGuild(name);
-	
+
 		CStatDB::getInstance()->removeGuild(id);
 	}
 
-	_ExistingGuildNames.erase( NLMISC::toLower( guild->getName().toString().c_str() ) );
+	_ExistingGuildNames.erase( NLMISC::toLower( guild->getName().toString() ) );
 	guild->unregisterGuild();
 
 	if (!guild->isProxy())
@@ -937,7 +934,6 @@ void CGuildManager::deleteGuild(uint32 id)
 //	}
 //	else
 //		_FreeGuildIds.insert(id);
-	
 }
 
 //----------------------------------------------------------------------------
@@ -957,25 +953,25 @@ void CGuildManager::characterDeleted( CCharacter & user )
 		nlwarning("<GUILD>invalid guild id %s", guildIdToString(user.getGuildId()).c_str() );
 		return;
 	}
-	
+
 	if (guild->isProxy())
 	{
 		// for proxyfied guild, we wait the action of the origin shard
 		return;
 	}
-	
+
 	CGuildMember* userMember = EGS_PD_CAST<CGuildMember*>( guild->getMembers( user.getId() ) );
 	if ( !userMember )
 	{
 		nlwarning("<GUILD>'%s' is not in guild %s", user.getId().toString().c_str(), guildIdToString(user.getGuildId()).c_str() );
 		return;
 	}
-	
+
 	if ( userMember->getGrade() == EGSPD::CGuildGrade::Leader )
 	{
 		// the leader quits : find a successor
 		CGuildMember * successor = NULL;
-		// best successor is the member with best grade. If more than 1 user fits, take the older in the guild 
+		// best successor is the member with best grade. If more than 1 user fits, take the older in the guild
 		for (map<EGSPD::TCharacterId, EGSPD::CGuildMemberPD*>::iterator it = guild->getMembersBegin();
 			it != guild->getMembersEnd();
 			++it  )
@@ -993,7 +989,6 @@ void CGuildManager::characterDeleted( CCharacter & user )
 				successor = member;
 			}
 		}
-		
 
 		// if the guild is still valid, set the successor as leader
 		if ( successor )
@@ -1001,13 +996,13 @@ void CGuildManager::characterDeleted( CCharacter & user )
 			guild->decGradeCount( successor->getGrade() );
 			guild->incGradeCount( EGSPD::CGuildGrade::Leader );
 			successor->setMemberGrade( EGSPD::CGuildGrade::Leader );
-			
+
 			// tell guild
 			SM_STATIC_PARAMS_1( params,STRING_MANAGER::player );
 			params[0].setEIdAIAlias( successor->getIngameEId(), CAIAliasTranslator::getInstance()->getAIAlias(successor->getIngameEId()) );
-			
+
 			guild->sendMessageToGuildMembers("GUILD_NEW_LEADER",params );
-			
+
 			// If the player is online, the module must be recreated. Do as the reference was destroyed
 			CGuildMemberModule * successorModule = NULL;
 			if ( successor->getReferencingModule(successorModule) )
@@ -1026,7 +1021,7 @@ void CGuildManager::characterDeleted( CCharacter & user )
 		guild->incGradeCount( EGSPD::CGuildGrade::Member );
 		guild->decGradeCount( EGSPD::CGuildGrade::Leader );
 	}
-	
+
 	guild->deleteMember( userMember );
 	if ( guild->getMembersBegin() == guild->getMembersEnd() )
 	{
@@ -1069,7 +1064,8 @@ void CGuildManager::callback(const CFileDescriptionContainer& fileList)
 		BOMB_IF(pos == string::npos, "Invalid guild file "<<fd.FileName<<" returned by BS : can't find 'guild_' inside", continue);
 		BOMB_IF(pos+6+5 >= fd.FileName.size(), "Invalid guild file "<<fd.FileName<<" returned by BS : not enough character after 'guild_'", continue);
 
-		TGuildId guildId = atoi(fd.FileName.substr(pos+6, 5).c_str());
+		TGuildId guildId;
+		NLMISC::fromString(fd.FileName.substr(pos+6, 5), guildId);
 
 		if (_GuildToLoad.find(guildId) != _GuildToLoad.end())
 		{
@@ -1127,7 +1123,7 @@ void CGuildManager::loadGuild(const std::string &fileName)
 //----------------------------------------------------------------------------
 void CGuildManager::callback(const CFileDescription& fileDescription, NLMISC::IStream& dataStream)
 {
-	const uint len = strlen("guild_XXXXX.ext");
+	const uint len = (uint)strlen("guild_XXXXX.ext");
 
 	string file = CFile::getFilename(fileDescription.FileName);
 
@@ -1135,7 +1131,8 @@ void CGuildManager::callback(const CFileDescription& fileDescription, NLMISC::IS
 	BOMB_IF(pos == string::npos, "Invalid guild file "<<fileDescription.FileName<<" send by BS : can't find 'guild_' inside", return);
 	BOMB_IF(pos+6+5 >= fileDescription.FileName.size(), "Invalid guild file "<<fileDescription.FileName<<" send by BS : not enough character after 'guild_'", return);
 
-	TGuildId guildId = atoi(fileDescription.FileName.substr(pos+6, 5).c_str());
+	TGuildId guildId;
+	NLMISC::fromString(fileDescription.FileName.substr(pos+6, 5), guildId);
 
 	BOMB_IF(guildId == 0, "Invalid guild file name '"<<fileDescription.FileName<<"' : can't found a valid guild id", return);
 
@@ -1157,7 +1154,7 @@ void CGuildManager::callback(const CFileDescription& fileDescription, NLMISC::IS
 		static CPersistentDataRecord	pdr;
 		pdr.clear();
 		pdr.fromBuffer(dataStream);
-		
+
 		guild = EGS_PD_CAST<CGuild*>( EGSPD::CGuildPD::create(guildId) );
 		EGS_PD_AST(guild);
 		// store it as loast loaded guild
@@ -1246,7 +1243,7 @@ void CGuildManager::callback(const CFileDescription& fileDescription, NLMISC::IS
 //			nlinfo("Loading outposts from save files...");
 //			COutpostManager::getInstance().loadOutpostSaveFiles();
 //
-//			// Send the guild list to SU to synchronize the ring database and name manager 
+//			// Send the guild list to SU to synchronize the ring database and name manager
 //			// (and eventualy rename some conflicting guilds)
 //			{
 //				std::vector<CHARSYNC::CGuildInfo> guildInfos;
@@ -1288,7 +1285,7 @@ void CGuildManager::callback(const CFileDescription& fileDescription, NLMISC::IS
 //			gi.setGuildName(guild->getName());
 //
 //			guildInfos.push_back(gi);
-//		
+//
 //			IShardUnifierEvent::getInstance()->registerLoadedGuildNames(guildInfos);
 //		}
 //
@@ -1306,7 +1303,7 @@ void CGuildManager::loadGuilds()
 		return;
 
 	IService::getInstance()->setCurrentStatus("Loading Guilds");
-	
+
 	// create the container if it was not loaded
 	if ( _Container == NULL )
 		_Container = EGSPD::CGuildContainerPD::create( 1 );
@@ -1367,7 +1364,7 @@ void CGuildManager::loadGuilds()
 	nlinfo("Loading outposts from save files...");
 	COutpostManager::getInstance().loadOutpostSaveFiles();
 
-	// Send the guild list to SU to synchronize the ring database and name manager 
+	// Send the guild list to SU to synchronize the ring database and name manager
 	// (and eventualy rename some conflicting guilds)
 	if (DontUseSU.get() == 0)
 	{
@@ -1425,8 +1422,8 @@ void CGuildManager::registerGuildAfterLoading(CGuild *guildToRegister)
 //			const ucstring & str = guildToRegister->getDescription();
 //			_GuildsAwaitingString.insert( make_pair( str, guildToRegister->getId() ) );
 //		}
-		
-		_ExistingGuildNames.insert( NLMISC::toLower( guildToRegister->getName().toString().c_str() ) );
+
+		_ExistingGuildNames.insert( NLMISC::toLower( guildToRegister->getName().toString() ) );
 	}
 }
 
@@ -1448,7 +1445,7 @@ void CGuildManager::checkMemberConsistency(CGuild *guildToCheck)
 					first->first.toString().c_str(),
 					gid,
 					guildToCheck->getId());
-				
+
 				memberToRemove.insert(first->first);
 			}
 			else
@@ -1470,9 +1467,9 @@ void CGuildManager::checkMemberConsistency(CGuild *guildToCheck)
 //----------------------------------------------------------------------------
 bool CGuildManager::checkGuildStrings(CGuildCharProxy & proxy,const ucstring & name, const ucstring & description)
 {
-	if( name.empty() ) 
+	if( name.empty() )
 		return false;
-	
+
 	// check if name already exists in the player list
 	if ( NLMISC::CEntityIdTranslator::getInstance()->entityNameExists( name ) )
 	{
@@ -1509,7 +1506,7 @@ bool CGuildManager::checkGuildStrings(CGuildCharProxy & proxy,const ucstring & n
 			{
 				proxy.sendSystemMessage("GUILD_NAME_BAD_CHAR");
 				return false;
-			}	
+			}
 			prevBlank = true;
 		}
 		else
@@ -1530,7 +1527,7 @@ bool CGuildManager::checkGuildStrings(CGuildCharProxy & proxy,const ucstring & n
 	}
 
 	/// check if name and description are ethically	acceptable
-	const uint size = CEntityIdTranslator::getInstance()->getInvalidNames().size();
+	const uint size = (uint)CEntityIdTranslator::getInstance()->getInvalidNames().size();
 	string nameStr = CEntityIdTranslator::getInstance()->getRegisterableString( name );
 	string descriptionStr = CEntityIdTranslator::getInstance()->getRegisterableString( description );
 	for (uint i = 0; i < CEntityIdTranslator::getInstance()->getInvalidNames().size(); i++)
@@ -1669,7 +1666,6 @@ restartMemberLoop:
 // A character connect/disconnect on another shard, update the online tags
 void	CGuildManager::characterConnectionEvent(const NLMISC::CEntityId &eid, bool online)
 {
-	
 	// iterate over all guild, for each look the member list and update online state if it is the concerned character
 
 	if (_Container == NULL)
@@ -1831,7 +1827,7 @@ NLMISC_CLASS_COMMAND_IMPL(CGuildManager, unloadGuild)
 
 	// force a save of the guild
 	saveGuild(guild);
-	// a little fake : we make the guild 'foreign' to skip deletion of the file 
+	// a little fake : we make the guild 'foreign' to skip deletion of the file
 	guild->setProxy(true);
 
 	// remove all but the last members
@@ -1861,7 +1857,9 @@ NLMISC_CLASS_COMMAND_IMPL(CGuildManager, loadGuild)
 		return true;
 	}
 
-	TGuildId guildId = (atoi(args[0].substr(pos+6, 5).c_str())) & 0xfffff;
+	TGuildId guildId;
+	NLMISC::fromString(args[0].substr(pos+6, 5), guildId);
+	guildId = guildId & 0xfffff;
 	if (guildId == 0)
 	{
 		log.displayNL("Invalid guild ID in '%s'", args[0].c_str());
@@ -1930,8 +1928,9 @@ NLMISC_CLASS_COMMAND_IMPL(CGuildManager, addGuildMember)
 //	if (args.size() > 3)
 //		return false;
 //
-//	TGuildId guildId = atoi(args[0].c_str());
-//	
+//	TGuildId guildId;
+//	NLMISC::fromString(args[0], guildId);
+//
 //	CGuild *guild = getGuildFromId(guildId);
 //	if (guild == NULL)
 //	{

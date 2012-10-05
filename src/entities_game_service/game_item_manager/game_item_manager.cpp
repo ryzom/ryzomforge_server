@@ -587,7 +587,7 @@ void CGameItemManager::destroyItem( CGameItemPtr &ptr )
 //								}
 //							}
 //						}
-//						catch( Exception& e )
+//						catch(const Exception &e)
 //						{
 //							nlwarning("<CGameItemManager::dropOnTheGround> %s",e.what());
 //							return;
@@ -627,7 +627,7 @@ void CGameItemManager::destroyItem( CGameItemPtr &ptr )
 //					}*/
 //			}
 //		}
-//		catch( Exception& e )
+//		catch(const Exception &e)
 //		{
 //			nlwarning("<CGameItemManager::dropOnTheGround> %s",e.what());
 //			return;
@@ -852,11 +852,15 @@ NLMISC_COMMAND(createItem,"create a new item","<sheet id><quality><owner id>")
 		return false;
 	}
 
-	CSheetId sheetId = CSheetId( atoi( args[0].c_str() ) );
+	uint32 itemId;
+	NLMISC::fromString(args[0], itemId);
+	CSheetId sheetId(itemId);
 
-	uint16 quality = (uint16)atoi( args[1].c_str() );
+	uint16 quality;
+	NLMISC::fromString(args[1], quality);
 
-	uint32 ownerIdTmp = atoi( args[2].c_str() );
+	uint32 ownerIdTmp;
+	NLMISC::fromString(args[2], ownerIdTmp);
 	CEntityId ownerId(RYZOMID::object,ownerIdTmp);	
 
 //	CGameItemPtr item = GameItemManager.createItem( sheetId, quality, ownerId, -1, true,true );
@@ -886,7 +890,10 @@ NLMISC_COMMAND(createItem,"create a new item","<sheet id><quality><owner id>")
 //		return false;
 //	}
 //
-//	CEntityId itemId( RYZOMID::object, atoi(args[0].c_str()) );
+//	uint32 itemId;
+//	NLMISC::fromString(args[0], itemId)
+//
+//	CEntityId itemId(RYZOMID::object, itemId);
 //	
 //	CGameItemPtr item = GameItemManager.getItem(itemId);
 //	if (item != NULL)
@@ -914,9 +921,15 @@ NLMISC_COMMAND(createItem,"create a new item","<sheet id><quality><owner id>")
 //	CEntityId itemId( RYZOMID::object, atoi(args[0].c_str()) );
 //	//uint16 quality = (uint16)atoi(args[1].c_str());
 //	
-//	sint32 x = (sint32)atoi(args[2].c_str()) * 1000;
-//	sint32 y = (sint32)atoi(args[3].c_str()) * 1000;
-//	sint32 z = (sint32)atoi(args[4].c_str()) * 1000;
+//	sint32 x;
+//	NLMISC::fromString(args[2], x);
+//	x *= 1000;
+//	sint32 y;
+//	NLMISC::fromString(args[3], y);
+//	y *= 1000;
+//	sint32 z;
+//	NLMISC::fromString(args[4], z);
+//	z *= 1000;
 //
 //	GameItemManager.dropOnTheGround( itemId, x, y, z );
 //
