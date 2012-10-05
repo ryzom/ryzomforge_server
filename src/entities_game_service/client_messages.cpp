@@ -1905,7 +1905,7 @@ void cbClientSendEmote( NLNET::CMessage& msgin, const std::string &serviceName, 
 		msgin.serial( emoteTextId );
 
 	}
-	catch(Exception &e)
+	catch(const Exception &e)
 	{
 		nlwarning("Bad emote serialisation '%s'", e.what());
 		return;
@@ -1950,7 +1950,7 @@ void cbClientSendCustomEmote( NLNET::CMessage& msgin, const std::string &service
 		msgin.serial( emoteCustomText );
 
 	}
-	catch(Exception &e)
+	catch(const Exception &e)
 	{
 		nlwarning("Bad custom emote serialisation '%s'", e.what());
 		return;
@@ -2518,7 +2518,7 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 	else
 	{
 		TChanID chanID;
-		
+
 		CCharacter * user = PlayerManager.getChar( id );
 		if ( !user )
 		{
@@ -2529,24 +2529,23 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 		
 		if (NLMISC::nlstricmp( opt.c_str(), "league" ) == 0)
 		{
-			
 			chanID = user->getLeagueId();
 		}
 		else
 		{
 			chanID = DynChatEGS.getChanIDFromName(opt);
 		}
-		
+
 		if (chanID == DYN_CHAT_INVALID_CHAN)
 		{
 			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_NOT_FOUND" );
 			return;
 		}
-		
+
 		bool havePriv = p->havePriv(":DEV:SGM:GM:EM:");
 		bool hasChannel = false;
 		nbAnswers = 0;
-		
+
 		vector<NLMISC::CEntityId> players;
 		DynChatEGS.getPlayersInChan(chanID, players);
 		ucstring playerNames("");
@@ -2565,16 +2564,16 @@ void cbClientWho( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 			}
 			playerNames += ((i > 0) ? "\n" : "") + name ;
 		}
-			
+
 		if (!hasChannel && !havePriv)
 		{
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
 			params[0].Literal = opt;
 			CCharacter::sendDynamicSystemMessage( id, "WHO_CHANNEL_NOT_CONNECTED", params );
-			
+
 			return;
 		}
-		
+
 		if (!playerNames.empty())
 		{
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
@@ -3077,7 +3076,7 @@ void cbClientQuitGameRequest( NLNET::CMessage& msgin, const std::string & servic
 			}
 		}
 	}
-	catch ( Exception& e ) // will catch any serialization/security exception
+	catch (const Exception &e) // will catch any serialization/security exception
 	{
 		GIVEUP_IF(charId.isUnknownId(), "cbClientQuitGameRequest: unknown char", return);
 		nldebug("BypassDisconnectionTimer denied for %s: %s", charId.toString().c_str(), e.what());

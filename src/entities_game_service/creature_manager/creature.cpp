@@ -943,7 +943,7 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 	_BotChatOutpost = description.getOutpost();
 	
 	_Organization = description.getOrganization();
-	
+
 	bool cosmeticCategory = false;
 	bool tradeCategory = false;
 	bool tpCategory = false;
@@ -1284,7 +1284,7 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 		_ContextTexts[i].second = description.getContextOptions()[i].getDetail();
 	}
 
-	// let's parse optionnal properties
+	// let's parse optional properties
 	for ( uint i = 0; i < description.getOptionalProperties().size(); i++ )
 	{
 		std::vector< std::string > result;
@@ -1386,7 +1386,8 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 			else
 			{
 				const string &factionName = result[1];
-				const sint32 fameLevel = sint32( atoi(result[2].c_str()) );
+				sint32 fameLevel;
+				NLMISC::fromString(result[2], fameLevel);
 				// get faction index
 				const uint32 index = CStaticFames::getInstance().getFactionIndex(factionName);
 				if (index == CStaticFames::INVALID_FACTION_INDEX)
@@ -1402,7 +1403,8 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 			else
 			{
 				const string &factionName = result[1];
-				const sint32 fameLevel = sint32( atoi(result[2].c_str()) );
+				sint32 fameLevel;
+				NLMISC::fromString(result[2], fameLevel);
 				// get faction index
 				const uint32 index = CStaticFames::getInstance().getFactionIndex(factionName);
 				if (index == CStaticFames::INVALID_FACTION_INDEX)
@@ -1418,7 +1420,7 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 		else if ( NLMISC::strlwr(result[0]) == "altar" )
 		{
 //			nlinfo("OPString: %s", optionalPropertiesString.c_str());
-			uint32 nbAltarParams = result.size();
+			uint32 nbAltarParams = (uint32)result.size();
 			for( uint32 i = 1; i < nbAltarParams; ++i )
 			{
 //				nlinfo("OPSResult: %s", result[i].c_str());
@@ -1439,20 +1441,25 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 					string res = NLMISC::strlwr(result[i]);
 					_TicketFameRestriction = CStaticFames::getInstance().getFactionIndex(NLMISC::strlwr(result[i]));
 				}
-				else if( ( atoi(result[i].c_str()) * FameAbsoluteMax / 100 ) != 0 )
+				else
 				{
-					_TicketFameRestrictionValue = atoi(result[i].c_str()) * FameAbsoluteMax / 100;
-					if( _TicketFameRestriction == CStaticFames::INVALID_FACTION_INDEX )
+					uint32 fame;
+					NLMISC::fromString(result[i], fame);
+					if( ( fame * FameAbsoluteMax / 100 ) != 0 )
 					{
-						if( _TicketClanRestriction != PVP_CLAN::None && _TicketFameRestriction == CStaticFames::INVALID_FACTION_INDEX )
+						_TicketFameRestrictionValue = fame * FameAbsoluteMax / 100;
+						if( _TicketFameRestriction == CStaticFames::INVALID_FACTION_INDEX )
 						{
-							_TicketFameRestriction = PVP_CLAN::getFactionIndex(_TicketClanRestriction);
-							_TicketClanRestriction = PVP_CLAN::None;
+							if( _TicketClanRestriction != PVP_CLAN::None && _TicketFameRestriction == CStaticFames::INVALID_FACTION_INDEX )
+							{
+								_TicketFameRestriction = PVP_CLAN::getFactionIndex(_TicketClanRestriction);
+								_TicketClanRestriction = PVP_CLAN::None;
+							}
 						}
 					}
+					else
+						nlwarning("parseBotOption -> invalid parameter '%s' for 'altar' command in bot %u", result[i].c_str(), _AIAlias );
 				}
-				else
-					nlwarning("parseBotOption -> invalid parameter '%s' for 'altar' command in bot %u", result[i].c_str(), _AIAlias );
 			}
 		}
 		else
@@ -1623,7 +1630,7 @@ CGameItemPtr CCreature::getNpcItem( const NLMISC::CSheetId &sheet, uint16 qualit
 	{
 		const std::vector< CGameItemPtr > & item = CStaticItems::getStaticItems();
 		
-		const uint nbItems = item.size();
+		const uint nbItems = (uint)item.size();
 		for (uint i = 0 ; i < nbItems ; ++i)
 		{
 			if ( item[i] != NULL && item[i]->getSheetId() == sheet && item[i]->quality() == quality )
@@ -1637,7 +1644,7 @@ CGameItemPtr CCreature::getNpcItem( const NLMISC::CSheetId &sheet, uint16 qualit
 	{
 		const std::vector< CGameItemPtr > & items = CGameItemManager::getNpcSpecificItems();
 		
-		const uint nbItems = items.size();
+		const uint nbItems = (uint)items.size();
 		for (uint i = 0 ; i < nbItems ; ++i)
 		{
 			if ( items[i] != NULL && items[i]->getSheetId() == sheet )
@@ -2230,7 +2237,7 @@ void CCreature::displayShopSelectors( NLMISC::CLog& log )
 //------------------------------------------------------------------------------
 bool CCreature::checkFactionAttackable(const CEntityId &playerId) const
 {
-	const uint size = _FactionAttackableAbove.size();
+	const uint size = (uint)_FactionAttackableAbove.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
 		// if player has one of specified fame above 0 he can attack this creature
@@ -2239,7 +2246,7 @@ bool CCreature::checkFactionAttackable(const CEntityId &playerId) const
 			return true;
 	}
 
-	const uint size2 = _FactionAttackableBelow.size();
+	const uint size2 = (uint)_FactionAttackableBelow.size();
 	for (uint i = 0 ; i < size2 ; ++i)
 	{
 		// if player has one of specified fame above 0 he can attack this creature

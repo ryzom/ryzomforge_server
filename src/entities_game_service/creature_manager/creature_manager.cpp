@@ -224,12 +224,12 @@ void CChangeCreatureHPImp::callback(const string &, NLNET::TServiceId sid)
 {
 	H_AUTO(CChangeCreatureHPImp);
 
-	uint16 size = Entities.size();
+	uint16 size = (uint16)Entities.size();
 	if (Entities.size() != DeltaHp.size() )
 	{
 		nlwarning("Entities.size() != DeltaHp.size()");
 
-		size = min(Entities.size(),DeltaHp.size());
+		size = (uint16)min(Entities.size(),DeltaHp.size());
 	}
 	
 	// for each creature, change HP
@@ -258,7 +258,7 @@ void CChangeCreatureHPImp::callback(const string &, NLNET::TServiceId sid)
 void CCreatureSetUrlImp::callback(const string &, NLNET::TServiceId sid)
 {
 	H_AUTO(CCreatureSetUrlImp);
-	
+
 	// for each creature set url
 	for ( uint i = 0; i < Entities.size(); ++i )
 	{

@@ -89,7 +89,7 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 		return false;
 	}
 
-	
+
 	if (user->currentHp() <= 0 )
 	{
 		nlwarning("<BUILDING>user %s will dead",user->getId().toString().c_str());
@@ -97,7 +97,7 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 	}
 
 	CCharacter *owner;
-		
+
 	if (ownerIdx < _Players.size())
 	{
 		owner = PlayerManager.getChar(_Players[ownerIdx] );
@@ -344,7 +344,7 @@ bool CBuildingPhysicalGuild::isUserAllowed(CCharacter * user, uint16 ownerId, ui
 	nlassert( user );
 	nlassert( ownerId < _Guilds.size() );
 	nlassert( roomIdx < _Template->Rooms.size() );
-	
+
 	if (user->isDead())
 		return false;
 
@@ -381,7 +381,7 @@ bool CBuildingPhysicalGuild::isUserAllowed(CCharacter * user, uint16 ownerId, ui
 //----------------------------------------------------------------------------
 uint16 CBuildingPhysicalGuild::getOwnerCount()
 { 
-	return _Guilds.size();
+	return (uint16)_Guilds.size();
 }
 
 //----------------------------------------------------------------------------
@@ -555,7 +555,7 @@ bool CBuildingPhysicalPlayer::isUserAllowed(CCharacter * user, uint16 ownerId, u
 //----------------------------------------------------------------------------
 uint16 CBuildingPhysicalPlayer::getOwnerCount()
 { 
-	return _Players.size();
+	return (uint16)_Players.size();
 }
 
 //----------------------------------------------------------------------------

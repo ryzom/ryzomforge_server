@@ -204,7 +204,7 @@ private:
 
 	/// physical buildings by Alias
 	std::map<TAIAlias,IBuildingPhysical*> _BuildingPhysicals;
-	
+
 	/// physical buildings by name
 	std::map<std::string,IBuildingPhysical*> _BuildingPhysicalsName;
 
