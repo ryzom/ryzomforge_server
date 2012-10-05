@@ -186,7 +186,7 @@ void	ICDBStructNode::setLabel( const std::string& bankName )
  */
 void	CCDBStructNodeBranch::initDataIndex( TCDBDataIndex& index )
 {
-	if ( _Atomic )
+	if ( _AtomicFlag )
 	{
 		_DataIndex = index;
 		checkIfNotMaxIndex();
@@ -207,7 +207,7 @@ void	CCDBStructNodeBranch::initDataIndex( TCDBDataIndex& index )
  */
 void	CCDBStructNodeBranch::initIdAndCallForEachIndex( CBinId& id, void (*callback)(ICDBStructNode*, void*), void *arg )
 {
-	if ( _Atomic )
+	if ( _AtomicFlag )
 	{
 		callback( this, arg );
 	}
@@ -239,7 +239,7 @@ static inline void addNode( ICDBStructNode *newNode,
 							NLMISC::IProgressCallback &progressCallBack )
 {
 	names.push_back(newName);
-	index.insert(make_pair(newName,nodes.size()));
+	index.insert(make_pair(newName,(NLMISC::TSStringId)nodes.size()));
 	nodes.push_back(newNode);
 	nodes.back()->setParent(parent);
 	nodes.back()->setLabel(bankName);
@@ -283,10 +283,11 @@ void CCDBStructNodeBranch::init( xmlNodePtr node, NLMISC::IProgressCallback &pro
 		if ((const char *) count != NULL)
 		{
 			// dealing with an array of entries
-			unsigned countAsInt=(unsigned)atoi(count);
+			uint countAsInt;
+			NLMISC::fromString(count, countAsInt);
 			nlassert((const char *) count != NULL);
 
-			for (unsigned i=0;i<countAsInt;i++)
+			for (uint i=0;i<countAsInt;i++)
 			{
 				// Progress bar
 				progressCallBack.progress ((float)i/(float)countAsInt);
@@ -345,10 +346,11 @@ void CCDBStructNodeBranch::init( xmlNodePtr node, NLMISC::IProgressCallback &pro
 		if ((const char *) count != NULL)
 		{
 			// dealing with an array of entries
-			unsigned countAsInt=(unsigned)atoi(count);
+			uint countAsInt;
+			NLMISC::fromString(count, countAsInt);
 			nlassert((const char *) count != NULL);
 
-			for (unsigned i=0;i<countAsInt;i++)
+			for (uint i=0;i<countAsInt;i++)
 			{
 				// Progress bar
 				progressCallBack.progress ((float)i/(float)countAsInt);
@@ -415,7 +417,7 @@ void CCDBStructNodeBranch::attachChild( ICDBStructNode * node, const string& nod
 	node->setParent(this);
 	_Nodes.push_back( node );
 	_Names.push_back( nodeName );
-	_Index.insert( make_pair(nodeName,_Nodes.size() -1) );
+	_Index.insert( make_pair(nodeName,(NLMISC::TSStringId)_Nodes.size() -1) );
 
 	calcIdBits();
 } // attachChild //
@@ -480,7 +482,7 @@ ICDBStructNode * CCDBStructNodeBranch::getNode (const CTextId& id , bool bCreate
 
 			_Nodes.push_back( newNode );
 			_Names.push_back( str );
-			_Index.insert( make_pair(str,_Nodes.size()-1) );
+			_Index.insert( make_pair(str,(NLMISC::TSStringId)_Nodes.size()-1) );
 			newNode->setParent(this);
 			itIdx = _Index.find(str);
 		}
@@ -535,7 +537,7 @@ TCDBDataIndex	CCDBStructNodeBranch::findDataIndex( ICDBStructNode::CTextId& id )
  */
 void			CCDBStructNodeBranch::foreachAtomBranchCall( void (*callback)(void*,TCDBDataIndex), void *arg ) const
 {
-	if ( _Atomic )
+	if ( _AtomicFlag )
 	{
 		callback( arg, _DataIndex );
 	}

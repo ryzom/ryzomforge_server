@@ -149,7 +149,7 @@ public:
 	}
 
 	// callback called when the effect is actually removed. Does nothing by default
-	virtual void removed(){};
+	virtual void removed(){}
 
 	///\name read accessors
 	//@{
@@ -160,7 +160,8 @@ public:
 	inline sint32							getParamValue()		const{ return	_Value;}
 	inline uint32							getPower()			const{ return	_Power;}
 	inline SKILLS::ESkills					getSkill()			const{ return	_Skill; }
-	virtual NLMISC::CSheetId				getAssociatedSheetId() const {
+	virtual NLMISC::CSheetId				getAssociatedSheetId() const
+	{
 		if (_IsFromConsumable)
 			return NLMISC::CSheetId("hatred.sbrick");
 		else
@@ -254,7 +255,7 @@ protected:
 	/// timer used to end the effect
 	CTimer							_EndTimer;
 
-	bool					_IsFromConsumable;
+	bool							_IsFromConsumable;
 
 
 public:

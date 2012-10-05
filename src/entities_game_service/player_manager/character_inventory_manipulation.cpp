@@ -534,7 +534,7 @@ bool CCharacter::pickUpItem(const CEntityId& entity)
 			}
 
 			// Check if this character have loot right
-			uint32 nRightSize = pCreature->getLootRight().size();
+			uint32 nRightSize = (uint32)pCreature->getLootRight().size();
 			if (nRightSize > 0)
 			{
 				bool bLootRight = false;
@@ -828,7 +828,6 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 		nlwarning("Character %s tries to move '%s' to inv %u", _Id.toString().c_str(), srcItem->getPhraseId().c_str(), dstInvId );
 		return;
 	}
-
 
 	// cannot move a pet animal ticket
 	if (srcForm->Family == ITEMFAMILY::PET_ANIMAL_TICKET)
@@ -1254,8 +1253,8 @@ bool CCharacter::checkItemValidityWithEquipmentSlot( const CSheetId& sheet, uint
 //----------------------------------------------------------------------------
 bool CCharacter::checkRightLeftHandCompatibility( const std::vector<std::string> itemRight, const std::vector<std::string> itemLeft )
 {
-	const int itemRightSlotSize = itemRight.size();
-	const int itemLeftSlotSize = itemLeft.size();
+	const sint itemRightSlotSize = (sint)itemRight.size();
+	const sint itemLeftSlotSize = (sint)itemLeft.size();
 	
 	for( int i = 0; i < itemRightSlotSize; ++i )
 	{
@@ -1276,8 +1275,8 @@ bool CCharacter::checkRightLeftHandCompatibility( const std::vector<std::string>
 //----------------------------------------------------------------------------
 bool CCharacter::checkIfItemCompatibleWithSlots( const std::vector<std::string> itemSlot, std::vector< uint16 > slots )
 {
-	const int itemSlotSize = itemSlot.size();
-	const int typeSlotSize = slots.size();
+	const sint itemSlotSize = (sint)itemSlot.size();
+	const sint typeSlotSize = (sint)slots.size();
 	for( int i = 0; i < itemSlotSize; ++i )
 	{
 		for( int j = 0; j < typeSlotSize; ++j )
@@ -2497,7 +2496,7 @@ void CCharacter::sendItemInfos( uint16 slotId )
 			pInv->onItemChanged(slot, INVENTORIES::itc_info_version);
 		}
 	}
-	catch ( NLMISC::Exception & e )
+	catch (const NLMISC::Exception &e)
 	{
 		nlwarning("<ITEM_INFOS> exception : '%s'",e.what() );
 	}	

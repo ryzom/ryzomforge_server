@@ -54,7 +54,7 @@ NL_INSTANCE_COUNTER_IMPL(CPlayer);
 bool wipeAndRestore(const std::string &fileName);
 
 FILE	*LastLoad = NULL;
-char	*LastLoadFileName = "last_loaded_char.bin";
+const char	*LastLoadFileName = "last_loaded_char.bin";
 
 extern CVariable<uint32>	MonkeyLoadEnable;
 extern uint32 CharacterSaveCounter;
@@ -110,7 +110,7 @@ void CPlayer::checkCrashMarker()
 		
 		// check 
 		uint32	lastBad[2];
-		uint32 nbRead = fread(lastBad, 1, 4*2, LastLoad);
+		uint32 nbRead = (uint32)fread(lastBad, 1, 4*2, LastLoad);
 		if (nbRead == 8 && lastBad[0] != 0xffffffff)
 		{
 			// there is a char to to backup
@@ -362,7 +362,7 @@ void	CAsyncPlayerLoad::receivedCharacterFile(const CFileDescription& fileDescrip
 				success = true;
 			}
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			reason = e.what();
 		}
@@ -807,7 +807,7 @@ void CPlayer::loadAllCharacters()
 					characterFound = true;
 					egs_plinfo("LOADED Character '%s' from file: %s",pCh->getName().toUtf8().c_str(),serialBinFileName.c_str());
 				}
-				catch( Exception& e)
+				catch(const Exception &e)
 				{
 					nlwarning("Failed to load '%s': %s", serialBinFileName.c_str(), e.what());
 					string newfn = serialBinFileName+".wiped";
@@ -906,7 +906,7 @@ void CPlayer::loadAllCharacters()
 						}
 					}
 				}
-				catch( Exception& e)
+				catch(const Exception &e)
 				{
 					nlwarning("Failed to load '%s': %s", fileName.c_str(), e.what());
 					string newfn = fileName+".wiped";
@@ -933,7 +933,7 @@ void CPlayer::loadAllCharacters()
 							PlayerManager.savePlayerChar( _UserId, i );
 					}
 				}
-				catch( Exception& e)
+				catch(const Exception &e)
 				{
 					nlwarning("Failed to load '%s': %s", fileName.c_str(), e.what());
 					string newfn = fileName+".wiped";
@@ -979,7 +979,7 @@ void CPlayer::loadAllCharactersPdr()
 			if (!isOK)
 				continue;
 		}
-		catch( Exception& e)
+		catch(const Exception &e)
 		{
 			nlwarning("Failed to load '%s': %s", fileName.c_str(), e.what());
 			string newfn = fileName+".wiped";
@@ -1305,17 +1305,20 @@ NLMISC_CATEGORISED_COMMAND(egs, convertToPdr, "Load all possible characters from
 			return false;
 		std::string	param = args[op++];
 
+		bool val = false;
+		NLMISC::fromString(param, val);
+
 		if (opt == "-recurse")
 		{
-			recurse = (param == "true" || atoi(param.c_str()) != 0);
+			recurse = (param == "true" || val);
 		}
 		else if (opt == "-xml")
 		{
-			xml = (param == "true" || atoi(param.c_str()) != 0);
+			xml = (param == "true" || val);
 		}
 		else if (opt == "-overwrite")
 		{
-			overwrite = (param == "true" || atoi(param.c_str()) != 0);
+			overwrite = (param == "true" || val);
 		}
 		else if (opt == "-wcbin")
 		{
@@ -1501,7 +1504,7 @@ NLMISC_CATEGORISED_COMMAND(egs, convertToPdr, "Load all possible characters from
 				}
 			}
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			reason = e.what();
 		}

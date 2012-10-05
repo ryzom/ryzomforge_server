@@ -282,7 +282,7 @@ public:
 //				success = (_CharLoadCb == NULL || _CharLoadCb(player->UserId, charId, pdr));
 //			}
 //		}
-//		catch (Exception& e)
+//		catch (const Exception& e)
 //		{
 //			nlwarning("Failed to load user '%d' character '%d' from BS pdr stream: %s", player->UserId, charId, e.what());
 //		}
@@ -745,7 +745,7 @@ void CPlayerManager::savePlayerCharRecurs( uint32 userId, sint32 idx, std::set<C
 					BsiGlobal.sendFile( msg );
 				}
 			}
-			catch( Exception& )
+			catch(const Exception &)
 			{
 				nlwarning("(EGS)<CPlayerManager::savePlayer>  :  Can't serial file %s (connection with BS service down ?)",serialFileName.c_str());
 				return;
@@ -772,7 +772,7 @@ void CPlayerManager::savePlayerCharRecurs( uint32 userId, sint32 idx, std::set<C
 						H_AUTO(SavePlayerPDRMakeTxtMsgBS);
 						std::string s;
 						pdr.toString(s);
-						msg.DataMsg.serialBuffer((uint8*)&s[0], s.size());
+						msg.DataMsg.serialBuffer((uint8*)&s[0], (uint)s.size());
 					}
 					else
 					{
@@ -789,7 +789,7 @@ void CPlayerManager::savePlayerCharRecurs( uint32 userId, sint32 idx, std::set<C
 					BsiGlobal.sendFile( msg );
 				}
 			}
-			catch( Exception& )
+			catch(const Exception &)
 			{
 				nlwarning("(EGS)<CPlayerManager::savePlayer>  :  Can't serial file %s (connection with BS service down ?)",pdrFileName.c_str());
 				return;
@@ -824,7 +824,7 @@ void CPlayerManager::savePlayerCharRecurs( uint32 userId, sint32 idx, std::set<C
 					f.close();
 				}
 			}
-			catch( Exception& e)
+			catch(const Exception &e)
 			{
 				//f.close();
 				nlwarning("(EGS)<CPlayerManager::savePlayer>  :  Can't write file %s : %s", serialPathFileName.c_str(), e.what());
@@ -849,7 +849,7 @@ void CPlayerManager::savePlayerCharRecurs( uint32 userId, sint32 idx, std::set<C
 					pdr.writeToFile(pdrPathFileName.c_str());
 				}
 			}
-			catch( Exception& )
+			catch(const Exception &)
 			{
 				nlwarning("(EGS)<CPlayerManager::savePlayer>  :  Can't serial file %s (connection with BS service down ?)", pdrPathFileName.c_str());
 				return;
@@ -2516,7 +2516,8 @@ NLMISC_COMMAND(actionReport,"report action for progression testing","<character 
 		CEntityId id;
 		id.fromString( args[0].c_str() );
 		
-		sint32 deltaLevel = atoi( args[1].c_str() );
+		sint32 deltaLevel;
+		NLMISC::fromString(args[1], deltaLevel);
 		string Skill = args[2];
 		SKILLS::ESkills s = SKILLS::toSkill( Skill );
 		if( s == SKILLS::unknown )
@@ -2557,7 +2558,8 @@ NLMISC_COMMAND(setPriv,"set a privilege to a user using his user id, must be in 
 		return true;
 	}
 
-	uint32 uid = atoi(args[0].c_str());
+	uint32 uid;
+	NLMISC::fromString(args[0], uid);
 	CPlayer *p = PlayerManager.getPlayer(uid);
 	if (p == NULL)
 	{
@@ -2611,7 +2613,8 @@ NLMISC_COMMAND(setPvPTag,"set player character PvP TAG to true or false","<eid> 
 
 	CEntityId id;
 	id.fromString(args[0].c_str());
-	uint tagValue = atoi(args[1].c_str());
+	uint tagValue;
+	NLMISC::fromString(args[1], tagValue);
 	CCharacter *c = PlayerManager.getChar(id);
 	if (c == NULL)
 	{

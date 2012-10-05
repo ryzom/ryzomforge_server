@@ -314,7 +314,6 @@ struct CPetAnimal
 	uint32 getAnimalMaxBulk();
 
 	void setCustomName(const ucstring& customName) { CustomName = customName; }
-
 };
 
 /**
@@ -434,7 +433,7 @@ private:
 		AddedAsLeague,
 		RemovedFromLeague,
 		RemoveLeague,
-		
+
 		NB_CONTACT_LIST_ACTIONS,
 		UnknownContactListAction= NB_CONTACT_LIST_ACTIONS,
 	};
@@ -754,7 +753,7 @@ public:
 	// teleport character with or without his mount, check if tp is regular and send a server tp command
 	void teleportCharacter( sint32 x, sint32 y, sint32 z, bool teleportWithMount, bool useHeading = false, float heading = 0.0f, uint8 continent = 0xFF, sint32 cell = 0, uint8 season = 0xff, const  R2::TR2TpInfos& tpInfos= R2::TR2TpInfos());
 
-	// return the season in wich is the current character
+	// return the season in which is the current character
 	uint8 getRingSeason() const { return _RingSeason;}
 
 	/// get the League id
@@ -800,7 +799,7 @@ public:
 	void clearHarvestDB();
 	void openHarvest();
 
-	// get reference on deposit harvest informations
+	// get reference on deposit harvest information
 	HARVEST_INFOS::CHarvestInfos& getHarvestInfos();
 
 	// Process static actions (like harvest, faber...)
@@ -1042,7 +1041,7 @@ public:
 	 *
 	 * \param value is the value to parse.
 	 * \param result is the result to fill if the value has been succesfully parsed.
-	 * \return UnkownValue if the value is not known, ValueError is the value evaluation failed or NoError 
+	 * \return UnknownValue if the value is not known, ValueError is the value evaluation failed or NoError 
 	 * if it has been parsed.
 	 */
 	virtual TReturnState evalValue (const char *value, double &result, uint32 userData);
@@ -1095,7 +1094,7 @@ public:
 	/// clear bot gift
 	void clearBotGift();
 
-	/// accept the exchange (exchangeId is a counter informing the server of the informations received by the client)
+	/// accept the exchange (exchangeId is a counter informing the server of the information received by the client)
 	void acceptExchange(uint8 exchangeId);
 
 	///exchange money
@@ -1192,7 +1191,7 @@ public:
 
 	/// get the number of pvp point given a faction
 	uint32	getPvpPoint();
-	
+
 	/// set the SDB path where player wins HoF points in PvP (if not empty)
 	void	setSDBPvPPath(const std::string & sdbPvPPath);
 
@@ -1204,14 +1203,13 @@ public:
 
 	/// init pvp point in client database
 	void	initPvpPointDb();
-	
+
 	void initOrganizationInfos();
 	void setOrganization(uint32 org);
 	void setOrganizationStatus(uint32 status);
 	void changeOrganizationStatus(sint32 status);
 	void changeOrganizationPoints(sint32 points);
-	
-	
+
 	/// send faction point gain phrase to the client
 	void	sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain);
 	/// send faction point gain kill phrase to the client
@@ -1262,7 +1260,7 @@ public:
 	/// update scores infos in database
 	void updateScoresInDatabase();
 
-	/// Set database with all character informations
+	/// Set database with all character information
 	void setDatabase();
 
 	/// cancel any static action in progress (ie actions canceled if the player moves like casting, harvest, faber...)
@@ -1357,7 +1355,7 @@ public:
 	sint processMissionMultipleEvent( CMissionEvent & event, TAIAlias alias = CAIAliasTranslator::Invalid);
 	/// process a mission event for the missions took by this player
 	bool processMissionUserEvent(std::list< CMissionEvent* > & eventList,TAIAlias alias);
-	/// process a mission event for a specific mission and optionnally for a specific step
+	/// process a mission event for a specific mission and optionally for a specific step
 	bool processMissionStepUserEvent(std::list< CMissionEvent* > & eventList, uint missionAlias, uint32 stepIndex );
 	/// make a mission advance through bot chat
 	void botChatMissionAdvance( uint8 index );
@@ -1668,13 +1666,13 @@ public:
 
 	/// set custom mission param
  	void setCustomMissionParams(const std::string &missionName, const std::string &params);
- 	
+
  	/// add custom mission param
  	void addCustomMissionParam(const std::string &missionName, const std::string &param);
- 	
+
  	/// get custom mission params
  	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
- 	
+
  	/// validate dynamic mission step sending url
  	void validateDynamicMissionStep(const std::string &url);
 
@@ -1959,7 +1957,6 @@ public:
 		/// remove player from ignore list
 		void removePlayerFromIgnoreListByContactId(uint32 contactId);
 		void removePlayerFromIgnoreListByEntityId(const NLMISC::CEntityId &id);
-
 		
 		/// clear friend list
 		void clearFriendList();
@@ -1985,10 +1982,10 @@ public:
 		/// get ignored player by index
 		const NLMISC::CEntityId &getIgnoredPlayer(uint16 index) const;
 
-		/// does the the entity friend(ify) this player?
+		/// does the entity friend(ify) this player?
 		bool hasInFriendList(const NLMISC::CEntityId &player) const;
 
-		/// does the the entity ignore this player?
+		/// does the entity ignore this player?
 		bool hasInIgnoreList(const NLMISC::CEntityId &player) const;
 		
 		/// player is going online or offline
@@ -2432,9 +2429,9 @@ public:
 	void haveToUpdateItemsPrerequisit( bool b );
 
 	void channelAdded( bool b );
-	bool isChannelAdded();
+	bool isChannelAdded() const;
 
-	uint8 getNbUserChannels() { return _NbUserChannels; };
+	uint8 getNbUserChannels() const { return _NbUserChannels; };
 	void addUserChannel() { _NbUserChannels++; };
 	void removeUserChannel() { _NbUserChannels--; };
 
@@ -2444,7 +2441,7 @@ public:
 	bool isAnActiveXpCatalyser( CGameItemPtr item );
 	
 	void setShowFactionChannelsMode(TChanID channel, bool s);
-	bool showFactionChannelsMode(TChanID channel);
+	bool showFactionChannelsMode(TChanID channel) const;
 
 	// from offline command
 	void contactListRefChangeFromCommand(const NLMISC::CEntityId &id, const std::string &operation);
@@ -2697,7 +2694,7 @@ public:
 	// End of methods from "character_inventory_manipulation.h"
 	////////////////////////////////////////////////////////////////
 	
-	/// Ring stuff <=> useful to update the player DB to indicateds the current speed of the incarnated creature
+	/// Ring stuff <=> useful to update the player DB to indicate the current speed of the incarnated creature
 	void setNpcControl(const NLMISC::CEntityId& eid);
 	void setStopNpcControl();
 
@@ -2998,7 +2995,7 @@ public:
 
 	void setFriendVisibility(TFriendVisibility val) { _FriendVisibility = val; }
 	const TFriendVisibility& getFriendVisibility() const { return _FriendVisibility; }
-	
+
 	void setFriendVisibilitySave(uint8 val) { if (val < NB_FRIEND_VISIBILITY) _FriendVisibility = (TFriendVisibility)val; }
 	uint8 getFriendVisibilitySave() const { return (uint8)_FriendVisibility; }
 
@@ -3053,7 +3050,7 @@ private:
 	uint64								_Money;
 
 	uint32								_FactionPoint[PVP_CLAN::EndClans-PVP_CLAN::BeginClans+1];
-	
+
 	uint32								_PvpPoint;
 
 	uint32								_Organization;
@@ -3085,7 +3082,7 @@ private:
 	CMirrorPropValueAlice< uint16, CPropLocationPacked<2> >	_TeamId;
 	
 	TChanID								_LeagueId;
-	
+
 	/// temp values used to test if team bars need an update or not
 	mutable uint8						_OldHpBarSentToTeam;
 	mutable uint8						_OldSapBarSentToTeam;
@@ -3204,7 +3201,7 @@ private:
 	bool						_HarvestDeposit;
 	/// if harvesting a deposit, the skill used
 	SKILLS::ESkills				_DepositSearchSkill;
-	/// Harvest deposit informations
+	/// Harvest deposit information
 	HARVEST_INFOS::CHarvestInfos _DepositHarvestInformations;		
 	//@}
 
@@ -3789,10 +3786,11 @@ public:
 
 	bool			getInvisibility() const	{ return _Invisibility;}
 	/// Set the invisibility flag, NB : just for persistence, do not change nothing.
-	void			setInvisibility(bool invisible)	{ 
-						_Invisibility = invisible;
-						CBankAccessor_PLR::getUSER().setIS_INVISIBLE(_PropertyDatabase, _Invisibility);
-					}
+	void			setInvisibility(bool invisible)
+	{ 
+		_Invisibility = invisible;
+		CBankAccessor_PLR::getUSER().setIS_INVISIBLE(_PropertyDatabase, _Invisibility);
+	}
 
 	sint8			getAggroableSave() const	{ return _AggroableSave;}
 	/// Set the aggroable save flag, NB : just for persistence, do not change nothing.
@@ -3810,7 +3808,6 @@ public:
 
 	/// Send the current timer period if is different from the default or force is true
 	void			sendNpcMissionGiverTimer(bool force);
-	
 };
 
 

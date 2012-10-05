@@ -80,7 +80,7 @@ void CPrimitivesParser::init()
 	for	(uint i=0; i<mapConfigNames.size(); ++i)
 	{
 		const vector<std::string> &prims = CPrimitiveCfg::getMap(mapConfigNames[i]);
-		primCount += prims.size();
+		primCount += (uint)prims.size();
 	}
 
 	uint numLoadedPrim = 0;
@@ -112,7 +112,7 @@ void CPrimitivesParser::init()
 				_Primitives.back().FileName = fullName;
 //				_PrimitiveFiles.push_back(fullName);
 			}
-			catch( Exception & e )
+			catch(const Exception &e)
 			{
 				nlwarning("<CPrimitivesParser ctor> exception launched : %s",e.what() );
 				_Primitives.pop_back();

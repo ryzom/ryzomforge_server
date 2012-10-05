@@ -210,7 +210,7 @@ inline bool CCharacter::isNearPetTpIsAllowed() const
 
 inline uint8 CCharacter::getNbPact()
 {
-	return _Pact.size(); 
+	return (uint8)_Pact.size(); 
 }
 
 //------------------------------------------------------------------------------
@@ -978,16 +978,16 @@ inline const std::list<TCharacterLogTime>& CCharacter::getLastLogStats() const
 
 //------------------------------------------------------------------------------
 
-inline bool CCharacter::isChannelAdded()
+inline bool CCharacter::isChannelAdded() const
 {
 	return _ChannelAdded; 
 }
 
 //------------------------------------------------------------------------------
 
-inline bool CCharacter::showFactionChannelsMode(TChanID channel)
+inline bool CCharacter::showFactionChannelsMode(TChanID channel) const
 {
-	std::map<TChanID, bool>::iterator it = _FactionChannelsMode.find(channel);
+	std::map<TChanID, bool>::const_iterator it = _FactionChannelsMode.find(channel);
 	if (it != _FactionChannelsMode.end())
 		return (*it).second;
 	else

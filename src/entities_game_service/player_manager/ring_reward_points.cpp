@@ -775,7 +775,7 @@ CRingRewardPoints::TGenerateRewardResult CRingRewardPointsImpl::generateReward(R
 			return CRingRewardPoints::grr_no_place;
 		}
 
-	// NB : need to return grr_ok_rare if rare item were gained
+		// NB : need to return grr_ok_rare if rare item were gained
 #pragma message (NL_LOC_WRN "Implements 'rare' item reward generation")
 	}
 

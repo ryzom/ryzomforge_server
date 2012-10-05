@@ -166,20 +166,20 @@ public :
 	/// exception thrown when player is unknown
 	struct EPlayer : public NLMISC::Exception
 	{
-		EPlayer( uint32 userId ) : Exception ("Player "+NLMISC::toString(userId)+" not found") {};
+		EPlayer( uint32 userId ) : Exception ("Player "+NLMISC::toString(userId)+" not found") {}
 	};
 
 	/// exception thrown when player's char is unknown
 	struct EChar : public NLMISC::Exception
 	{
-		EChar( const NLMISC::CEntityId& id ) : Exception ("The char "+id.toString()+" doesn't exist") {};
+		EChar( const NLMISC::CEntityId& id ) : Exception ("The char "+id.toString()+" doesn't exist") {}
 	};
 
 	///init the manager
 	void init();
 
 	/// get number of player character in manager
-	uint32 getNumberPlayers() { return _Players.size(); }
+	uint32 getNumberPlayers() { return (uint32)_Players.size(); }
 
 	/// get a reference on player in manager
 	const IPlayerManager::TMapPlayers& getPlayers() { return _Players; }

@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "stdpch.h"
 #include "game_share/power_types.h"
 #include "game_share/brick_flags.h"
@@ -57,7 +58,7 @@ void CPowerActivationDateVector::clear()
 //-----------------------------------------------------------------------------
 void CPowerActivationDateVector::clearConsumable()
 {
-	for(sint32 i = PowerActivationDates.size()-1; i >= 0; --i )
+	for(sint32 i = (sint32)PowerActivationDates.size()-1; i >= 0; --i )
 	{
 		if (PowerActivationDates[i].ConsumableFamilyId != (uint16)~0)
 		{
@@ -158,14 +159,20 @@ void CPowerActivationDateVector::activate()
 	while (it != PowerActivationDates.end())
 	{
 		if ( ((*it).DeactivationDate >= 0) && ((*it).DeactivationDate < MAX_DEACTIVATION_DATE) )
+		{
 			(*it).DeactivationDate = time - (*it).DeactivationDate; // the value saved is time length since deactivation, here we transform length into a date
-		else {
+		}
+		else
+		{
 			nlinfo("POWER_AURA_CONTROL : Bad Deactivation date : %d", (*it).DeactivationDate);
 			(*it).DeactivationDate = time - MAX_DEACTIVATION_DATE;
 		}
 		if ((*it).ActivationDate < MAX_ACTIVATION_DATE)
+		{
 			(*it).ActivationDate += time;
-		else {
+		}
+		else
+		{
 			nlinfo("POWER_AURA_CONTROL : Bad Activation date : %d", (*it).ActivationDate);
 			(*it).ActivationDate = time;
 		}
@@ -238,6 +245,7 @@ bool CAuraActivationDateVector::isAuraEffective(POWERS::TPowerType type, const N
 	const NLMISC::TGameCycle time = CTickEventHandler::getGameCycle();
 	std::vector <CPowerActivationDate>::iterator it = _AuraActivationDates.begin();
 	std::vector <NLMISC::CEntityId>::iterator itUser = _AuraUsers.begin();
+
 	while (it != _AuraActivationDates.end())
 	{
 		if ( (*it).ActivationDate <= time )
@@ -271,8 +279,11 @@ void CAuraActivationDateVector::activate()
 		(*it).DeactivationDate = time - (*it).DeactivationDate; // the value saved is time length since deactivation, here we transform length into a date
 
 		if ((*it).ActivationDate < MAX_ACTIVATION_DATE)
+		{
 			(*it).ActivationDate += time;
-		else {
+		}
+		else
+		{
 			nlinfo("POWER_AURA_CONTROL : Bad Activation date : %d", (*it).ActivationDate);
 			(*it).ActivationDate = time;
 		}
@@ -339,8 +350,11 @@ void CConsumableOverdoseTimerVector::activate()
 	while (it != Dates.end())
 	{
 		if ((*it).ActivationDate < MAX_ACTIVATION_DATE)
+		{
 			(*it).ActivationDate += time;
-		else {
+		}
+		else
+		{
 			nlinfo("POWER_AURA_CONTROL : Bad Activation date : %d", (*it).ActivationDate);
 			(*it).ActivationDate = time;
 		}
