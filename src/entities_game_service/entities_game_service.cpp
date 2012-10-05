@@ -126,6 +126,11 @@
 #include "server_share/logger_service_client.h"
 #include "server_share/stl_allocator_checker.h"
 
+#ifdef NL_OS_WINDOWS
+#	define NOMINMAX
+#	include <windows.h>
+#endif // NL_OS_WINDOWS
+
 ///////////
 // USING //
 ///////////
@@ -245,7 +250,7 @@ float						SlowWeaponHit = 5.0f;
 CCharacterBotChatBeginEnd	CharacterBotChatBeginEnd;
 CCharacterDynChatBeginEnd	CharacterDynChatBeginEnd;
 //*** Removed by Sadge ***
-//// Transport class for EGS asking informations about creatures/Npc
+//// Transport class for EGS asking information about creatures/Npc
 //CCreatureAskInformationMsg	CreatureNpcInformations;
 //*** ***
 //	Transport class sent to AIS to set bot mode as death.
@@ -273,7 +278,8 @@ NLMISC_COMMAND( spawnFakePlayers, "Temp", "<nb>" )
 {
 	if ( args.size() == 0 )
 		return false;
-	uint nb = atoi(args[0].c_str());
+	uint nb;
+	NLMISC::fromString(args[0], nb);
 	sint32 minx=2236000, maxx=6000000, miny=-7000000, maxy=-1000000;
 
 	log.displayNL( "Spawning %u fake players in (%d,%d)-(%d,%d)", nb, minx, miny, maxx, maxy );
@@ -578,7 +584,7 @@ bool loadAndResaveCheckCharacters( const std::vector<string>& files, NLMISC::CLo
 				if (!(dump1 == dump2))
 					log.displayNL("WARNING: character %d:%d changed after saving!", id.PlayerId, id.Chars[i].CharId );
 			}
-			catch (Exception& e)
+			catch (const Exception& e)
 			{
 				log.displayNL("Exception caught while executing command '%s' (%s): %s", currentCommand.c_str(), currentState.c_str(), e.what());
 				result = false;
@@ -1123,7 +1129,7 @@ void CPlayerService::initConfigFileVars()
 //		CConfigFile::CVar& cvDecay = ConfigFile.getVar("DecayDelay");
 //		GameItemManager.DecayDelay = cvDecay.asInt() * 60 * 10;
 //	}
-//	catch(EUnknownVar &)
+//	catch(const EUnknownVar &)
 //	{
 //		//nlwarning("<CPlayerService> var DecayDelay not found");
 //	}
@@ -1133,7 +1139,7 @@ void CPlayerService::initConfigFileVars()
 //		CConfigFile::CVar& cvCorpseToCarrion = ConfigFile.getVar("CorpseToCarrionDelay");
 //		GameItemManager.CorpseToCarrionDelay = cvCorpseToCarrion.asInt() * 60 * 10;
 //	}
-//	catch(EUnknownVar &)
+//	catch(const EUnknownVar &)
 //	{
 //		//nlwarning("<CPlayerService> var CorpseToCarrionDelay not found");
 //	}
@@ -1143,7 +1149,7 @@ void CPlayerService::initConfigFileVars()
 //		CConfigFile::CVar& cvCarrionDecay = ConfigFile.getVar("CarrionDecayDelay");
 //		GameItemManager.CarrionDecayDelay = cvCarrionDecay.asInt() * 60 * 10;
 //	}
-//	catch(EUnknownVar &)
+//	catch(const EUnknownVar &)
 //	{
 //		//nlwarning("<CPlayerService> var CarrionDecayDelay not found");
 //	}
@@ -1153,7 +1159,7 @@ void CPlayerService::initConfigFileVars()
 //		CConfigFile::CVar& cvCorpse = ConfigFile.getVar("CorpseMaxCount");
 //		GameItemManager.CorpseMaxCount = cvCorpse.asInt();
 //	}
-//	catch(EUnknownVar &)
+//	catch(const EUnknownVar &)
 //	{
 //		//nlwarning("<CPlayerService> var CorpseMaxCount not found");
 //	}
@@ -1253,7 +1259,9 @@ void CPlayerService::initConfigFileVars()
 			for ( uint i = 0; (sint)i<mainlands.size(); i+=4 )
 			{
 				CMainlandSummary mlSm;
-				mlSm.Id = (TSessionId) atoi(mainlands.asString(i).c_str());
+				uint32 sessionId;
+				NLMISC::fromString(mainlands.asString(i), sessionId);
+				mlSm.Id = TSessionId(sessionId);
 				mlSm.Name = ucstring::makeFromUtf8(mainlands.asString(i+1));
 				mlSm.Description = ucstring::makeFromUtf8(mainlands.asString(i+2));
 				mlSm.LanguageCode = mainlands.asString(i+3);
@@ -1265,7 +1273,7 @@ void CPlayerService::initConfigFileVars()
 			nlwarning("<CPlayerService::initConfigFileVars> bad size for var Mainlands : %d",mlsz);
 		}
 	}
-	catch(EUnknownVar &)
+	catch(const EUnknownVar &)
 	{
 		nlwarning("<CPlayerService::initConfigFileVars> var Mainlands not found");
 	}
@@ -1423,7 +1431,9 @@ void CPlayerService::init()
 
 	if (IService::getInstance()->haveArg('S'))
 	{
-		IService::getInstance()->anticipateShardId( atoi(IService::getInstance()->getArg('S').c_str()) );
+		uint32 shardId;
+		NLMISC::fromString(IService::getInstance()->getArg('S'), shardId);
+		IService::getInstance()->anticipateShardId(shardId);
 	}
 	else if (ConfigFile.getVarPtr("ShardId") != NULL)
 	{
@@ -1621,12 +1631,13 @@ NLMISC_COMMAND(loadAndReSaveCharacters,"load and resave the complete set of play
 	{
 		files[ i ] = files[ i ].substr( files[ i ].find("account_") + strlen("account_"), string::npos );
 		files[ i ] = files[ i ].substr(0 , files[ i ].find('_') );
-		uint32 account = atoi( files[ i ].c_str() );
+		uint32 account;
+		NLMISC::fromString(files[ i ], account);
 		if ( playerIds.find( account ) == playerIds.end() )
 			playerIds.insert( account );
 	}
 
-	uint32 size= playerIds.size();
+	uint32 size= (uint32)playerIds.size();
 	uint32 i = 0;
 	for( set<uint32>::iterator it=playerIds.begin(); it != playerIds.end(); ++i, ++it )
 	{
@@ -1699,7 +1710,7 @@ NLMISC_COMMAND(loadCharacterNames,"load all character save games and extract nam
 	}
 
 	// iterate over files
-	uint32 numFiles= files.size();
+	uint32 numFiles= (uint32)files.size();
 	uint32 i=0;
 	for (TFilesMap::iterator it=files.begin(); it!=files.end(); ++it, ++i)
 	{
@@ -2138,7 +2149,8 @@ NLMISC_COMMAND(plrStat,"get or set a player stat","<pid><stat><value>")
 	// get
 	if( args.size() == 2 )
 	{
-		uint32 pid = atoi( args[0].c_str() );
+		uint32 pid;
+		NLMISC::fromString(args[0], pid);
 		CEntityId playerId(RYZOMID::player,pid);
 		string stat( args[1] );
 		string value = PlayerManager.getValue( playerId, stat );
@@ -2149,7 +2161,8 @@ NLMISC_COMMAND(plrStat,"get or set a player stat","<pid><stat><value>")
 	// set
 	if( args.size() > 2 )
 	{
-		uint32 pid = atoi( args[0].c_str() );
+		uint32 pid;
+		NLMISC::fromString(args[0], pid);
 		CEntityId playerId(RYZOMID::player,pid);
 		string stat( args[1] );
 		string value = args[2];
@@ -2178,7 +2191,8 @@ NLMISC_COMMAND(obj_stat,"get or set an object stat","<oid><stat>[type|loc|qualit
 	// get
 	if( args.size() == 2 )
 	{
-		uint32 oid = atoi( args[0].c_str() );
+		uint32 oid;
+		NLMISC::fromString(args[0], oid);
 		CEntityId objectId(player,oid);
 		string stat( args[1] );
 		string result;
@@ -2193,7 +2207,8 @@ NLMISC_COMMAND(obj_stat,"get or set an object stat","<oid><stat>[type|loc|qualit
 	// set
 	if( args.size() > 2 )
 	{
-		uint32 oid = atoi( args[0].c_str() );
+		uint32 oid;
+		NLMISC::fromString(args[0], oid);
 		CEntityId objectId(object,oid);
 		if( args[1] == "type" ) WorldObjectManager.getObject(objectId).setType(atoi(args[2].c_str()));
 		//if( args[1] == "loc" )
@@ -2234,7 +2249,8 @@ NLMISC_COMMAND(remove_obj,"remove an object","<id>")
 {
 	if( args.size() > 0 )
 	{
-		uint32 oid = atoi( args[0].c_str() );
+		uint32 oid;
+		NLMISC::fromString(args[0], oid);
 		CEntityId objId(object,oid);
 		WorldObjectManager.removeObject( objId );
 		return true;
@@ -2370,7 +2386,9 @@ NLMISC_COMMAND(changeBehaviour," change entity behaviour","<entity id(id:type:cr
 		CEntityId id;
 		id.fromString( args[0].c_str() );
 
-		MBEHAV::EBehaviour behaviour = MBEHAV::EBehaviour(atoi(args[1].c_str()));
+		sint behav;
+		NLMISC::fromString(args[1], behav);
+		MBEHAV::EBehaviour behaviour = MBEHAV::EBehaviour(behav);
 
 		CEntityBase *e = NULL;
 		if( id.getType() == 0 )
@@ -2584,7 +2602,8 @@ NLMISC_COMMAND(changeVisualPropertyA, " changeVisualPropertyA","<entity id(id:ty
 		id.fromString( args[0].c_str() );
 
 		string name = args[1];
-		uint8 value = (uint8) atoi( args[2].c_str() );
+		uint8 value;
+		NLMISC::fromString(args[2], value);
 
 		CCharacter *c;
 		c = PlayerManager.getChar(id);
@@ -2920,7 +2939,8 @@ NLMISC_COMMAND(createPlayer," create a player","<playerId, characterName, race, 
 {
 	if( args.size() == 4 )
 	{
-		uint32 playerId = atoi( args[0].c_str() );
+		uint32 playerId;
+		NLMISC::fromString(args[0], playerId);
 		string characterName = args[1];
 		EGSPD::CPeople::TPeople race = EGSPD::CPeople::fromString( args[2] );
 		if( race == EGSPD::CPeople::EndPeople ) return false;
@@ -2963,7 +2983,8 @@ NLMISC_COMMAND(spawnCharacters," spawn somes characters","<Number, characterName
 
 	if( args.size() == 4 )
 	{
-		uint32 NbPlayer = atoi( args[0].c_str() );
+		uint32 NbPlayer;
+		NLMISC::fromString(args[0], NbPlayer);
 		for( uint32 i = 0; i < NbPlayer; ++i )
 		{
 			command = string("createPlayer ") + NLMISC::toString(i) + string(" ") + args[1] + NLMISC::toString(i) + string(" ") + args[2] + string(" ") + args[3];
@@ -2983,7 +3004,8 @@ NLMISC_COMMAND(spawnCharacters," spawn somes characters","<Number, characterName
 {
 	if( args.size() == 6 )
 	{
-		uint32 playerId = atoi( args[0].c_str() );
+		uint32 playerId;
+		NLMISC::fromString(args[0], playerId);
 		string characterName = args[1];
 		EGSPD::CPeople::TPeople race = EGSPD::CPeople::fromString( args[2] );
 		if( race == EGSPD::CPeople::EndPeople ) return false;
@@ -2994,7 +3016,8 @@ NLMISC_COMMAND(spawnCharacters," spawn somes characters","<Number, characterName
 		ROLES::ERole role = ROLES::toRoleId( args[4] );
 		if( role == ROLES::role_unknown ) return false;
 
-		uint16 level = atoi( args[5].c_str() );
+		uint16 level;
+		NLMISC::fromString(args[5], level);
 
 		CPlayer *player = PlayerManager.getPlayer( playerId );
 		if( player != 0 )
@@ -3014,7 +3037,8 @@ NLMISC_COMMAND(savePlayerActiveChar," save player with regular character filenam
 {
 	if( args.size() >= 1 )
 	{
-		uint32 userId = atoi( args[0].c_str() );
+		uint32 userId;
+		NLMISC::fromString(args[0], userId);
 		if(args.size() == 2)
 		{
 			string filename = args[1];
@@ -3037,7 +3061,8 @@ NLMISC_COMMAND(saveAllPlayerChars," saveAllPlayerChars","uid")
 {
 	if( args.size() == 1 )
 	{
-		uint32 userId = atoi( args[0].c_str() );
+		uint32 userId;
+		NLMISC::fromString(args[0], userId);
 
 		// If the user really exist
 		CPlayer	*player= PlayerManager.getPlayer(userId);
@@ -3075,10 +3100,12 @@ NLMISC_COMMAND(reloadPlayer," reload a connected player character, a previous sa
 {
 	if( args.size() == 1 || args.size() == 3 )
 	{
-		uint32 userId = atoi( args[0].c_str() );
+		uint32 userId;
+		NLMISC::fromString(args[0], userId);
 		if(args.size() == 3)
 		{
-			uint32 charIndex = (uint32)atoi(args[1].c_str());
+			uint32 charIndex;
+			NLMISC::fromString(args[1], charIndex);
 			string filename = args[2];
 			PlayerManager.reloadPlayerActiveChar( userId, charIndex, &filename );
 		}
@@ -3098,7 +3125,8 @@ NLMISC_COMMAND(loadPlayer," load a player","uid")
 {
 	if( args.size() == 1 )
 	{
-		uint32 userId = atoi( args[0].c_str() );
+		uint32 userId;
+		NLMISC::fromString(args[0], userId);
 
 		// set the front end id of this player
 		PlayerManager.setPlayerFrontEndId( userId, NLNET::TServiceId(0xff) );
@@ -3125,8 +3153,10 @@ NLMISC_COMMAND(activePlayer," active a character (same has choosed by player)","
 {
 	if( args.size() == 2 )
 	{
-		uint32 userId = atoi( args[0].c_str() );
-		uint32 characterIndex = atoi( args[1].c_str() );
+		uint32 userId;
+		NLMISC::fromString(args[0], userId);
+		uint32 characterIndex;
+		NLMISC::fromString(args[1], characterIndex);
 
 		CCharacter * ch = PlayerManager.getChar( userId, characterIndex );
 		if( ch )
@@ -3150,8 +3180,10 @@ NLMISC_COMMAND(simulateClientReady,"Simulate clientReady for a character","clien
 {
 	if( args.size() == 2 )
 	{
-		uint32 userId = atoi( args[0].c_str() );
-		uint32 characterIndex = atoi( args[1].c_str() );
+		uint32 userId;
+		NLMISC::fromString(args[0], userId);
+		uint32 characterIndex;
+		NLMISC::fromString(args[1], characterIndex);
 
 		CCharacter * ch = PlayerManager.getChar( userId, characterIndex );
 		if( ch )
@@ -3203,7 +3235,8 @@ NLMISC_COMMAND(moveCharAndOfflineCmdToHashTable, "Move all character and offline
 			explode(CFile::getFilename(allChars[i]), string("_"), parts);
 			if (parts.size() == 4)
 			{
-				uint32 userId = atoi(parts[1].c_str());
+				uint32 userId;
+				NLMISC::fromString(parts[1], userId);
 
 				// make sure the dest path exist
 				CFile::createDirectory(PlayerManager.getCharacterPath(userId, false));
@@ -3229,7 +3262,8 @@ NLMISC_COMMAND(moveCharAndOfflineCmdToHashTable, "Move all character and offline
 			explode(CFile::getFilename(allCommands[i]), string("_"), parts);
 			if (parts.size() == 4)
 			{
-				uint32 userId = atoi(parts[1].c_str());
+				uint32 userId;
+				NLMISC::fromString(parts[1], userId);
 
 				// make sure the dest path exist
 				CFile::createDirectory(PlayerManager.getOfflineCommandPath(userId, false));
@@ -3281,8 +3315,8 @@ NLMISC_COMMAND(loadAllPlayerAndReady,"Load all the player saves (all account, al
 		string slotStr = parts[2];
 
 		uint32 account, slot;
-		account = atoi(accountStr.c_str());
-		slot = atoi(slotStr.c_str());
+		NLMISC::fromString(accountStr, account);
+		NLMISC::fromString(slotStr, slot);
 
 		nldebug("Loading account %u, slot %u", account, slot);
 
@@ -3372,8 +3406,8 @@ NLMISC_COMMAND(convertAllOldCharacterSaves,"Load all the old (.bin) not already 
 		string slotStr = parts[2];
 
 		uint32 account, slot;
-		account = atoi(accountStr.c_str());
-		slot = atoi(slotStr.c_str());
+		NLMISC::fromString(accountStr, account);
+		NLMISC::fromString(slotStr, slot);
 
 		// check if the character is already converted
 		string newFileName = PlayerManager.getCharacterPath(account, false)+toString("/account_%u_%u_pdr.bin", account, slot);
@@ -3425,10 +3459,13 @@ NLMISC_COMMAND(simulatePlayerConnect,"simulate connect players","<first user id>
 	if( args.size() != 4 )
 		return false;
 
-	uint32 fid = (uint32)atoi(args[0].c_str());
-	uint32 lid = (uint32)atoi(args[1].c_str());
-	uint32 rep = (uint32)atoi(args[2].c_str());
-	NLNET::TServiceId feid(atoi(args[3].c_str()));
+	uint32 fid, lid, rep;
+	NLMISC::fromString(args[0], fid);
+	NLMISC::fromString(args[1], lid);
+	NLMISC::fromString(args[2], rep);
+	uint16 sid;
+	NLMISC::fromString(args[3], sid);
+	NLNET::TServiceId feid(sid);
 
 	if( rep != 0 && lid >= fid )
 	{
@@ -3496,7 +3533,8 @@ NLMISC_COMMAND(disconnectPlayer,"remove player from egs","<user id>")
 	if( args.size() != 1 )
 		return false;
 
-	uint32 id = (uint32)atoi(args[0].c_str());
+	uint32 id;
+	NLMISC::fromString(args[0], id);
 	if( PlayerManager.getPlayer( id ) != 0)
 	{
 		PlayerManager.savePlayerActiveChar( id );
@@ -3608,9 +3646,11 @@ NLMISC_COMMAND( harvest," harvest","entity id(id:type:crea:dyn), Index Mp, Qty")
 		CEntityId id;
 		id.fromString( args[0].c_str() );
 
-		uint8 index = (uint8) atoi( args[1].c_str() );
+		uint8 index;
+		NLMISC::fromString(args[1], index);
 
-		uint16 qty = (uint16) atoi( args[2].c_str() );
+		uint16 qty;
+		NLMISC::fromString(args[2], qty);
 
 		CCharacter *character = PlayerManager.getChar( id );
 		if( character )
@@ -3663,7 +3703,8 @@ NLMISC_COMMAND( createItemInBagTest," create_item_in_bag", "player id(id:type:cr
 
 		CSheetId sheet;
 
-		uint32 sheetId =  atoi(args[1].c_str());
+		uint32 sheetId;
+		NLMISC::fromString(args[1], sheetId);
 		if (sheetId)
 			sheet = CSheetId(sheetId);
 		else
@@ -3673,8 +3714,9 @@ NLMISC_COMMAND( createItemInBagTest," create_item_in_bag", "player id(id:type:cr
 				sheetName += string(".item");
 			sheet = CSheetId(sheetName.c_str());
 		}
-		uint quantity = atoi(args[2].c_str());
-		uint quality = atoi(args[3].c_str());
+		uint quantity, quality;
+		NLMISC::fromString(args[2], quantity);
+		NLMISC::fromString(args[3], quality);
 
 		const CStaticItem* form = CSheets::getForm( sheet );
 		if (form == NULL)
@@ -3816,7 +3858,7 @@ NLMISC_COMMAND(displayDatabaseEntry," display a database entry value","<entity i
 				sint64 value = e->_PropertyDatabase.x_getProp(entry);
 				log.displayNL("For player %s, buffer %s : value %"NL_I64"d", id.toString().c_str(), entry.c_str(), value );
 			}
-			catch ( CCDBSynchronised::ECDBNotFound &)
+			catch (const CCDBSynchronised::ECDBNotFound &)
 			{
 				log.displayNL("%s isn't a valid database entry", entry.c_str());
 			}
@@ -3857,7 +3899,7 @@ NLMISC_COMMAND( db, "Display or set the value of a property in the database", "<
 				log.displayNL( "%"NL_I64"d", value );
 				res = true;
 			}
-			catch ( CCDBSynchronised::ECDBNotFound& )
+			catch (const CCDBSynchronised::ECDBNotFound& )
 			{
 				res = false;
 			}
@@ -3923,10 +3965,10 @@ NLMISC_COMMAND(spendMoney," spend money","<entity id(id:type:crea:dyn)> <money>"
 		id.fromString( args[0].c_str() );
 
 		sint32 vb, b, m, s;
-		vb = atoi( args[1].c_str() );
-		b = atoi( args[2].c_str() );
-		m = atoi( args[3].c_str() );
-		s = atoi( args[4].c_str() );
+		NLMISC::fromString(args[1], vb);
+		NLMISC::fromString(args[2], b);
+		NLMISC::fromString(args[3], m);
+		NLMISC::fromString(args[4], s);
 
 		CCharacter *e = PlayerManager.getChar(id);
 		if( e )
@@ -4143,7 +4185,8 @@ NLMISC_COMMAND(displayAIRegisteredServices,"Display the list of services registe
 			return false;
 		}
 
-		const uint16 level = atoi( args[2].c_str() );
+		uint16 level;
+		NLMISC::fromString(args[2], level);
 
 		CCharacter *e = PlayerManager.getChar(id);
 		if( e )
@@ -4174,7 +4217,7 @@ NLMISC_COMMAND(entityForcedDefaultLevel,"read or set the EntityForcedDefaultLeve
 	}
 	else if( args.size() == 1 )
 	{
-		EntityForcedDefaultLevel = (uint8)atoi(args[0].c_str());
+		NLMISC::fromString(args[0], EntityForcedDefaultLevel);
 		log.displayNL("EntityForcedDefaultLevel set to %d", EntityForcedDefaultLevel);
 		return true;
 	}
@@ -4235,7 +4278,8 @@ NLMISC_COMMAND(setAllJobsLevel,"set all chosen player job levels to given value 
 		CEntityId id;
 		id.fromString( args[0].c_str() );
 
-		uint8 level = (uint8)atoi(args[1].c_str());
+		uint8 level;
+		NLMISC::fromString(args[1], level);
 
 		CCharacter *e = PlayerManager.getChar(id);
 		if( e )
@@ -4270,7 +4314,8 @@ NLMISC_COMMAND(setAllSkillsToValue,"set all skills to value","<entity id(id:type
 		CEntityId id;
 		id.fromString( args[0].c_str() );
 
-		sint32 value = atoi(args[1].c_str());
+		sint32 value;
+		NLMISC::fromString(args[1], value);
 
 		CCharacter *e = PlayerManager.getChar(id);
 		if( e )
@@ -4333,11 +4378,14 @@ NLMISC_COMMAND(displayItemInInventory,"display item characteristics (item is in 
 	INVENTORIES::TInventory inventory = INVENTORIES::toInventory( args[1].c_str() );
 	if( inventory == INVENTORIES::UNDEFINED )
 	{
-		inventory = INVENTORIES::TInventory(atoi(args[1].c_str()));
+		sint invId;
+		NLMISC::fromString(args[1], invId);
+		inventory = INVENTORIES::TInventory(invId);
 		if( inventory >= INVENTORIES::UNDEFINED )
 			return false;
 	}
-	const uint32 slot = atoi(args[2].c_str());
+	uint32 slot;
+	NLMISC::fromString(args[2], slot);
 
 	const CGameItemPtr item = player->getInventory( inventory)->getItem(slot);
 	if (item != NULL)
@@ -4370,11 +4418,12 @@ NLMISC_COMMAND(destroyItemInInventory,"destroy the specified item","<player id(i
 			return true;
 		}
 		const INVENTORIES::TInventory inventory = INVENTORIES::toInventory(args[1].c_str());
-		const uint32 slot = atoi(args[2].c_str());
+		uint32 slot;
+		NLMISC::fromString(args[2], slot);
 
 		uint32 qty = 1;
 		if (args.size() == 4)
-			qty = atoi(args[3].c_str());
+			NLMISC::fromString(args[3], qty);
 
 		CGameItemPtr itemPtr = c->getInventory(inventory)->getItem(slot);
 		if (itemPtr != NULL)
@@ -4414,13 +4463,15 @@ NLMISC_COMMAND(swapItemInInventory,"swap item in specified inventory / slot","<p
 		}
 
 		const INVENTORIES::TInventory inventory1 = INVENTORIES::toInventory(args[1]);
-		const uint32 slot1 = atoi(args[2].c_str());
+		uint32 slot1;
+		NLMISC::fromString(args[2], slot1);
 		const INVENTORIES::TInventory inventory2 = INVENTORIES::toInventory(args[3]);
-		const uint32 slot2 = atoi(args[4].c_str());
+		uint32 slot2;
+		NLMISC::fromString(args[4], slot2);
 
 		uint32 qty = 1;
 		if (args.size() == 6)
-			qty = atoi(args[5].c_str());
+			NLMISC::fromString(args[5], qty);
 
 		c->moveItem( inventory1, slot1, inventory2, slot2, qty );
 
@@ -4511,10 +4562,13 @@ NLMISC_COMMAND(carriedItemsDecayRate,"display/change the rate of carried items d
 		log.displayNL("<changeItemVar> command, unknown player '%s'", id.toString().c_str() );
 		return true;
 	}
-	const uint16 inventory = (uint16) atoi(args[1].c_str());
-	const uint16 slot = (uint16) atoi(args[2].c_str());
+	uint16 inventory;
+	NLMISC::fromString(args[1], inventory);
+	uint16 slot;
+	NLMISC::fromString(args[2], slot);
 	const string &var = args[3];
-	const sint32 value = (sint32) atoi(args[4].c_str());
+	sint32 value;
+	NLMISC::fromString(args[4], value);
 
 	CGameItemPtr itemPtr = player->getItem( inventory, slot);
 	if (itemPtr != NULL)
@@ -4561,8 +4615,8 @@ NLMISC_COMMAND(sendPetAnimalCommand,"Send a pet animal command","<player id(id:t
 		uint32 petCommand;
 
 		id.fromString( args[0].c_str() );
-		petIndex = atoi( args[1].c_str());
-		petCommand = atoi( args[2].c_str() );
+		NLMISC::fromString(args[1], petIndex);
+		NLMISC::fromString(args[2], petCommand);
 
 		CCharacter *c = PlayerManager.getChar(id);
 		if( c )
@@ -4594,7 +4648,7 @@ NLMISC_COMMAND(testProgression,"testProgression of skill","<player id(id:type:cr
 			else
 			{
 				c->TestProgression = SKILLS::toSkill( c->TestProgressSkill ) != SKILLS::unknown;
-				Rate = atoi( args[1].c_str() );
+				NLMISC::fromString(args[1], Rate);
 				c->XpGainRate = Rate;
 				c->TestProgressSkill = args[2];
 
@@ -4640,9 +4694,12 @@ NLMISC_COMMAND(teleportPlayerCharacter,"Teleport online player character","<char
 		if( c )
 		{
 			sint32 x, y, z;
-			x = atoi( args[1].c_str() ) * 1000;
-			y = atoi( args[2].c_str() ) * 1000;
-			z = atoi( args[3].c_str() ) * 1000;
+			NLMISC::fromString(args[1], x);
+			x *= 1000;
+			NLMISC::fromString(args[2], y);
+			y *= 1000;
+			NLMISC::fromString(args[3], z);
+			z *= 1000;
 
 			if( c->getEnterFlag() )
 			{
@@ -4703,7 +4760,8 @@ NLMISC_COMMAND(setHPBar,"set the value of an entity HP bar (0..100)","<entity id
 			return false;
 		}
 
-		sint32 barValue = atoi( args[1].c_str() );
+		sint32 barValue;
+		NLMISC::fromString(args[1], barValue);
 
 		entity->setScoreBar( SCORES::hit_points, (uint32)(barValue * 1023 / 127) );
 		log.displayNL("for entity id %s, new hpBar value : %d", id.toString().c_str(), barValue );
@@ -4847,8 +4905,8 @@ NLMISC_COMMAND(displayBricksInDb,"display the bricks in DB for given player","<p
 		set<CSheetId>::const_iterator it2 = bricksKnown.begin();
 		set<CSheetId>::const_iterator it2End = bricksKnown.end();
 
-		uint16 size1 = bricksInDb.size();
-		uint16 size2 = bricksKnown.size();
+		uint16 size1 = (uint16)bricksInDb.size();
+		uint16 size2 = (uint16)bricksKnown.size();
 
 		bool ok = true;
 
@@ -4923,7 +4981,8 @@ NLMISC_COMMAND(consumeAmmos,"consume ammos for given player ","<player id(id:typ
 		CCharacter * c = PlayerManager.getChar( id );
 		if (c )
 		{
-			uint8 nb = (uint8)atoi(args[1].c_str());
+			uint8 nb;
+			NLMISC::fromString(args[1], nb);
 
 			c->consumeAmmo(nb);
 			log.displayNL("Player id %s consumed %u ammos",id.toString().c_str(), nb);
@@ -5063,7 +5122,7 @@ NLMISC_COMMAND(createSapRecharge,"create sap recharge item in temp inventory","<
 		CEntityId id;
 		uint32 sapRecharged;
 		id.fromString(args[0].c_str());
-		sapRecharged = (uint32) atoi( args[1].c_str());
+		NLMISC::fromString(args[1], sapRecharged);
 		CCharacter * player = dynamic_cast< CCharacter * > ( CEntityBaseManager::getEntityBasePtr( id ) );
 		if( player )
 		{
@@ -5088,7 +5147,8 @@ NLMISC_COMMAND(enchantItem,"enchantItem with crystallized action from bag","<eId
 	{
 		CEntityId id;
 		id.fromString(args[0].c_str());
-		uint16 slot = (uint16) atoi( args[1].c_str() );
+		uint16 slot;
+		NLMISC::fromString(args[1], slot);
 		CCharacter * player = dynamic_cast< CCharacter * > ( CEntityBaseManager::getEntityBasePtr( id ) );
 		if( player )
 		{
@@ -5113,7 +5173,8 @@ NLMISC_COMMAND(rechargeItem,"recharge sapLaod of an item with sap recharge item 
 	{
 		CEntityId id;
 		id.fromString(args[0].c_str());
-		uint16 slot = (uint16) atoi( args[1].c_str() );
+		uint16 slot;
+		NLMISC::fromString(args[1], slot);
 		CCharacter * player = dynamic_cast< CCharacter * > ( CEntityBaseManager::getEntityBasePtr( id ) );
 		if( player )
 		{
@@ -5392,8 +5453,11 @@ NLMISC_COMMAND (createEffectOnEntity, "create given effect on entity", "<eid> <e
 		return false;
 	}
 
-	uint32 duration = (uint32)( atoi(args[2].c_str()) / CTickEventHandler::getGameTimeStep() );
-	uint32 value = (uint32) atoi(args[3].c_str());
+	uint32 duration;
+	NLMISC::fromString(args[2], duration);
+	duration = (uint32)(NLMISC::TGameCycle(duration) / CTickEventHandler::getGameTimeStep());
+	uint32 value;
+	NLMISC::fromString(args[3], value);
 
 	CSTimedEffect *effect = IEffectFactory::buildEffect(family);
 	if (effect)
@@ -5580,7 +5644,7 @@ NLMISC_COMMAND(execScript, "Execute a script file (.cmd)","<FileName>")
 
 		string script;
 		script.resize(iFile.getFileSize());
-		iFile.serialBuffer((uint8 *)&script[0], script.size());
+		iFile.serialBuffer((uint8 *)&script[0], (uint)script.size());
 
 
 		vector<string> scriptLines;

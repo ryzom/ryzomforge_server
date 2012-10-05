@@ -316,7 +316,6 @@ extern NLMISC::CVariable<float>					RechargeMoneyFactor;
 extern NLMISC::CVariable<float>					RechargeMoneyFactor;
 extern NLMISC::CVariable<float>					CristalMoneyFactor;
 
-
 /// PVP
 extern NLMISC::CVariable<bool>					AllowPVP;
 extern NLMISC::CVariable<sint32>				PVPFameRequired;

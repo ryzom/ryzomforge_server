@@ -851,14 +851,15 @@ bool CEntityBase::setValue( const string& var, const string& value )
 		{
 			nldebug( "CEntityBase::setValue setting value %s to %s", var.c_str(),value.c_str() );
 			sint32 &temp = lookupStat(var);
-			sint32 v = atoi( value.c_str() );
+			sint32 v;
+			NLMISC::fromString(value, v);
 			if( v < 0 )
 			{
 				v = 0;
 			}
 			temp = v;
 		}
-		catch( CEntityBase::EInvalidStat &e)
+		catch(const CEntityBase::EInvalidStat &e)
 		{
 			nlwarning("<CEntityBase::setValue> Exception : %s",e.what( var ) );
 			return false;
@@ -881,12 +882,13 @@ bool CEntityBase::modifyValue( const string& var, const string& value )
 		try
 		{
 			sint32 &temp = lookupStat(var);
-			sint32 v = atoi( value.c_str() );
+			sint32 v;
+			NLMISC::fromString(value, v);
 			sint32 oldValue = temp;
 			temp = temp + v;
 			//nlinfo(" Modify value %s of %s for entity %s, old value %d, new value %d", var.c_str(), value.c_str(), _Id.toString().c_str(), oldValue, temp.getValue() );
 		}
-		catch( CEntityBase::EInvalidStat &e)
+		catch(const CEntityBase::EInvalidStat &e)
 		{
 			nlwarning("<CEntityBase::modifyValue> Exception : %s",e.what( var ) );
 			return false;
@@ -911,7 +913,7 @@ bool CEntityBase::getValue( const string& var, string& value )
 		sint32 val = lookupStat(var);
 		value = toString(val);
 	}
-	catch( CEntityBase::EInvalidStat &e)
+	catch(const CEntityBase::EInvalidStat &e)
 	{
 		if( var == string("Behaviour") )
 		{
@@ -2358,7 +2360,7 @@ bool CEntityBase::canEntityDefend()
 		return false;
 
 	const uint8 size = sizeof(ForbidDefenseEffects) / sizeof(EFFECT_FAMILIES::TEffectFamily);
-	const uint8 nbEffects = _SEffects.size();
+	const uint8 nbEffects = (uint8)_SEffects.size();
 
 	// look for forbidden effects
 	for (uint i = 0; i < nbEffects; ++i )

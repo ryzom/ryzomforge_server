@@ -197,7 +197,7 @@ void cbClientConnection(CMessage& msgin, const std::string &serviceName, NLNET::
 	msgin.serial( userName, userPriv, userExtended, languageId);
 	msgin.serial( fromAddr );
 	msgin.serial( cookie );
-#ifdef NL_DEBUG	
+#ifdef NL_DEBUG
 	egs_ecinfo("WEB: received cookie %s from player %u", cookie.toString().c_str(), userId);
 #endif
 	//Bsi.append( StatPath, NLMISC::toString("[UC] %u %s %s %s %s %s", userId, userName.c_str(), userPriv.c_str(), languageId.c_str(), fromAddr.c_str(), cookie.toString().c_str()) );
@@ -230,7 +230,7 @@ void cbClientConnection(CMessage& msgin, const std::string &serviceName, NLNET::
 
 	// set the front end id of this player
 	PlayerManager.setPlayerFrontEndId( userId, serviceId );
-	
+
 	const bool betaTester = (userExtended.find(":FBT:") != string::npos);
 	const bool preOrder = (userExtended.find(":PO:") != string::npos);
 	const bool windermeerCommunity = (userExtended.find(":WIND:") != string::npos);
@@ -294,19 +294,19 @@ void cbClientConnection(CMessage& msgin, const std::string &serviceName, NLNET::
 //
 //	msgin.serial( longUserId );
 //	userId = (uint32) longUserId;
-//	
+//
 //	CCharacter * c = PlayerManager.getActiveChar( userId );
 //	if( c != 0 )
 //	{
 //		charId = c->getId();
 //
 //		// send userId/charId association to the FE
-//		CMessage msgout("CL_ID"); 
+//		CMessage msgout("CL_ID");
 //		msgout.serial(userId);
 //		msgout.serial( charId );
 //		uint16 frontEndId = PlayerManager.getPlayerFrontEndId( userId );
 //		CUnifiedNetwork::getInstance()->send(frontEndId, msgout);
-//		
+//
 //		// send acknowledge to client for received Enter message
 //		CBitMemStream bms;
 //		if ( ! GenericMsgManager.pushNameToStream( "CONNECTION:READY", bms) )
@@ -338,7 +338,7 @@ void cbClientConnection(CMessage& msgin, const std::string &serviceName, NLNET::
 void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbClientReady);
-	
+
 	// read the player id
 	CEntityId characterId;
 	msgin.serial( characterId );
@@ -349,7 +349,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 		disconnectUser( PlayerManager.getPlayerId( characterId ) );
 		return;
 	}
-	
+
 	// add the character in the GPMS
 	COfflineEntityState state;
 	PlayerManager.getState( characterId ).setCOfflineEntityState( state ); // state properties with temp storage
@@ -367,7 +367,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 		// validate player web account
 		// \todo this is unsafe, because name is an ucstring which might be fucked up when casted into string
 		CMailForumValidator::validateUserEntry( c->getHomeMainlandSessionId(), c->getName().toString(), player->getLoginCookie().toString() );
-		
+
 		NLNET::CMessage	msgout( "IMPULSION_ID" );
 		CEntityId		id = c->getId();
 		msgout.serial( id );
@@ -376,11 +376,11 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 		{
 			uint32	shardId = IService::getInstance()->getShardId();
 			bms.serial(shardId);
-			
+
 			CConfigFile::CVar	*var = IService::getInstance()->ConfigFile.getVarPtr("WebSrvHost");
 			string	webHost = (var != NULL ? var->asString() : "");
 			bms.serial(webHost);
-			
+
 			msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
 			CUnifiedNetwork::getInstance()->send( NLNET::TServiceId(c->getId().getDynamicId()), msgout ); // sendMessageViaMirror() not needed to FS in general
 		}
@@ -388,9 +388,9 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 		{
 			nlwarning("Unable to send CONNECTION:SHARD_ID to player %s", id.toString().c_str());
 		}
-		
+
 	}
-		
+
 	// Add player in the mirror // createEntity() will produce warnings if it fails
 	if ( ! Mirror.createEntity( characterId ) )
 	{
@@ -419,7 +419,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 	uint32 in = c->getStartupInstance();
 	if (in != INVALID_AI_INSTANCE)
 	{
-		nldebug("Setting player %s in ring instance #%u", 
+		nldebug("Setting player %s in ring instance #%u",
 			c->getId().toString().c_str(),	in);
 
 		// set instance id for ring session
@@ -438,7 +438,7 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 			nlwarning("user %s is in invalid continent '%s'", c->getId().toString().c_str(), strlwr( CONTINENT::toString(c->getCurrentContinent()) ).c_str() );
 		}
 
-		nldebug("Setting player %s in instance #%u for continent '%s'", 
+		nldebug("Setting player %s in instance #%u for continent '%s'",
 			c->getId().toString().c_str(),	in,	strlwr( CONTINENT::toString(c->getCurrentContinent())).c_str());
 		c->setInstanceNumber( in );
 	}
@@ -502,7 +502,6 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 		{
 			c->setWhoSeesMe(UINT64_CONSTANT(0xffffffffffffffff));
 		}
-			
 	}
 
 	if (!IsRingShard && player->havePriv(AlwaysInvisiblePriv))
@@ -510,26 +509,26 @@ void cbClientReady( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 		c->setWhoSeesMe(uint64(0));
 		c->setInvisibility(true);
 	}
-	
+
 	TheDataset.declareEntity( entityIndex ); // after the writing of properties to mirror
 
 //#ifdef NL_DEBUG
 	egs_ecinfo("Client ready (entity %s (Row %u) added to mirror)", characterId.toString().c_str(), entityIndex.getIndex() );
 //#endif
-	
+
 	// player enter the game
 	PlayerManager.setEnterFlag( characterId, true );
-	
+
 	// ask backup for offline commands file
 	COfflineCharacterCommand::getInstance()->characterOnline( characterId );
-	
+
 	c->onConnection();
 } // cbClientReady //
 
 
 //---------------------------------------------------
 // finalizeClientReady :
-// 
+//
 //---------------------------------------------------
 void finalizeClientReady( uint32 userId, uint32 index )
 {
@@ -537,21 +536,21 @@ void finalizeClientReady( uint32 userId, uint32 index )
 
 	CPlayer *player = PlayerManager.getPlayer(userId);
 	BOMB_IF( player == 0,"Failed to get player from user Id",return );
-	
+
 	BOMB_IF( index==-1, "Failed to find char with given index for this player", return );
-	
+
 	// get the char infos
 	CCharacter * c = PlayerManager.getChar( userId, index );
 	BOMB_IF( c == NULL, toString("Character %u of user %u not created", index, userId), return);
 
 	// get character CEntityId
 	CEntityId characterId = c->getId();
-	
+
 	c->sendDynamicSystemMessage( c->getId(), "OPS_WELCOME" );
 //	c->sendMessageToClient( c->getId(), "OPS_WELCOME" );
 
 	c->sendMessageOfTheDay();
-		
+
 	c->checkSkillTreeForLockedSkill();
 
 	c->setDatabase();
@@ -586,7 +585,7 @@ void finalizeClientReady( uint32 userId, uint32 index )
 			nlwarning("<cbclientReady : user %s is not in his guild>");
 		}
 	}
-	
+
 	c->resetFameDatabase();
 
 	// notify player respawn points system that player is ready
@@ -645,7 +644,7 @@ void finalizeClientReady( uint32 userId, uint32 index )
 			}
 		}
 	}
-	
+
 	// check sell store
 	c->checkSellStore();
 
@@ -704,7 +703,7 @@ void finalizeClientReady( uint32 userId, uint32 index )
 	c->setFinalized(true);
 
 } // finalizeClientReady //
-	
+
 
 //-----------------------------------------------
 // cbClientDisconnection :
@@ -713,7 +712,7 @@ void finalizeClientReady( uint32 userId, uint32 index )
 void cbClientDisconnection(CMessage& msgin, const string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClientDisconnection);
-	
+
 	// read the player id
 	uint32 userId;
 	msgin.serial( userId );
@@ -750,7 +749,7 @@ void cbClientDisconnection(CMessage& msgin, const string &serviceName, NLNET::TS
 void disconnectUser(uint32 userId)
 {
 	H_AUTO(disconnectUser);
-	
+
 	PlayerManager.disconnectPlayer( userId );
 }
 
@@ -761,7 +760,7 @@ void disconnectUser(uint32 userId)
 void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbSelectChar);
-	
+
 	// read the player id
 //	uint64 longUserId;
 	uint32 userId;
@@ -787,7 +786,7 @@ void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 			{
 				// get the char infos
 				CCharacter * ch = PlayerManager.getChar( userId, index );
-		
+
 				if( ch != 0 )
 				{
 					// Check if not loading an old file with no normal positions
@@ -831,11 +830,11 @@ void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 
 					// store the ai instance
 					ch->setStartupInstance(instanceId);
-					
+
 					// Send userId/charId association to the FE (IMPULSION_ID becomes valid from now on)
 					CEntityId charId = ch->getId();
 					PlayerManager.setActiveCharForPlayer( userId, index, charId );
-					CMessage msgout2("CL_ID"); 
+					CMessage msgout2("CL_ID");
 					msgout2.serial( userId );
 					msgout2.serial( charId );
 					NLNET::TServiceId frontEndId = PlayerManager.getPlayerFrontEndId( userId );
@@ -866,10 +865,10 @@ void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 						// Continue on same shard => send user char data (start pos, etc.)
 						ch->sendUserChar( userId, 0 /*auto*/, R2::TUserRole::ur_player );
 					}
-					
+
 					// send CEntityId/name association to the IOS
-					//			ch->registerName();		
-					
+					//			ch->registerName();
+
 					// send acknowledge to client for received Enter message (new: it includes version handshake)
 					CBitMemStream bms2;
 					nlverify(GenericMsgManager.pushNameToStream( "CONNECTION:READY", bms2));
@@ -878,12 +877,12 @@ void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 					msgout3.serial( charId );
 					msgout3.serialBufferWithSize((uint8*)bms2.buffer(), bms2.length());
 					CUnifiedNetwork::getInstance()->send( frontEndId, msgout3 );
-					
+
 //					// Remove user language from IOS, we don't need it anymore
 //					CMessage msgout4("REMOVE_USER_LANGUAGE");
 //					msgout4.serial(userId);
 //					CUnifiedNetwork::getInstance()->send("IOS", msgout4);
-					
+
 					if( CPVPManager2::getInstance()->inSafeZone( ch->getPosition() ) )
 					{
 						// character must be safe in PVP until he leave safe zone
@@ -904,7 +903,7 @@ void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 			}
 		}
 	}
-	catch( Exception& e )
+	catch(const Exception &e)
 	{
 		nlwarning( "(PS)<cbGetChar> Error: %s", e.what() );
 	}
@@ -920,11 +919,11 @@ void cbSelectChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 void cbCheckName( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbCheckName);
-	
+
 	uint64 longUid;
 	uint32 userId;
 	CCheckNameMsg checkNameMsg;
-	
+
 	msgin.serial( longUid );
 	userId = (uint32) longUid;
 	msgin.serial( checkNameMsg );
@@ -958,16 +957,16 @@ void cbCheckName( CMessage& msgin, const std::string &serviceName, NLNET::TServi
 void cbCreateChar( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbCreateChar);
-	
+
 	// read the player id
 	uint64 longUserId;
 	uint32 userId;
 	msgin.serial( longUserId );
 	userId = (uint32) longUserId;
-	
+
 	CCreateCharMsg createCharMsg;
 	createCharMsg.serial( msgin );
-	
+
 	// Yoyo: fix to force new newbieland.
 	if(UseNewNewbieLandStartingPoint)
 	{
@@ -988,7 +987,7 @@ void cbCreateChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 			createCharMsg.Name[i] = createCharMsg.Name[i] - 'A' + 'a';
 		}
 	}
-		
+
 	CCreateCharErrorMsg createCharErrorMsg;
 	if( ! CCharacter::checkCreateParams( createCharMsg, createCharErrorMsg, userId ) )
 	{
@@ -1010,7 +1009,7 @@ void cbCreateChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 		{
 			CUnifiedNetwork::getInstance()->send(serviceId, msgout);
 		}
-		catch( Exception& e )
+		catch(const Exception &e)
 		{
 			nlwarning( "(PS)<cbCreateChar> Error: %s", e.what() );
 		}
@@ -1045,7 +1044,6 @@ CreationFailed:
 	sendCharactersSummary( PlayerManager.getPlayer( userId ) );
 	return;
 }
-	
 
 void cbCreateChar_part2(uint32 userId, const CCreateCharMsg &createCharMsg, bool ok)
 {
@@ -1065,12 +1063,12 @@ void cbCreateChar_part2(uint32 userId, const CCreateCharMsg &createCharMsg, bool
 
 	// create a new char
 	CCharacter * ch = new CCharacter();
-	
+
 	createCharMsg.Slot;
 
 	CEntityId charId = PlayerManager.createCharacterId( userId, createCharMsg.Slot );
 
-	ch->setId( charId ); 
+	ch->setId( charId );
 	ch->setName( createCharMsg.Name );
 //	ch->setSurname( string("unknown") );
 
@@ -1105,11 +1103,11 @@ void cbCreateChar_part2(uint32 userId, const CCreateCharMsg &createCharMsg, bool
 		ICharacter * cItf = ICharacter::getInterface( ch, false );
 		cItf->sendUserChar( userId, 0 /*auto*/, R2::TUserRole::ur_player );
 	}
-	catch( Exception& e )
+	catch(const Exception &e)
 	{
 		nlwarning( "(PS)<cbCreateChar> Error: %s", e.what() );
 	}
-	
+
 	PlayerManager.savePlayerChar( userId, createCharMsg.Slot );
 
 	// update the ring database with the new char
@@ -1127,7 +1125,7 @@ void cbCreateChar_part2(uint32 userId, const CCreateCharMsg &createCharMsg, bool
 //		std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance = ch->getAllegiance();
 //		charInfo.setCivilisation(ch->
 //		charInfo.setCult(
-		// no respawn points 
+		// no respawn points
 		IShardUnifierEvent::getInstance()->onNewChar(charInfo);
 	}
 } // cbCreateChar //
@@ -1140,7 +1138,7 @@ void cbCreateChar_part2(uint32 userId, const CCreateCharMsg &createCharMsg, bool
 void sendIfNameIsValide( uint32 userId, bool nameValide )
 {
 	H_AUTO(sendIfNameIsValide);
-	
+
 	CBitMemStream bmsName;
 	if ( ! GenericMsgManager.pushNameToStream( "CONNECTION:VALID_NAME", bmsName) )
 	{
@@ -1149,16 +1147,16 @@ void sendIfNameIsValide( uint32 userId, bool nameValide )
 	}
 	uint8 valide = nameValide;
 	bmsName.serial( valide );
-	
+
 	CMessage msgoutName( "IMPULSION_UID" );
 	msgoutName.serial( userId );
 	msgoutName.serialBufferWithSize((uint8*)bmsName.buffer(), bmsName.length());
-	
+
 	try
 	{
 		CUnifiedNetwork::getInstance()->send( PlayerManager.getPlayerFrontEndId( userId ), msgoutName );
 	}
-	catch( Exception& e )
+	catch(const Exception &e)
 	{
 		nlwarning( "(PS)<cbCreateChar> Error: %s", e.what() );
 	}
@@ -1172,16 +1170,16 @@ void sendIfNameIsValide( uint32 userId, bool nameValide )
 void cbDeleteChar( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbDeleteChar);
-	
+
 	// read the player id
 	uint64 longUserId;
 	uint32 userId;
 	msgin.serial( longUserId );
 	userId = (uint32) longUserId;
-	
+
 	uint8 characterIndex;
 	msgin.serial( characterIndex );
-	
+
 	CPlayer* player = PlayerManager.getPlayer( userId );
 	if ( player == NULL )
 	{
@@ -1212,10 +1210,10 @@ void cbDeleteChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 
 	fileName = charPath+NLMISC::toString( "account_%u_%d.xml", userId, index );
 	BsiGlobal.deleteFile( fileName );
-	
+
 	fileName = charPath+NLMISC::toString( "account_%u_%d.xml.backup", userId, index );
 	BsiGlobal.deleteFile( fileName );
-	
+
 	fileName = charPath+NLMISC::toString( "account_%u_%d.bin", userId, index );
 	BsiGlobal.deleteFile( fileName );
 
@@ -1247,7 +1245,7 @@ void cbDeleteChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 void sendCharactersSummary( CPlayer *player, bool AllAutorized, uint32 bitfieldOwnerOfActiveAnimSession, uint32 bitfieldOwnerOfEditSession )
 {
 	H_AUTO(sendCharactersSummary);
-	
+
 	if ( player == NULL )
 		return;
 
@@ -1256,20 +1254,19 @@ void sendCharactersSummary( CPlayer *player, bool AllAutorized, uint32 bitfieldO
 	player->getCharactersSummary( chars );
 	if (bitfieldOwnerOfActiveAnimSession != 0)
 	{
-		for ( uint i=0, len=chars.size(); i!=len; ++i )
+		for ( uint i=0, len=(uint)chars.size(); i!=len; ++i )
 		{
-			chars[i].InRingSession = ((bitfieldOwnerOfActiveAnimSession & (1 << i)) != 0);		
+			chars[i].InRingSession = ((bitfieldOwnerOfActiveAnimSession & (1 << i)) != 0);
 		}
 	}
 
 	if (bitfieldOwnerOfEditSession != 0)
 	{
-		for ( uint i=0, len=chars.size(); i!=len; ++i )
-		{			
+		for ( uint i=0, len=(uint)chars.size(); i!=len; ++i )
+		{
 			chars[i].HasEditSession = ((bitfieldOwnerOfEditSession & (1 << i)) != 0);
 		}
 	}
-
 
 	// Build the message
 	CBitMemStream bms;
@@ -1319,7 +1316,7 @@ void sendCharactersSummary( CPlayer *player, bool AllAutorized, uint32 bitfieldO
 	bms.serialCont (shardNames);
 
 	// send privileges in all cases
-	std::string priv;	
+	std::string priv;
 	priv = player->getUserPriv();
 	bms.serial(priv);
 
@@ -1339,7 +1336,7 @@ void sendCharactersSummary( CPlayer *player, bool AllAutorized, uint32 bitfieldO
 	{
 		CUnifiedNetwork::getInstance()->send( frontEndId, msgout);
 	}
-	catch( Exception& e )
+	catch(const Exception &e)
 	{
 		nlwarning( "<sendCharactersSummary> Error: %s", e.what() );
 	}
@@ -1353,7 +1350,7 @@ void sendCharactersSummary( CPlayer *player, bool AllAutorized, uint32 bitfieldO
 void cbEntityPos(CMessage& msgin, const string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbEntityPos);
-	
+
 	CEntityId id;
 	sint32 x, y, z;
 	float t;
@@ -1399,7 +1396,7 @@ void cbEntityPos(CMessage& msgin, const string &serviceName, NLNET::TServiceId s
 void cbClientTpAck( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbTpAcknowledge);
-	
+
 	CEntityId Id;
 
 	msgin.serial( Id );
@@ -1460,7 +1457,7 @@ void cbClientTpAck( NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		CBankAccessor_PLR::getTARGET().getBARS().setFOCUS(ch->_PropertyDatabase, 0 );
 		ch->setTarget( CEntityId::Unknown );
 
-		// player still intangible for a few seconds  
+		// player still intangible for a few seconds
 		ch->setIntangibleEndDate( CTickEventHandler::getGameCycle() + IntangibleTimeAfterTP );
 
 		if (ch->getMode()==MBEHAV::DEATH)
@@ -1488,11 +1485,11 @@ void cbClientTpAck( NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 				{
 					nlwarning("<TP>%s will arrive in invalid continent %s", ch->getId().toString().c_str(), NLMISC::strlwr( cont->getName() ).c_str() );
 				}
-				
+
 				// respawn the pets if needed
 				ch->respawnPetAfterTp( state, in );
-				
-				nldebug("Setting player %s in instance #%u for continent '%s'", 
+
+				nldebug("Setting player %s in instance #%u for continent '%s'",
 					ch->getId().toString().c_str(),
 					in,
 					CONTINENT::toString(contId).c_str());
@@ -1542,8 +1539,6 @@ void cbClientTpAck( NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 					ch->setWhoSeesMe( IsRingShard? R2_VISION::buildWhoSeesMe(R2_VISION::WHOSEESME_VISIBLE_PLAYER,true): UINT64_CONSTANT(0xffffffffffffffff) );
 				}
 			}
-			
-			
 		}
 
 
@@ -1560,12 +1555,12 @@ void cbClientTpAck( NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 } // cbTpAcknowledge //
 
 //---------------------------------------------------
-// cbLeaveTeam: a player 
+// cbLeaveTeam: a player
 //---------------------------------------------------
 void cbLeaveTeam( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbLeaveTeam);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 	TeamManager.quitTeam( charId );
@@ -1577,7 +1572,7 @@ void cbLeaveTeam( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 void cbJoinTeam( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbJoinTeam);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 	TeamManager.joinAccept( charId );
@@ -1589,7 +1584,7 @@ void cbJoinTeam( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::
 void cbJoinTeamDecline( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbJoinTeamDecline);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 	TeamManager.joinDecline( charId );
@@ -1602,7 +1597,7 @@ void cbJoinTeamDecline( NLNET::CMessage& msgin, const std::string &serviceName, 
 void cbJoinTeamProposal( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbJoinTeamProposal);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -1670,7 +1665,7 @@ void cbJoinLeagueProposal( NLNET::CMessage& msgin, const std::string &serviceNam
 void cbKickTeammate( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbKickTeammate);
-	
+
 	CEntityId charId;
 	uint8 memberIndex;
 	msgin.serial( charId );
@@ -1694,7 +1689,7 @@ void cbKickTeammate( NLNET::CMessage& msgin, const std::string &serviceName, NLN
 void cbHarvest( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbHarvest);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -1722,7 +1717,7 @@ void cbHarvest( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::T
 void cbHarvestClose( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbHarvestClose);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -1748,7 +1743,7 @@ void cbHarvestClose( NLNET::CMessage& msgin, const std::string &serviceName, NLN
 void cbHarvestDeposit( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbHarvestDeposit);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -1789,7 +1784,7 @@ void cbHarvestDeposit( NLNET::CMessage& msgin, const std::string &serviceName, N
 	nlerror( "character->harvestDeposit(true);" ); // TODO
 	/*character->depositSearchSkill(skill);
 	character->openHarvest();*/
-	
+
 //	character->sendMessageToClient( character->getId(), "WOS_HARVEST_SEARCHING" );
 	nlerror( "CZoneManager::getInstance().harvestDeposit(character);" );
 
@@ -1805,7 +1800,7 @@ void cbHarvestDeposit( NLNET::CMessage& msgin, const std::string &serviceName, N
 // Changed : Wait new harvest rules ////////////////////////////////////////////////////
 
 //	character->setBehaviour( MBEHAV::HARVESTING );
-	
+
 } // cbHarvestDeposit //
 
 
@@ -1816,7 +1811,7 @@ void cbHarvestDeposit( NLNET::CMessage& msgin, const std::string &serviceName, N
 void cbHarvestMPDestroyed( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbHarvestMPDestroyed);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -1861,7 +1856,7 @@ void cbHarvestMPDestroyed( NLNET::CMessage& msgin, const std::string &serviceNam
 void cbHarvestInterrupted( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbHarvestInterrupted);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -1900,13 +1895,13 @@ void cbHarvestInterrupted( NLNET::CMessage& msgin, const std::string &serviceNam
 void cbHarvestDB( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbHarvestDB);
-	
+
 	CEntityId charId;
 	CSheetId sheet;
 	uint16 quantity;
 	uint16 minQuality;
 	uint16 maxQuality;
-	
+
 	msgin.serial( charId );
 	msgin.serial( sheet );
 	msgin.serial( quantity );
@@ -1932,7 +1927,7 @@ void cbHarvestDB( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 	character->staticActionInProgress(true);
 
 	CTempInventory *invTemp = (CTempInventory*)(CInventoryBase*)character->getInventory(INVENTORIES::temporary);
-	
+
 	for (uint32 i = 0 ; i < invTemp->getSlotCount(); ++i )
 	{
 		if (i != 0 )
@@ -1944,7 +1939,7 @@ void cbHarvestDB( NLNET::CMessage& msgin, const std::string &serviceName, NLNET:
 		{
 			invTemp->setDispQuantity(i, quantity);
 			invTemp->setDispSheetId(i, sheet);
-		}		
+		}
 		invTemp->setDispQuality(i, 0);
 //trap		character->incSlotVersion( INVENTORIES::temporary,i );
 	}
@@ -2008,7 +2003,7 @@ void cbHarvestDBUpdateQty( NLNET::CMessage& msgin, const std::string &serviceNam
 void cbClearHarvestDB( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbClearHarvestDB);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -2043,7 +2038,7 @@ void cbClearHarvestDB( NLNET::CMessage& msgin, const std::string &serviceName, N
 
 	uint16 quantity;
 	msgin.serial( quantity );
-	
+
 	uint16 quality;
 	msgin.serial( quality );
 
@@ -2074,7 +2069,7 @@ void cbClearHarvestDB( NLNET::CMessage& msgin, const std::string &serviceName, N
 void cbFightingTarget( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbFightingTarget);
-	
+
 	CEntityId IdCharacter, Target;
 
 	msgin.serial( IdCharacter );
@@ -2104,7 +2099,7 @@ void cbFightingTarget( NLNET::CMessage& msgin, const std::string &serviceName, N
 void cbAnimalCommand( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbAnimalCommand);
-	
+
 	CEntityId entity;
 	uint8 beastIndex;
 	uint8 command;
@@ -2180,7 +2175,7 @@ void cbTradeListReceived( NLNET::CMessage& msgin, const std::string &serviceName
 void cbTradeBuySomething( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbTradeBuySomething);
-	
+
 	CEntityId player;
 	uint8 ItemNumber;
 	uint16 Quantity;
@@ -2232,7 +2227,7 @@ void cbGiveSeed( NLNET::CMessage& msgin, const std::string &serviceName, uint16 
 void cbAddSurvivePact( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbAddSurvivePact);
-	
+
 	CEntityId player;
 	uint8 PactNature, PactType;
 
@@ -2294,7 +2289,7 @@ void cbFameChange( NLNET::CMessage& msgin, const std::string &serviceName, uint1
 	// read the creature id
 	CEntityId Id;
 	msgin.serial( Id );
-	
+
 	// read creature sheet id
 	uint32 Sheet;
 	msgin.serial( Sheet );
@@ -2333,7 +2328,7 @@ void cbFameChange( NLNET::CMessage& msgin, const std::string &serviceName, uint1
 void cbSetValue( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbSetValue);
-	
+
 	// read the entity id
 	CEntityId Id;
 	msgin.serial( Id );
@@ -2366,7 +2361,7 @@ void cbSetValue( CMessage& msgin, const std::string &serviceName, NLNET::TServic
 void cbModifyValue( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbModifyValue);
-	
+
 	// read the creature id
 	CEntityId Id;
 	msgin.serial( Id );
@@ -2380,7 +2375,7 @@ void cbModifyValue( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 	msgin.serial( modifValue );
 
 //	egs_ecinfo("*** cbModifyValue from service %s modify value %s to %s", serviceName.c_str(), var.c_str(), modifValue.c_str() );
-	
+
 	CEntityBase* entity = CEntityBaseManager::getEntityBasePtr( Id );
 
 	if (entity == 0)
@@ -2397,7 +2392,7 @@ void cbModifyValue( CMessage& msgin, const std::string &serviceName, NLNET::TSer
 void cbTarget( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbTarget);
-	
+
 	if ( ! Mirror.mirrorIsReady() )
 	{
 		nlwarning("<cbTarget> Received from %s service but mirror not yet ready", serviceName.c_str() );
@@ -2409,7 +2404,7 @@ void cbTarget( CMessage& msgin, const std::string &serviceName, NLNET::TServiceI
 	// read the entity id
 	TDataSetRow	Id;
 	msgin.serial(Id);
-		
+
 	// read the target id
 	TDataSetRow	targetId;
 	msgin.serial(targetId);
@@ -2425,12 +2420,12 @@ void cbTarget( CMessage& msgin, const std::string &serviceName, NLNET::TServiceI
 	CEntityBase* entity = CEntityBaseManager::getEntityBasePtr(Id);
 	CEntityId	EentityId=TheDataset.getEntityId(Id);
 	CEntityId	EtargetId=TheDataset.getEntityId(targetId);
-					
+
 	if (entity == 0)
 	{
 		nlwarning("<cbTarget> Invalid entity Id %s", EentityId.toString().c_str() );
 		return;
-	}		
+	}
 	if	(entity->getId().getType()==RYZOMID::player)
 	{
 		entity->setTarget(EtargetId);
@@ -2445,7 +2440,7 @@ void cbTarget( CMessage& msgin, const std::string &serviceName, NLNET::TServiceI
 void cbChangeMode( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbChangeMode);
-	
+
 	/*// read the character id
 	CEntityId Id;
 	msgin.serial( Id );
@@ -2477,7 +2472,7 @@ void cbChangeMode( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 void cbChangeBehaviour( CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbChangeBehaviour);
-	
+
 	// read the character id
 	CEntityId Id;
 	msgin.serial( Id );
@@ -2506,7 +2501,7 @@ void cbItemDrop( CMessage& msgin, const std::string &serviceName, NLNET::TServic
 {
 	nlwarning("cbItemDrop no more allowed");
 //	H_AUTO(cbItemDrop);
-//	
+//
 //	CEntityId user;
 //	uint16 inventory,slot,quantity;
 //
@@ -2562,7 +2557,7 @@ void cbItemPickup( NLNET::CMessage& msgin, const std::string &serviceName, NLNET
 void cbItemClosePickup( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbItemClosePickup);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
@@ -2583,7 +2578,6 @@ void cbItemSwap( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::
 {
 	H_AUTO(cbItemSwap);
 
-	
 	CEntityId charId;
 	uint16 slotSrc, slotDst, quantity;
 	INVENTORIES::TInventory inventorySrc, inventoryDst;
@@ -2606,7 +2600,7 @@ void cbItemSwap( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::
 	}
 
 	TLogContext_Item_Swap logContext(character->getId());
-	
+
 	character->setAfkState(false);
 
 	// increment inventory counter
@@ -2614,11 +2608,11 @@ void cbItemSwap( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::
 	character->incInterfaceCounter();
 
 	// Special case for guilds
-	if (inventorySrc == INVENTORIES::guild || inventoryDst == INVENTORIES::guild)	
+	if (inventorySrc == INVENTORIES::guild || inventoryDst == INVENTORIES::guild)
 	{
 		uint16 nGuildSessionCounter;
 		msgin.serial( nGuildSessionCounter );
-		
+
 		string sDebug = "<cbItemSwap> user:" + TheDataset.getEntityId(character->getEntityRowId()).toString() + " ";
 
 		CGuild *pGuild = CGuildManager::getInstance()->getGuildFromId( character->getGuildId() );
@@ -2672,18 +2666,18 @@ void cbItemSwap( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::
 void cbEngage( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbEngage);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
 	CEntityBase* entity = CEntityBaseManager::getEntityBasePtr( charId );
-	
+
 	if (entity == NULL)
 	{
 		nlwarning("<EntityCallbacks::cbEngage> Invalid entity Id %s", charId.toString().c_str() );
 		return;
 	}
-	
+
 	CEntityId targetId = entity->getTarget();
 
 	vector<CSheetId>	bricks;
@@ -2712,9 +2706,9 @@ void cbDefaultAttack( NLNET::CMessage& msgin, const std::string &serviceName, NL
 
 	CEntityId entityId;
 	msgin.serial( entityId );
-	
+
 	CEntityBase* entity = CEntityBaseManager::getEntityBasePtr( entityId );
-	
+
 	if (entity == NULL)
 	{
 		nlwarning("<EntityCallbacks::cbDefaultAttack> Invalid entity Id %s", entityId.toString().c_str() );
@@ -2727,7 +2721,7 @@ void cbDefaultAttack( NLNET::CMessage& msgin, const std::string &serviceName, NL
 
 	CEntityId targetId = entity->getTarget();
 	CPhraseManager::getInstance().defaultAttackSabrina( entityId, targetId );
-	
+
 } // cbDefaultAttack //
 
 
@@ -2737,12 +2731,12 @@ void cbDefaultAttack( NLNET::CMessage& msgin, const std::string &serviceName, NL
 void cbStun( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbStun);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
 	CEntityBase* entity = CEntityBaseManager::getEntityBasePtr( charId );
-	
+
 	if (entity == NULL)
 	{
 		nlwarning("<EntityCallbacks::cbStun> Invalid entity Id %s", charId.toString().c_str() );
@@ -2759,12 +2753,12 @@ void cbStun( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TSer
 void cbWake( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbWake);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 
 	CEntityBase* entity = CEntityBaseManager::getEntityBasePtr( charId );
-	
+
 	if (entity == NULL)
 	{
 		nlwarning("<EntityCallbacks::cbWake> Invalid entity Id %s", charId.toString().c_str() );
@@ -2802,7 +2796,7 @@ void cbExchangeProposal( NLNET::CMessage& msgin, const std::string &serviceName,
 void cbAcceptExchangeInvitation( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbAcceptExchangeInvitation);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 	CCharacter * c = PlayerManager.getChar( charId );
@@ -2821,7 +2815,7 @@ void cbAcceptExchangeInvitation( NLNET::CMessage& msgin, const std::string &serv
 void cbDeclineExchangeInvitation( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbDeclineExchangeInvitation);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 	CCharacter * c = PlayerManager.getChar( charId );
@@ -2841,7 +2835,7 @@ void cbDeclineExchangeInvitation( NLNET::CMessage& msgin, const std::string &ser
 void cbAcceptExchange( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbAcceptExchange);
-	
+
 	CEntityId charId;
 	uint8 exchangeId;
 	msgin.serial( charId );
@@ -2862,7 +2856,7 @@ void cbAcceptExchange( NLNET::CMessage& msgin, const std::string &serviceName, N
 void cbEndExchange( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbEndExchange);
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 	CCharacter * c = PlayerManager.getChar( charId );
@@ -2882,7 +2876,7 @@ void cbEndExchange( NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 void cbExchangeSeeds( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbExchangeSeeds);
-	
+
 	///\todo : why not  an uint64?
 	CEntityId charId;
 	sint64 quantity;
@@ -2906,7 +2900,7 @@ void cbExchangeSeeds( NLNET::CMessage& msgin, const std::string &serviceName, NL
 void cbAnimalMount( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbAnimalMount);
-	
+
 	CEntityId id;
 	msgin.serial( id );
 
@@ -2978,7 +2972,7 @@ void cbAnimalMount( NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 void cbAnimalUnseat( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId )
 {
 	H_AUTO(cbAnimalUnseat);
-	
+
 	CEntityId id;
 	msgin.serial( id );
 
@@ -3040,7 +3034,7 @@ void cbSetPlayerSeason(NLNET::CMessage& msgin, const std::string &serviceName, N
 void cbTeleportPlayer(NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbTeleportPlayer);
-	
+
 	CEntityId playerEid;
 	sint32 x, y, z;
 	float t;
@@ -3051,12 +3045,12 @@ void cbTeleportPlayer(NLNET::CMessage& msgin, const std::string &serviceName, NL
 	nlRead(msgin, serial, t);
 
 
-	CCharacter *chr = PlayerManager.getChar(playerEid);	
+	CCharacter *chr = PlayerManager.getChar(playerEid);
 	if (!chr)
 	{
 		return;
 	}
-	chr->teleportCharacter(x, y, z, true, true, t);	
+	chr->teleportCharacter(x, y, z, true, true, t);
 }
 
 
@@ -3093,7 +3087,7 @@ void cbRcvValidateSourceSpawnReply( NLNET::CMessage& msgin, const std::string &s
 		// End spawning (either leave it or destroy it)
 		harvestSource->spawnEnd( canSpawn );
 	}
-	
+
 	if ( ! prospectorDataSetRow.isNull() ) // is null for auto-spawned sources
 	{
 		// Report the sources found (or not found) to the user
@@ -3116,7 +3110,7 @@ void cbRcvValidateSourceSpawnReply( NLNET::CMessage& msgin, const std::string &s
 void cbPlayerUnreachable( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
 {
 	H_AUTO(cbPlayerUnreachable);
-	
+
 	CEntityId creatureId;
 	msgin.serial( creatureId );
 	CCreature * creature = CreatureManager.getCreature( creatureId );
@@ -3125,7 +3119,7 @@ void cbPlayerUnreachable( NLNET::CMessage& msgin, const std::string &serviceName
 		nlwarning("<cbPlayerUnreachable> Unknown creature %s", creatureId.toString().c_str() );
 		return;
 	}
-	
+
 	CEntityId charId;
 	msgin.serial( charId );
 	CCharacter * character = PlayerManager.getChar( charId );
@@ -3134,7 +3128,7 @@ void cbPlayerUnreachable( NLNET::CMessage& msgin, const std::string &serviceName
 		nlwarning("<cbPlayerUnreachable> Unknown character %s", charId.toString().c_str() );
 		return;
 	}
-	
+
 	// Do nothing for now, damage removal is done in aggro lost.
 }
 

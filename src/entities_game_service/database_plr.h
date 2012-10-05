@@ -9057,7 +9057,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 
 			return value;
 		}
-		
+
 		ICDBStructNode *getNAMECDBNode()
 		{
 			return _NAME;

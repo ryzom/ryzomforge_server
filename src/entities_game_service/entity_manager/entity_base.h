@@ -140,7 +140,7 @@ public:
 			_ExceptionString = std::string("<CEntityBase> : Invalid stat name ") + var;
 			return _ExceptionString.c_str();
 		}
-		virtual ~EInvalidStat() throw() {};
+		virtual ~EInvalidStat() throw() {}
 	private:
 		mutable std::string _ExceptionString;
 	};
@@ -260,7 +260,7 @@ public:
 
 	/**
 	 * Add the properties to the mirror (except the entity state)
-	 * If keepSheetId is false, the sheet id in the object will not be used (usefull to take the value in the mirror instead)
+	 * If keepSheetId is false, the sheet id in the object will not be used (useful to take the value in the mirror instead)
 	 */
 	void addPropertiesToMirror( const TDataSetRow& entityIndex, bool keepSheetId=true );
 
@@ -791,7 +791,7 @@ public:
 	virtual void stopAllLinks(float factorOnSurvivalTime = 1.0f);
 
 	/// get current number of links cast by this entity
-	inline uint8 getNbLinks() const { return _SEffectLinks.size(); }
+	inline uint8 getNbLinks() const { return (uint8)_SEffectLinks.size(); }
 
 	/**
 	 * look for a particular effect. 
@@ -820,7 +820,7 @@ public:
 	/// Return the damage using current armor, done by an explosion (e.g. forage source explosion)
 	virtual float getActualDamageFromExplosionWithArmor( float dmg ) const =0;
 
-	inline virtual void clearCurrentAction() {};
+	inline virtual void clearCurrentAction() {}
 
 	inline virtual void setCurrentAction(CLIENT_ACTION_TYPE::TClientActionType,NLMISC::TGameCycle) {}
 
