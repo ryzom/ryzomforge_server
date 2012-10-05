@@ -1124,7 +1124,6 @@ public:
 			}
 
 			updateContactListAndGuilMembers(charEid, cci.getConnection());
-			
 //
 //			// if the character is not connected here, update the contact list of
 //			// all characters

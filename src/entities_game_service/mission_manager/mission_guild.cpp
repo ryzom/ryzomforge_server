@@ -25,6 +25,9 @@
 #include "player_manager/player.h"
 #include "player_manager/character.h"
 
+using namespace std;
+using namespace NLMISC;
+
 NL_INSTANCE_COUNTER_IMPL(CMissionGuild);
 
 //----------------------------------------------------------------------------

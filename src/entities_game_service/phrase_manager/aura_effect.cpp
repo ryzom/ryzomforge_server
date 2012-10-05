@@ -73,7 +73,7 @@ bool CAuraRootEffect::update(CTimerEvent * event, bool )
 
 		// create or update effect on entities returned
 		const vector<CEntityBase*> &entities = entitiesSelector.getEntities();
-		const uint size = entities.size();
+		const uint size = (uint)entities.size();
 		for (uint i = 0; i < size ; ++i)
 		{
 			if (entities[i] && isEntityValidTarget(entities[i], creator) )
@@ -127,7 +127,6 @@ void CAuraRootEffect::createEffectOnEntity(CEntityBase *entity, CEntityBase *cre
 	const std::vector<CSEffectPtr>& effects = entity->getSEffects();
 	for (uint i = 0 ; i < effects.size() ; ++i)
 	{
-		if (effects[i])
 		if (effects[i] && effects[i]->getFamily() == _CreatedEffectFamily)
 		{
 			// find an effect created by this root effect, refesh it's lifetime
@@ -138,14 +137,16 @@ void CAuraRootEffect::createEffectOnEntity(CEntityBase *entity, CEntityBase *cre
 			}
 			else
 			{
-				if (_Value < auraEffect->getParamValue()) {
+				if (_Value < auraEffect->getParamValue())
+				{
 					auraEffect->stopEffect();
-				} else {
+				}
+				else
+				{
 					auraEffect->addLifeTime();
 					return;
 				}
 			}
-			
 		}
 	}
 

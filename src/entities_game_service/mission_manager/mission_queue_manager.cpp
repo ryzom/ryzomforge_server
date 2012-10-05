@@ -78,7 +78,7 @@ void CMissionQueueManager::characterLoadedCallback(CCharacter *c)
 		for ( uint i = 0 ; i < queues.QueueIds.size() ; )
 		{
 			// check coherency with infos kept in manager
-			const uint size2 = playerQueues.size();
+			const uint size2 = (uint)playerQueues.size();
 			uint j;
 			for ( j = 0 ; j < size2 ; ++j)
 			{
@@ -154,11 +154,11 @@ void CMissionQueueManager::saveToFile()
 			{
 				std::string s;
 				pdr.toString(s);
-				msg.DataMsg.serialBuffer((uint8*)&s[0], s.size());
+				msg.DataMsg.serialBuffer((uint8*)&s[0], (uint)s.size());
 			}
 			Bsi.sendFile( msg );
 		}
-		catch( Exception& )
+		catch(const Exception &)
 		{
 			nlwarning("(EGS)<CMissionQueueManager::saveToFile>  :  Can't serial file %s (connection with BS service down ?)",sFilename.c_str());
 			return;

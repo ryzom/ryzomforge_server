@@ -1379,7 +1379,7 @@ const CStaticDepositRawMaterial *CFgProspectionPhrase::selectRMAtPos(
 
 	// Now we are sure the deposit(s) before matchingEnd contain(s) raw materials compliant with the filters (not exclusively).
 	// Select a random deposit among them. If not found, another attempt will be necessary.
-	uint nbMatching = matchingEnd - matchingDeposits.begin();
+	uint nbMatching = (uint)(matchingEnd - matchingDeposits.begin());
 	*deposit = matchingDeposits[RandomGenerator.rand((uint16)(nbMatching-1))];
 
 	// Find the deposit, among the matching ones, for which the kami anger level is the lowest (nlassert(matchingEnd!=matchingDeposits.begin())
@@ -1652,7 +1652,9 @@ NLMISC_COMMAND( makeDepositMap, "Write a map of the raw materials at a position"
 	else if ( (p = args[0].find( '_' )) == 0 )
 	{
 		// Get player position (if rowId given)
-		playerRowId = TDataSetRow::createFromRawIndex( atoi( args[0].substr( 1 ).c_str() ) );
+		TDataSetIndex entityIndex;
+		NLMISC::fromString(args[0].substr( 1 ), entityIndex);
+		playerRowId = TDataSetRow::createFromRawIndex(entityIndex);
 		if ( TheDataset.isAccessible(playerRowId) )
 		{
 			CVector centerPos;

@@ -119,7 +119,7 @@ void CAIAliasTranslator::buildBotTree(const NLLIGO::IPrimitive* prim)
 
 			NLMISC::strlwr(name);
 			//remove AI name parameters
-			uint trash = name.find('$');
+			string::size_type trash = name.find('$');
 			if ( trash != string::npos )
 			{
 				name.resize(trash);
@@ -157,7 +157,7 @@ void CAIAliasTranslator::buildBotTree(const NLLIGO::IPrimitive* prim)
 
 		//	NLMISC::strlwr(name);
 			//remove AI name parameters
-		//	uint trash = name.find('$');
+		//	string::size_type trash = name.find('$');
 		//	if ( trash != string::npos )
 		//	{
 		//		name.resize(trash);
@@ -195,7 +195,8 @@ void CAIAliasTranslator::buildMissionTree(const NLLIGO::IPrimitive* prim)
 				nlwarning("<CAIAliasTranslator buildMissionTree> no alias property in a mission node");
 				error = true;
 			}
-//			TAIAlias id = atoi( value.c_str() );
+//			TAIAlias id;
+//			NLMISC::fromString(value, id);
 			if ( !prim->getPropertyByName("name",name) )
 			{
 				nlwarning("<CAIAliasTranslator buildMissionTree> no name property in a mission node");

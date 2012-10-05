@@ -70,10 +70,10 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			for ( uint i = 0; i < subs.size(); i++ )
 			{
 				CSubStep subStep;
-				
+
 				std::vector< std::string > args;
 				CMissionParser::tokenizeString( subs[i]," \t", args );
-								
+
 				//// Dynamic Mission Args : #dynamic# <quantity>
 				if ((args.size() == 2) && (args[0] == "#dynamic#"))
 				{
@@ -88,7 +88,6 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 						MISLOGSYNTAXERROR("<creature> <quantity> *[; <creature> <quantity>] [: <place>]");
 						return false;
 					}
-					
 					missionData.ChatParams.push_back( make_pair(args[0],STRING_MANAGER::creature_model) );
 				
 					subStep.Dynamic = "";
@@ -98,7 +97,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 						ret = false;
 						MISLOGERROR1("invalid sheet '%s'", args[0].c_str());
 					}
-					subStep.Quantity = atoi( args[1].c_str() );
+					NLMISC::fromString(args[1], subStep.Quantity);
 				}
 				_SubSteps.push_back(subStep);
 			}
@@ -129,7 +128,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			CMissionEventKill & eventSpe = (CMissionEventKill&)event;
 			CCreature * c = CreatureManager.getCreature( event.TargetEntity );
 			CSheetId faunaSheet;
-			
+
 			//// Dynamic Mission Args
 			if (_SubSteps[subStepIndex].Dynamic.empty()) {
 				faunaSheet = _SubSteps[subStepIndex].Sheet;
@@ -161,7 +160,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				}
 				////
 			}
-			
+
 			if ( !c )
 			{
 				LOGMISSIONSTEPERROR("kill_fauna : invalid creature " + toString(event.TargetEntity.getIndex()));
@@ -207,7 +206,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				}
 			}
 		}
-		
+
 		return 0;
 	}
 
@@ -229,7 +228,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 		for ( uint i  = 0; i < subStepStates.size(); i++ )
 		{
 			if( subStepStates[i] != 0 )
-			{		
+			{
 				if (_SubSteps[i].Dynamic.empty())
 				{
 					faunaSheet = _SubSteps[i].Sheet;
@@ -347,7 +346,7 @@ class CMissionStepKillRace : public IMissionStepTemplate
 					ret = false;
 					MISLOGERROR1("invalid race '%s'", args[0].c_str());
 				}
-				subStep.Quantity = atoi( args[1].c_str() );
+				NLMISC::fromString(args[1], subStep.Quantity);
 				_SubSteps.push_back( subStep );
 			}
 			if ( script.size() == 3 )
@@ -481,7 +480,7 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 {
 	struct CSubStep
 	{
-		string		Dynamic;		
+		string		Dynamic;
 		TAIAlias	Alias;
 //		NLMISC::TStringId	NpcName;
 	};
@@ -522,7 +521,7 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 	{
 		string webAppUrl;
 		CCharacter * user = PlayerManager.getChar(getEntityIdFromRow(userRow));
-		
+
 		if ( event.Type == CMissionEvent::Kill )
 		{
 			CMissionEventKill & eventSpe = (CMissionEventKill&)event;
@@ -610,13 +609,14 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 				else
 				{
 					vector<string> params = _User->getCustomMissionParams(_SubSteps[i].Dynamic);
-					if (params.size() < 2) {
+					if (params.size() < 2)
+					{
 						nlinfo("kill_npc : invalid dynamic npc");
 						textPtr = &stepTextReact;
 						return;
 					}
 					else
-					{				
+					{
 						vector<TAIAlias> aliases;
 						CAIAliasTranslator::getInstance()->getNPCAliasesFromName( params[1] , aliases );
 						if ( aliases.empty() )
@@ -773,7 +773,7 @@ class CMissionStepKillFaction : public IMissionStepTemplate
 			ret = false;
 			MISLOGERROR1("invalid faction '%s'", args[0].c_str());
 		}
-		_Quantity = atoi( args[1].c_str() );
+		NLMISC::fromString(args[1], _Quantity);
 
 		if ( script.size() == 3 )
 		{
@@ -933,7 +933,7 @@ class CMissionStepKillByName : public IMissionStepTemplate
 
 			Aliases.insert(va.begin(), va.end());
 		}
-		Quantity = (uint16) atoi( args[1].c_str() );
+		NLMISC::fromString(args[1], Quantity);
 		if ( Quantity == 0 )
 		{
 			MISLOGERROR("invalid quantity 0");

@@ -400,10 +400,10 @@ void CFaberPhrase::apply()
 	// TODO check compatibility of Rms with plan
 	// temporary only check number of Mp match with plan
 
-	sint32 nbMp = _Mps.size();
+	sint32 nbMp = (sint32)_Mps.size();
 
 	uint32 nbMpNeedeInPlan = 0;
-	uint32 neededMp = _RootFaberPlan->Faber->NeededMps.size();
+	uint32 neededMp = (uint32)_RootFaberPlan->Faber->NeededMps.size();
 	for( uint mp = 0; mp < neededMp; ++mp )
 	{
 		//for each type of Mp needed
@@ -418,10 +418,10 @@ void CFaberPhrase::apply()
 		return;
 	}
 
-	nbMp = _MpsFormula.size();
+	nbMp = (sint32)_MpsFormula.size();
 
 	uint32 nbMpForumulaNeedeInPlan = 0;
-	neededMp = _RootFaberPlan->Faber->NeededMpsFormula.size();
+	neededMp = (uint32)_RootFaberPlan->Faber->NeededMpsFormula.size();
 	for( uint mp = 0; mp < neededMp; ++mp )
 	{
 		//for each type of Mp needed
@@ -463,8 +463,8 @@ void CFaberPhrase::apply()
 		return;
 	}
 
-	neededMp = _RootFaberPlan->Faber->NeededMps.size();
-    EGSPD::CPeople::TPeople civRestriction = _RootFaberPlan->CivRestriction;
+	neededMp = (uint32)_RootFaberPlan->Faber->NeededMps.size();
+	EGSPD::CPeople::TPeople civRestriction = _RootFaberPlan->CivRestriction;
 	uint32 usedMp=0;
 	vector< const CStaticItem * > usedMps = _Mps;
 
@@ -706,14 +706,15 @@ void CFaberPhrase::stop()
 } // stop //
 
 
-NLMISC_COMMAND(simuCraft, "Simulation de craft pour verifier les probabilités de reusir un item","<Nb simulations><level skill><item quality>")
+NLMISC_COMMAND(simuCraft, "Craft simulation to verify probabilities to succesfully craft an item","<Nb simulations><level skill><item quality>")
 {
 	if (args.size() != 3)
 		return false;
 
-	uint32 nbSimu = (uint32)atoi(args[0].c_str());
-	uint32 skillLevel = (uint32)atoi(args[1].c_str());
-	uint32 itemQuality = (uint32)atoi(args[2].c_str());
+	uint32 nbSimu, skillLevel, itemQuality;
+	NLMISC::fromString(args[0], nbSimu);
+	NLMISC::fromString(args[1], skillLevel);
+	NLMISC::fromString(args[2], itemQuality);
 
 	sint32 deltaLvl = skillLevel - itemQuality;
 

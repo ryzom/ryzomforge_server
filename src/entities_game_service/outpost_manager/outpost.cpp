@@ -84,7 +84,7 @@ CVariable<bool> UseProxyMoneyForOutpostCosts("egs", "UseProxyMoneyForOutpostCost
 CVariable<uint32> OutpostStateTimeOverride("egs", "OutpostStateTimeOverride", "Each state can be set to a shorter time in seconds, 0 means default computed value", true, 0, true );
 CVariable<uint32> OutpostJoinPvpTimer("egs", "OutpostJoinPvpTimer", "Max time the player has to answer the JoinPvp Window, in seconds", 10, 0, true );
 CVariable<uint32> NumberDayFactorGuildNeedForChallengeOutpost("egs","NumberDayFactorGuildNeedForChallengeOutpost","Nombre de 'level outpost / factor' jours d'existance que la guilde doit avoir pour pouvoir challenger un outpost",10,0,true);
-CVariable<sint32> NumberDaysMinusOutpostLevelForChallenge("egs","NumberDaysMinusOutpostLevelForChallenge", "Nombre à enlever au level du oupost pour avoir l'ancieneté requise pour challenger un outpost",50,0,true);
+CVariable<sint32> NumberDaysMinusOutpostLevelForChallenge("egs","NumberDaysMinusOutpostLevelForChallenge", "Number to substract from outpost level to get oldness required to challenge an outpost",50,0,true);
 
 extern CPlayerManager PlayerManager;
 
@@ -1332,7 +1332,7 @@ bool COutpost::insertDefaultSquad(OUTPOSTENUMS::TPVPSide side, uint32 squadSlot)
 	// right shift slots
 	if (squads->size() >= 2)
 	{
-		uint32 i = squads->size()-2;
+		uint32 i = (uint32)squads->size()-2;
 		while (i >= squadIndex)
 		{
 			(*squads)[i+1] = (*squads)[i];
@@ -1400,7 +1400,7 @@ uint32 COutpost::getChallengeCost() const
 TAIAlias COutpost::getRandomSpawnZone() const
 {
 	// choose a random spawn zone
-	sint32 randomCount = RandomGenerator.rand(_SpawnZones.size() - 1);
+	sint32 randomCount = RandomGenerator.rand((uint16)_SpawnZones.size() - 1);
 	nlassert(randomCount >= 0 && randomCount < (sint32)_SpawnZones.size());
 	return _SpawnZones[randomCount].alias();
 }
@@ -1466,7 +1466,7 @@ PVP_RELATION::TPVPRelation COutpost::getPVPRelation( CCharacter * user, CEntityB
 
 	bool targetSafe = false;
 	bool actorSafe = false;
-	
+
 	if( target->getOutpostAlias() == 0 )
 	{
 		return PVP_RELATION::Neutral;
@@ -1476,7 +1476,6 @@ PVP_RELATION::TPVPRelation COutpost::getPVPRelation( CCharacter * user, CEntityB
 	if (pTarget == 0)
 		return PVP_RELATION::Unknown;
 
-	
 	if (CPVPManager2::getInstance()->inSafeZone(pTarget->getPosition()))
 	{
 		if (pTarget->getSafeInPvPSafeZone())
@@ -1488,12 +1487,12 @@ PVP_RELATION::TPVPRelation COutpost::getPVPRelation( CCharacter * user, CEntityB
 		if( user->getSafeInPvPSafeZone())
 			actorSafe = true;
 	}
-	
+
 	// One is safe but not other => NeutralPVP
 	if ((targetSafe && !actorSafe) || (actorSafe && !targetSafe)) {
 		return PVP_RELATION::NeutralPVP;
 	}
-	
+
 	if( user->getOutpostAlias() == target->getOutpostAlias() )
 	{
 		if( user->getOutpostSide() != target->getOutpostSide() )
@@ -1510,7 +1509,7 @@ PVP_RELATION::TPVPRelation COutpost::getPVPRelation( CCharacter * user, CEntityB
 			return PVP_RELATION::Ally;
 		}
 	}
-	
+
 	return PVP_RELATION::NeutralPVP;
 
 } // getPVPRelation //
@@ -1851,7 +1850,7 @@ bool COutpost::convertShopSquadIndex(uint32 shopSquadIndex, COutpostSquadDescrip
 	}
 	else
 	{
-		shopSquadIndex -= _DefaultSquads.size();
+		shopSquadIndex -= (uint32)_DefaultSquads.size();
 		if (shopSquadIndex < _BuyableSquads.size())
 		{
 			squadDesc = _BuyableSquads[shopSquadIndex];

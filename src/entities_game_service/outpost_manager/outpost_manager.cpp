@@ -304,7 +304,7 @@ void COutpostManager::loadOutpostPrimitives()
 										OUTPOST_INF("Outpost '%s' was successfully parsed", outpost->getName().c_str());
 									
 										// nb : short id starts at 1, 0 is used for invalid
-										_OutpostAliasToShortId.insert( make_pair( outpost->getAlias(), _Outposts.size()) );
+										_OutpostAliasToShortId.insert( make_pair( outpost->getAlias(), (uint16)_Outposts.size()) );
 									}
 								}
 							}
@@ -357,7 +357,8 @@ void COutpostManager::outpostFileCallback(const CFileDescription& fileDescriptio
 	aliasStr.resize( aliasStr.length() - 4 );
 	aliasStr = aliasStr.substr( 8);
 
-	TAIAlias alias = (TAIAlias) atoi( aliasStr.c_str() );
+	TAIAlias alias;
+	NLMISC::fromString(aliasStr, alias);
 	COutpost * outpost = getOutpostFromAlias( alias );
 	if ( !outpost )
 		OUTPOST_WRN("Invalid outpost file '%s' %s : not found in the primitive", fileDescription.FileName.c_str(), CPrimitivesParser::aliasToString(alias).c_str());
@@ -419,7 +420,8 @@ void COutpostManager::loadOutpostSaveFiles()
 //			aliasStr.resize( file.length() - 4 );
 //			aliasStr = aliasStr.substr( 8, file.length() - 8 );
 //
-//			TAIAlias alias = (TAIAlias) atoi( aliasStr.c_str() );
+//			TAIAlias alias;
+//			NLMISC::fromString(aliasStr, alias);
 //			COutpost * outpost = getOutpostFromAlias( alias );
 //			if ( !outpost )
 //				OUTPOST_WRN("Invalid outpost file '%s' ('%u') : not found in the primitive", file.c_str(), alias);
@@ -681,7 +683,7 @@ void COutpostManager::tickUpdate()
 		}
 		else
 		{
-			uint32 nbOutpost = _Outposts.size();
+			uint32 nbOutpost = (uint32)_Outposts.size();
 			uint32 nbOutpostPerTick = (uint32)floor(double(nbOutpost) / double(OutpostUpdatePeriod.get()));
 			nbOutpostPerTick = std::max(uint32(1), nbOutpostPerTick); // The strict minimum is a single outpost update per tick
 			
@@ -705,7 +707,7 @@ void COutpostManager::tickUpdate()
 				}
 				else
 				{
-					endIndex -= _Outposts.size();
+					endIndex -= (uint32)_Outposts.size();
 					for (uint32 i = beginIndex; i < _Outposts.size(); i++)
 						_Outposts[i]->updateOutpost(currentTime);
 					for (uint32 i = 0; i < endIndex; i++)
@@ -784,7 +786,7 @@ void COutpostManager::saveOutpost(NLMISC::CSmartPtr<COutpost> outpost)
 				H_AUTO(COutpostSerialXML);
 				std::string s;
 				pdr.toString(s);
-				msg.DataMsg.serialBuffer((uint8*)&s[0], s.size());
+				msg.DataMsg.serialBuffer((uint8*)&s[0], (uint)s.size());
 			}
 			else
 			{
@@ -797,7 +799,7 @@ void COutpostManager::saveOutpost(NLMISC::CSmartPtr<COutpost> outpost)
 			}
 			Bsi.sendFile( msg );
 		}
-		catch( Exception& )
+		catch(const Exception &)
 		{
 			OUTPOST_WRN("Can't serial file %s",fileName.c_str());
 			return;

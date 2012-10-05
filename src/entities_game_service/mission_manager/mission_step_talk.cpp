@@ -145,7 +145,7 @@ class CMissionStepTalk : public IMissionStepTemplate
 				return false;
 			}
 			else
-			{				
+			{
 				vector<TAIAlias> aliases;
 				CAIAliasTranslator::getInstance()->getNPCAliasesFromName(params[1], aliases);
 				if ( aliases.empty() )
@@ -171,14 +171,13 @@ class CMissionStepTalk : public IMissionStepTemplate
 				MISLOG("sline:%u ERROR : talk_to (sendContextText) : invalid bot", _SourceLine);
 				return 0;
 			}
-		
+
 			TVectorParamCheck params;
 			return STRING_MANAGER::sendStringToClient( user, _PhraseId, params );
-			
 		}
-		
+
 		CCreature * bot = CreatureManager.getCreature( interlocutor );
-		
+
 		if ( bot )
 		{
 			if ( ( _Bot != CAIAliasTranslator::Invalid && _Bot == bot->getAlias() ) ||
@@ -203,7 +202,7 @@ class CMissionStepTalk : public IMissionStepTemplate
 			MISLOG("sline:%u ERROR : talk_to (sendContextText) : invalid bot", _SourceLine);
 			return 0;	
 		}
-		
+
 		CCreature * bot = CreatureManager.getCreature( interlocutor );
 		if ( bot )
 		{
@@ -220,7 +219,6 @@ class CMissionStepTalk : public IMissionStepTemplate
 
 	virtual void getTextParams( uint & nbSubSteps,const std::string* & textPtr,TVectorParamCheck& retParams, const std::vector<uint32>& subStepStates)
 	{
-		
 		if (_IsDynamic && !getDynamicBot(_Bot))
 		{
 			MISLOG("sline:%u ERROR : talk_to (sendContextText) : invalid bot", _SourceLine);
@@ -231,7 +229,7 @@ class CMissionStepTalk : public IMissionStepTemplate
 
 		if (_IsDynamic &&  _User != NULL)
 		{
-		
+
 			vector<string> params = _User->getCustomMissionParams(_Dynamic);
 			if (params.size() < 2)
 			{
@@ -241,7 +239,7 @@ class CMissionStepTalk : public IMissionStepTemplate
 			_Params.insert(_Params.begin(), STRING_MANAGER::TParam());
 			_Params[0].Identifier = params[1];
 		}
-		
+
 		nbSubSteps = 1;
 		static const std::string stepText = "MIS_TALK_TO";
 		textPtr = &stepText;
@@ -293,7 +291,7 @@ class CMissionGiveMoney : public IMissionStepTemplate
 			MISLOGSYNTAXERROR("<amount><npc_name>");
 			return false;
 		}
-		_Amount = (uint)atoi(script[1].c_str());
+		NLMISC::fromString(script[1], _Amount);
 		
 		if ( !CMissionParser::parseBotName(script[2],_Bot,missionData) )
 		{
@@ -431,7 +429,7 @@ class CMissionStepGiveItem : public IMissionStepTemplate
 			CSubStep subStep;
 			subStep.Sheet = CSheetId( CMissionParser::getNoBlankString(args[0]) + ".sitem" );
 			missionData.ChatParams.push_back( make_pair( args[0], STRING_MANAGER::item ) );
-			subStep.Quantity = atoi( args[1].c_str() );
+			NLMISC::fromString(args[1], subStep.Quantity);
 			if ( subStep.Sheet == CSheetId::Unknown )
 			{
 				ret = false;
@@ -441,7 +439,7 @@ class CMissionStepGiveItem : public IMissionStepTemplate
 			{
 				if( args.size() == 3 )
 				{
-					subStep.Quality = atoi( args[2].c_str() );
+					NLMISC::fromString(args[2], subStep.Quality);
 					Quality = true;
 				}
 				else
@@ -534,7 +532,7 @@ class CMissionStepGiveItem : public IMissionStepTemplate
 				gift = true;
 				TVectorParamCheck vect( 1 + _Params.size() );
 				vect[0].Type = STRING_MANAGER::integer;
-				vect[0].Int = _SubSteps.size();
+				vect[0].Int = (sint32)_SubSteps.size();
 				
 				if ( !_PhraseId.empty() )
 				{
@@ -783,7 +781,7 @@ bool CMissionStepDynChat::buildStep( uint32 line, const std::vector< std::string
 	for  (uint i = 3; i < script.size(); i++ )
 	{
 		string answerStr = CMissionParser::getNoBlankString( script[i] );
-		uint pos = answerStr.find( ' ' );
+		string::size_type pos = answerStr.find( ' ' );
 		if( pos == string::npos || answerStr.empty() )
 		{
 			MISLOGERROR1("invalid answer '%s'", answerStr.c_str());

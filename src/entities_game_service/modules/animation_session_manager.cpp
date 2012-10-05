@@ -240,7 +240,8 @@ public:
 		if (args.size() != 1)
 			return false;
 
-		TSessionId sessionId(atoi(args[0].c_str()));
+		TSessionId sessionId;
+		NLMISC::fromString(args[0], sessionId);
 		if (sessionId == 0)
 		{
 			log.displayNL("Invalid session id '%s'", args[0].c_str());
@@ -299,7 +300,7 @@ public:
 		log.displayNL("Dumping AnimSessionManager state");
 		log.displayNL("--------------------------------");
 
-		// dump some general informations
+		// dump some general information
 		log.displayNL(" This module know %u ring session manager module, %u server animation module", 
 			_RingSessionManagerTracker.getTrackedModules().size(),
 			_ServerAnimationModuleTracker.getTrackedModules().size());

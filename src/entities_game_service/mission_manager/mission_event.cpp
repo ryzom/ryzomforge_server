@@ -211,7 +211,7 @@ bool CMissionEventGiveMoney::buildFromScript( const std::vector< std::string > &
 		log.displayNL("<money>");
 		return false;
 	}
-	Amount = atoi( script[0].c_str() );
+	NLMISC::fromString(script[0], Amount);
 	log.displayNL("Not the best way to test this event : bot chat needed");
 	return true;
 }
@@ -304,8 +304,8 @@ bool CMissionEventBuyItem::buildFromScript( const std::vector< std::string > & s
 		log.displayNL("Invalid sheet %s",script[0].c_str() );
 	}
 
-	Quantity = atoi( script[1].c_str() );
-	Quality = atoi( script[2].c_str() );
+	NLMISC::fromString(script[1], Quantity);
+	NLMISC::fromString(script[2], Quality);
 	if (script.size() == 4)
 	{
 		CEntityId id;
@@ -336,8 +336,8 @@ bool CMissionEventSellItem::buildFromScript( const std::vector< std::string > & 
 		log.displayNL("Invalid sheet %s",script[0].c_str() );
 	}
 	
-	Quantity = atoi( script[1].c_str() );
-	Quality = atoi( script[2].c_str() );
+	NLMISC::fromString(script[1], Quantity);
+	NLMISC::fromString(script[2], Quality);
 	if (script.size() == 4)
 	{
 		CEntityId id;
@@ -369,8 +369,8 @@ bool CMissionEventForage::buildFromScript( const std::vector< std::string > & sc
 		log.displayNL("Invalid sheet %s",script[0].c_str() );
 	}
 	
-	Quantity = atoi( script[1].c_str() );
-	Quality = atoi( script[2].c_str() );
+	NLMISC::fromString(script[1], Quantity);
+	NLMISC::fromString(script[2], Quality);
 	return ret;
 }
 
@@ -401,7 +401,7 @@ bool CMissionEventSkillProgress::buildFromScript( const std::vector< std::string
 		ret = false;
 		log.displayNL("Invalid sheet %s",script[0].c_str() );
 	}
-	Level = atoi( script[1].c_str() );
+	NLMISC::fromString(script[1], Level);
 	return ret;
 }
 
@@ -440,8 +440,8 @@ bool CMissionEventCraft::buildFromScript( const std::vector< std::string > & scr
 		log.displayNL("Invalid sheet %s",script[0].c_str() );
 	}
 	
-	Quantity = atoi( script[1].c_str() );
-	Quality = atoi( script[2].c_str() );
+	NLMISC::fromString(script[1], Quantity);
+	NLMISC::fromString(script[2], Quality);
 	return ret;
 }
 
@@ -485,8 +485,8 @@ bool CMissionEventLootItem::buildFromScript( const std::vector< std::string > & 
 		log.displayNL("Invalid sheet %s",script[0].c_str() );
 	}
 	
-	Quantity = atoi( script[1].c_str() );
-	Quality = atoi( script[2].c_str() );
+	NLMISC::fromString(script[1], Quantity);
+	NLMISC::fromString(script[2], Quality);
 	return ret;
 }
 
@@ -506,8 +506,8 @@ bool CMissionEventLootRm::buildFromScript( const std::vector< std::string > & sc
 		log.displayNL("Invalid sheet %s",script[0].c_str() );
 	}
 	
-	Quantity = atoi( script[1].c_str() );
-	Quality = atoi( script[2].c_str() );
+	NLMISC::fromString(script[1], Quantity);
+	NLMISC::fromString(script[2], Quality);
 	return ret;
 }
 
@@ -519,8 +519,8 @@ bool CMissionEventKillGroup::buildFromScript( const std::vector< std::string > &
 		log.displayNL("<alias>");
 		return false;
 	}
-	
-	Alias = (TAIAlias)atoi(script[0].c_str());
+
+	NLMISC::fromString(script[0], Alias);
 	return ret;
 }
 

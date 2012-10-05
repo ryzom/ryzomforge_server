@@ -225,7 +225,7 @@ public:
 						PHRASE_UTILITIES::sendDynamicSystemMessage(phrase->getActor(), "FABER_TEMP_INVENTORY_FULL");
 
 						// Delete remaining stacks so that the vector 'items' contains only valid items
-						uint sizeOk = itemStacks.size();
+						uint sizeOk = (uint)itemStacks.size();
 						if ( sizeOk == 0 )
 							c->sendCloseTempInventoryImpulsion();
 						++itSt;
@@ -403,14 +403,14 @@ protected:
 				uint32 mpOccurence = 0;
 				
 				// parsing faber plan 
-				uint32 neededMp = phrase->getRootFaberPlan()->Faber->NeededMps.size();
+				uint32 neededMp = (uint32)phrase->getRootFaberPlan()->Faber->NeededMps.size();
 				for( uint mp = 0; mp < neededMp; ++mp )
 				{
 					//for each type of Mp needed
 					for( uint k = 0; k < phrase->getRootFaberPlan()->Faber->NeededMps[ mp ].Quantity; ++k )
 					{
 						// for each Mp of one type (we have Quantity by type)
-						uint32 NumMpParameters = phrase->getMps()[ mpOccurence ]->Mp->MpFaberParameters.size();
+						uint32 NumMpParameters = (uint32)phrase->getMps()[ mpOccurence ]->Mp->MpFaberParameters.size();
 						// for each Faber parameters in Mp
 						for( uint j = 0; j < NumMpParameters; ++j )
 						{
@@ -662,19 +662,19 @@ protected:
 					for (it=effects.begin(), itEnd=effects.end(); it!=itEnd; ++it)
 					{
 						float rnd = RandomGenerator.frand();
-						float effect0 = it->EffectArgFloat[0];
-						float effect1 = it->EffectArgFloat[1];
+						double effect0 = it->EffectArgFloat[0];
+						double effect1 = it->EffectArgFloat[1];
 						// Clamp boost when player do not have required privs
 						if (!character->havePriv(":DEV:") && !character->havePriv(":SGM:"))
 						{
-							clamp(effect0, 0.f, 0.25f);
-							clamp(effect1, 0.f, 0.25f);
+							clamp(effect0, 0.0, 0.25);
+							clamp(effect1, 0.0, 0.25);
 						}
 
 						if (rnd < effect0)
 						{
 							applyProcAddLimit(Params, statBitField, effect1);
-							PHRASE_UTILITIES::sendItemSpecialEffectProcMessage(ITEM_SPECIAL_EFFECT::ISE_CRAFT_ADD_LIMIT, character, NULL, (sint32)(effect1*100.f));
+							PHRASE_UTILITIES::sendItemSpecialEffectProcMessage(ITEM_SPECIAL_EFFECT::ISE_CRAFT_ADD_LIMIT, character, NULL, (sint32)(effect1*100.0));
 						}
 					}
 				}
@@ -707,14 +707,14 @@ protected:
 		uint16 Quality = 0;
 		
 		// parsing faber plan 
-		uint32 neededMp = phrase->getRootFaberPlan()->Faber->NeededMps.size();
+		uint32 neededMp = (uint32)phrase->getRootFaberPlan()->Faber->NeededMps.size();
 		for( uint mp = 0; mp < neededMp; ++mp )
 		{
 			//for each type of Mp needed
 			for( uint k = 0; k < phrase->getRootFaberPlan()->Faber->NeededMps[ mp ].Quantity; ++k )
 			{
 				// for each Mp of one type (we have Quantity by type)
-				uint32 NumMpParameters = phrase->getMps()[ mp ]->Mp->MpFaberParameters.size();
+				uint32 NumMpParameters = (uint32)phrase->getMps()[ mp ]->Mp->MpFaberParameters.size();
 				// for each Faber parameters in Mp
 				for( uint j = 0; j < NumMpParameters; ++j )
 				{
@@ -1854,7 +1854,7 @@ protected:
 				
 				// Count number of MPs required (for possible XP gain)
 				uint32 mpOccurence = 0;
-				uint32 neededMp = phrase->getRootFaberPlan()->Faber->NeededMps.size();
+				uint32 neededMp = (uint32)phrase->getRootFaberPlan()->Faber->NeededMps.size();
 				for( uint mp = 0; mp < neededMp; ++mp )
 				{
 					mpOccurence+= phrase->getRootFaberPlan()->Faber->NeededMps[ mp ].Quantity;

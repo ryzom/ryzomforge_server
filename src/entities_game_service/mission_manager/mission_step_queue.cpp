@@ -60,14 +60,14 @@ bool CMissionStepQueueStart::buildStep( uint32 line, const vector< string > & sc
 			QueueName = missionData.Name + "_" + script[1];
 		
 		// remove all blanks in name
-		uint pos = QueueName.find_first_of(" ");
+		string::size_type pos = QueueName.find_first_of(" ");
 		while ( pos != string::npos )
 		{
 			QueueName.erase(pos,1);
 			pos = QueueName.find_first_of(" ");
 		}
 		
-		Timer = (uint32)atoi(script[2].c_str());
+		NLMISC::fromString(script[2], Timer);
 		
 		return true;
 	}
@@ -203,7 +203,7 @@ bool CMissionStepQueueEnd::buildStep( uint32 line, const vector< string > & scri
 		QueueName = missionData.Name + "_" + script[1];
 
 	// remove all blanks in name
-	uint pos = QueueName.find_first_of(" ");
+	string::size_type pos = QueueName.find_first_of(" ");
 	while ( pos != string::npos )
 	{
 		QueueName.erase(pos,1);
