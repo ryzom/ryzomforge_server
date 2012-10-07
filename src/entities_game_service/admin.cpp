@@ -4628,7 +4628,7 @@ CInventoryPtr getInv(CCharacter *c, const string &inv)
 	return inventoryPtr;
 }
 
-NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac> [<new_check=0|1>] [<next_step=0|1>] [<send_url=0|1>]")
+NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac> [<new_check=0|1|2|3>] [<next_step=0|1>] [<send_url=0|1>]")
 {
 
 	if (args.size() < 5)
@@ -5515,7 +5515,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	//***************** set_title
 	//*************************************************
-	// /a webExecCommand debug 1 set_title!toto hmac 0
+	// /a webExecCommand debug 1 set_title!#toto# hmac 0
 	else if (command_args[0] == "set_title")
 	{
 		if (command_args.size () != 2) return false;
@@ -8537,7 +8537,7 @@ NLMISC_COMMAND(eventSetBotFacing, "Set the direction in which a bot faces", "<bo
 
 	std::vector<std::string> args2;
 
-	if (args.size() == 3 && args[3] != "0")
+	if (args.size() == 3 && args[2] != "0")
 	{
 		// Do the whole group
 		args2.push_back(args[0]);
