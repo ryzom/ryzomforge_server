@@ -430,6 +430,78 @@ bool getAIInstanceFromGroupName(string& groupName, uint32& instanceNumber)
 	return true;
 }
 
+bool checkBannerPriv(const string &sheetName, CEntityId eid)
+{
+
+	if (sheetName.find("banner") == -1)
+	{
+		// Not a banner
+		return true;
+	}
+	
+	CPlayer* player = PlayerManager.getPlayer( PlayerManager.getPlayerId(eid) );
+
+	if (player == NULL)
+	{
+		return false;
+	}
+
+	if (player->havePriv(":DEV:"))
+	{
+		// Dev should be able to get all banners
+		return true;
+	}
+
+	if ( ! player->havePriv(BannerPriv))
+	{
+		// Player has no banner privs
+		return false;
+	}
+
+	if (sheetName.find("_gu") != -1)
+	{
+		if (player->havePriv(":G:"))
+		{
+			return true;
+		}
+	}
+	else if (sheetName.find("_sgu") != -1)
+	{
+		if (player->havePriv(":SG:"))
+		{
+			return true;
+		}
+		// VG uses SG banner for now
+		if (player->havePriv(":VG:")) 
+		{
+			return true;
+		}
+	}
+	else if (sheetName.find("_vgu") != -1)
+	{
+		if (player->havePriv(":VG:")) 
+		{
+			return true;
+		}
+	}
+	else if (sheetName.find("_gm") != -1)
+	{
+		if (player->havePriv(":GM:")) 
+		{
+			return true;
+		}
+	}
+	else if (sheetName.find("_sgm") != -1)
+	{
+		if (player->havePriv(":SGM:")) 
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 CAdminCommand * findAdminCommand(const string & name)
 {
 	H_AUTO(findAdminCommand);
@@ -1381,18 +1453,12 @@ NLMISC_COMMAND (createItemInBag, "Create an item and put it in the player bag", 
 	}
 
 	// banners are the only items in game which use privilege
-	if( sheetName.find("banner") != string::npos )
+	// banners are the only items in game which use privilege
+	bool ok = checkBannerPriv(sheetName, eid);
+	if ( ! ok)
 	{
-		CPlayer * player = PlayerManager.getPlayer( PlayerManager.getPlayerId(eid) );
-//		if (player != NULL && !player->havePriv(":DEV:") )
-		if (player != NULL && player->havePriv(BannerPriv) )
-		{
-			if( sheetName.find("_gu") != string::npos && !player->havePriv(":G:") )	return false;
-			if( sheetName.find("_sgu") != string::npos && !player->havePriv(":SG:") )	return false;
-			if( sheetName.find("_vgu") != string::npos && !player->havePriv(":VG:") )	return false;
-			if( sheetName.find("_gm") != string::npos && !player->havePriv(":GM:") )	return false;
-			if( sheetName.find("_sgm") != string::npos && !player->havePriv(":SGM:") )	return false;
-		}
+		log.displayNL("Invalid banner priviledge");
+		return false;
 	}
 
 	const CStaticItem *form = CSheets::getForm (sheet);
@@ -1472,17 +1538,11 @@ NLMISC_COMMAND (createItemInTmpInv, "Create an item and put it in the player tem
 	}
 
 	// banners are the only items in game which use privilege
-	if( sheetName.find("banner") != string::npos )
+	bool ok = checkBannerPriv(sheetName, eid);
+	if ( ! ok)
 	{
-		CPlayer * player = PlayerManager.getPlayer( PlayerManager.getPlayerId(eid) );
-		if (player != NULL && player->havePriv(BannerPriv) )
-		{
-			if( sheetName.find("_gu") != string::npos && !player->havePriv(":G:") )	return false;
-			if( sheetName.find("_sgu") != string::npos && !player->havePriv(":SG:") )	return false;
-			if( sheetName.find("_vgu") != string::npos && !player->havePriv(":VG:") )	return false;
-			if( sheetName.find("_gm") != string::npos && !player->havePriv(":GM:") )	return false;
-			if( sheetName.find("_sgm") != string::npos && !player->havePriv(":SGM:") )	return false;
-		}
+		log.displayNL("Invalid banner priviledge");
+		return false;
 	}
 
 	const CStaticItem *form = CSheets::getForm (sheet);
@@ -1545,17 +1605,11 @@ NLMISC_COMMAND (createItemInInv, "Create items and put them in the given invento
 	}
 
 	// banners are the only items in game which use privilege
-	if( sheetName.find("banner") != string::npos )
+	bool ok = checkBannerPriv(sheetName, eid);
+	if ( ! ok)
 	{
-		CPlayer * player = PlayerManager.getPlayer( PlayerManager.getPlayerId(eid) );
-		if (player != NULL && player->havePriv(BannerPriv) )
-		{
-			if( sheetName.find("_gu") != string::npos && !player->havePriv(":G:") )	return false;
-			if( sheetName.find("_sgu") != string::npos && !player->havePriv(":SG:") )	return false;
-			if( sheetName.find("_vgu") != string::npos && !player->havePriv(":VG:") )	return false;
-			if( sheetName.find("_gm") != string::npos && !player->havePriv(":GM:") )	return false;
-			if( sheetName.find("_sgm") != string::npos && !player->havePriv(":SGM:") )	return false;
-		}
+		log.displayNL("Invalid banner priviledge");
+		return false;
 	}
 
 	const CStaticItem *form = CSheets::getForm (sheet);
