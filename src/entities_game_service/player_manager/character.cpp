@@ -501,7 +501,7 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_TeamId= CTEAM::InvalidTeamId;
 
 	///init LeagueId
-	_LeagueId = TChanID::Unknown;
+	_LeagueId = DYN_CHAT_INVALID_CHAN;
 
 	// init combat flags
 	_CombatEventFlagTicks.resize(32);
