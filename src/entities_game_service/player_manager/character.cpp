@@ -12437,10 +12437,15 @@ bool CCharacter::autoFillExchangeView()
 			{
 				invItem = playerBagInvPointer->getItem(inventoryIndex);
 				if (invItem == NULL)
-				continue;
+					continue;
+					
+				if (invItem->getLockedByOwner())
+					continue;
 
+				if (invItem->getRefInventory() != NULL)
+					continue;
+				
 				itemsSeenCount++;
-
 				// Changed to support comparisons on sheetID masks
 				if (invItem->getSheetId() == validateSteps[stepCounter].Sheet)
 				{
