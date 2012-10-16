@@ -1802,7 +1802,23 @@ void cbDynChatSetHideBubble(CMessage& msgin, const string &serviceName, TService
 	chan->HideBubble = hideBubble;
 }
 
-
+void cbDynChatSetUniversalChannel(CMessage& msgin, const string &serviceName, TServiceId serviceId)
+{
+	TChanID		chanID;
+	bool universalChannel;
+	
+	msgin.serial(chanID);
+	msgin.serial(universalChannel);
+	
+	CChatManager &cm = IOS->getChatManager();
+	CDynChatChan *chan = cm.getDynChat().getChan(chanID);
+	if (!chan)
+	{
+		nlwarning("Unknown chan");
+		return;
+	}
+	chan->UniversalChannel = universalChannel;
+}
 
 void cbDynChatServiceChat(CMessage& msgin, const string &serviceName, TServiceId serviceId)
 {
@@ -2072,6 +2088,7 @@ TUnifiedCallbackItem CbIOSArray[]=
 	{ "DYN_CHAT:SERVICE_CHAT", cbDynChatServiceChat },		// a service send a chat message in the channel without sender id
 	{ "DYN_CHAT:SERVICE_TELL", cbDynChatServiceTell },		// a service send a chat message to a specific client in the channel without sender id
 	{ "DYN_CHAT:SET_HIDE_BUBBLE", cbDynChatSetHideBubble },		// a service send a chat message to a specific client in the channel without sender id
+	{ "DYN_CHAT:SET_UNIVERSAL_CHANNEL", cbDynChatSetUniversalChannel },
 	//received from DSS
 	{ "REQUEST_DSR", cbRequestDsr},
 //	{ "ADD_DM",  cbAddDM	},			// A character enter a ring session that he own
