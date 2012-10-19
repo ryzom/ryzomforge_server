@@ -16,12 +16,12 @@ IF(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARIES)
 ELSE(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARIES)
 
   FIND_PATH(MYSQL_INCLUDE_DIR mysql.h
-      /usr/include
-      /usr/local/include
-      /opt/local/include/mysql5
+      PATH_SUFFIXES mysql
+      /usr/include/mysql
+      /usr/local/include/mysql
+      /opt/local/include/mysql5/mysql
       $ENV{ProgramFiles}/MySQL/*/include
-      $ENV{SystemDrive}/MySQL/*/include
-	  PATH_SUFFIXES mysql)
+      $ENV{SystemDrive}/MySQL/*/include)
 
   IF(WIN32 AND MSVC)
     FIND_LIBRARY(MYSQL_LIBRARY_RELEASE NAMES libmysql mysqlclient
@@ -55,10 +55,14 @@ ELSE(MYSQL_INCLUDE_DIR AND MYSQL_LIBRARIES)
 
   IF(MYSQL_INCLUDE_DIR)
     IF(MYSQL_LIBRARY_RELEASE)
-      SET(MYSQL_LIBRARIES "optimized;${MYSQL_LIBRARY_RELEASE}")
+      SET(MYSQL_LIBRARIES optimized ${MYSQL_LIBRARY_RELEASE})
       IF(MYSQL_LIBRARY_DEBUG)
-        SET(MYSQL_LIBRARIES "${MYSQL_LIBRARIES};debug;${MYSQL_LIBRARY_DEBUG}")
+        SET(MYSQL_LIBRARIES ${MYSQL_LIBRARIES} debug ${MYSQL_LIBRARY_DEBUG})
       ENDIF(MYSQL_LIBRARY_DEBUG)
+      FIND_PACKAGE(OpenSSL)
+      IF(OPENSSL_FOUND)
+        SET(MYSQL_LIBRARIES ${MYSQL_LIBRARIES} ${OPENSSL_LIBRARIES})
+      ENDIF(OPENSSL_FOUND)
     ENDIF(MYSQL_LIBRARY_RELEASE)
   ENDIF(MYSQL_INCLUDE_DIR)
 
