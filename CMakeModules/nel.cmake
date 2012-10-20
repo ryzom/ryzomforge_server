@@ -922,6 +922,10 @@ MACRO(SETUP_EXTERNAL)
   IF(WIN32)
     FIND_PACKAGE(External REQUIRED)
 
+    IF(NOT VC_DIR)
+      SET(VC_DIR $ENV{VC_DIR})
+    ENDIF(NOT VC_DIR)
+
     IF(MSVC10)
       IF(NOT MSVC10_REDIST_DIR)
         # If you have VC++ 2010 Express, put x64/Microsoft.VC100.CRT/*.dll in ${EXTERNAL_PATH}/redist
