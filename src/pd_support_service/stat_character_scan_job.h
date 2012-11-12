@@ -30,6 +30,9 @@
 #include "stat_char_filter_factory.h"
 #include "stat_file_list_builder_factory.h"
 
+#ifdef ERROR
+#undef ERROR
+#endif
 
 //-------------------------------------------------------------------------------------------------
 // class CCharacterScanJob

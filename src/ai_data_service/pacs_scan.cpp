@@ -39,7 +39,7 @@
 #include "nel/pacs/u_retriever_bank.h"
 #include "nel/pacs/u_primitive_block.h"
 
-#include "nel/../../src/pacs/global_retriever.h"
+#include "nel/pacs/global_retriever.h"
 
 
 // Nel Ligo
@@ -47,9 +47,9 @@
 #include "nel/ligo/primitive.h"
 
 
-// Game share
-#include "game_share/bmp4image.h"
-#include "game_share/continent_container.h"
+// Server share
+#include "server_share/bmp4image.h"
+#include "server_share/continent_container.h"
 
 
 // AI share

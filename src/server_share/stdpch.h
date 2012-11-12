@@ -35,6 +35,12 @@
 #include <memory>
 #include <limits>
 
+#ifdef NL_OS_WINDOWS
+#define NOMINMAX
+#include	<WinSock2.h>
+#include	<windows.h>
+#endif // NL_OS_WINDOWS
+
 #include <nel/misc/common.h>
 #include <nel/misc/debug.h>
 

@@ -26,6 +26,9 @@
 #include "stat_guild_container.h"
 #include "stat_job_manager.h"
 
+#ifdef ERROR
+#undef ERROR
+#endif
 
 //-------------------------------------------------------------------------------------------------
 // class CGuildScanJob
