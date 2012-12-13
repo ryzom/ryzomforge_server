@@ -967,7 +967,7 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 			// set faction flag
 			if( offensive && _PVPFactionEnemyReminder )
 			{
-				if(pTarget)
+				if(pTarget && pTarget->getId() != actor->getId())
 				{
 					actor->setPVPRecentActionFlag();
 					TeamManager.pvpAttackOccursInTeam( actor, pTarget );
