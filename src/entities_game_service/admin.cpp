@@ -4999,7 +4999,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	else if (command_args[0] == "change_fame")
 	{
-		if (command_args.size () != 4) return false;
+		if (command_args.size () < 4) return false;
 
 		uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex(command_args[1]);
 		if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
@@ -5024,7 +5024,14 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, value, false);
 			nlinfo("fame : %d => %d", fame, value);
 		}
+		
+		if (command_args.size() == 4 || (command_args.size () == 5 && command_args[4] != "0")) {
+			// Make sure fame values are properly capped.
+			CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
 
+			// set tribe fame threshold and clamp fame if necessary
+			CFameManager::getInstance().setAndEnforceTribeFameCap(c->getId(), c->getAllegiance());
+		}
 	}
 
 	//*************************************************
@@ -5886,6 +5893,50 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			double xp;
 			fromString(command_args[3], xp);
 			c->addXpToSkill(xp, command_args[2]);
+		}
+	}
+	
+	//*************************************************
+	//***************** Dead
+	//*************************************************
+	
+	else if (command_args[0] == "check_state")
+	{
+		if (command_args.size() < 3) return false;
+		
+		string action = command_args[1]; // dead, alive, tag, flag
+		
+		if (action == "dead")
+		{
+			if (!c->isDead()) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=not_dead", getSalt());
+				return true;
+			}
+		}
+		else if (action == "alive")
+		{
+			if (c->isDead()) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=not_alive", getSalt());
+				return true;
+			}
+		}
+		else if (action == "tag")
+		{
+			if (!c->getPVPFlag()) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=not_tag", getSalt());
+				return true;
+			}
+		}
+		else if (action == "flag")
+		{
+			if (!c->getPvPRecentActionFlag()) {
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=not_flag", getSalt());
+				return true;
+			}
 		}
 	}
 	

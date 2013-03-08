@@ -14138,7 +14138,7 @@ void CCharacter::sendCloseTempInventoryImpulsion()
 // setFameValuesPlayer
 //-----------------------------------------------
 void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint32 fameMax, uint16 fameTrend)
-{
+{		
 	uint32 firstTribeFameIndex = CStaticFames::getInstance().getFirstTribeFameIndex();
 	uint32 firstTribeDbIndex = CStaticFames::getInstance().getDatabaseIndex( firstTribeFameIndex );
 	uint32 fameIndexInDatabase = CStaticFames::getInstance().getDatabaseIndex( factionIndex );
@@ -14235,6 +14235,13 @@ void CCharacter::setFameBoundaries()
 void CCharacter::resetFameDatabase()
 {
 	CFameInterface &fi = CFameInterface::getInstance();
+
+	// Check fames and fix bad values
+	//if (!haveAnyPrivilege())
+	{
+		CFameManager::getInstance().enforceFameCaps(getId(), getAllegiance());
+		CFameManager::getInstance().setAndEnforceTribeFameCap(getId(), getAllegiance());
+	}
 
 	for (uint i=0; i<CStaticFames::getInstance().getNbFame(); ++i)
 	{

@@ -21,6 +21,8 @@
 /////////////
 #include "stdpch.h"
 
+#include "guild_manager/fame_manager.h"
+
 #include "player_manager/character_version_adapter.h"
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"
@@ -90,7 +92,7 @@ uint32 CCharacterVersionAdapter::currentVersionNumber() const
 	// 21 : (19/04/2006) convert to position stack & store the mainland in db
 	// 22 : (15/05/2006) reset flag pvp for resolve migration timer pb
 	////////////////////////////////////
-	return 22;
+	return 23;
 }
 
 
@@ -122,6 +124,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	case 19: adaptToVersion20(character);
 	case 20: adaptToVersion21(character);
 	case 21: adaptToVersion22(character);
+	case 22: adaptToVersion23(character);
 	default:;
 	}
 }
@@ -652,7 +655,9 @@ void CCharacterVersionAdapter::adaptToVersion11(CCharacter &character) const
 		case EGSPD::CPeople::Zorai :
 			mission = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName( "ZORAI_NEWB_WELCOME_SHENG_WO_1" );
 			CAIAliasTranslator::getInstance()->getNPCAliasesFromName("welcomer_sheng_wo_1", bots);
-			break;	
+			break;
+		default:
+			break;
 		}
 	}
 	// other give him a rite intro mission
@@ -1006,4 +1011,76 @@ void CCharacterVersionAdapter::adaptToVersion21(CCharacter &character) const
 void CCharacterVersionAdapter::adaptToVersion22(CCharacter &character) const
 {
 	character.resetPVPTimers();
+}
+
+
+//---------------------------------------------------
+void CCharacterVersionAdapter::adaptToVersion23(CCharacter &character) const
+{
+	nlinfo("Start");
+	//check if phrase is already known and Fix marauder sbricks + sp craft
+	uint16 sp = 0;
+	vector<string> parts;
+	parts.push_back("b");
+	parts.push_back("g");
+	parts.push_back("h");
+	parts.push_back("p");
+	parts.push_back("s");
+	parts.push_back("v");
+	vector<uint> deletePhrases;
+	// Check each part
+	for (uint i = 1; i < parts.size(); i++)
+	{
+		nlinfo("Part : %s", parts[i].c_str());
+		CSheetId phraseSId = CSheetId("abcbah"+parts[i]+".sphrase");
+		CSheetId brickMSid = CSheetId("bcbah"+parts[i]+"_m.sbrick");
+		CSheetId brickSid = CSheetId("bcbah"+parts[i]+".sbrick");
+		
+		/*bool foundPhrase = false;
+		// Look for Known Phrase
+		for (uint p = 0; p < character._KnownPhrases.size(); ++p)
+		{
+			if (character._KnownPhrases[ p ].PhraseSheetId == phraseSId)
+			{
+				nlinfo("Known Phrase found !");
+				// Check if player is buggy
+				if (character._KnownBricks.find(brickMSid) != character._KnownBricks.end()
+				&& 	character._KnownBricks.find(brickSid) == character._KnownBricks.end() )
+				{
+					nlinfo("Bugged Char !");
+					// Remove phrase and brick
+					character._KnownBricks.erase(brickMSid);
+					deletePhrases.push_back(p);
+					sp += 40;
+				}
+			}
+		}*/
+	
+		if (character._BoughtPhrases.find(phraseSId)  != character._BoughtPhrases.end())
+		{
+			nlinfo("Bought Phrase found !");
+			if (character._KnownBricks.find(brickMSid) != character._KnownBricks.end()
+			&& 	character._KnownBricks.find(brickSid) == character._KnownBricks.end() )
+			{
+				nlinfo("Bugged Char !");
+				// Remove phrase and brick
+				character._BoughtPhrases.erase(phraseSId);
+				character._KnownBricks.erase(brickMSid);
+				sp += 40;
+			}
+		}
+	/*
+	for (uint i = 0; i < deletePhrases.size(); ++i)
+	{
+		nlinfo("Deleting Phrase");
+		character._KnownPhrases[deletePhrases[i]].clear();
+	}*/
+	}
+	
+	nlinfo("Adding %d SP Craft !", sp);
+	character._SpType[EGSPD::CSPType::Craft] += sp;
+	
+	// Fix Rite Bonus
+	
+	nlinfo("End");
 }
