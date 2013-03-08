@@ -14237,7 +14237,7 @@ void CCharacter::resetFameDatabase()
 	CFameInterface &fi = CFameInterface::getInstance();
 
 	// Check fames and fix bad values
-	//if (!haveAnyPrivilege())
+	if (!haveAnyPrivilege())
 	{
 		CFameManager::getInstance().enforceFameCaps(getId(), getAllegiance());
 		CFameManager::getInstance().setAndEnforceTribeFameCap(getId(), getAllegiance());

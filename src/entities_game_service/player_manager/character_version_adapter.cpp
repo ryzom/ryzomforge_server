@@ -1028,8 +1028,8 @@ void CCharacterVersionAdapter::adaptToVersion23(CCharacter &character) const
 	parts.push_back("s");
 	parts.push_back("v");
 	vector<uint> deletePhrases;
-	// Check each part
-	for (uint i = 1; i < parts.size(); i++)
+	// Check each part 
+	for (uint i = 0; i < parts.size(); i++)
 	{
 		nlinfo("Part : %s", parts[i].c_str());
 		CSheetId phraseSId = CSheetId("abcbah"+parts[i]+".sphrase");
