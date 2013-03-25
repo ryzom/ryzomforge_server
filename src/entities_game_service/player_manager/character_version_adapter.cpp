@@ -1031,56 +1031,30 @@ void CCharacterVersionAdapter::adaptToVersion23(CCharacter &character) const
 	// Check each part 
 	for (uint i = 0; i < parts.size(); i++)
 	{
-		nlinfo("Part : %s", parts[i].c_str());
 		CSheetId phraseSId = CSheetId("abcbah"+parts[i]+".sphrase");
 		CSheetId brickMSid = CSheetId("bcbah"+parts[i]+"_m.sbrick");
 		CSheetId brickSid = CSheetId("bcbah"+parts[i]+".sbrick");
 		
-		/*bool foundPhrase = false;
-		// Look for Known Phrase
-		for (uint p = 0; p < character._KnownPhrases.size(); ++p)
-		{
-			if (character._KnownPhrases[ p ].PhraseSheetId == phraseSId)
-			{
-				nlinfo("Known Phrase found !");
-				// Check if player is buggy
-				if (character._KnownBricks.find(brickMSid) != character._KnownBricks.end()
-				&& 	character._KnownBricks.find(brickSid) == character._KnownBricks.end() )
-				{
-					nlinfo("Bugged Char !");
-					// Remove phrase and brick
-					character._KnownBricks.erase(brickMSid);
-					deletePhrases.push_back(p);
-					sp += 40;
-				}
-			}
-		}*/
-	
 		if (character._BoughtPhrases.find(phraseSId)  != character._BoughtPhrases.end())
 		{
-			nlinfo("Bought Phrase found !");
 			if (character._KnownBricks.find(brickMSid) != character._KnownBricks.end()
 			&& 	character._KnownBricks.find(brickSid) == character._KnownBricks.end() )
 			{
-				nlinfo("Bugged Char !");
+				nlinfo("Bugged Char with phrase %s!", parts[i].c_str());
 				// Remove phrase and brick
 				character._BoughtPhrases.erase(phraseSId);
 				character._KnownBricks.erase(brickMSid);
 				sp += 40;
 			}
 		}
-	/*
-	for (uint i = 0; i < deletePhrases.size(); ++i)
-	{
-		nlinfo("Deleting Phrase");
-		character._KnownPhrases[deletePhrases[i]].clear();
-	}*/
 	}
 	
-	nlinfo("Adding %d SP Craft !", sp);
-	character._SpType[EGSPD::CSPType::Craft] += sp;
+	if (sp > 0)
+	{
+		nlinfo("Adding %d SP Craft !", sp);
+		character._SpType[EGSPD::CSPType::Craft] += sp;
+	}
 	
 	// Fix Rite Bonus
 	
-	nlinfo("End");
 }

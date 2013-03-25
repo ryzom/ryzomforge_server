@@ -286,7 +286,7 @@ public:
 						}
 						else
 						{
-							c->wearRightHandItem(phrase->getMps().size()/10);
+							c->wearRightHandItem((double)phrase->getMps().size()/10);
 
 							// report Xp Gain unless used tool is worned
 							PROGRESSIONPVE::CCharacterProgressionPVE::getInstance()->actionReport( report, true, false );
