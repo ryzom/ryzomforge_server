@@ -1912,7 +1912,7 @@ void CChatManager::tell( const TDataSetRow& sender, const string& receiverIn, co
 				}
 
 				// info for log the chat message
-				string senderName = senderInfos->Name.toString();
+				//string senderName = senderInfos->Name.toString(); // removed by ulukyn to prevent crash
 /*
 				{
 					if (senderInfos == NULL)
@@ -1925,7 +1925,7 @@ void CChatManager::tell( const TDataSetRow& sender, const string& receiverIn, co
 */
 
 				// info for log the chat message
-				string receiverName = receiverInfos->Name.toString();
+				//string receiverName = receiverInfos->Name.toString();  // removed by ulukyn to prevent crash
 /*
 				{
 					CCharacterInfos *ci = IOS->getCharInfos(senderInfos->EntityId);
@@ -1938,7 +1938,7 @@ void CChatManager::tell( const TDataSetRow& sender, const string& receiverIn, co
 				}
 */
 
-				_Log.displayNL("'%s' to '%s' (%s) : \t\"%s\"", senderName.c_str(), receiverName.c_str(), "tell", ucstr.toString().c_str() );
+				//_Log.displayNL("'%s' to '%s' (%s) : \t\"%s\"", senderName.c_str(), receiverName.c_str(), "tell", ucstr.toString().c_str() );  // removed by ulukyn to prevent crash
 				
 				
 				// if the client doesn't know this dynamic string(name of sender), we send it to him
