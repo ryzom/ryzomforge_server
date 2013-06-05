@@ -376,7 +376,7 @@ CMissionManager::CMissionManager()
 		std::map<TAIAlias,std::string>::iterator itName = globalData.NameMap.find( (*it).first );
 		if ( itName != globalData.NameMap.end() )
 		{
-			MISLOG("'%s' alias = %s",(*itName).second.c_str(), CPrimitivesParser::aliasToString((*it).first).c_str());
+			MISLOG("'%s' alias = %u giver = %u",(*itName).second.c_str(), (*it).first, (*it).second->getDefaultNpcGiver());
 			count++;
 		}
 		else
@@ -459,7 +459,6 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			nlinfo("Mission validation: mission %s is not valid and not loaded", templ->getMissionName().c_str());
 			delete templ;
 		}
-
 		return true;
 	}
 	//this is not a mission node, so lookup recursively in the children

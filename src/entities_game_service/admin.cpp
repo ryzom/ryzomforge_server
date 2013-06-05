@@ -4774,7 +4774,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				return false;
 		}
 	}
-
+	
+	nlinfo("%s|%s", web_app_url.c_str(), command.c_str());
+	
 	std::vector<std::string> command_args;
 	if (new_separator)
 		NLMISC::splitString(command, "|", command_args);

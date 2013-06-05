@@ -2385,11 +2385,26 @@ void CCharacter::applyRegenAndClipCurrentValue()
 	// restore value without weight malus
 	_PhysScores.SpeedVariationModifier -= _LastAppliedWeightMalus;
 
+	// adapt speed of mount without weight malus
+	if( TheDataset.isAccessible(_EntityMounted()) )
+	{
+		TDataSetRow creatureId = _EntityMounted;
+		CCreature *creature = CreatureManager.getCreature(creatureId);
+		if (creature)
+		{
+			creature->setSpeedVariationModifier(_PhysScores.SpeedVariationModifier);
+		}
+	}
+	
 	// compute new value
 	_LastAppliedWeightMalus = getWeightMalus();
 	_PhysScores.SpeedVariationModifier += _LastAppliedWeightMalus;
 
 	sint16 speedVariationModifier = std::max( (sint)_PhysScores.SpeedVariationModifier, (sint)-100 );
+
+	
+	
+
 
 	// Speed
 	// while stunned/root/mezzed etc speed is forced to 0

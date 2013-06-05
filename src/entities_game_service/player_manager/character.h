@@ -639,6 +639,12 @@ public:
 	void setEnterFlag( bool b );
 
 	/**
+	 * Get/Set the score permanent modifier
+	 */
+	uint32 getScorePermanentModifiers(SCORES::TScores score) const;
+	void setScorePermanentModifiers(SCORES::TScores score, uint32 value) const;
+
+	/**
 	 * Get the enter flag 
 	 * \return true if the player entered the game, false if he left
 	 */
