@@ -68,7 +68,7 @@ inline uint32 CCharacter::getScorePermanentModifiers(SCORES::TScores score) cons
 	return _ScorePermanentModifiers[score]; 
 }
 
-inline CCharacter::getScorePermanentModifiers(SCORES::TScores score, uint32 value) const
+inline CCharacter::setScorePermanentModifiers(SCORES::TScores score, uint32 value) const
 {
 	_ScorePermanentModifiers[score] = value; 
 }
