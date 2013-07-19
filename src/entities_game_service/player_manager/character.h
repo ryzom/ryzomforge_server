@@ -642,7 +642,7 @@ public:
 	 * Get/Set the score permanent modifier
 	 */
 	uint32 getScorePermanentModifiers(SCORES::TScores score) const;
-	void setScorePermanentModifiers(SCORES::TScores score, uint32 value) const;
+//	void setScorePermanentModifiers(SCORES::TScores score, uint32 value) const;
 
 	/**
 	 * Get the enter flag 

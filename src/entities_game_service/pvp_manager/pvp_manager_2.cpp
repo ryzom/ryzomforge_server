@@ -710,7 +710,8 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 	_Instance->_PVPOutpostAllyReminder = false;
 	_Instance->_PVPOutpostEnemyReminder = false;
 	
-
+	PVP_RELATION::TPVPRelation relationTmp = PVP_RELATION::Neutral;
+	
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
 	if( pTarget )
 	{
@@ -728,14 +729,18 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 		IPVP * pvpSession = pTarget->getPVPInterface().getPVPSession();
 		if( pvpSession )
 		{
-			relation = pvpSession->getPVPRelation( actor, target );
-			if( relation == PVP_RELATION::Ennemy )
+			nlinfo("Target session");
+			relationTmp = pvpSession->getPVPRelation( actor, target );
+			if( relationTmp == PVP_RELATION::Ennemy )
 			{
+				nlinfo("is ennemy");
 				pvpSession = actor->getPVPInterface().getPVPSession();
 				if( pvpSession )
 				{
+					nlinfo("Actor session");
 					if( pvpSession->getPVPRelation( pTarget, actor )  == PVP_RELATION::Ennemy )
 					{
+						nlinfo("is ennemy");
 						if( CPVPManager2::getInstance()->inSafeZone( pTarget->getPosition() ) && pTarget->getSafeInPvPSafeZone() )
 						{
 							relation = PVP_RELATION::NeutralPVP;
@@ -755,7 +760,7 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 		////////////////////////////////////////////////////////
 	}
 
-	PVP_RELATION::TPVPRelation relationTmp = PVP_RELATION::Neutral;
+	
 	uint i;
 	for( i=0; i<_PVPInterface.size(); ++i )
 	{
