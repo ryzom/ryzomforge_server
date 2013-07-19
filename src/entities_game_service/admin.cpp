@@ -4557,7 +4557,7 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 
 }
 
-NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>")
+NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang> <leave:0|1>")
 {
 	if ((args.size() < 2) || (args.size() > 3))
 		return false;
@@ -4569,17 +4569,25 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 	string lang = args[1];
 	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es")
 		return false;
-
+	bool leave = false;
+	if (args.size() > 2)
+		leave = args[2] == "1";
 	TChanID channel = inst->getFactionDynChannel(lang);
 
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
-		if (!c->getLangChannel().empty()) {
+		if (!c->getLangChannel().empty() && !c->havePriv(":DEV:SGM:GM:EM:EG:G")) {
 			TChanID current_channel = inst->getFactionDynChannel(c->getLangChannel());
 			inst->removeFactionChannelForCharacter(current_channel, c);
 		}
-		inst->addFactionChannelToCharacter(channel, c, true);
-		c->setLangChannel(lang);
+		if (c->havePriv(":DEV:SGM:GM:EM:EG:G") && leave) {
+			inst->removeFactionChannelForCharacter(channel, c);
+		}
+		else
+		{
+			inst->addFactionChannelToCharacter(channel, c, true);
+			c->setLangChannel(lang);
+		}
 		return true;
 	}
 
@@ -4786,7 +4794,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		return false;
 
 	//*************************************************
-	//***************** give_item
+	//***************** give_item sheet quality quantity inv is_min_qual[0|1]=0
 	//*************************************************
 
 	if (command_args[0] == "give_item")
@@ -4807,7 +4815,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			return false;
 
 		string selected_inv;
-		if (command_args.size() == 5)
+		if (command_args.size() >= 5)
 			selected_inv = command_args[4];
 		CInventoryPtr inventory = getInv(c, selected_inv);
 
@@ -4818,20 +4826,28 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			return false;
 		}
 
+		bool is_min_quality = false;
+		if (command_args.size() >= 6)
+			selected_inv = command_args[5];
+
+		uint32 numberEqualItem = 0;
 		uint32 numberItem = 0;
-		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
+		for ( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
 			const CGameItemPtr itemPtr = inventory->getItem(i);
-			if( itemPtr != NULL )
+			if ( itemPtr != NULL )
 			{
-				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() == quality) )
+				if ( (itemPtr->getSheetId() == sheetId) )
 				{
-					numberItem += itemPtr->getStackSize();
+					if (itemPtr->quality() == quality) 
+						numberEqualItem += itemPtr->getStackSize();
+					if (itemPtr->quality() >= quality)
+						numberItem += itemPtr->getStackSize();
 				}
 			}
 		}
 
-		if (numberItem < quantity)
+		if ( (is_min_quality && numberItem < quantity) || (!is_min_quality && numberEqualItem < quantity) )
 		{
 			if (send_url)
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_items", getSalt());
@@ -4839,16 +4855,27 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 
 		numberItem = quantity;
-		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
+		numberEqualItem = quantity;
+		for ( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
 			const CGameItemPtr itemPtr = inventory->getItem(i);
-			if( itemPtr != NULL )
+			if ( itemPtr != NULL )
 			{
-				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() == quality) )
+				if ( (itemPtr->getSheetId() == sheetId) )
 				{
-					numberItem -= inventory->deleteStackItem(i, quantity);
-					if(numberItem == 0)
-						break;
+					if (is_min_quality && itemPtr->quality() >= quality)
+					{
+						numberEqualItem -= inventory->deleteStackItem(i, quantity);
+						if(numberEqualItem == 0)
+							break;
+					}
+					else if (!is_min_quality && itemPtr->quality() == quality)
+					{
+						numberItem -= inventory->deleteStackItem(i, quantity);
+						if(numberItem == 0)
+							break;
+					}
+					
 				}
 			}
 		}
