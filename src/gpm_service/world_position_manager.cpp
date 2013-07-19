@@ -2205,19 +2205,20 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 
 	// Check player speed
 	// only consider (x,y) motion for speed and position correction
-	if (master->PlayerInfos != NULL /*&& master->PlayerInfos->CheckSpeed && CheckPlayerSpeed*/ && fabs(movVector.x)+fabs(movVector.y) > maxDist)
+	if (master->PlayerInfos != NULL /*&& master->PlayerInfos->CheckSpeed && CheckPlayerSpeed && fabs(movVector.x)+fabs(movVector.y) > maxDist*/)
 	{
 		double		movNorm = sqr(movVector.x)+sqr(movVector.y); // already done if (entity != master) but here is a rare overspeed case
 
 		if (movNorm > sqr(maxDist))
 		{
-			if (true/*VerboseSpeedAbuse*/)
-			{
-				nlwarning("CWorldPositionManager::movePlayer%s: limited speed (movNorm=%.2f, movMax=%.2f, maxSpeed=%.2f)", entity->Id.toString().c_str(), sqrt(movNorm), maxDist, limitSpeedToUse*0.001*SecuritySpeedFactor);
+			if (movNorm > sqr(5 * SecuritySpeedFactor * CTickEventHandler::getGameTimeStep() * ticksSinceLastUpdate)) {
+				movVector *= (maxDist / sqrt(movNorm));
 				nlwarning("Player limitSpeed=%2.f, entitySpeed=%.2f, masterSpeed=%.2f", limitSpeedToUse, maxSpeed(), mountWalkSpeed);
 			}
-
-			//movVector *= (maxDist / sqrt(movNorm));
+			else
+			{
+				nlwarning("Player limitSpeed=%2.f, entitySpeed=%.2f, masterSpeed=%.2f", limitSpeedToUse, maxSpeed(), mountWalkSpeed);
+			}
 		}
 	}
 
@@ -2273,9 +2274,9 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 		if (diff2d.sqrnorm() > 1.0 )
 		{
 			correctPos = true;
-			if (VerboseSpeedAbuse)
+			if (true/*VerboseSpeedAbuse*/)
 			{
-				nlwarning("CWorldPositionManager::movePlayer%s: corrected position: real=(%.1f,%.1f) targeted=(%.1f,%.1f)", master->Id.toString().c_str(), finalPos.x, finalPos.y, targetPos.x, targetPos.y);
+				nlwarning("PlayerAbuse %s real=(%.1f,%.1f) targeted=(%.1f,%.1f)", master->Id.toString().c_str(), finalPos.x, finalPos.y, targetPos.x, targetPos.y);
 			}
 		}
 
