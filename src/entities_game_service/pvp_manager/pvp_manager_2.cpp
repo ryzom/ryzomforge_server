@@ -755,7 +755,12 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 						}
 					}
 				}
+			} 
+			else if ( relationTmp != PVP_RELATION::Ally )
+			{
+				relationTmp = PVP_RELATION::NeutralPVP;
 			}
+			relation = relationTmp;
 		}
 		////////////////////////////////////////////////////////
 	}

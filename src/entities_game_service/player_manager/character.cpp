@@ -14735,6 +14735,12 @@ TCharConnectionState CCharacter::isFriendCharVisualyOnline(const NLMISC::CEntity
 			return ccs_offline;
 		}
 
+		if ( PlayerManager.hasBetterCSRGrade(_Id, friendId, true))
+		{
+			// better CSR grade return always 'online' status
+			return ccs_online;
+		}
+
 		ret = ccs_online;
 	}
 
