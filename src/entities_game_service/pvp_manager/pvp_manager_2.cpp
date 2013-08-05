@@ -715,6 +715,10 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
 	if( pTarget )
 	{
+		if (curative && pTarget == actor)
+		{
+			return PVP_RELATION::Ally;
+		}
 		// Full PVP is ennemy of everybody
 		if (pTarget->getFullPVP() || actor->getFullPVP())
 		{
@@ -729,18 +733,14 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 		IPVP * pvpSession = pTarget->getPVPInterface().getPVPSession();
 		if( pvpSession )
 		{
-			nlinfo("Target session");
 			relationTmp = pvpSession->getPVPRelation( actor, target );
 			if( relationTmp == PVP_RELATION::Ennemy )
 			{
-				nlinfo("is ennemy");
 				pvpSession = actor->getPVPInterface().getPVPSession();
 				if( pvpSession )
 				{
-					nlinfo("Actor session");
 					if( pvpSession->getPVPRelation( pTarget, actor )  == PVP_RELATION::Ennemy )
 					{
-						nlinfo("is ennemy");
 						if( CPVPManager2::getInstance()->inSafeZone( pTarget->getPosition() ) && pTarget->getSafeInPvPSafeZone() )
 						{
 							relation = PVP_RELATION::NeutralPVP;
@@ -931,7 +931,6 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 {
 	nlassert(actor);
 	nlassert(areaTarget);
-
 	// cannot hurt a dead entity
 	if( offensive )
 		if ( areaTarget->isDead() )
@@ -962,7 +961,6 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 		/*	if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() != pTarget->getGuildId()))
 				return false;
 		*/
-
 		if( areaTarget->getId().getType() == RYZOMID::player )
 		{
 			CCharacter * pTarget = dynamic_cast<CCharacter*>(areaTarget);
