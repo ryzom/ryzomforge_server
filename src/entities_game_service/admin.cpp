@@ -4576,17 +4576,14 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
-		if (!c->getLangChannel().empty() && !c->havePriv(":DEV:SGM:GM:EM:EG:G")) {
-			TChanID current_channel = inst->getFactionDynChannel(c->getLangChannel());
-			inst->removeFactionChannelForCharacter(current_channel, c);
-		}
-		if (c->havePriv(":DEV:SGM:GM:EM:EG:G") && leave) {
+		string current_channels = c->getLangChannel();
+		if (leave) {
 			inst->removeFactionChannelForCharacter(channel, c);
 		}
-		else
+		else if (current_channels.find(lang) == string::npos)
 		{
 			inst->addFactionChannelToCharacter(channel, c, true);
-			c->setLangChannel(lang);
+			c->setLangChannel(c->getLangChannel() + " "+lang);
 		}
 		return true;
 	}
