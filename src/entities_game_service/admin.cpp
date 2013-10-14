@@ -5492,7 +5492,11 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial(botsName);
 		for (uint32 i=2; i<nbString; ++i)
 		{
-			string arg = command_args[i]+";";
+			string arg;
+			if (command_args[i]=="__OR__")
+				arg = "|";
+			else
+				arg = command_args[i]+";";
 			msgout.serial(arg);
 		}
 		CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
@@ -6300,6 +6304,31 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			sendMessageViaMirror("IOS", msgout);
 			return true;
 		}
+	}
+
+	//*************************************************
+	//***************** sendurl
+	//*************************************************
+	
+	else if (command_args[0] == "sendurl")
+	{
+				
+		if (command_args.size() != 4)
+			return false;
+
+		string player = command_args[1]; // player
+		string app = command_args[2]; // app
+		string params = command_args[3]; // params
+		CCharacter *destPlayer;
+		
+		if (player != "_target_") {
+			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), player));
+			destPlayer = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(entityBase->getId()));
+		} else {
+			const CEntityId &target = c->getTarget();
+			destPlayer = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
+		}
+		destPlayer->sendUrl(app+" "+params, "");
 	}
 
 	//*************************************************
