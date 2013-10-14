@@ -670,6 +670,8 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_LastTickNpcControlUpdated = CTickEventHandler::getGameCycle();
 
 	_LastWebCommandIndex = 0;
+	_LastUrlIndex = 0;
+
 
 	_CustomMissionsParams.clear();
 
@@ -3703,7 +3705,28 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 
 			// send the web page url
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-			params[0].Literal= c->getWebPage();
+			string url = c->getWebPage();
+			
+			// add ? or & with
+			if ( url.find('?') == string::npos )
+				url += NLMISC::toString("?urlidx=%d", getUrlIndex());
+			else
+				url += NLMISC::toString("&urlidx=%d", getUrlIndex());
+			
+			setUrlIndex(getUrlIndex()+1);
+			
+			url += "&player_eid="+getId().toString();
+
+			// add cheksum : pnj eid
+			url += "&teid="+c->getId().toString();
+			
+			string defaultSalt = toString(getLastConnectedDate());
+			nlinfo(defaultSalt.c_str());
+			nlinfo(url.c_str());
+			string control = "&hmac="+getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size()).toString();
+		
+			params[0].Literal= url+control;
+			
 			text = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", params );
 //			_PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_URL" , text );
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_URL(_PropertyDatabase, text );

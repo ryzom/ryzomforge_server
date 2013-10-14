@@ -3323,6 +3323,9 @@ private:
 	/// last webcommand index
 	uint32						_LastWebCommandIndex;
 
+	/// last web url index
+	uint32						_LastUrlIndex;
+
  	std::map<std::string, std::string>	_CustomMissionsParams;
 
 	// for a power/combat event, stores start and end ticks
@@ -3789,6 +3792,8 @@ public:
 	void			setWebCommandIndex(uint32 index) { _LastWebCommandIndex = index;}
 	uint32			getWebCommandIndex() const { return _LastWebCommandIndex;}
 
+	void			setUrlIndex(uint32 index) { _LastUrlIndex = index;}
+	uint32			getUrlIndex() const { return _LastUrlIndex;}
 
 	bool			getInvisibility() const	{ return _Invisibility;}
 	/// Set the invisibility flag, NB : just for persistence, do not change nothing.
