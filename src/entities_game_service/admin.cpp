@@ -5250,7 +5250,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	//***************** check_item
 	//*************************************************
-	else if (command_args[0] == "check_item") // sheetid ! quality ! quantity ! iscrafted
+	else if (command_args[0] == "check_item" || command_args[0] == "check_no_item") // sheetid ! quality ! quantity ! inv ! iscrafted ! customName
 	{
 		if (command_args.size() < 4)
 			return false;
@@ -5265,11 +5265,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (quantity == 0)
 			return false;
 
-		bool crafted = false;
-		if (command_args.size() == 5)
-			crafted = (command_args[4] == "1");
-
-		string selected_inv;
+		string selected_inv = "bag";
 		if (command_args.size() == 5)
 			selected_inv = command_args[4];
 		CInventoryPtr inventory = getInv(c, selected_inv);
@@ -5281,6 +5277,14 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			return false;
 		}
 
+		bool crafted = false;
+		if (command_args.size() == 6)
+			crafted = (command_args[5] == "1");
+
+		ucstring needCustomName;
+		if (command_args.size() == 7)
+			needCustomName.fromUtf8(command_args[6]);
+			
 		uint32 numberItem = 0;
 		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
@@ -5290,16 +5294,33 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				if( (itemPtr->getSheetId() == sheetId) && (itemPtr->quality() == quality) )
 				{
 					if (!crafted || itemPtr->getCreator() == c->getId())
-						numberItem += itemPtr->getStackSize();
+					{
+						if (needCustomName.empty() || itemPtr->getCustomName() == needCustomName)
+						{
+							numberItem += itemPtr->getStackSize();
+						}
+					}
 				}
 			}
 		}
 
 		if (numberItem < quantity)
 		{
-			if (send_url)
-				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_items", getSalt());
-			return false;
+			if (command_args[0] == "check_item")
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_items", getSalt());
+				return false;
+			}
+		}
+		else
+		{
+			if (command_args[0] == "check_no_item")
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=have_items", getSalt());
+				return false;
+			}
 		}
 	}
 
