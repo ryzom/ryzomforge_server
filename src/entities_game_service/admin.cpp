@@ -5095,27 +5095,67 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	else if (command_args[0] == "check_target")
 	{
-		if (command_args.size () != 3) return false;
-
 		const CEntityId &target = c->getTarget();
-		if (target == CEntityId::Unknown)
+		
+		if (command_args.size () < 2) return false;
+		
+		if (command_args[1] == "leaguemate")
 		{
-			if (send_url)
-				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_target", getSalt());
-			return false;
-		}
-
-		if (command_args[1] == "sheet")
-		{
-			if (target.getType() == RYZOMID::player)
+			if (target == CEntityId::Unknown || target.getType() != RYZOMID::player)
 			{
 				if (send_url)
 					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
 				return false;
 			}
+			CCharacter * targetTarget = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
+			if (targetTarget->getLeagueId() == DYN_CHAT_INVALID_CHAN || c->getLeagueId() != targetTarget->getLeagueId())
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_league", getSalt());
+				return false;
+			}
+		}
+		else if (command_args[1] == "guildmate")
+		{
+			if (target == CEntityId::Unknown || target.getType() != RYZOMID::player)
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
+				return false;
+			}
+			CCharacter * targetTarget = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
+			if (targetTarget->getGuildId() == 0 || c->getGuildId() != targetTarget->getGuildId())
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_guild", getSalt());
+				return false;
+			}
+		}
+		else if (command_args[1] == "teammate")
+		{
+			if (target == CEntityId::Unknown || target.getType() != RYZOMID::player)
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
+				return false;
+			}
+			CCharacter * targetTarget = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
+			if (targetTarget->getTeamId() == CTEAM::InvalidTeamId || c->getTeamId() != targetTarget->getTeamId())
+			{
+				if (send_url)
+					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_team", getSalt());
+				return false;
+			}
+		}
+		
+		if (command_args.size () < 3) return false;
+
+		if (command_args[1] == "sheet")
+		{
 			CSheetId creatureSheetId(command_args[2]);
 			CCreature *creature = CreatureManager.getCreature(target);
-			if (creature == NULL ||  creatureSheetId == CSheetId::Unknown || creatureSheetId != creature->getType())
+
+			if (creature == NULL || creatureSheetId == CSheetId::Unknown || creatureSheetId != creature->getType())
 			{
 				if (send_url)
 					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_sheet", getSalt());
@@ -5124,7 +5164,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 		else if (command_args[1] == "bot_name")
 		{
-			if (target.getType() == RYZOMID::player)
+
+			if (target == CEntityId::Unknown || target.getType() == RYZOMID::player)
 			{
 				if (send_url)
 					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
@@ -5151,7 +5192,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 		else if (command_args[1] == "player_name")
 		{
-			if (target.getType() != RYZOMID::player)
+			if (target == CEntityId::Unknown || target.getType() != RYZOMID::player)
 			{
 				if (send_url)
 					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_type", getSalt());
@@ -5165,7 +5206,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				return false;
 			}
 		} else
-			return false;
+			return false;		
 	}
 
 	//*************************************************
