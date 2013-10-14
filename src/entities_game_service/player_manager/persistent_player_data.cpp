@@ -507,6 +507,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	STRUCT_VECT(_Pact)\
 	STRUCT_VECT(_KnownPhrases)\
 	STRUCT_MAP(TAIAlias,	TMissionHistory,	_MissionHistories)\
+	PROP_MAP(string,	string,	_CustomMissionsParams)\
 	LSTRUCT(_WelcomeMissionDesc, if (_WelcomeMissionDesc.isValid()))\
 	STRUCT_ARRAY(_PlayerPets,_PlayerPets.size())\
 \
