@@ -4882,7 +4882,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//***************** recv_item
 	//*************************************************
 
-	else if (command_args[0] == "recv_item")
+	else if (command_args[0] == "recv_item" || command_args[0] == "recv_unique_item")
 	{
 		if (command_args.size() < 4)
 			return false;
@@ -4925,16 +4925,36 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if ( sheet.find(".sitem") == string::npos ) // try named item
 		{
 			new_item = CNamedItems::getInstance().createNamedItem(command_args[1], quantity);
-			if (new_item == NULL)
-				return true;
 		}
 		else
 		{
 			const CSheetId sheetId(sheet);
 			if (sheetId == CSheetId::Unknown)
 				return true;
+
+			if (command_args[0] == "recv_unique_item")
+			{
+				CInventoryPtr selected_inv = c->getInventory(inventory);
+				for( uint32 i = 0; i < selected_inv->getSlotCount(); ++ i )
+				{
+					const CGameItemPtr itemPtr = selected_inv->getItem(i);
+					if( itemPtr != NULL )
+					{
+						if( itemPtr->getSheetId() == sheetId && itemPtr->quality() == quality )
+						{
+							if (send_url)
+								c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=allready_have_item", getSalt());
+							return false;
+						}
+					}
+				}
+			}
+
 			new_item = c->createItem(quality, quantity, sheetId);
 		}
+
+		if (new_item == NULL)
+			return true;
 
 		if (!c->addItemToInventory(inventory, new_item))
 		{
@@ -4946,16 +4966,26 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		ucstring customValue;
 
-		if (command_args.size() == 6 && command_args[5] != "*")
+		if (command_args.size() >= 6 && command_args[5] != "*")
 		{
 			customValue.fromUtf8(command_args[5]);
 			new_item->setCustomName(customValue);
 		}
 
-		if (command_args.size() == 7 && command_args[6] != "*")
+		if (command_args.size() >= 7 && command_args[6] != "*")
 		{
 			customValue.fromUtf8(command_args[6]);
 			new_item->setCustomText(customValue);
+		}
+		
+		if (command_args.size() >= 8)
+		{
+			new_item->setMovable(command_args[7] == "1");
+		}
+
+		if (command_args.size() >= 9)
+		{
+			new_item->setUnMovable(command_args[8] == "1");
 		}
 	}
 	//*************************************************

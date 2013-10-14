@@ -1357,6 +1357,9 @@ private:
 	STRUCT_VECT(_TypeSkillMods)\
 	LPROP_VECT(CSheetId, _Enchantment, VECT_LOGIC(_Enchantment) if (_Enchantment[i]!=CSheetId::Unknown))\
 	PROP2(_CustomText,					ucstring,	_CustomText,				_CustomText=val)\
+	PROP2(_CustomName,					ucstring,	_CustomName,				_CustomName=val)\
+	PROP(bool, _Movable)\
+	PROP(bool, _UnMovable)\
 	PROP(bool, _LockedByOwner)\
 	
 #pragma message( PERSISTENT_GENERATION_MESSAGE )

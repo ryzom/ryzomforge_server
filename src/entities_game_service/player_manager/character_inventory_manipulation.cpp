@@ -819,7 +819,7 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 		return;
 
 	// cannot move a non dropable item or an active xp catalyser
-	if ((!srcForm->DropOrSell && !canPutNonDropableItemInInventory(dstInvId)) || isAnActiveXpCatalyser(srcItem))
+	if (!srcItem->getMovable() && (srcItem->getUnMovable() || (!srcForm->DropOrSell && !canPutNonDropableItemInInventory(dstInvId)) || isAnActiveXpCatalyser(srcItem)))
 		return;
 
 	// You cannot exchange genesis named items

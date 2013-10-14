@@ -9907,7 +9907,7 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 			nlwarning("<CCharacter sellItem> character %s Invalid item sheet %s : the sheet is invalid",_Id.toString().c_str(),sheet.toString().c_str());
 			return;
 		}
-		if ( !itemForm->DropOrSell )
+		if ( !item->getMovable() && ( !itemForm->DropOrSell || item->getUnMovable() ) )
 		{
 			nlwarning("<CCharacter sellItem> character %s try to sell item slot %u  sheet %s",
 						_Id.toString().c_str(),

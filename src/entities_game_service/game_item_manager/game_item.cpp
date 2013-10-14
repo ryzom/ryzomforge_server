@@ -1372,6 +1372,8 @@ void CGameItem::clear()
 	_HasPrerequisit= false;
 
 	_LockedByOwner = false;
+	_Movable = false;
+	_UnMovable = false;
 
 	_TypeSkillMods.clear();
 	_PhraseId.clear();

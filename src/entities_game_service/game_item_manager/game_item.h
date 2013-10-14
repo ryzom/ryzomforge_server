@@ -682,6 +682,12 @@ public :
 	bool getLockedByOwner() const { return _LockedByOwner; }
 	void setLockedByOwner(bool value);
 
+	inline bool getMovable() const { return _Movable; }
+	inline void setMovable(bool value) { _Movable = value; }
+
+	inline bool getUnMovable() const { return _UnMovable; }
+	inline void setUnMovable(bool value) { _UnMovable = value; }
+	
 	/// get required stat
 	inline CHARACTERISTICS::TCharacteristics getRequiredCharac() const { return _RequiredCharac; }
 	/// set required stat
@@ -958,6 +964,8 @@ private:
 
 	ucstring			_CustomText;
 	bool                _LockedByOwner;
+	bool                _UnMovable;
+	bool                _Movable;
 	uint8               _PetIndex;
 	ucstring            _CustomName;
 };
