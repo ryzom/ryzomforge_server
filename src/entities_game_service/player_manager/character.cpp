@@ -10359,7 +10359,7 @@ void CCharacter::initOrganizationInfos()
 //-----------------------------------------------------------------------------
 void CCharacter::sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain)
 {
-	BOMB_IF(clan != PVP_CLAN::Neutral && ( clan < PVP_CLAN::BeginClans || clan > PVP_CLAN::EndClans ), "invalid pvp clan!", return);
+	BOMB_IF(clan < PVP_CLAN::BeginClans || clan > PVP_CLAN::EndClans, "invalid pvp clan!", return);
 
 	SM_STATIC_PARAMS_2(fpMsgParams, STRING_MANAGER::faction, STRING_MANAGER::integer);
 	fpMsgParams[0].Enum = PVP_CLAN::getFactionIndex(clan);
@@ -10371,7 +10371,7 @@ void CCharacter::sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpG
 //-----------------------------------------------------------------------------
 void CCharacter::sendFactionPointGainKillMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain, const NLMISC::CEntityId & victimId)
 {
-	BOMB_IF(clan != PVP_CLAN::Neutral && ( clan < PVP_CLAN::BeginClans || clan > PVP_CLAN::EndClans ), "invalid pvp clan!", return);
+	BOMB_IF(clan < PVP_CLAN::BeginClans || clan > PVP_CLAN::EndClans, "invalid pvp clan!", return);
 
 	SM_STATIC_PARAMS_3(fpMsgParams, STRING_MANAGER::faction, STRING_MANAGER::integer, STRING_MANAGER::player);
 	fpMsgParams[0].Enum = PVP_CLAN::getFactionIndex(clan);
