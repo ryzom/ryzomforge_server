@@ -4964,6 +4964,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			return false;
 		}
 
+		if (new_item == NULL) // When the item is stacked, it's deleted by addItemToInventory. Need be checked again to prevent crash of egs
+			return true;
+			
 		ucstring customValue;
 
 		if (command_args.size() >= 6 && command_args[5] != "*")
@@ -5492,11 +5495,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial(botsName);
 		for (uint32 i=2; i<nbString; ++i)
 		{
-			string arg;
-			if (command_args[i]=="__OR__")
-				arg = "|";
-			else
-				arg = command_args[i]+";";
+			string arg = command_args[i]+";";
+			strFindReplace(arg, "__OR__", "|");
 			msgout.serial(arg);
 		}
 		CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
@@ -6414,6 +6414,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 					PlayerManager.sendImpulseToClient(c->getId(), "JOURNAL:ADD_COMPASS", x, y, txt);
 				}
 			}
+		}
+		else if (action == "set_text" && command_args.size() == 4)
+		{
+			c->setCustomMissionParams(command_args[2], command_args[3]);
 		}
 		else if (action == "set_params" && command_args.size() == 4)
 		{
