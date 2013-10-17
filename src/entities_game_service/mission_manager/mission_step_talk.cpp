@@ -172,8 +172,19 @@ class CMissionStepTalk : public IMissionStepTemplate
 				return 0;
 			}
 
-			TVectorParamCheck params;
-			return STRING_MANAGER::sendStringToClient( user, _PhraseId, params );
+			_User = PlayerManager.getChar(getEntityIdFromRow(user));
+			uint32 userId = PlayerManager.getPlayerId(_User->getId());
+			string text = _PhraseId;
+			if (_User)
+			{
+				uint32 userId = PlayerManager.getPlayerId(_User->getId());
+				text = _User->getCustomMissionText(_PhraseId);
+				if (text.empty())
+					return 0;
+			}
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal= text;
+			return STRING_MANAGER::sendStringToClient( user, "LITERAL", params );
 		}
 
 		CCreature * bot = CreatureManager.getCreature( interlocutor );

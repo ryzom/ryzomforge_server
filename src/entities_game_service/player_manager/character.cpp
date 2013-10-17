@@ -13661,18 +13661,15 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 	}
 
 	nlinfo(url.c_str());
-	TVectorParamCheck titleParams;
-	TVectorParamCheck textParams;
+	
 	uint32 userId = PlayerManager.getPlayerId(getId());
-	std::string name = "CUSTOM_URL_"+toString(userId);
-	ucstring phrase = ucstring(name+"(){[WEB : "+url+control+"]}");
-	NLNET::CMessage	msgout("SET_PHRASE");
-	msgout.serial(name);
-	msgout.serial(phrase);
-	sendMessageViaMirror("IOS", msgout);
 
+	SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
+	textParams[0].Literal= "WEB : "+url+control;
+	
+	TVectorParamCheck titleParams;
 	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "web_transactions", titleParams);
-	uint32 textId = STRING_MANAGER::sendStringToUser(userId, name, textParams);
+	uint32 textId = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", textParams );
 	PlayerManager.sendImpulseToClient(getId(), "USER:POPUP", titleId, textId);
 }
 
@@ -13711,6 +13708,21 @@ vector<string> CCharacter::getCustomMissionParams(const string &missionName)
 			NLMISC::splitString(_CustomMissionsParams[missionName], ",", params);
 	}
 	return params;
+}
+
+/// get custom mission text
+string CCharacter::getCustomMissionText(const string &missionName)
+{
+	if (_CustomMissionsParams.empty()) 
+	{
+		return "";
+	}
+	
+	if (!_CustomMissionsParams.empty() && _CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
+	{
+		return _CustomMissionsParams[missionName];
+	}
+	return "";
 }
 
 
