@@ -14081,7 +14081,50 @@ bool CCharacter::pickUpRawMaterial( uint32 indexInTempInv, bool * lastMaterial )
 		{
 			return false; // don't try to quarter an item for looting
 		}
+		
+		// Send url for Arcc triggers
 
+		vector<string> params = getCustomMissionParams("__LOOT_SHEET__");
+		if (params.size() >= 2)
+		{
+			// check if it's the creature have good sheet
+			CSheetId creatureSheetId(params[1]);
+			if (creatureSheetId != CSheetId::Unknown && creatureSheetId == creature->getType()) 
+			{
+				validateDynamicMissionStep(params[0]);
+				setCustomMissionParams("__LOOT_SHEET__", "");
+			}
+		}
+		// only check first item
+		if (indexInTempInv == 0)
+		{
+			
+			params = getCustomMissionParams("__LOOT_SHEET_WITH_ITEM__");
+			if (params.size() >= 3)
+			{
+				// check if it's the creature have good sheet
+				CSheetId creatureSheetId(params[1]);
+				if (creatureSheetId != CSheetId::Unknown && creatureSheetId == creature->getType()) 
+				{
+					// check if player have item in right hand
+					CGameItemPtr rightHandItem = getRightHandItem();
+					CSheetId needItem(params[2]);
+					if (rightHandItem != NULL && rightHandItem->getSheetId() == needItem)
+					{
+						validateDynamicMissionStep(params[0]);
+						setCustomMissionParams("__LOOT_SHEET_WITH_ITEM__", "");
+						if (params.size() >= 4)
+							setCustomMissionParams(params[3], "");
+					}
+					else if (params.size() >= 4)
+					{
+						string message = getCustomMissionText(params[3]);
+						if (!message.empty())
+							sendDynamicMessage(params[3], message);
+					}
+				}
+			}
+		}
 		// first slots are filled with loot items, quarter items are not in temp inv but only info in DB
 		uint32 rawMaterialIndex = indexInTempInv - creature->getLootSlotCount();
 		const CCreatureRawMaterial * mp = creature->getCreatureRawMaterial( rawMaterialIndex );
