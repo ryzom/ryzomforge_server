@@ -175,24 +175,42 @@ uint32 IMissionStepTemplate::sendStepText(CCharacter * user,const std::vector<ui
 	// If the text is overriden, add the overide parameters
 	if ( !_OverridenText.empty() )
 	{
-		if ( _AddDefaultParams )
+		
+		if (_OverridenText.substr(0, 6) == "WEBIG_")
 		{
-			params.reserve(params.size() + _AdditionalParams.size());
-			params.insert(params.end(), _AdditionalParams.begin(), _AdditionalParams.end());
-			if ( textPtr && !textPtr->empty() && (*textPtr)[textPtr->size()-1] == '_' )
+			string text = _OverridenText;
+			if (user)
 			{
-				buffer = _OverridenText + "_";
-				textPtr = &buffer;
+				uint32 userId = PlayerManager.getPlayerId(user->getId());
+				text = user->getCustomMissionText(_OverridenText);
+				if (text.empty())
+					text = _OverridenText;
 			}
-			else
-				textPtr = &_OverridenText;
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal.fromUtf8(text);
+			return STRING_MANAGER::sendStringToClient( user->getEntityRowId(), "LITERAL", params );
 		}
 		else
 		{
-			params = _AdditionalParams;
-			textPtr = &_OverridenText;
+				
+			if ( _AddDefaultParams )
+			{
+				params.reserve(params.size() + _AdditionalParams.size());
+				params.insert(params.end(), _AdditionalParams.begin(), _AdditionalParams.end());
+				if ( textPtr && !textPtr->empty() && (*textPtr)[textPtr->size()-1] == '_' )
+				{
+					buffer = _OverridenText + "_";
+					textPtr = &buffer;
+				}
+				else
+					textPtr = &_OverridenText;
+			}
+			else
+			{
+				params = _AdditionalParams;
+				textPtr = &_OverridenText;
+			}
 		}
-
 	}
 
 	if( !textPtr )

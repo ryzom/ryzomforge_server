@@ -1667,6 +1667,9 @@ public:
 	/// get ammo item
 	virtual CGameItemPtr getAmmoItem() const;
 
+	/// send dynamic message
+	void sendDynamicMessage(const std::string &phrase, const std::string &message);
+	
 	/// send custom url
 	void sendUrl(const std::string &url, const std::string &salt);
 
@@ -1678,6 +1681,9 @@ public:
 
  	/// get custom mission params
  	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
+
+ 	/// get custom mission texts
+ 	std::string getCustomMissionText(const std::string &missionName);
 
  	/// validate dynamic mission step sending url
  	void validateDynamicMissionStep(const std::string &url);

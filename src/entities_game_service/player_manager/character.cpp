@@ -13649,6 +13649,21 @@ uint16 CCharacter::getFirstFreeSlotInKnownPhrase()
 } // getFirstFreeSlotInKnownPhrase //
 
 
+void CCharacter::sendDynamicMessage(const string &phrase, const string &message)
+{
+	TVectorParamCheck messageParams;
+	ucstring phraseText;
+	string phraseName = phrase;
+	phraseText.fromUtf8(message);
+	ucstring phraseContent = phrase+"(){["+phraseText+"]}";
+	NLNET::CMessage	msgout("SET_PHRASE");
+	msgout.serial(phraseName);
+	msgout.serial(phraseContent);
+	sendMessageViaMirror("IOS", msgout);
+	PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, phrase, messageParams );
+}
+
+
 void CCharacter::sendUrl(const string &url, const string &salt)
 {
 	string control;
@@ -13681,7 +13696,10 @@ void CCharacter::validateDynamicMissionStep(const string &url)
 /// set custom mission param
 void CCharacter::setCustomMissionParams(const string &missionName, const string &params)
 {
-	_CustomMissionsParams[missionName] = params;
+	if (params.empty())
+		_CustomMissionsParams.erase(missionName);
+	else
+		_CustomMissionsParams[missionName] = params;
 }
 
 /// add custom mission param

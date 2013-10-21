@@ -2408,7 +2408,7 @@ uint32 CMissionTemplate::sendTitleText( const TDataSetRow & userRow, const TData
 				text = "<Undefined>";
 		}
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-		params[0].Literal= text;
+		params[0].Literal.fromUtf8(text);
 		return STRING_MANAGER::sendStringToClient( userRow, "LITERAL", params );
 	}
 	else
@@ -2436,7 +2436,7 @@ uint32 CMissionTemplate::sendAutoText( const TDataSetRow & userRow,const NLMISC:
 				return 0;
 		}
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-		params[0].Literal= text;
+		params[0].Literal.fromUtf8(text);
 		return STRING_MANAGER::sendStringToClient( userRow, "LITERAL", params );
 	}
 	else
@@ -2461,7 +2461,7 @@ uint32 CMissionTemplate::sendDescText( const TDataSetRow & userRow, const TDataS
 				text = "<Undefined>";
 		}
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-		params[0].Literal= text;
+		params[0].Literal.fromUtf8(text);
 		return STRING_MANAGER::sendStringToClient( userRow, "LITERAL", params );
 	}
 	else

@@ -182,9 +182,18 @@ class CMissionStepTalk : public IMissionStepTemplate
 				if (text.empty())
 					return 0;
 			}
-			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-			params[0].Literal= text;
-			return STRING_MANAGER::sendStringToClient( user, "LITERAL", params );
+			TVectorParamCheck params;
+			ucstring phrase = ucstring(_PhraseId+"(){["+text+"]}");
+			NLNET::CMessage	msgout("SET_PHRASE");
+			msgout.serial(_PhraseId);
+			msgout.serial(text);
+			sendMessageViaMirror("IOS", msgout);
+			
+			return STRING_MANAGER::sendStringToClient( user, _PhraseId, params );*/
+			
+			
+/*			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+			params[0].Literal= text;*/
 		}
 
 		CCreature * bot = CreatureManager.getCreature( interlocutor );

@@ -37,6 +37,7 @@
 #include "nel/misc/eid_translator.h"
 #include "nel/misc/algo.h"
 #include "nel/misc/sstring.h"
+#include "nel/misc/i18n.h"
 
 #include "nel/net/admin.h"
 #include "nel/net/service.h"
@@ -702,6 +703,37 @@ void initSalt()
 	{
 		nlinfo("Salt loading : salt_egs.txt");
 		Bsi.syncLoadFile("salt_egs.txt", new SaltFileLoadCallback("salt_egs.txt"));
+	}
+}
+
+string getStringFromHash(const string &hash) {
+	ucstring finaltext;
+	getUCstringFromHash(hash, finaltext);
+	
+	return finaltext.toUtf8();
+}
+
+void getUCstringFromHash(const string &hash, ucstring &finaltext)
+{
+	string fullhash = hash;
+	// fill hash with space to be a *2
+	if (hash.size() % 2)
+	{
+		fullhash += " ";
+	}
+
+	// cut hash in portion of 4
+	for (uint i=0; i<fullhash.size()/4; i++) {
+		string part = fullhash.substr((i*4)+2, 2)+fullhash.substr(i*4, 2);
+		ucstring ucpart;
+		uint ch;
+		uint n;
+		if (sscanf(part.c_str(), "%4x%n", &ch, &n) != 1) {
+			// Unexpected string format
+			break;
+		}
+		
+		finaltext.push_back((ucchar)ch);
 	}
 }
 
@@ -3149,14 +3181,12 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		TLogContext_Character_BuyRolemasterPhrase characterCtx(onTarget ? c->getTarget() : eid);
 		std::string csName = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
 
-		NLMISC::CSString cs_res = CSString(res);
-		cs_res = cs_res.replace("#player", eid.toString().c_str());
+		strFindReplace(res, "#player", eid.toString().c_str());
 		if (c->getTarget() != CEntityId::Unknown)
 		{
-			cs_res = cs_res.replace("#target", c->getTarget().toString().c_str());
-			cs_res = cs_res.replace("#gtarget", string("#"+c->getTarget().toString()).c_str());
+			strFindReplace(res, "#target", c->getTarget().toString().c_str());
+			strFindReplace(res, "#gtarget", string("#"+c->getTarget().toString()).c_str());
 		}
-		res = (string)cs_res;
 		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
 
 		audit(cmd, res, eid, csName, targetName);
@@ -6415,9 +6445,14 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				}
 			}
 		}
-		else if (action == "set_text" && command_args.size() == 4)
+		else if (action == "set_text" && command_args.size() >= 4)
 		{
-			c->setCustomMissionParams(command_args[2], command_args[3]);
+			uint32 nbString = (uint32)command_args.size();
+			string text = getStringFromHash(command_args[3]);
+		
+			for (uint32 i=4; i<nbString; ++i)
+				text +=  "\n"+getStringFromHash(command_args[i]);
+			c->setCustomMissionParams(command_args[2], text);
 		}
 		else if (action == "set_params" && command_args.size() == 4)
 		{
