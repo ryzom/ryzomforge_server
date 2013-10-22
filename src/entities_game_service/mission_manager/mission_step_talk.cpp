@@ -189,7 +189,7 @@ class CMissionStepTalk : public IMissionStepTemplate
 			msgout.serial(text);
 			sendMessageViaMirror("IOS", msgout);
 			
-			return STRING_MANAGER::sendStringToClient( user, _PhraseId, params );*/
+			return STRING_MANAGER::sendStringToClient( user, _PhraseId, params );
 			
 			
 /*			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
