@@ -1136,8 +1136,13 @@ bool CCombatPhrase::validate()
 		if(_MeleeCombat)
 		{
 			// check combat float mode
+			uint32 range;
+			if ( defender->getId().getType() == RYZOMID::player )
+				range = 1500;
+			else
+				range = 10000;
 			CCharacter *character = PlayerManager.getChar(_Attacker->getEntityRowId());
-			if (character && !character->meleeCombatIsValid())
+			if ((character && !character->meleeCombatIsValid()) ||  ! PHRASE_UTILITIES::testRange(*actingEntity, *defender, range ))
 			{
 				if (!_TargetTooFarMsg)
 				{
@@ -1488,8 +1493,13 @@ bool  CCombatPhrase::update()
 				if (_MeleeCombat )
 				{
 					debugStep = 18;
+					uint32 range;
+					if ( combatDefender->getEntity()->getId().getType() == RYZOMID::player )
+						range = 1500;
+					else
+						range = 10000;
 					CCharacter *character = dynamic_cast<CCharacter *> (actor);
-					if (character && !character->meleeCombatIsValid())
+					if ((character && !character->meleeCombatIsValid()) || !PHRASE_UTILITIES::testRange(*actor, *combatDefender->getEntity(), range) )
 					{
 						debugStep = 19;
 						if (!_TargetTooFarMsg && !_Idle)
