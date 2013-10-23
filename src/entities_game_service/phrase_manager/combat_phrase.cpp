@@ -1493,6 +1493,8 @@ bool  CCombatPhrase::update()
 				if (_MeleeCombat )
 				{
 					debugStep = 18;
+					if (!combatDefender || !combatDefender->getEntity())
+						return false;
 					uint32 range;
 					if ( combatDefender->getEntity()->getId().getType() == RYZOMID::player )
 						range = 1500;
