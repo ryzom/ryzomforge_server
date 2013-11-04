@@ -1139,11 +1139,19 @@ bool CCombatPhrase::validate()
 			uint32 range;
 			if (!combatDefender || !combatDefender->getEntity())
 				return false;
+
+			CCharacter *character = PlayerManager.getChar(_Attacker->getEntityRowId());
+			CCharacter *cdefender = PlayerManager.getChar(defender->getEntityRowId());
 			if ( defender->getId().getType() == RYZOMID::player )
-				range = 3000;
+			{
+				if (character && character->hasMoved() && cdefender && cdefender->hasMoved())
+					range = 10000;
+				else
+					range = 3000;
+			}
 			else
 				range = 6000;
-			CCharacter *character = PlayerManager.getChar(_Attacker->getEntityRowId());
+				
 			if ((character && !character->meleeCombatIsValid()) ||  ! PHRASE_UTILITIES::testRange(*actingEntity, *defender, range ))
 			{
 				if (!_TargetTooFarMsg && (character && !character->meleeCombatIsValid()))
@@ -1498,12 +1506,20 @@ bool  CCombatPhrase::update()
 					if (!combatDefender || !combatDefender->getEntity())
 						return false;
 					uint32 range;
+
+					CCharacter *character = dynamic_cast<CCharacter *> (actor);
+					CCharacter *defender = dynamic_cast<CCharacter *> (combatDefender->getEntity());
 					if ( combatDefender->getEntity()->getId().getType() == RYZOMID::player )
-						range = 3000;
+					{
+						if (character && character->hasMoved() && defender && defender->hasMoved() )
+							range = 10000;
+						else
+							range = 3000;
+					}
 					else
 						range = 6000;
-					CCharacter *character = dynamic_cast<CCharacter *> (actor);
-					if ((character && !character->meleeCombatIsValid()) || !PHRASE_UTILITIES::testRange(*actor, *combatDefender->getEntity(), range) )
+					
+					if ((character && !character->meleeCombatIsValid()) || !PHRASE_UTILITIES::testRange(*actor, *combatDefender->getEntity(), range))
 					{
 						debugStep = 19;
 						if (!_TargetTooFarMsg && !_Idle && (character && !character->meleeCombatIsValid()))

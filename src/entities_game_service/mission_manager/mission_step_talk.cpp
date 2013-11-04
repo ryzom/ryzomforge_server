@@ -186,7 +186,7 @@ class CMissionStepTalk : public IMissionStepTemplate
 			ucstring phrase = ucstring(_PhraseId+"(){["+text+"]}");
 			NLNET::CMessage	msgout("SET_PHRASE");
 			msgout.serial(_PhraseId);
-			msgout.serial(text);
+			msgout.serial(phrase);
 			sendMessageViaMirror("IOS", msgout);
 			
 			return STRING_MANAGER::sendStringToClient( user, _PhraseId, params );

@@ -1519,6 +1519,9 @@ uint32 CCharacter::tickUpdate()
 		nextUpdate = 8;
 	}
 
+	_SavedPosX = _EntityState.X();
+	_SavedPosY = _EntityState.Y();
+
 	return nextUpdate;
 } // tickUpdate //
 

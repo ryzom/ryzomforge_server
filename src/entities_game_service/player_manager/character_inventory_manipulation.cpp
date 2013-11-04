@@ -1325,9 +1325,7 @@ bool CCharacter::checkPreRequired(const CGameItemPtr & item, bool equipCheck )
 			}
 		}
 	}
-	
-	nlinfo("Required Faction : %s", item->getRequiredFaction().c_str());
-	
+		
 	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();
 	bool neutralcult = (allegeance.first == PVP_CLAN::Neutral || allegeance.first == PVP_CLAN::None);
 	bool neutralciv = (allegeance.second == PVP_CLAN::Neutral || allegeance.second == PVP_CLAN::None);

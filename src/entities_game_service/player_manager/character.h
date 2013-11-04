@@ -3187,6 +3187,11 @@ private:
 	/// old pos Y
 	mutable sint32				_OldPosY;
 
+	/// old pos X
+	mutable sint32				_SavedPosX;
+	/// old pos Y
+	mutable sint32				_SavedPosY;
+
 	/// last X position written in DB
 	sint32						_LastPosXInDB;
 	/// last Y position written in DB
@@ -3764,8 +3769,8 @@ private:
 	
 public:
 	uint32 getLastDisconnectionDate();
-
-
+	bool hasMoved();
+	
 private:
 	TAIAlias _SelectedOutpost;
 public:

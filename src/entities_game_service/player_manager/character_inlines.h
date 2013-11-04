@@ -1058,6 +1058,12 @@ inline TAIAlias CCharacter::getSelectedOutpost() const
 	return _SelectedOutpost; 
 }
 
+// return true if character has moved
+inline bool CCharacter::hasMoved()
+{
+	return ( _EntityState.X() != _SavedPosX || _EntityState.Y() != _SavedPosY );
+}
+
 //------------------------------------------------------------------------------
 
 //inline CCharacter::CCharacterDbReminder* CCharacter::getDataIndexReminder()
