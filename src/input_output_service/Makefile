@@ -6,19 +6,22 @@ include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
+	    -DMONGO_HAVE_UNISTD \
 		-I/usr/include/libxml2 \
+		-I/usr/local/include \
 		-I$(NEL_INCLUDE) \
 		-I$(RYZOM_COMMON_SRC) \
 		-I..
 
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \
+		-L/usr/local/lib/ \
 		-L$(RYZOM_COMMON_SRC)/game_share \
-        -L../server_share \
+		-L../server_share \
 		-L../pd_lib \
 		-L../admin_modules \
 		-lpd_lib \
-        -lserver_share \
+	    -lserver_share \
 		-lgame_share \
 		-ladmin_modules \
 		-lnelgeorges \
@@ -26,6 +29,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lnelmisc \
 		-lxml2 \
 		-lrt\
+        -lmongoc \
 		-ldl
 
 #############################################################################

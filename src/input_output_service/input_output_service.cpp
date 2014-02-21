@@ -68,15 +68,18 @@ CInputOutputService * IOS = NULL;
 uint8 MaxDistSay = 1; 
 uint8 MaxDistShout = 3;
 
+
 // true if we display all chat received
 bool ShowChat = false;
 
 CVariable<bool>	VerboseNameTranslation("ios","VerboseNameTranslation", "Set verbosity for bot name trnaslation", false, 0, true);
+CVariable<uint32>	MongoDBChatsCheckingDelay("ios","MongoDBChatCheckingDelay", "Set delay in tick before new MongDb chats check", 10, 0, true);
 extern CVariable<bool>	VerboseChatManagement;
 
 
 CGenericXmlMsgHeaderManager GenericXmlMsgHeaderMngr;
 
+uint8 ticks_before_mongodb_check = 0;
 
 void CAIAliasManager::clear()
 { 
@@ -300,6 +303,20 @@ bool CInputOutputService::update()
 		else
 			++first;
 	}
+
+	/// MongoDB Chats Check
+
+	if (ticks_before_mongodb_check > 0)
+	{
+		ticks_before_mongodb_check--;
+	}
+	else
+	{
+		ticks_before_mongodb_check = MongoDBChatsCheckingDelay;
+		IOS->getChatManager().update();
+	}
+
+
 
 	return true;
 } // update //

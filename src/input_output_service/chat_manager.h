@@ -424,6 +424,8 @@ public:
 	 * \param ucstr is the message content
 	 */
 	void sendChatCustomEmote( const TDataSetRow &sender, const TDataSetRow &receiver, const ucstring& ucstr );
+
+	void update();
 };
 
 
