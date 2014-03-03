@@ -230,11 +230,13 @@ nldebug("sendFarTell : can't get character name from sender char id %s", senderC
 
 			uint32 hostShardId = 0;
 
+			nlinfo("MongoDB : Far Tell from %s to %s", senderName.c_str(), destName.c_str());
 			if (destName[0] == '~') // Don't check sender online status => will be send to mongoDB
 				hostShardId = el->getShardIdForChar(senderName); // Use sender shardId
 			else
 				hostShardId = el->getShardIdForChar(destName); // Use receiver shardId
 
+			nlinfo("MongoDB : hostShardId : %d", hostShardId);
 			if (hostShardId == 0)
 			{
 				// the character is not online

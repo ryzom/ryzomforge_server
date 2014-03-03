@@ -787,17 +787,20 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 
 					///// Uni lang
 					//
-					// En: (0x0000000001:0a:00:00)
-					// Fr: (0x0000000002:0a:00:00)
-					// De: (0x0000000003:0a:00:00)
-					// Ru: (0x0000000004:0a:00:00)
-					// Es: (0x0000000005:0a:00:00)
+					// En: (0x0000000000:0a:00:00)
+					// Fr: (0x0000000001:0a:00:00)
+					// De: (0x0000000002:0a:00:00)
+					// Ru: (0x0000000003:0a:00:00)
+					// Es: (0x0000000004:0a:00:00)
 					//
 
-					if (chanID.getShortId() < 6) {
+					nlinfo("MongoDB Channel : %d, %d", session->StringID, chanID.getShortId());
 
-						string langChannels[] = {"all", "en", "fr", "de", "ru", "es"};
+					if (chanID.getShortId() < 5) {
+
+						string langChannels[] = {"en", "fr", "de", "ru", "es"};
 						string chatId = langChannels[chanID.getShortId()];
+						nlinfo("MongoDB Channel : %s", chatId.c_str());
 
 						double date = 1000.0*(double)CTime::getSecondsSince1970();
 						string name = senderName;
@@ -2219,7 +2222,7 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 	if (receiver[0] == '~') {
 		/// MONGODB
 		//
-
+		nlinfo("MongoDB : received tell");
 		double date = 1000.0*(double)CTime::getSecondsSince1970();
 
 		string username = toLower(senderName.toString());
@@ -2727,20 +2730,21 @@ void CChatManager::update()
 			TChanID chanID;
 			///// Uni lang
 			//
-			// En: (0x0000000001:0a:00:00)
-			// Fr: (0x0000000002:0a:00:00)
-			// De: (0x0000000003:0a:00:00)
-			// Ru: (0x0000000004:0a:00:00)
-			// Es: (0x0000000005:0a:00:00)
+			// En: (0x0000000000:0a:00:00)
+			// Fr: (0x0000000001:0a:00:00)
+			// De: (0x0000000002:0a:00:00)
+			// Ru: (0x0000000003:0a:00:00)
+			// Es: (0x0000000004:0a:00:00)
 			//
 			
 			map<string, TChanID> channels;
-			channels["en"] = CEntityId("(0x0000000001:0a:00:00)");
-			channels["fr"] = CEntityId("(0x0000000002:0a:00:00)");
-			channels["de"] = CEntityId("(0x0000000003:0a:00:00)");
-			channels["ru"] = CEntityId("(0x0000000004:0a:00:00)");
-			channels["es"] = CEntityId("(0x0000000005:0a:00:00)");
+			channels["en"] = CEntityId("(0x0000000000:0a:00:00)");
+			channels["fr"] = CEntityId("(0x0000000001:0a:00:00)");
+			channels["de"] = CEntityId("(0x0000000002:0a:00:00)");
+			channels["ru"] = CEntityId("(0x0000000003:0a:00:00)");
+			channels["es"] = CEntityId("(0x0000000004:0a:00:00)");
 
+			nlinfo("MongoDB : channel %s ", chatId.c_str());
 			CDynChatSession *dcc = _DynChat.getChan(channels[chatId])->getFirstSession();
 			while (dcc)
 			{
