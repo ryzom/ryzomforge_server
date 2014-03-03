@@ -65,6 +65,9 @@ CVariable<bool>			ForceFarChat("ios","ForceFarChat", "Force the use of SU to dis
 
 double last_mongo_chat_date = 1000.0*(double)CTime::getSecondsSince1970();
 
+typedef NLMISC::CTwinMap<TChanID, string> TChanTwinMap;
+TChanTwinMap 	_ChanNames;
+
 
 CChatManager::CChatManager () : _Log(CLog::LOG_INFO)
 {
@@ -764,9 +767,9 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 			break;
 		case CChatGroup::dyn_chat:
 		{
-			TChanID chanID = itCl->second->getDynChatChan();
+			TChanID chanId = itCl->second->getDynChatChan();
 
-			CDynChatSession *session = _DynChat.getSession(chanID, sender);
+			CDynChatSession *session = _DynChat.getSession(chanId, sender);
 			if (session) // player must have a session in that channel
 			{
 				if (session->WriteRight) // player must have the right to speak in the channel
@@ -794,13 +797,19 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					// Es: (0x0000000004:0a:00:00)
 					//
 
-					nlinfo("MongoDB Channel : %d, %d", session->StringID, chanID.getShortId());
+					nlinfo("MongoDB Channel : %d, %d", session->StringID, chanId.getShortId());
 
-					if (chanID.getShortId() < 5) {
+					if (chanId.getShortId() < 5) {
 
-						string langChannels[] = {"en", "fr", "de", "ru", "es"};
-						string chatId = langChannels[chanID.getShortId()];
-						nlinfo("MongoDB Channel : %s", chatId.c_str());
+						const std::string *tmpChatId = _ChanNames.getB(chanId);
+						string chatId;
+						if (tmpChatId)
+							chatId = *tmpChatId;
+
+						chatId = toLower(chatId.substr(chatId.length()-2));
+
+						nlinfo("MongoDB: chatId = %s, chanId = %s", chatId.c_str(), chanId.toString().c_str());
+
 
 						double date = 1000.0*(double)CTime::getSecondsSince1970();
 						string name = senderName;
@@ -867,22 +876,22 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 						CDynChatSession *dcc = session->getChan()->getFirstSession();
 						while (dcc)
 						{
-							sendChat(itCl->second->getChatMode(), dcc->getClient()->getID(), content, sender, chanID);
+							sendChat(itCl->second->getChatMode(), dcc->getClient()->getID(), content, sender, chanId);
 							dcc = dcc->getNextChannelSession(); // next session in this channel
 						}
 					}
 					else
 					{
 						// only send an echo to the sender
-						sendChat(itCl->second->getChatMode(), itCl->first, ucstr, sender, chanID);
+						sendChat(itCl->second->getChatMode(), itCl->first, ucstr, sender, chanId);
 					}
 					if (session->getChan()->getForwardPlayerIntputToOwnerService())
 					{
 						// send player input to service owner
-						NLNET::TServiceId serviceId(chanID.getCreatorId());
+						NLNET::TServiceId serviceId(chanId.getCreatorId());
 
 						TPlayerInputForward	pif;
-						pif.ChanID = chanID;
+						pif.ChanID = chanId;
 						pif.Sender = sender;
 						pif.Content = ucstr;
 
@@ -2727,28 +2736,20 @@ void CChatManager::update()
 		else if (chatType == "univers" and chatId != "all")
 		{
 			// broadcast to other client in the channel
-			TChanID chanID;
-			///// Uni lang
-			//
-			// En: (0x0000000000:0a:00:00)
-			// Fr: (0x0000000001:0a:00:00)
-			// De: (0x0000000002:0a:00:00)
-			// Ru: (0x0000000003:0a:00:00)
-			// Es: (0x0000000004:0a:00:00)
-			//
-			
-			map<string, TChanID> channels;
-			channels["en"] = CEntityId("(0x0000000000:0a:00:00)");
-			channels["fr"] = CEntityId("(0x0000000001:0a:00:00)");
-			channels["de"] = CEntityId("(0x0000000002:0a:00:00)");
-			channels["ru"] = CEntityId("(0x0000000003:0a:00:00)");
-			channels["es"] = CEntityId("(0x0000000004:0a:00:00)");
+			TChanID chanId = NLMISC::CEntityId::Unknown;
 
-			nlinfo("MongoDB : channel %s ", chatId.c_str());
-			CDynChatSession *dcc = _DynChat.getChan(channels[chatId])->getFirstSession();
+			chatId = "FACTION_"+toUpper(chatId);
+
+			const TChanID *tmpChanId = _ChanNames.getA(chatId);
+			if (tmpChanId)
+				chanId = *tmpChanId;
+
+			nlinfo("MongoDB: chatId = %s, chanId = %s", chatId.c_str(), chanId.toString().c_str());
+
+			CDynChatSession *dcc = _DynChat.getChan(chanId)->getFirstSession();
 			while (dcc)
 			{
-				sendFarChat((CChatGroup::TGroupType)12, dcc->getClient()->getID(), text, ucstring("~")+ucstring(name), channels[chatId]);
+				sendFarChat((CChatGroup::TGroupType)12, dcc->getClient()->getID(), text, ucstring("~")+ucstring(name), chanId);
 				dcc = dcc->getNextChannelSession(); // next session in this channel
 			}
 			// void CChatManager::sendFarChat( C const ucstring& ucstr, const ucstring &senderName, TChanID chanID)
