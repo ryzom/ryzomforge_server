@@ -2652,14 +2652,15 @@ void CChatManager::update()
 	bson_append_finish_object( &query );
 	bson_finish( &query );
 
-/*
-	nlinfo("check %d %d %d %d", mongo_check_connection(&conn), conn.err, conn.errcode, conn.lasterrcode);
+
 	if(mongo_check_connection(&conn) == MONGO_ERROR) {
 		nlwarning("boom");
 		mongo_reconnect(&conn);
-		// TODO reauth
+		if( mongo_cmd_authenticate(&conn, mongo_db.c_str(), "megacorp", "feFrvs3rfdcef4")  != MONGO_OK ) {
+			nlwarning( "FAIL: Failed to auth %d\n", conn.err );
+		}
 	}
-*/
+	
 
 	mongo_cursor_init( &cursor, &conn, mongo_col.c_str() );
 	mongo_cursor_set_query( &cursor, &query );
