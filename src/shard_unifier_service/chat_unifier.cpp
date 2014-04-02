@@ -207,27 +207,6 @@ namespace CHATUNI
 nldebug("sendFarTell : no entity locator");
 				return;
 			}
-			uint32 hostShardId = el->getShardIdForChar(destName);
-
-			if (hostShardId == 0)
-			{
-				// the character is not online
-				cucSender.recvFarTellFail(this, senderCharId, destName, TFailInfo::fi_char_offline);
-nldebug("sendFarTell : no valid host shard id for addressee '%s'", destName.toUtf8().c_str());
-				return;
-			}
-
-			// This player is online, we can forward the tell to him
-
-			// lookup in the IOS proxies
-			const TModuleProxyPtr *pproxy = _ChatClients.getA(hostShardId);
-			if (pproxy == NULL)
-			{
-				// no IOS for the hosting shard !
-				cucSender.recvFarTellFail(this, senderCharId, destName, TFailInfo::fi_no_ios_module);
-nldebug("sendFatTell : no module proxy for shard %u", hostShardId);
-				return;
-			}
 
 			ICharacterSync *charSync = ICharacterSync::getInstance();
 
@@ -238,7 +217,7 @@ nldebug("sendFatTell : no module proxy for shard %u", hostShardId);
 nldebug("sendFarTell : can't finc character sync singleton");
 				return;
 			}
-
+			
 			ucstring senderName = charSync->getCharacterName(uint32(senderCharId.getShortId()));
 
 			if (senderName.empty())
@@ -248,6 +227,33 @@ nldebug("sendFarTell : can't finc character sync singleton");
 nldebug("sendFarTell : can't get character name from sender char id %s", senderCharId.toString().c_str());
 				return;
 			}
+
+			uint32 hostShardId = 0;
+
+			nlinfo("MongoDB : Far Tell from %s to %s", senderName.c_str(), destName.c_str());
+			if (destName[0] == '~') // Don't check sender online status => will be send to mongoDB
+				hostShardId = el->getShardIdForChar(senderName); // Use sender shardId
+			else
+				hostShardId = el->getShardIdForChar(destName); // Use receiver shardId
+
+			nlinfo("MongoDB : hostShardId : %d", hostShardId);
+			if (hostShardId == 0)
+			{
+				// the character is not online
+				cucSender.recvFarTellFail(this, senderCharId, destName, TFailInfo::fi_char_offline);
+nldebug("sendFarTell : no valid host shard id for addressee '%s'", destName.toUtf8().c_str());
+				return;
+			}
+
+			// lookup in the IOS proxies
+			const TModuleProxyPtr *pproxy = _ChatClients.getA(hostShardId);
+			if (pproxy == NULL)
+			{
+				// no IOS for the hosting shard !
+				cucSender.recvFarTellFail(this, senderCharId, destName, TFailInfo::fi_no_ios_module);
+nldebug("sendFatTell : no module proxy for shard %u", hostShardId);
+				return;
+			};
 
 			// ok, we can send the far tell
 			CChatUnifierClientProxy cucDest(*pproxy);

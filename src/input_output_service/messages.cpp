@@ -45,6 +45,9 @@ extern CGenericXmlMsgHeaderManager GenericXmlMsgHeaderMngr;
 
 extern CVariable<bool>	VerboseChatManagement;
 
+typedef NLMISC::CTwinMap<TChanID, string> TChanTwinMap;
+extern TChanTwinMap 	_ChanNames;
+
 
 //-----------------------------------------------
 //	cbImpulsionReadyString :
@@ -1584,15 +1587,26 @@ void cbDynChatAddChan(CMessage& msgin, const string &serviceName, TServiceId ser
 	bool noBroadcast;
 	bool forwardInput;
 	bool unify;
+	string name;
 
 	msgin.serial(chanID);
 	msgin.serial(noBroadcast);
 	msgin.serial(forwardInput);
 	msgin.serial(unify);
-	nlinfo("cbDynChatAddChan: add channel");
+	msgin.serial(name);
+
+	nlinfo("cbDynChatAddChan: add channel : %s", name.c_str());
 	bool res = IOS->getChatManager().getDynChat().addChan(chanID, noBroadcast, forwardInput, unify);
-	if (!res) nlwarning("Couldn't add chan %s", chanID.toString().c_str());
-	else nlinfo("cbDynChatAddChan: add channel %s",chanID.toString().c_str());
+	if (!res)
+		nlwarning("Couldn't add chan %s", chanID.toString().c_str());
+	else
+	{
+		if (_ChanNames.getA(name) == NULL && _ChanNames.getB(chanID) == NULL)
+			_ChanNames.add(chanID, name);
+		else
+			nlwarning("Couldn't add chan %s. already added! %p %p", chanID.toString().c_str(), _ChanNames.getA(name), _ChanNames.getB(chanID));
+		nlinfo("cbDynChatAddChan: add channel %s",chanID.toString().c_str());
+	}
 }
 
 //-----------------------------------------------
