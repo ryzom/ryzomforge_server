@@ -5744,6 +5744,25 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}
 
 	//*************************************************
+	//***************** rename
+	//*************************************************
+	// /a webExecCommand debug 1 rename!moondev!ulukyndev hmac 0
+	else if (command_args[0] == "rename")
+	{
+		if (command_args.size () != 3) return false;
+		string arg = command_args[1]+" "+command_args[2];
+		const CAdminCommand * cmd = findAdminCommand("renamePlayer");
+		if (!cmd->ForwardToservice.empty())
+		{
+			// we need to forward the command to another service
+			if (IClientCommandForwader::getInstance())
+			{
+				IClientCommandForwader::getInstance()->sendCommand(cmd->ForwardToservice, "renamePlayer", c->getId(), false, CEntityId::Unknown, arg);
+			}
+		}
+	}
+
+	//*************************************************
 	//***************** set_tag
 	//*************************************************
 
