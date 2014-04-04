@@ -482,6 +482,14 @@
 			RelativePath=".\mysql_wrapper.h"
 			>
 		</File>
+        <File
+            RelativePath=".\mongo_wrapper.cpp"
+            >
+		  </File>
+        <File
+            RelativePath=".\mongo_wrapper.h"
+            >
+		  </File>
 		<File
 			RelativePath=".\npc_description_messages.cpp"
 			>

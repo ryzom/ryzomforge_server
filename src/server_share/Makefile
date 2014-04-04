@@ -9,6 +9,7 @@ include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
+		-DMONGO_HAVE_UNISTD \
 		-I/usr/include/libxml2 \
 		-I/usr/include/mysql \
 		-I$(HOME)/code/nel/include \

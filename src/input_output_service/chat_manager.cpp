@@ -21,7 +21,7 @@
 
 // MongoDB
 
-#include <mongo.h>
+/*b#include <mongo.h>*/
 
 
 #include <nel/misc/command.h>
@@ -34,6 +34,7 @@
 #include "game_share/backup_service_interface.h"
 
 #include "server_share/r2_variables.h"
+#include "server_share/mongo_wrapper.h"
 
 #include "chat_manager.h"
 #include "input_output_service.h"
@@ -47,11 +48,11 @@ using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
 
-
+/*b
 mongo conn;
 string mongo_db;
 string mongo_col;
-
+*/
 
 void	logChatDirChanged(IVariable &var)
 {
@@ -87,7 +88,10 @@ void CChatManager::init( /*const string& staticDBFileName, const string& dynDBFi
 //	if (!dynDBFileName.empty())
 //		_DynDB.load( dynDBFileName );
 
+	CMongo::init();
+
 	/* Now make a connection to MongoDB. */
+/*b
 	if( mongo_client( &conn, "ryzom.com", 22110 ) != MONGO_OK ) {
 		switch( conn.err ) {
         	case MONGO_CONN_SUCCESS:
@@ -121,7 +125,7 @@ void CChatManager::init( /*const string& staticDBFileName, const string& dynDBFi
 		nlwarning( "FAIL: Failed to auth %d\n", conn.err );
 		exit( 1 );
 	}
-
+*/
 
 	// create a chat group 'universe'
 	addGroup(CEntityId(RYZOMID::chatGroup,0), CChatGroup::universe, "");
@@ -672,18 +676,20 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				/// MONGODB
 				//
 
-				double date = 1000.0*(double)CTime::getSecondsSince1970();
+                double date = 1000.0*(double)CTime::getSecondsSince1970();
 
-				string name = senderName;
+                string name = senderName;
 
 				string::size_type pos = senderName.find('(');
-				if (pos != string::npos)
-					name = senderName.substr(0, pos);
-				else
-					name = senderName;
+                if (pos != string::npos)
+                    name = senderName.substr(0, pos);
+                else
+                    name = senderName;
 
+				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': 'all', 'date': %f, 'ig': true }", name.c_str(), ucstr.toUtf8().c_str(), date));
+
+/*b
 				bson base;
-				
 				bson_init( &base );
 					bson_append_string( &base, "username", name.c_str() );
 					bson_append_string( &base, "chat", ucstr.toUtf8().c_str() );
@@ -699,7 +705,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				}
 
 				bson_destroy ( &base );
-
+*/
 				/////
 
 				chatInGroup( grpId, ucstr, sender );
@@ -742,6 +748,9 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				else
 					name = senderName;
 
+				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'guildId', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), ucstr.toUtf8().c_str(), sGuildId.str().c_str(), date));
+
+/*b
 				bson base;
 				bson_init( &base );
 					bson_append_string( &base, "username", name.c_str() );
@@ -758,7 +767,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				}
 
 				bson_destroy ( &base );
-
+*/
 				/////
 
 
@@ -820,6 +829,9 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 						else
 							name = senderName;
 
+						CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), ucstr.toUtf8().c_str(), chatId.c_str(), date));
+
+/*b
 						bson base;
 						bson_init( &base );
 							bson_append_string( &base, "username", name.c_str() );
@@ -836,7 +848,9 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 						}
 
 						bson_destroy ( &base );
+*/
 					}
+
 					//////////////
 
 					if (!session->getChan()->getDontBroadcastPlayerInputs())
@@ -2091,7 +2105,7 @@ void CChatManager::tell( const TDataSetRow& sender, const string& receiverIn, co
 						sendChat2Ex( CChatGroup::tell, senderInfos->DataSetIndex, phraseId, TDataSetRow(), receiverInfos->AfkCustomTxt );
 					}
 					if ( _UsersIgnoringTells.find( receiverInfos->EntityId ) != _UsersIgnoringTells.end() )
-					{						
+					{
 						// send special message to user (same message as if the receiver was offline)
 						SM_STATIC_PARAMS_1( vect, STRING_MANAGER::literal );
 						vect[0].Literal = ucstring( receiver );
@@ -2231,6 +2245,7 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 	if (receiver[0] == '~') {
 		/// MONGODB
 		//
+
 		nlinfo("MongoDB : received tell");
 		double date = 1000.0*(double)CTime::getSecondsSince1970();
 
@@ -2244,8 +2259,10 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 		if (pos != string::npos)
 			chatId = chatId.substr(0, pos);
 
+		CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'username', 'chatId': '%s', 'date': %f, 'ig': true }", username.c_str(), ucstr.toUtf8().c_str(), chatId.c_str(), date));
+
+/*b
 		bson base;
-	
 		bson_init( &base );
 			bson_append_string( &base, "username", username.c_str() );
 			bson_append_string( &base, "chat", ucstr.toUtf8().c_str() );
@@ -2261,7 +2278,7 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 		}
 
 		bson_destroy ( &base );
-
+*/
 		/////
 		return;
 	}
@@ -2641,6 +2658,84 @@ void CChatManager::unsubscribeCharacterInRingUniverse(const NLMISC::CEntityId &c
 /// Update from input_output_service.cpp to check MongoDb changes
 void CChatManager::update()
 {
+	try {
+		std::auto_ptr<DBClientCursor> cursor = CMongo::query("chats", toString("{'date': { $gt: %f }  }", last_mongo_chat_date));
+		if(!cursor.get()) return;
+
+		while (cursor->more()) {
+			mongo::BSONObj obj = cursor->next();
+			nlinfo("mongo: new entry to parse '%s'", obj.jsonString().c_str());
+
+			string name;
+			string chat;
+			string chatType;
+			string chatId;
+			double date;
+			bool ig;
+
+			name = obj.getStringField("username");
+			chat = obj.getStringField("chat");
+			chatType = obj.getStringField("chatType");
+			chatId = obj.getStringField("chatId");
+			date = obj.getField("date").numberDouble();
+			last_mongo_chat_date = date;
+			ig = obj.getBoolField("ig");
+			if(ig) continue;
+
+			ucstring text;
+			text.fromUtf8(chat);
+
+
+			TGroupId grpId = CEntityId(RYZOMID::chatGroup, 0);
+
+			if (chatType == "guildId") // Chat avec la guilde
+			{
+				uint32 guildId;
+				NLMISC::fromString(chatId, guildId);
+
+				grpId.setShortId(guildId + 0x10000000);  // 0x10000000 is the GuildBase to chat group id
+				grpId.setDynamicId(0);
+				grpId.setCreatorId(0);
+			}
+			else if (chatType == "univers" and chatId != "all")
+			{
+				// broadcast to other client in the channel
+				TChanID chanId = NLMISC::CEntityId::Unknown;
+
+				chatId = "FACTION_"+toUpper(chatId);
+
+				const TChanID *tmpChanId = _ChanNames.getA(chatId);
+				if (tmpChanId)
+					chanId = *tmpChanId;
+
+				nlinfo("MongoDB: chatId = %s, chanId = %s", chatId.c_str(), chanId.toString().c_str());
+
+				CDynChatSession *dcc = _DynChat.getChan(chanId)->getFirstSession();
+				while (dcc)
+				{
+					sendFarChat((CChatGroup::TGroupType)12, dcc->getClient()->getID(), text, ucstring("~")+ucstring(name), chanId);
+					dcc = dcc->getNextChannelSession(); // next session in this channel
+				}
+				// void CChatManager::sendFarChat( C const ucstring& ucstr, const ucstring &senderName, TChanID chanID)
+				continue;
+			}
+			else if (chatType == "username")
+			{
+				if (IService::getInstance()->getShardId() == 301)
+					chatId = chatId+"(Yubo)";
+				else
+					chatId = chatId+"(Atys)";
+
+				farTell(CEntityId(uint64(0)), ucstring("~")+ucstring(name), false, ucstring(chatId), text);
+				continue;
+			}
+			farChatInGroup(grpId, 0, text, ucstring("~")+ucstring(name));
+		}
+	} catch(DBException& e) {
+		cout << "caught DBException " << e.toString() << endl;
+	}
+
+/*b
  	mongo_cursor cursor;
 	bson query;
 
@@ -2660,7 +2755,7 @@ void CChatManager::update()
 			nlwarning( "FAIL: Failed to auth %d\n", conn.err );
 		}
 	}
-	
+
 
 	mongo_cursor_init( &cursor, &conn, mongo_col.c_str() );
 	mongo_cursor_set_query( &cursor, &query );
@@ -2772,4 +2867,5 @@ void CChatManager::update()
 
 	bson_destroy( &query );
 	mongo_cursor_destroy( &cursor );
+*/
 }

@@ -6,7 +6,6 @@ include ../../../Variables.mk
 
 # The flags for the C++ compiler
 CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
-	    -DMONGO_HAVE_UNISTD \
 		-I/usr/include/libxml2 \
 		-I/usr/local/include \
 		-I$(NEL_INCLUDE) \
@@ -29,7 +28,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lnelmisc \
 		-lxml2 \
 		-lrt\
-        -lmongoc \
+        -lmongoclient -lboost_thread -lboost_filesystem -lboost_program_options -lboost_system \
 		-ldl
 
 #############################################################################
