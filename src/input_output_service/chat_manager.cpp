@@ -2678,13 +2678,15 @@ void CChatManager::update()
 			chatType = obj.getStringField("chatType");
 			chatId = obj.getStringField("chatId");
 			date = obj.getField("date").numberDouble();
-			last_mongo_chat_date = date;
+
+			if(date > last_mongo_chat_date)
+				last_mongo_chat_date = date;
+
 			ig = obj.getBoolField("ig");
 			if(ig) continue;
 
 			ucstring text;
 			text.fromUtf8(chat);
-
 
 			TGroupId grpId = CEntityId(RYZOMID::chatGroup, 0);
 
