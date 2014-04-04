@@ -90,6 +90,9 @@ void CChatManager::init( /*const string& staticDBFileName, const string& dynDBFi
 
 	CMongo::init();
 
+	// reset all muted players
+	CMongo::update("users", "{ 'game.muted': true}", toString("{ $set:{ 'game.muted': false } }"), false, true);
+
 	/* Now make a connection to MongoDB. */
 /*b
 	if( mongo_client( &conn, "ryzom.com", 22110 ) != MONGO_OK ) {
@@ -202,6 +205,37 @@ bool CChatManager::checkClient( const TDataSetRow& id )
 
 	return itCl != _Clients.end();
 }
+
+
+
+void CChatManager::addMutedUser( const NLMISC::CEntityId &eid )
+{
+	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': true } }"));
+
+	_MutedUsers.insert( eid );
+}
+
+void CChatManager::removeMutedUser( const NLMISC::CEntityId &eid )
+{
+	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': false } }"));
+
+	_MutedUsers.erase( eid );
+}
+
+void CChatManager::addUniverseMutedUser( const NLMISC::CEntityId &eid )
+{
+	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': true } }"));
+
+	_MutedUniverseUsers.insert( eid );
+}
+
+void CChatManager::removeUniverseMutedUser( const NLMISC::CEntityId &eid )
+{
+	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': false } }"));
+
+	_MutedUniverseUsers.erase( eid );
+}
+
 
 //-----------------------------------------------
 //	addClient

@@ -42,14 +42,14 @@
 
 
 
- 
+
 /**
  * CChatManager
  * \author Stephane Coutelas
  * \author Nevrax France
  * \date 2002
  */
-class CChatManager 
+class CChatManager
 {
 public :
 
@@ -72,7 +72,7 @@ public :
 	 */
 	void init( /*const std::string& staticDBFileName, const std::string& dynDBFileName*/ );
 
-	/** A service has gone down 
+	/** A service has gone down
 	 */
 	void onServiceDown(const std::string &serviceShortName);
 
@@ -80,7 +80,7 @@ public :
 	 * Reset ChatLog management
 	 */
 	void	resetChatLog();
-	
+
 	/**
 	 * Check if the client is already registered in the chat manager.
 	 */
@@ -102,7 +102,7 @@ public :
 	 * \param id is the client character id
 	 */
 	CChatClient& getClient( const TDataSetRow& id ); //throw (EChatClient);
-	
+
 	/**
 	 * Return a reference on the static database
 	 */
@@ -195,7 +195,7 @@ public :
 	void chat2( const TDataSetRow& sender, const std::string &phraseId );
 
 
-	
+
 	/**
 	 * Transmit a chat message
 	 * \param sender is the id of the talking char
@@ -292,28 +292,16 @@ public :
 	}
 
 	/// add a muted user
-	void addMutedUser( const NLMISC::CEntityId &eid )
-	{
-		_MutedUsers.insert( eid );
-	}
+	void addMutedUser( const NLMISC::CEntityId &eid );
 
 	/// remove a muted user
-	void removeMutedUser( const NLMISC::CEntityId &eid )
-	{
-		_MutedUsers.erase( eid );
-	}
+	void removeMutedUser( const NLMISC::CEntityId &eid );
 
 	// add a muted universe channel user
-	void addUniverseMutedUser( const NLMISC::CEntityId &eid )
-	{
-		_MutedUniverseUsers.insert( eid );
-	}
+	void addUniverseMutedUser( const NLMISC::CEntityId &eid );
 
 	// remove a muted universe channel user
-	void removeUniverseMutedUser( const NLMISC::CEntityId &eid )
-	{
-		_MutedUniverseUsers.erase( eid );
-	}
+	void removeUniverseMutedUser( const NLMISC::CEntityId &eid );
 
 	/// get the dyn chat
 	CDynChat &getDynChat() { return _DynChat; }
@@ -334,7 +322,7 @@ public :
 
 
 private :
-	
+
 	typedef std::map< TDataSetRow, CChatClient*>	TClientInfoCont;
 	/// client infos
 	TClientInfoCont	_Clients;
@@ -377,7 +365,7 @@ protected:
 	friend void cbNpcTellEx( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId );
 	friend void cbDynChatServiceChat( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId );
 	friend void cbDynChatServiceTell( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId );
-	
+
 public:
 	/**
 	 * Send a chat message
@@ -389,7 +377,7 @@ public:
 	 * \param senderName Can be used to replace the sender name with a specific string
 	 */
 	void sendChat( CChatGroup::TGroupType senderChatMode, const TDataSetRow &receiver, const ucstring& ucstr, const TDataSetRow &sender = TDataSetRow(), TChanID chanID = NLMISC::CEntityId::Unknown, const ucstring &senderName = ucstring());
-	
+
 
 	/**
 	 * Send a far chat message
