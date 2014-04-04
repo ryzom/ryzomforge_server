@@ -47,6 +47,7 @@
 #include "game_share/mainland_summary.h"
 #include "game_share/shard_names.h"
 #include "server_share/handy_commands.h"
+#include "server_share/mongo_wrapper.h"
 
 // egs
 #include "game_item_manager/game_item_manager.h"
@@ -1319,6 +1320,8 @@ void CPlayerService::init()
 	TTSIsUp = false;
 
 	initAdmin ();
+
+	CMongo::init();
 
 	//uint16 i = SKILLS::NUM_SKILLS;
 

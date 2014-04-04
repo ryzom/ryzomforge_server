@@ -33,6 +33,7 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lpd_lib \
 		-lxml2 \
 		-lrt\
+        -lmongoclient -lboost_thread -lboost_filesystem -lboost_program_options -lboost_system \
 		-ldl
 
 #############################################################################

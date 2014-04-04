@@ -146,6 +146,7 @@
 #include "modules/client_command_forwarder.h"
 #include "server_share/log_character_gen.h"
 #include "server_share/log_item_gen.h"
+#include "server_share/mongo_wrapper.h"
 
 ///////////
 // USING //
@@ -19148,6 +19149,8 @@ bool CCharacter::setGuildId( uint32 guildId )
 			IShardUnifierEvent::getInstance()->onUpdateCharGuild(_Id, guildId);
 
 		_GuildId = guildId;
+
+		CMongo::update("users", toString("{'game.cid':%"NL_I64"u}", _Id.getShortId()), toString("{$set:{'game.guildId':%d}}", guildId));
 
 		return true;
 	}
