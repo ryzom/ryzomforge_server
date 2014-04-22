@@ -84,3 +84,45 @@ void CMongo::update(const string &collection, const string &jsonQuery, const str
 		nlwarning("mongo: update failed, caught DBException '%s'", e.toString().c_str());
     }
 }
+
+string CMongo::quote(const string &s) {
+	string ret;
+	for ( std::string::const_iterator i = s.begin(); i != s.end(); ++i ) {
+		switch ( *i ) {
+		case '"':
+			ret += "\\\"";
+			break;
+		case '\'':
+			ret += "\\'";
+			break;
+		case '\\':
+			ret += "\\\\";
+			break;
+		case '\b':
+			ret += "\\b";
+			break;
+		case '\f':
+			ret += "\\f";
+			break;
+		case '\n':
+			ret += "\\n";
+			break;
+		case '\r':
+			ret += "\\r";
+			break;
+		case '\t':
+			ret += "\\t";
+			break;
+		default:
+			if ( *i >= 0 && *i <= 0x1f ) {
+				//TODO: these should be utf16 code-units not bytes
+				char c = *i;
+				ret += "\\u00" + toHexLower(&c, 1);
+			}
+			else {
+				ret += *i;
+			}
+		}
+	}
+	return ret;
+}

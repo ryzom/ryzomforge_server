@@ -36,6 +36,7 @@
 #include "building_manager/building_physical.h"
 #include "guild_manager/fame_manager.h"
 #include "zone_manager.h"
+#include "server_share/mongo_wrapper.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -562,13 +563,16 @@ void CGuildMemberModule::kickMember( uint16 index,uint8 session )const
 	if ( member->getReferencingModule( module ) )
 	{
 		module->clearOnlineGuildProperties();
+	} else {
+		CMongo::update("users", toString("{'game.cid':%"NL_I64"u}", member->getIngameEId().getShortId()), "{$set:{'game.guildId':0}}");
 	}
+
 	// send system message
 	SM_STATIC_PARAMS_2(params,STRING_MANAGER::player,STRING_MANAGER::string_id);
 	params[0].setEIdAIAlias( proxy.getId(), CAIAliasTranslator::getInstance()->getAIAlias(proxy.getId()) );
 	params[1].StringId = CEntityIdTranslator::getInstance()->getEntityNameStringId(member->getIngameEId());
 	sendMessageToGuildMembers("GUILD_KICK_MEMBER",params);
-	
+
 	guild->deleteMember( member );	
 }
 

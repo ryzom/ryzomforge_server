@@ -720,7 +720,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
                 else
                     name = senderName;
 
-				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': 'all', 'date': %f, 'ig': true }", name.c_str(), ucstr.toUtf8().c_str(), date));
+				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': 'all', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), date));
 
 /*b
 				bson base;
@@ -782,7 +782,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				else
 					name = senderName;
 
-				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'guildId', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), ucstr.toUtf8().c_str(), sGuildId.str().c_str(), date));
+				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'guildId', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), sGuildId.str().c_str(), date));
 
 /*b
 				bson base;
@@ -840,7 +840,6 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					// Es: (0x0000000004:0a:00:00)
 					//
 
-					nlinfo("MongoDB Channel : %d, %d", session->StringID, chanId.getShortId());
 
 					if (chanId.getShortId() < 5) {
 
@@ -851,9 +850,6 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 
 						chatId = toLower(chatId.substr(chatId.length()-2));
 
-						nlinfo("MongoDB: chatId = %s, chanId = %s", chatId.c_str(), chanId.toString().c_str());
-
-
 						double date = 1000.0*(double)CTime::getSecondsSince1970();
 						string name = senderName;
 
@@ -863,7 +859,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 						else
 							name = senderName;
 
-						CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), ucstr.toUtf8().c_str(), chatId.c_str(), date));
+						CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
 
 /*b
 						bson base;
@@ -2280,7 +2276,6 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 		/// MONGODB
 		//
 
-		nlinfo("MongoDB : received tell");
 		double date = 1000.0*(double)CTime::getSecondsSince1970();
 
 		string username = toLower(senderName.toString());
@@ -2293,7 +2288,7 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 		if (pos != string::npos)
 			chatId = chatId.substr(0, pos);
 
-		CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'username', 'chatId': '%s', 'date': %f, 'ig': true }", username.c_str(), ucstr.toUtf8().c_str(), chatId.c_str(), date));
+		CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'username', 'chatId': '%s', 'date': %f, 'ig': true }", username.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
 
 /*b
 		bson base;
@@ -2693,7 +2688,10 @@ void CChatManager::unsubscribeCharacterInRingUniverse(const NLMISC::CEntityId &c
 void CChatManager::update()
 {
 	try {
+		TTime before = CTime::getLocalTime();
 		std::auto_ptr<DBClientCursor> cursor = CMongo::query("chats", toString("{'date': { $gt: %f }  }", last_mongo_chat_date));
+		TTime after = CTime::getLocalTime();
+
 		if(!cursor.get()) return;
 
 		while (cursor->more()) {
@@ -2743,8 +2741,6 @@ void CChatManager::update()
 				const TChanID *tmpChanId = _ChanNames.getA(chatId);
 				if (tmpChanId)
 					chanId = *tmpChanId;
-
-				nlinfo("MongoDB: chatId = %s, chanId = %s", chatId.c_str(), chanId.toString().c_str());
 
 				CDynChatSession *dcc = _DynChat.getChan(chanId)->getFirstSession();
 				while (dcc)
