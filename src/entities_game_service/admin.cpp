@@ -62,6 +62,7 @@
 #include "player_manager/player.h"
 #include "player_manager/character.h"
 #include "player_manager/character_encyclopedia.h"
+#include "player_manager/player_room.h"
 #include "creature_manager/creature_manager.h"
 #include "phrase_manager/phrase_manager.h"
 #include "mission_manager/mission_manager.h"
@@ -6023,6 +6024,15 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if ( building )
 			{
 				CBuildingManager::getInstance()->buyBuilding(c->getId(), building->getAlias());
+			}
+		}
+		else if (action == "set_player_room"  && command_args.size () == 3)
+		{
+			CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]));
+			if ( building )
+			{
+				c->getRoomInterface().setBuilding(building);
+				building->addPlayer(c->getId());
 			}
 		}
 	}	
