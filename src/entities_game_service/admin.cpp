@@ -4609,12 +4609,15 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 	{
 		string current_channels = c->getLangChannel();
 		if (leave) {
+			strFindReplace(current_channels, lang+" ", "");
+			strFindReplace(current_channels, " "+lang, "");
 			inst->removeFactionChannelForCharacter(channel, c);
+			c->setLangChannel(current_channels);
 		}
 		else if (current_channels.find(lang) == string::npos)
 		{
 			inst->addFactionChannelToCharacter(channel, c, true);
-			c->setLangChannel(c->getLangChannel() + " "+lang);
+			c->setLangChannel(current_channels + " "+lang);
 		}
 		return true;
 	}
