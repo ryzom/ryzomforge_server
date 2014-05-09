@@ -3737,6 +3737,9 @@ private:
 	/// keep the Ids of the mission queues in which is this player
 	std::vector<uint32>	_MissionsQueues;
 
+	/// keep the validated web commandes
+	std::set<uint32>	_ValideWebCommandIndex;
+
 	/// keep here the queue for which this player currently has an enter critical zone proposal
 	uint32				_EnterCriticalZoneProposalQueueId;
 
@@ -3802,6 +3805,9 @@ public:
 
 	void			setWebCommandIndex(uint32 index) { _LastWebCommandIndex = index;}
 	uint32			getWebCommandIndex() const { return _LastWebCommandIndex;}
+
+	void			validateWebCommandIndex(uint32 index) { _ValideWebCommandIndex.insert(index);}
+	uint32			isValidWebCommandIndex(uint32 index) { return _ValideWebCommandIndex.find(index) != _ValideWebCommandIndex.end();}
 
 	void			setUrlIndex(uint32 index) { _LastUrlIndex = index;}
 	uint32			getUrlIndex() const { return _LastUrlIndex;}

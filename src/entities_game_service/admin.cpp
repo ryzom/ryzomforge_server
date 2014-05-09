@@ -4718,7 +4718,7 @@ CInventoryPtr getInv(CCharacter *c, const string &inv)
 	return inventoryPtr;
 }
 
-NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac> [<new_check=0|1|2|3>] [<next_step=0|1>] [<send_url=0|1>]")
+NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url> <index> <command> <hmac> [<new_check=0|1|2|3>] [<next_step=0|1>] [<send_url=0|1|2>]")
 {
 
 	if (args.size() < 5)
@@ -4744,6 +4744,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	if (args.size() >= 8 && args[7] == "1")
 		send_url = true;
 
+	bool save_index = false;
+	if (args.size() >= 8 && args[7] == "2") {
+		send_url = true;
+		save_index = true;
+	}
+
  	c->setAfkState(false);
 
 	string web_app_url = args[1];
@@ -4759,7 +4765,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	if (new_check)
 	{
 		uint32 saved_index = c->getWebCommandIndex();
-		if (iindex <= saved_index)
+		if (iindex <= saved_index && command != "is_valid_index")
 		{
 			// Index of command must be higher than last used index to prevent re-use of commands
 			if (send_url)
@@ -4781,7 +4787,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		string realhmacEid = getHMacSHA1((uint8*)&checksumEid[0], checksumEid.size(), (uint8*)&salt[0], salt.size()).toString();
 		string realhmacRowId = getHMacSHA1((uint8*)&checksumRowId[0], checksumRowId.size(), (uint8*)&salt[0], salt.size()).toString();
-		if (realhmacEid != hmac && realhmacRowId != hmac)
+		if (realhmacEid != hmac && realhmacRowId != hmac && command != "is_valid_index")
 		{
 			if (send_url)
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=bad_auth", getSalt());
@@ -4813,8 +4819,20 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 	}
 	
-	nlinfo("%s|%s", web_app_url.c_str(), command.c_str());
-	
+	nlinfo("%s|%s|%d", web_app_url.c_str(), command.c_str(), iindex);
+
+	if (command == "is_valid_index")
+	{
+		if (!c->isValidWebCommandIndex(iindex)) {
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=unvalid_index", getSalt());
+		}
+		else
+		{
+			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished&desc=valid_index", getSalt());
+		}
+		return true;
+	}
+
 	std::vector<std::string> command_args;
 	if (new_separator)
 		NLMISC::splitString(command, "|", command_args);
@@ -5097,7 +5115,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
 			return false;
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
-
+ 
 		sint32 value;
 		NLMISC::fromString(command_args[3], value);
 
@@ -5973,6 +5991,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		
 	//*************************************************
 	//***************** buildings
+	// /a webExecCommand debug 1 building!set_player_room!building_instance_ARCC_player_320 hmac 0
 	//*************************************************
 	else if (command_args[0] == "building")
 	{
@@ -6500,6 +6519,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}
 
 	if (!new_check)
+
 	{
 		if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
 		{
@@ -6512,11 +6532,20 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			{
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 			}
+		} else {
+			if (save_index) {
+				c->validateWebCommandIndex(iindex);
+				nlinfo("Valide command index saved!");
+			}
+			if (send_url)
+				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 		}
 	}
 	else
 	{
 		c->setWebCommandIndex(iindex);
+		if (save_index)
+			c->validateWebCommandIndex(iindex);
 		if (send_url)
 			c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 	}
