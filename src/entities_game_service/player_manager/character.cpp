@@ -14841,6 +14841,12 @@ TCharConnectionState CCharacter::isFriendCharVisualyOnline(const NLMISC::CEntity
 			return ccs_online;
 		}
 
+		if (haveAnyPrivilege())
+		{
+			// this character has some privs, so just show status.
+			return ccs_online;
+		}
+
 		ret = ccs_online;
 	}
 
