@@ -14829,6 +14829,22 @@ TCharConnectionState CCharacter::isFriendCharVisualyOnline(const NLMISC::CEntity
 
 	if (CEntityIdTranslator::getInstance()->isEntityOnline(friendId))
 	{
+		ret = ccs_online;
+
+		// Change this to true after clients have been patched.
+		const bool bMayReturnAFk = false;
+		if (bMayReturnAFk)
+		{
+			// Check if the friend is afk perhaps
+			TDataSetRow rowId = TheDataset.getDataSetRow(friendId);
+			CMirrorPropValue<uint16> mirrorValue( TheDataset, rowId, DSPropertyCONTEXTUAL );
+			CProperties prop(mirrorValue);
+			if ( prop.afk() )
+			{
+				ret = ccs_online_afk;
+			}
+		}
+
 		if ( PlayerManager.hasBetterCSRGrade(friendId, _Id, true))
 		{
 			// better CSR grade return always 'offline' status
@@ -14837,17 +14853,15 @@ TCharConnectionState CCharacter::isFriendCharVisualyOnline(const NLMISC::CEntity
 
 		if ( PlayerManager.hasBetterCSRGrade(_Id, friendId, true))
 		{
-			// better CSR grade return always 'online' status
-			return ccs_online;
+			// better CSR grade return always true status
+			return ret;
 		}
 
 		if (haveAnyPrivilege())
 		{
 			// this character has some privs, so just show status.
-			return ccs_online;
+			return ret;
 		}
-
-		ret = ccs_online;
 	}
 
 	// Handle friend preference setting
@@ -14882,7 +14896,7 @@ TCharConnectionState CCharacter::isFriendCharVisualyOnline(const NLMISC::CEntity
 
 	// Additional online check for ring shard :
 	//   - a contact is online only if it is in the same ring session
-	if (ret == ccs_online && IsRingShard)
+	if (ret != ccs_offline && IsRingShard)
 	{
 		if (friendChar == NULL)	// not found ! set offline
 			ret = ccs_offline;
@@ -14892,6 +14906,7 @@ TCharConnectionState CCharacter::isFriendCharVisualyOnline(const NLMISC::CEntity
 				ret = ccs_offline;
 		}
 	}
+
 	if (ret == ccs_offline)
 	{
 		// check for 'far online'
@@ -16104,6 +16119,24 @@ void CCharacter::setAfkState( bool isAfk )
 				setMode(MBEHAV::NORMAL);
 			}
 		}
+
+		// tell other players I'm now afk
+		// setContactOnlineStatus may change _IsFriendOf container, so we
+		// take of copy before iterating
+		vector<CEntityId> friendOf(_IsFriendOf);
+		vector<CEntityId>::iterator it;
+		for (it = friendOf.begin() ; it != friendOf.end() ; ++it)
+		{
+			// notify active character matching the id (ignoring the dynamic part because it may have changed)
+			CEntityId &id = (*it);
+			uint32 playerId = PlayerManager.getPlayerId(id);
+			CCharacter *character = PlayerManager.getActiveChar(playerId);
+			if (character && character->getId().getShortId() == id.getShortId())
+			{
+				character->setContactOnlineStatus(_Id, true);
+			}
+		}
+
 	}
 }
 
