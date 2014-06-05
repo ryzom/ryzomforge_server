@@ -1574,7 +1574,7 @@ inline sint32 CCreature::applyDamageOnArmor( DMGTYPE::EDamageType dmgType, sint3
 	///\todo localisation for NPCS
 	if ( dmgType <0 || uint(dmgType) >= /*form->Protections.size()*/DMGTYPE::NBTYPES )
 	{
-		nlwarning( "<CCreature getProtection> invalid damage type %d in entity %s", (sint)dmgType, _Id.toString().c_str() );
+		//nlwarning( "<CCreature getProtection> invalid damage type %d in entity %s", (sint)dmgType, _Id.toString().c_str() );
 		return damage;
 	}
 	else
@@ -1654,7 +1654,7 @@ CGameItemPtr CCreature::getNpcItem( const NLMISC::CSheetId &sheet, uint16 qualit
 		}
 	}
 	
-	nlwarning("Failed to create NPC item %s with quality %d for entity %s (%s)", sheet.toString().c_str(), quality, _Id.toString().c_str(), getType().toString().c_str() );
+	//nlwarning("Failed to create NPC item %s with quality %d for entity %s (%s)", sheet.toString().c_str(), quality, _Id.toString().c_str(), getType().toString().c_str() );
 
 	return CGameItemPtr(NULL);
 } // getNpcItem //

@@ -2863,8 +2863,8 @@ void CCharacter::procEnchantment()
 						rightHandItem->setLatencyEndDate( phrase.getCastingTime() + CTickEventHandler::getGameCycle() );
 					}
 				}
-				else
-					nlwarning("user %s : no valid image for right weapon", _Id.toString().c_str());
+			/*	else
+					nlwarning("user %s : no valid image for right weapon", _Id.toString().c_str());*/
 			} 
 			else
 			{

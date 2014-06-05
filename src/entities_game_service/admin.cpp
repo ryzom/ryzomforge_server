@@ -3079,7 +3079,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 	CSString cmdName, arg;
 	msgin.serial (cmdName, arg);
 
-	nlinfo("ADMIN: Executing admin command: eid=%s onTarget=%s cmdName=%s arg=%s",eid.toString().c_str(),onTarget?"true":"false",cmdName.quote().c_str(),arg.quote().c_str());
+	//nlinfo("ADMIN: Executing admin command: eid=%s onTarget=%s cmdName=%s arg=%s",eid.toString().c_str(),onTarget?"true":"false",cmdName.quote().c_str(),arg.quote().c_str());
 	TLogContext_Command_ExecCtx logContext(eid);
 
 	// find the character
@@ -4822,7 +4822,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 	}
 	
-	nlinfo("%s|%s|%d", web_app_url.c_str(), command.c_str(), iindex);
+	nlinfo("%s[%s]%d", web_app_url.c_str(), command.c_str(), iindex);
 
 	if (command == "is_valid_index")
 	{
@@ -6538,7 +6538,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		} else {
 			if (save_index) {
 				c->validateWebCommandIndex(iindex);
-				nlinfo("Valide command index saved!");
 			}
 			if (send_url)
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
