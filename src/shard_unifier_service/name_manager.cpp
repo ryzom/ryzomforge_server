@@ -1118,6 +1118,7 @@ bool CNameManager::loadGuildsNamesFromTxt()
 	typedef map<TGuildSlot, TName> TGuildSlotToName;
 	TGuildSlotToName guildSlotToName;
 
+
 	vector<string> lines;
 	NLMISC::explode(string(input), string("\n"), lines, true);
 
@@ -1142,7 +1143,7 @@ bool CNameManager::loadGuildsNamesFromTxt()
 			words.erase(words.begin()+1);
 		}
 		BOMB_IF (words.size()!=3,"Invalid line "<<i+1<<" found in guild names file : '"<<line<<"'", continue);
-
+		
 		sint i1, i2;
 		NLMISC::fromString(words[1], i1);
 		NLMISC::fromString(words[2], i2);
