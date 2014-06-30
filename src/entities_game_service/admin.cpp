@@ -5018,31 +5018,31 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			return false;
 		}
 
-		if (new_item == NULL) // When the item is stacked, it's deleted by addItemToInventory. Need be checked again to prevent crash of egs
-			return true;
+		if (new_item != NULL) // When the item is stacked, it's deleted by addItemToInventory. Need be checked again to prevent crash of egs
+		{
+			ucstring customValue;
+
+			if (command_args.size() >= 6 && command_args[5] != "*")
+			{
+				customValue.fromUtf8(command_args[5]);
+				new_item->setCustomName(customValue);
+			}
+
+			if (command_args.size() >= 7 && command_args[6] != "*")
+			{
+				customValue.fromUtf8(command_args[6]);
+				new_item->setCustomText(customValue);
+			}
 			
-		ucstring customValue;
+			if (command_args.size() >= 8)
+			{
+				new_item->setMovable(command_args[7] == "1");
+			}
 
-		if (command_args.size() >= 6 && command_args[5] != "*")
-		{
-			customValue.fromUtf8(command_args[5]);
-			new_item->setCustomName(customValue);
-		}
-
-		if (command_args.size() >= 7 && command_args[6] != "*")
-		{
-			customValue.fromUtf8(command_args[6]);
-			new_item->setCustomText(customValue);
-		}
-		
-		if (command_args.size() >= 8)
-		{
-			new_item->setMovable(command_args[7] == "1");
-		}
-
-		if (command_args.size() >= 9)
-		{
-			new_item->setUnMovable(command_args[8] == "1");
+			if (command_args.size() >= 9)
+			{
+				new_item->setUnMovable(command_args[8] == "1");
+			}
 		}
 	}
 	//*************************************************
