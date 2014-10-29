@@ -4822,7 +4822,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 	}
 	
-	nlinfo("%s[%s]%d", web_app_url.c_str(), command.c_str(), iindex);
+	string pName = CEntityIdTranslator::getInstance()->getByEntity(c->getId()).toString();
+	nlinfo("(%s ,%s) %s[%s]%d", c->getId().toString().c_str(), pName.c_str(), web_app_url.c_str(), command.c_str(), iindex);
 
 	if (command == "is_valid_index")
 	{
@@ -5912,7 +5913,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 					}
 
 				}
-				if (entityBase != 0)
+				else
 				{
 					x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
 					y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
@@ -6411,7 +6412,55 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			const CEntityId &target = c->getTarget();
 			destPlayer = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
 		}
-		destPlayer->sendUrl(app+" "+params, "");
+		if (destPlayer)
+			destPlayer->sendUrl(app+" "+params, "");
+	}
+
+
+	//*************************************************
+	//***************** dt_bot
+	// /a webExecCommand debug 1 dt_bot!bejc hmac 0
+	//*************************************************
+	
+	else if (command_args[0] == "dt_bot")
+	{
+				
+		if (command_args.size() != 2)
+			return false;
+
+		string botname = command_args[1]; // bot_name
+		vector<TAIAlias> aliases;
+
+		CAIAliasTranslator::getInstance()->getNPCAliasesFromName( botname, aliases );
+		if ( aliases.empty() )
+		{
+			nldebug ("Bot not found '%s'", botname.c_str());
+			return true;
+		}
+
+		TAIAlias alias = aliases[0];
+
+		const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
+		if ( botId != CEntityId::Unknown )
+		{
+			nlinfo("Openning window trad...");
+			c->setDirectTradeNpc(botId);
+			if ( !c->startDirectBotChat( BOTCHATTYPE::TradeItemFlag ) )
+			{
+				nlinfo("failed !");
+				return true;
+			}
+			c->resetRawMaterialItemPartFilter();
+			c->resetItemTypeFilter();
+			c->refreshTradeList();
+			nlinfo("done!");
+		}
+		else
+		{
+			nlwarning ("'%s' has no eId. Is it Spawned???", botname.c_str());
+			return true;
+		}
+		
 	}
 
 	//*************************************************

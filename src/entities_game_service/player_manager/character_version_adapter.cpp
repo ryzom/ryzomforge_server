@@ -91,8 +91,10 @@ uint32 CCharacterVersionAdapter::currentVersionNumber() const
 	// 20 : (06/03/2006) give full hp to tools (even in player room and guild inv)
 	// 21 : (19/04/2006) convert to position stack & store the mainland in db
 	// 22 : (15/05/2006) reset flag pvp for resolve migration timer pb
+	// 23 : (05/04/2013) fix post merge marauder plan issue
+	// 24 : (23/10/2014) fix post merge rite bonus issue
 	////////////////////////////////////
-	return 23;
+	return 24;
 }
 
 
@@ -125,6 +127,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	case 20: adaptToVersion21(character);
 	case 21: adaptToVersion22(character);
 	case 22: adaptToVersion23(character);
+	case 23: adaptToVersion24(character);
 	default:;
 	}
 }
@@ -1054,7 +1057,115 @@ void CCharacterVersionAdapter::adaptToVersion23(CCharacter &character) const
 		nlinfo("Adding %d SP Craft !", sp);
 		character._SpType[EGSPD::CSPType::Craft] += sp;
 	}
+
+}
+
+//---------------------------------------------------
+void CCharacterVersionAdapter::adaptToVersion24(CCharacter &character) const
+{
+	// HP
+	uint32 bonus;
+	vector<string> bricks;
+	bricks.push_back("bthp01");
+	bricks.push_back("bthp04");
+	bricks.push_back("bthp06");
+	bricks.push_back("bthp08");
+	bricks.push_back("bthp12");
+	bricks.push_back("bthp13");
+	bricks.push_back("bthp16");
+	bricks.push_back("bthp17");
+	bricks.push_back("bthp18");
+	bricks.push_back("bthp20");
 	
-	// Fix Rite Bonus
+	bonus = 0;
+	for (uint i = 0; i < bricks.size(); i++)
+	{
+		CSheetId brickSid = CSheetId(bricks[i]+".sbrick");
+		if (character._KnownBricks.find(brickSid) != character._KnownBricks.end())
+		{
+			bonus += 50;
+		}
+	}
 	
+	if (character.getScorePermanentModifiers(SCORES::hit_points) < bonus)
+	{
+		nlinfo("RITE BONUS FIX: Player %s need %d (hp) but have %d !", character.getName().toString().c_str(), bonus, character.getScorePermanentModifiers(SCORES::hit_points));
+		character.setScorePermanentModifiers(SCORES::hit_points, bonus);
+	}
+	
+	// SAP
+	bricks.clear();
+	bricks.push_back("btsap03");
+	bricks.push_back("btsap04");
+	bricks.push_back("btsap12");
+	bricks.push_back("btsap16");
+	bricks.push_back("btsap18");
+	
+	bonus = 0;
+	for (uint i = 0; i < bricks.size(); i++)
+	{
+		CSheetId brickSid = CSheetId(bricks[i]+".sbrick");
+		if (character._KnownBricks.find(brickSid) != character._KnownBricks.end())
+		{
+			bonus += 50;
+		}
+	}
+	
+	if (character.getScorePermanentModifiers(SCORES::sap) < bonus)
+	{
+		nlinfo("RITE BONUS FIX: Player %s need %d (sap) but have %d !", character.getName().toString().c_str(),bonus, character.getScorePermanentModifiers(SCORES::sap));
+		character.setScorePermanentModifiers(SCORES::sap, bonus);
+	}
+	
+	// FOCUS
+	bricks.clear();
+	bricks.push_back("btfoc01");
+	bricks.push_back("btfoc04");
+	bricks.push_back("btfoc09");
+	bricks.push_back("btfoc11");
+	bricks.push_back("btfoc15");
+	bricks.push_back("btfoc17");
+	bricks.push_back("btfoc19");
+	bricks.push_back("btfoc20");
+	
+	bonus = 0;
+	for (uint i = 0; i < bricks.size(); i++)
+	{
+		CSheetId brickSid = CSheetId(bricks[i]+".sbrick");
+		if (character._KnownBricks.find(brickSid) != character._KnownBricks.end())
+		{
+			bonus += 50;
+		}
+	}
+	
+	if (character.getScorePermanentModifiers(SCORES::focus) < bonus)
+	{
+		nlinfo("RITE BONUS FIX: Player %s need %d (focus) but have %d !", character.getName().toString().c_str(),bonus, character.getScorePermanentModifiers(SCORES::focus));
+		character.setScorePermanentModifiers(SCORES::focus, bonus);
+	}
+	
+	// STA
+	bricks.clear();
+	bricks.push_back("btsta13");
+	bricks.push_back("btsta14");
+	bricks.push_back("btsta15");
+	bricks.push_back("btsta16");
+	bricks.push_back("btsta17");
+	bricks.push_back("btsta20");
+	
+	bonus = 0;
+	for (uint i = 0; i < bricks.size(); i++)
+	{
+		CSheetId brickSid = CSheetId(bricks[i]+".sbrick");
+		if (character._KnownBricks.find(brickSid) != character._KnownBricks.end())
+		{
+			bonus += 50;
+		}
+	}
+	
+	if (character.getScorePermanentModifiers(SCORES::stamina) < bonus)
+	{
+		nlinfo("RITE BONUS FIX: Player %s need %d (stamina) but have %d !", character.getName().toString().c_str(),bonus, character.getScorePermanentModifiers(SCORES::stamina));
+		character.setScorePermanentModifiers(SCORES::stamina, bonus);
+	}
 }

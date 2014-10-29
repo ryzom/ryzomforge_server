@@ -10962,6 +10962,33 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 						TLogContext_Item_Swap logContext(c->_Id);
 						c->removeExchangeItems(items2, exchangePlayerPets2);
 					}
+					
+					if (haveAnyPrivilege() && !c->haveAnyPrivilege())
+					{
+						for (uint i = 0; i < items1.size(); ++i)
+						{
+							nlinfo ("ADMIN: CSR (%s,%s) exchange %s Q%u with %s",
+								getId().toString().c_str(), 
+								getName().toString().c_str(),
+								items1[i]->getSheetId().toString().c_str(),
+								items1[i]->quality(),
+								c->getName().toString().c_str());
+						}
+					}
+
+					if (c->haveAnyPrivilege() && !haveAnyPrivilege())
+					{
+						for (uint i = 0; i < items2.size(); ++i)
+						{
+							nlinfo ("ADMIN: CSR (%s,%s) exchange %s Q%u with %s",
+								c->getId().toString().c_str(), 
+								c->getName().toString().c_str(),
+								items2[i]->getSheetId().toString().c_str(),
+								items2[i]->quality(),
+								getName().toString().c_str());
+						}
+					}
+
 
 					// do the exchange
 					{
