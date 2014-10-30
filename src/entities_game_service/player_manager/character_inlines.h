@@ -68,11 +68,11 @@ inline uint32 CCharacter::getScorePermanentModifiers(SCORES::TScores score) cons
 	return _ScorePermanentModifiers[score]; 
 }
 
-/*inline CCharacter::setScorePermanentModifiers(SCORES::TScores score, uint32 value) const
+inline void CCharacter::setScorePermanentModifiers(SCORES::TScores score, uint32 value)
 {
 	_ScorePermanentModifiers[score] = value; 
 }
-*/
+
 inline bool CCharacter::getEnterFlag() const
 {
 	return _Enter; 
