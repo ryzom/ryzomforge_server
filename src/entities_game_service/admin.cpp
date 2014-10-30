@@ -6422,7 +6422,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	// /a webExecCommand debug 1 dt_bot!bejc hmac 0
 	//*************************************************
 	
-	else if (command_args[0] == "dt_bot")
+/*	else if (command_args[0] == "dt_bot")
 	{
 				
 		if (command_args.size() != 2)
@@ -6461,7 +6461,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			return true;
 		}
 		
-	}
+	}*/
 
 	//*************************************************
 	//***************** missions
