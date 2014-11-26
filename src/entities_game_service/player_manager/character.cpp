@@ -188,7 +188,7 @@ extern float						CarriedItemsDecayRate;
 extern uint8						TeamMembersStatusMaxValue;
 extern CCharacterBotChatBeginEnd	CharacterBotChatBeginEnd;
 //*** Removed by Sadge ***
-//extern CCreatureAskInformationMsg	CreatureNpcInformations;
+//extern CCreatureAskInformationMsg	CreatureNpcInformation;
 //*** ***
 extern float						MaxHarvestDistance;
 extern float						MaxMountDistance;
@@ -2408,10 +2408,6 @@ void CCharacter::applyRegenAndClipCurrentValue()
 
 	sint16 speedVariationModifier = std::max( (sint)_PhysScores.SpeedVariationModifier, (sint)-100 );
 
-	
-	
-
-
 	// Speed
 	// while stunned/root/mezzed etc speed is forced to 0
 	float oldCurrentSpeed;
@@ -2812,6 +2808,7 @@ CCharacter::~CCharacter()
 
 //	NLMEMORY::StatisticsReport( "egs_memory_report.csv", false );
 } // destructor //
+
 
 //---------------------------------------------------
 // prepareToLoad: method called before applying a pdr save record
@@ -3508,8 +3505,8 @@ void CCharacter::setTarget( const CEntityId &targetId, bool sendMessage )
 
 //*** Removed by Sadge ***
 //		// Ask information about target to AI service
-//		CreatureNpcInformations.Character.push_back( _EntityRowId );
-//		CreatureNpcInformations.Creature.push_back( target->getEntityRowId() );
+//		CreatureNpcInformation.Character.push_back( _EntityRowId );
+//		CreatureNpcInformation.Creature.push_back( target->getEntityRowId() );
 //*** ***
 	}
 	else // target == NULL
@@ -7538,7 +7535,6 @@ void CCharacter::sendUserChar( uint32 userId, uint8 scenarioSeason, const R2::TU
 		_RingSeason = scenarioSeason;
 	}
 }
-
 
 //-----------------------------------------------
 // Return the home mainland session id for a character
@@ -13701,7 +13697,9 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 	if (!salt.empty())
 	{
 		control = "&hmac="+getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
-	} else {
+	}
+	else
+	{
 		string defaultSalt = toString(getLastConnectedDate());
 		control = "&hmac="+getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size()).toString();
 	}
@@ -14094,7 +14092,7 @@ bool CCharacter::pickUpRawMaterial( uint32 indexInTempInv, bool * lastMaterial )
 				}
 
 				clearHarvestDB();
-				//CZoneManager::getInstance().removeRmFromDeposit( this, _DepositHarvestInformations.DepositIndex, _DepositHarvestInformations.DepositIndexContent,_HarvestedQuantity);
+				//CZoneManager::getInstance().removeRmFromDeposit( this, _DepositHarvestInformation.DepositIndex, _DepositHarvestInformation.DepositIndexContent,_HarvestedQuantity);
 			}
 		}
 	}

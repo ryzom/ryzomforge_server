@@ -625,7 +625,7 @@ void AISHEETS::CCreature::readGeorges(NLMISC::CSmartPtr<NLGEORGES::UForm> const&
 		{
 			std::string	scriptCompStr;
 			scriptCompNode->getArrayValue(scriptCompStr, arrayIndex);
-			
+
 			CFightScriptComp* scriptComp;
 			try
 			{

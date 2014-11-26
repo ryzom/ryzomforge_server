@@ -78,7 +78,6 @@ inline bool CCharacter::getEnterFlag() const
 	return _Enter; 
 }
 
-
 //------------------------------------------------------------------------------
 
 //inline CEntityState& CCharacter::getState()

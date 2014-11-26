@@ -92,7 +92,7 @@ void CRoomInstanceGuild::removeUser( CCharacter* user )
 	}
 
 	user->sendUrl("app_ryzhome action=quit_guild_room&room_name="+guildBuilding->getName(), "");
-	
+
 	--_RefCount;
 	if ( _RefCount == 0 )
 	{
@@ -113,7 +113,7 @@ void CRoomInstanceGuild::addUser( CCharacter* user, CCharacter* owner )
 	PlayerManager.sendImpulseToClient(user->getId(), "GUILD:OPEN_INVENTORY");
 
 	user->sendUrl("app_ryzhome action=open_guild_room&owner="+ owner->getName().toString()+"&room_name="+guildBuilding->getName(), "");
-	
+
 	++_RefCount;
 }
 

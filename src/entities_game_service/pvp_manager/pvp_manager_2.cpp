@@ -300,7 +300,7 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 			result.push_back((*it).second);
 		}
 	}
-//	}*/
+*/
 	return result;
 }
 
@@ -936,6 +936,7 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 {
 	nlassert(actor);
 	nlassert(areaTarget);
+
 	// cannot hurt a dead entity
 	if( offensive )
 		if ( areaTarget->isDead() )
@@ -966,6 +967,7 @@ bool CPVPManager2::canApplyAreaEffect(CCharacter* actor, CEntityBase * areaTarge
 		/*	if ((pTarget->getGuildId() != 0) && (actor->getGuildId() != 0) && (actor->getGuildId() != pTarget->getGuildId()))
 				return false;
 		*/
+
 		if( areaTarget->getId().getType() == RYZOMID::player )
 		{
 			CCharacter * pTarget = dynamic_cast<CCharacter*>(areaTarget);

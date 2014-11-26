@@ -92,7 +92,7 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 
 	if (user->currentHp() <= 0 )
 	{
-		nlwarning("<BUILDING>user %s will dead",user->getId().toString().c_str());
+		nlwarning("<BUILDING>user %s is dead",user->getId().toString().c_str());
 		return false;
 	}
 

@@ -5119,7 +5119,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
 			return false;
 		sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
- 
+
 		sint32 value;
 		NLMISC::fromString(command_args[3], value);
 
@@ -5138,7 +5138,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, value, false);
 			nlinfo("fame : %d => %d", fame, value);
 		}
-		
+
 		if (command_args.size() == 4 || (command_args.size () == 5 && command_args[4] != "0")) {
 			// Make sure fame values are properly capped.
 			CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
@@ -5264,7 +5264,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				return false;
 			}
 		} else
-			return false;		
+			return false;
 	}
 
 	//*************************************************
@@ -5342,7 +5342,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		ucstring needCustomName;
 		if (command_args.size() == 7)
 			needCustomName.fromUtf8(command_args[6]);
-			
+
 		uint32 numberItem = 0;
 		for( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
@@ -6571,7 +6571,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}
 
 	if (!new_check)
-
 	{
 		if (!c->havePriv(":DEV:") || (web_app_url != "debug"))
 		{

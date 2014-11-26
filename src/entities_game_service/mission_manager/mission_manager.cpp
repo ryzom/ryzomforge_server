@@ -459,6 +459,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			nlinfo("Mission validation: mission %s is not valid and not loaded", templ->getMissionName().c_str());
 			delete templ;
 		}
+
 		return true;
 	}
 	//this is not a mission node, so lookup recursively in the children
@@ -835,7 +836,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 	}
 	else if ( templ->Type  == MISSION_DESC::Guild )
 	{
-		/// todo guild mission
+		/// Check to see if we can pick the mission
 		CGuildMemberModule * module;
 		if ( !user->getModuleParent().getModule( module ) )
 		{
@@ -853,7 +854,6 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 		CGuild * guild = user->getGuild();
 		if ( guild )
 		{
-		mission->getguild
 			if ( guild->getMissions().size() >= MaxGuildMissionCount)
 			{
 				CCharacter::sendDynamicSystemMessage(user->getId(), "MISSION_MAX_GUILD_REACHED" );
@@ -879,8 +879,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 		else
 		{
 
-		}
-		*/
+		}*/
 	}
 	else
 	{

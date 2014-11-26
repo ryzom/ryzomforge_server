@@ -107,7 +107,7 @@ namespace RSMGR
 			_PrevPtr(NULL)
 		{
 			_Ptr = objectPtr;
-			
+
 			linkPtr();
 		}
 
@@ -247,7 +247,7 @@ namespace RSMGR
 			_PrevPtr(NULL)
 		{
 			_Ptr = objectPtr;
-			
+
 			linkPtr();
 		}
 
@@ -556,7 +556,7 @@ namespace RSMGR
 		time_t					_ReleaseDate;
 
 		/// The linked list of pointer on this object
-		CNelUserPtr		*_PtrList;			
+		CNelUserPtr		*_PtrList;
 
 		// Try to load the specified object from the memory cache, return NULL if the object is not in the cache
 		static CNelUser *loadFromCache(uint32 objectId, bool unrelease);
@@ -583,7 +583,7 @@ namespace RSMGR
 		}
 
 	public:
-	
+
 		/** Return the object identifier (witch is unique)
 		 *	You can only call this method on a persistent instance.
 		 *	(because transient instance can have invalid id)
@@ -677,10 +677,7 @@ namespace RSMGR
 				if (getPersistentState() != NOPE::os_transient)
 					setPersistentState(NOPE::os_dirty);
 
-
 				_DomainName = value;
-
-				
 			}
 
 		}
@@ -852,7 +849,7 @@ namespace RSMGR
 		}
 
 	public:
-	
+
 		/** Return the object identifier (witch is unique)
 		 *	You can only call this method on a persistent instance.
 		 *	(because transient instance can have invalid id)
