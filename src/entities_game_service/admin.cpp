@@ -5479,13 +5479,13 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if (command_args[6] != "*") {
 				float userX;
 				NLMISC::fromString(command_args[6], userX);
-				x = (sint32)(userX * 1000);
+				x = (sint32)(userX * 1000.0);
 			}
 
 			if (command_args[7] != "*") {
 				float userY;
 				NLMISC::fromString(command_args[7], userY);
-				y = (sint32)(userY * 1000);
+				y = (sint32)(userY * 1000.0);
 			}
 		}
 
@@ -5556,7 +5556,25 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		for (uint32 i=2; i<nbString; ++i)
 		{
 			string arg = command_args[i]+";";
-			strFindReplace(arg, "__OR__", "|");
+			
+                        size_t pos = 0;
+			while((pos = arg.find("&nbsp&", pos)) != string::npos)
+			{
+				arg.replace(pos, 6, " ");
+				pos ++;
+			}
+			pos = 0;
+			while((pos = arg.find("_NBSP_", pos)) != string::npos)
+			{
+				arg.replace(pos, 6, " ");
+				pos ++;
+			}
+			pos = 0;
+			while((pos = arg.find("__OR__", pos)) != string::npos)
+			{
+				arg.replace(pos, 6, "|");
+				pos ++;
+			}
 			msgout.serial(arg);
 		}
 		CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
@@ -5941,7 +5959,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		CContinent * cont = CZoneManager::getInstance().getContinent(x,y);
 
 		bool allowPetTp = false;
-		if (command_args.size () == 3 && command_args[2] == "1")
+		if (command_args.size () > 2 && command_args[2] == "1")
 			allowPetTp = true;
 
 		if (allowPetTp)
@@ -7995,13 +8013,13 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		if (args[7] != "*") {
 			float userX;
 			NLMISC::fromString(args[7], userX);
-			x = (sint32)(userX * 1000);
+			x = (sint32)(userX * 1000.0);
 		}
 
 		if (args[8] != "*") {
 			float userY;
 			NLMISC::fromString(args[8], userY);
-			y = (sint32)(userY * 1000);
+			y = (sint32)(userY * 1000.0);
 		}
 	}
 
@@ -8096,9 +8114,16 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
-
-		// Replace "(eid:<player name>)" with player Entity ID string
-		size_t pos = arg.find("(eid:");
+                
+                size_t pos = 0;
+		while((pos = arg.find("&nbsp&", pos)) != string::npos)
+		{
+			arg.replace(pos, 6, " ");
+			pos ++;
+		}
+		
+                // Replace "(eid:<player name>)" with player Entity ID string
+		pos = arg.find("(eid:");
 		while (pos != string::npos)
 		{
 			string s = arg.substr(pos, arg.find(")\"", pos) - pos + 1);
