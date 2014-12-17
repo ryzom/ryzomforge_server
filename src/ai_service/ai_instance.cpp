@@ -31,6 +31,7 @@
 
 using namespace std;
 using namespace NLMISC;
+using namespace NLNET;
 using namespace MULTI_LINE_FORMATER;
 
 CAIInstance::CAIInstance(CAIS* owner)
@@ -861,6 +862,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 	bool spawnBots;
 	std::string botsName;
 	std::string look;
+	sint32 cell;
 	msgin.serial(messageVersion);
 	nlassert(messageVersion==1);
 	msgin.serial(instanceNumber);
@@ -874,6 +876,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 	msgin.serial(spawnBots);
 	msgin.serial(botsName);
 	msgin.serial(look);
+	msgin.serial(cell);
 	CAIInstance* instance = CAIS::instance().getAIInstance(instanceNumber);
 	if (instance)
 	{
@@ -881,6 +884,32 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 		if (npcGroup != NULL)
 		{
 			_PlayersLastCreatedNpcGroup[playerId] = npcGroup->getName();
+
+			FOREACH(botIt, CCont<CBot>,	npcGroup->bots())
+			{
+				CSpawnBot* pbot = botIt->getSpawnObj();
+				if (pbot!=NULL)
+				{		
+					CEntityId id = pbot->getEntityId();
+					sint32 z = 0;
+					float t = 0;
+					uint8 cont = 0;
+					uint8 one = 1;
+					NLMISC::TGameCycle tick = CTickEventHandler::getGameCycle() + 1;					
+					CMessage msgout2("ENTITY_TELEPORTATION");
+					msgout2.serial( id   );
+					msgout2.serial( x );
+					msgout2.serial( y );
+					msgout2.serial( z );
+					msgout2.serial( t );
+					msgout2.serial( tick );
+					msgout2.serial( cont );
+					msgout2.serial( cell );
+					msgout2.serial( one  );
+					
+					sendMessageViaMirror("GPMS", msgout2);
+				}
+			}
 		}
 	}
 }

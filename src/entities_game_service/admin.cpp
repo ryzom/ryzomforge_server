@@ -5503,6 +5503,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			return false;
 		}
 
+		TDataSetRow dsr = c->getEntityRowId();
+		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+		sint32 cell = srcCell;
+
 		CEntityId playerId = c->getId();
 
 		CMessage msgout("EVENT_CREATE_NPC_GROUP");
@@ -5519,6 +5523,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial(spawnBots);
 		msgout.serial(botsName);
 		msgout.serial(look);
+		msgout.serial(cell);
 		CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
 	}
 
@@ -5952,6 +5957,14 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			c->applyRespawnEffects();
 		}
 
+                // Use same Cell
+		if (command_args.size () > 4 && command_args[4] == "1")
+		{
+			TDataSetRow dsr = c->getEntityRowId();
+			CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+			cell = mirrorCell;
+		}
+
 		c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
 
 		if ( cont )
@@ -5959,6 +5972,78 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
 		}
 	}
+
+	//*************************************************
+	//***************** slide
+	//*************************************************
+	else if (command_args[0] == "slide") // x,y,z,a!building![player name|guild name]!teleport mektoub?
+	{
+		if (command_args.size () < 3) return false;
+
+		nlinfo("ok");
+		string value = command_args[1];
+		vector<string> res;
+		sint32 x = c->getState().X();
+		sint32 y = c->getState().Y();
+		sint32 z = c->getState().Z();
+		float h = c->getState().Heading();
+		sint32 cell;
+		if ( value.find(',') != string::npos ) // Position x,y,z,a
+		{
+			explode (value, string(","), res);
+			if (res.size() >= 2)
+			{
+				fromString(res[0], x);
+				x *= 1000;
+				fromString(res[1], y);
+				y *= 1000;
+			}
+			if (res.size() >= 3)
+			{
+				fromString(res[2], z);
+				z *= 1000;
+			}
+			if (res.size() >= 4)
+				fromString(res[3], h);
+		}
+
+		bool allowPetTp = false;
+		if (command_args.size() > 4 && command_args[4] == "1")
+			allowPetTp = true;
+
+		if (allowPetTp)
+			c->allowNearPetTp();
+		else
+			c->forbidNearPetTp(); 
+
+		IBuildingPhysical * building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]);
+		if ( building )
+		{
+
+			if (building->getTemplate()->Type == BUILDING_TYPES::Player)
+			{
+
+				TDataSetRow dsr = c->getEntityRowId();
+				CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+				sint32 cell = srcCell;
+
+				if (cell >= 0)
+				{
+					CBuildingPhysicalPlayer * buildingPlayer = dynamic_cast<CBuildingPhysicalPlayer *>( building );
+
+					CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[3]));
+					if (entityBase)
+					{
+						CBuildingManager::getInstance()->removePlayerFromRoom( c );
+						uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
+						buildingPlayer->addUser(c, 0, ownerId, cell);
+						c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
+					}
+				}
+			}
+		}
+	}
+
 
 	//*************************************************
 	//***************** rename_animal
@@ -6057,6 +6142,13 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				c->getRoomInterface().setBuilding(building);
 				building->addPlayer(c->getId());
 			}
+		}
+                else if (action == "get_access_room" && command_args.size () == 3)
+		{
+
+			CCharacter *owner = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[2]));
+			if (owner)
+				owner->addRoomAccessToPlayer(c->getId());
 		}
 	}	
 	
@@ -7927,6 +8019,10 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		return true;
 	}
 
+	TDataSetRow dsr = c->getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+	sint32 cell = srcCell;
+
 	CEntityId playerId = c->getId();
 
 	CMessage msgout("EVENT_CREATE_NPC_GROUP");
@@ -7943,6 +8039,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	msgout.serial(spawnBots);
 	msgout.serial(botsName);
 	msgout.serial(look);
+	msgout.serial(cell);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
 
 	return true;
