@@ -544,6 +544,10 @@ void cbEntityTeleportation( CMessage& msgin, const string &serviceName, NLNET::T
 		cell = 0;
 	}
 
+	uint8 move_to_new_cell = 0;
+	if (msgin.getPos() != (sint32)msgin.length())
+		msgin.serial(move_to_new_cell);
+
 	if (IsRingShard)
 	{
 		// update the ring vision universe position
@@ -560,7 +564,11 @@ void cbEntityTeleportation( CMessage& msgin, const string &serviceName, NLNET::T
 	}
 	else
 	{
-		CWorldPositionManager::teleport(index, x, y, z, t, continent, cell, tick);
+	
+		if (move_to_new_cell == 1)
+			CWorldPositionManager::updateEntityPosition(CWorldPositionManager::getEntityPtr(index), cell);
+		else
+			CWorldPositionManager::teleport(index, x, y, z, t, continent, cell, tick);
 	}
 
 
