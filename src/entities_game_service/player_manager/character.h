@@ -724,13 +724,19 @@ public:
 	void updateTarget();
 
 	/// add a known brick
-	void addKnownBrick( const NLMISC::CSheetId& brickId );
+	void addKnownBrick( const NLMISC::CSheetId& brickId);
+	
+	/// add a known brick bonus
+	void addKnownBrickBonus( const NLMISC::CSheetId& brickId);
 
 	/// check if have brick
 	bool haveBrick( const NLMISC::CSheetId& brickId );
 
 	/// remove a known brick
 	void removeKnownBrick( const NLMISC::CSheetId& brickId );
+
+	/// remove a known brick
+	void removeKnownBrickBonus( const NLMISC::CSheetId& brickId );
 
 	/// get known bricks
 	const std::set<NLMISC::CSheetId> &getKnownBricks() const;

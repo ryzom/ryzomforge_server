@@ -4377,6 +4377,37 @@ void CCharacter::addKnownBrick( const CSheetId& brickId )
 } //addKnownBrick//
 
 //-----------------------------------------------
+// CCharacter::addKnownBrickBonus add a know brick bonus
+//-----------------------------------------------
+void CCharacter::addKnownBrickBonus( const CSheetId& brickId )
+{
+//	egs_chinfo("<CCharacter::addKnownBrickBonus> adding new known brick idSheet (%s)", brickId.toString().c_str() );
+	const CStaticBrick* brickForm = CSheets::getSBrickForm( brickId );
+	if( brickForm )
+	{
+		
+		// if the brick is a training brick, then apply charac increase
+		if ( BRICK_FAMILIES::brickType(brickForm->Family) == BRICK_TYPE::TRAINING)
+		{
+			processTrainingBrick(brickForm);
+		}
+
+		// if the brick is a bonus that needs to be taken into account now, do it
+		switch ( brickForm->Family )
+		{
+		case BRICK_FAMILIES::BPBHFEA:
+			processForageBonusBrick(brickForm);
+			break;
+		case BRICK_FAMILIES::BPBGLA:
+			processMiscBonusBrick(brickForm);
+			break;
+		default:;
+		}
+	}
+		
+} //addKnownBrickBonus//
+
+//-----------------------------------------------
 // CCharacter::removeKnownBrick remove a known brick
 //-----------------------------------------------
 void CCharacter::removeKnownBrick( const CSheetId& brickId )
@@ -4453,6 +4484,37 @@ void CCharacter::removeKnownBrick( const CSheetId& brickId )
 		nlwarning("<CCharacter::removeKnownBrick> Can't remove known brick cause static form of idSheet (%s) missing", brickId.toString().c_str() );
 	}
 } //removeKnownBrick//
+
+//-----------------------------------------------
+// CCharacter::removeKnownBrickBonus remove a known brick bonus
+//-----------------------------------------------
+void CCharacter::removeKnownBrickBonus( const CSheetId& brickId )
+{
+//	egs_chinfo("<CCharacter::removeKnownBrickBonus> removing a known brick idSheet (%s)", brickId.toString().c_str() );
+	const CStaticBrick* brickForm = CSheets::getSBrickForm( brickId );
+	if( brickForm )
+	{
+	
+		// if the brick is a training brick, then apply charac increase
+		if ( BRICK_FAMILIES::brickType(brickForm->Family) == BRICK_TYPE::TRAINING)
+		{
+			unprocessTrainingBrick(brickForm, true);
+		}
+
+		// if the brick is a bonus that needs to be taken into account now, do it
+		switch ( brickForm->Family )
+		{
+		case BRICK_FAMILIES::BPBHFEA:
+			unprocessForageBonusBrick(brickForm);
+			break;
+		case BRICK_FAMILIES::BPBGLA:
+			unprocessMiscBonusBrick(brickForm);
+			break;
+		default:;
+		}
+	}
+
+} //removeKnownBrickBonus//
 
 //-----------------------------------------------
 // CCharacter::processTrainingBrick
