@@ -85,6 +85,7 @@ private:
 	void adaptToVersion22(CCharacter &character) const;
 	void adaptToVersion23(CCharacter &character) const;
 	void adaptToVersion24(CCharacter &character) const;
+	void adaptToVersion25(CCharacter &character) const;
 private:
 	/// unique instance
 	static CCharacterVersionAdapter*			_Instance;
