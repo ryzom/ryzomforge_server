@@ -11601,7 +11601,8 @@ void CCharacter::cancelStaticActionInProgress(STATIC_ACT_TYPES::TStaticActTypes 
 {
 	setAfkState( false );
 	// changed : always stop links (so one can only have one link at a time... as casting a new one will cancel the previous one)
-	stopAllLinks();
+	if (!isDead())
+		stopAllLinks();
 
 	CPhraseManager::getInstance().cancelTopPhrase(_EntityRowId, true);
 
