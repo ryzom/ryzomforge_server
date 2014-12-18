@@ -1814,6 +1814,8 @@ void CCreature::tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading , float
 	msgout2.serial( z );
 	msgout2.serial( heading );
 	msgout2.serial( tick );
+	msgout2.serial( continent );
+	msgout2.serial( cell );
 	
 	sendMessageViaMirror("GPMS", msgout2);
 }
