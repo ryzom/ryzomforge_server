@@ -94,6 +94,7 @@ uint32 CCharacterVersionAdapter::currentVersionNumber() const
 	// 23 : (05/04/2013) fix post merge marauder plan issue
 	// 24 : (23/10/2014) fix post merge rite bonus issue
 	////////////////////////////////////
+	//TODO: change to 25 !!!!!!
 	return 24;
 }
 
@@ -128,7 +129,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	case 21: adaptToVersion22(character);
 	case 22: adaptToVersion23(character);
 	case 23: adaptToVersion24(character);
-	case 24: adaptToVersion25(character);
+	//case 24: adaptToVersion25(character);
 	default:;
 	}
 }
@@ -1170,7 +1171,6 @@ void CCharacterVersionAdapter::adaptToVersion24(CCharacter &character) const
 		character.setScorePermanentModifiers(SCORES::stamina, bonus);
 	}
 }
-
 
 
 //---------------------------------------------------

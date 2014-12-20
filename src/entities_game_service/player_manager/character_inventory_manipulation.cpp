@@ -1325,7 +1325,7 @@ bool CCharacter::checkPreRequired(const CGameItemPtr & item, bool equipCheck )
 			}
 		}
 	}
-		
+	/*
 	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();
 	bool neutralcult = (allegeance.first == PVP_CLAN::Neutral || allegeance.first == PVP_CLAN::None);
 	bool neutralciv = (allegeance.second == PVP_CLAN::Neutral || allegeance.second == PVP_CLAN::None);
@@ -1340,7 +1340,7 @@ bool CCharacter::checkPreRequired(const CGameItemPtr & item, bool equipCheck )
 		(item->getRequiredFaction() == "tryker" && (allegeance.second != PVP_CLAN::Tryker || getOrganization() != 0)) ||
 		(item->getRequiredFaction() == "zorai" && (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0)))
 			requiredRespected = false;
-	
+	*/
 	if( requiredRespected == false && equipCheck )
 	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "REQUIRED_EQUIP" );
