@@ -11025,9 +11025,10 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 					{
 						for (uint i = 0; i < items1.size(); ++i)
 						{
-							nlinfo ("ADMIN: CSR (%s,%s) exchange %s Q%u with %s",
+							nlinfo ("ADMIN: CSR (%s,%s) exchange %ux%s Q%u with %s",
 								getId().toString().c_str(), 
 								getName().toString().c_str(),
+								items1[i]->quantity(),
 								items1[i]->getSheetId().toString().c_str(),
 								items1[i]->quality(),
 								c->getName().toString().c_str());
@@ -11046,9 +11047,10 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 					{
 						for (uint i = 0; i < items2.size(); ++i)
 						{
-							nlinfo ("ADMIN: CSR (%s,%s) exchange %s Q%u with %s",
+							nlinfo ("ADMIN: CSR (%s,%s) exchange %ux%s Q%u with %s",
 								c->getId().toString().c_str(), 
 								c->getName().toString().c_str(),
+								items1[i]->quantity(),
 								items2[i]->getSheetId().toString().c_str(),
 								items2[i]->quality(),
 								getName().toString().c_str());
