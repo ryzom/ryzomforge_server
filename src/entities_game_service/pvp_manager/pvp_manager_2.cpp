@@ -716,7 +716,7 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 	_Instance->_PVPOutpostEnemyReminder = false;
 	
 	PVP_RELATION::TPVPRelation relationTmp = PVP_RELATION::Neutral;
-	
+
 	CCharacter * pTarget = dynamic_cast<CCharacter*>(target);
 	if( pTarget )
 	{

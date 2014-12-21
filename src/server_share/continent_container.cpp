@@ -47,7 +47,7 @@ CContinentContainer::CContinentContainer()
 }
 
 //
-void	CContinentContainer::init(uint gridWidth, uint gridHeight, double primitiveMaxSize, uint nbWorldImages, const string packedSheetsDirectory, double cellSize, bool loadPacsPrims)
+void	CContinentContainer::init(uint gridWidth, uint gridHeight, double primitiveMaxSize, uint nbWorldImages, const string &packedSheetsDirectory, double cellSize, bool loadPacsPrims)
 {
 	_GridWidth = gridWidth;
 	_GridHeight = gridHeight;

@@ -443,8 +443,8 @@ private:
 	static const std::string	&contactListActionToString(TConctactListAction e);
 
 	NL_INSTANCE_COUNTER_DECL(CCharacter);
-public:
 
+public:
 	// Start by declaring methods for persistent load/ save operations
 	// The following macro is defined in persistent_data.h
 	// At time of writing it evaluated to:
@@ -725,7 +725,7 @@ public:
 
 	/// add a known brick
 	void addKnownBrick( const NLMISC::CSheetId& brickId);
-	
+
 	/// add a known brick bonus
 	void addKnownBrickBonus( const NLMISC::CSheetId& brickId);
 
@@ -1675,7 +1675,7 @@ public:
 
 	/// send dynamic message
 	void sendDynamicMessage(const std::string &phrase, const std::string &message);
-	
+
 	/// send custom url
 	void sendUrl(const std::string &url, const std::string &salt);
 
@@ -3779,7 +3779,7 @@ private:
 public:
 	uint32 getLastDisconnectionDate();
 	bool hasMoved();
-	
+
 private:
 	TAIAlias _SelectedOutpost;
 public:

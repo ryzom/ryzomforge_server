@@ -1172,7 +1172,7 @@ void CGuild::sendMessageToGuildChat( const std::string &  msg, const TVectorPara
 	{
 		CGuildMember * member = EGS_PD_CAST<CGuildMember*>( (*it).second );
 		EGS_PD_AST( member );
-		
+
 		// continue if the player is offline
 		CGuildMemberModule * module = NULL;
 		if ( member->getReferencingModule(module) )

@@ -161,7 +161,7 @@ public:
 	CContinentContainer();
 
 	/// Init whole continent container
-	void	init(uint gridWidth, uint gridHeight, double primitiveMaxSize, uint nbWorldImages, const std::string packedSheetsDirectory, double cellSize=0.0, bool loadPacsPrims = true);
+	void	init(uint gridWidth, uint gridHeight, double primitiveMaxSize, uint nbWorldImages, const std::string &packedSheetsDirectory, double cellSize=0.0, bool loadPacsPrims = true);
 
 	/// Init pacs prims
 	void	initPacsPrim(const std::string &path = std::string("landscape_col_prim_pacs_list.txt"));

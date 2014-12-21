@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifndef INCLUDED_database_PLR_H
-#define INCLUDED_database_PLR_H
+#ifndef INCLUDED_DATABASE_PLR_H
+#define INCLUDED_DATABASE_PLR_H
 /////////////////////////////////////////////////////////////////
 // WARNING : this is a generated file, don't change it !
 /////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 
 		
 	class TGameTime
-	{	
+	{
 	public:
 		
 
@@ -183,7 +183,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TINTERFACES
-	{	
+	{
 	public:
 		
 
@@ -247,11 +247,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TUSER
-	{	
+	{
 	public:
 		
 	class TSKILL_POINTS_
-	{	
+	{
 	public:
 		
 
@@ -294,7 +294,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TFACTION_POINTS_
-	{	
+	{
 	public:
 		
 
@@ -337,7 +337,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TRRPS_LEVELS
-	{	
+	{
 	public:
 		
 
@@ -380,7 +380,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TNPC_CONTROL
-	{	
+	{
 	public:
 		
 
@@ -490,7 +490,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		ICDBStructNode	*_IS_NEWBIE;
 		ICDBStructNode	*_IS_TRIAL;
 		ICDBStructNode	*_DEFAULT_WEIGHT_HANDS;
-		ICDBStructNode  *_IS_INVISIBLE;
+		ICDBStructNode	*_IS_INVISIBLE;
 		ICDBStructNode	*_COUNTER;
 		TSKILL_POINTS_ _SKILL_POINTS_[4];
 		TFACTION_POINTS_ _FACTION_POINTS_[6];
@@ -1013,15 +1013,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TDEFENSE
-	{	
+	{
 	public:
 		
 	class TSLOTS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -1156,15 +1156,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TFLAGS
-	{	
+	{
 	public:
 		
 	class TBRICK_TICK_RANGE
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -1316,13 +1316,13 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		}
 
 	};
-	
+
 	class TTARGET
-	{	
+	{
 	public:
 		
 	class TBARS
-	{	
+	{
 	public:
 		
 
@@ -1482,15 +1482,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TCONTEXT_MENU
-	{	
+	{
 	public:
 		
 	class TMISSIONS_OPTIONS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -1602,11 +1602,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMISSION_RING
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -1927,11 +1927,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TGROUP
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -2109,19 +2109,19 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMISSIONS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 	class TGOALS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -2209,7 +2209,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TTARGET
-	{	
+	{
 	public:
 		
 
@@ -2294,11 +2294,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class THISTO
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -2716,7 +2716,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TDM_GIFT
-	{	
+	{
 	public:
 		
 
@@ -2759,15 +2759,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TEXCHANGE
-	{	
+	{
 	public:
 		
 	class TGIVE
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -3062,11 +3062,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TRECEIVE
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -3540,15 +3540,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TINVENTORY
-	{	
+	{
 	public:
 		
 	class THAND
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -3618,11 +3618,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TEQUIP
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -3692,11 +3692,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TTEMP
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -4033,11 +4033,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TSHARE
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -4377,7 +4377,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TTM_
-	{	
+	{
 	public:
 		
 
@@ -4504,7 +4504,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TROOM
-	{	
+	{
 	public:
 		
 
@@ -4575,6 +4575,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		{
 			uint64 value;
 			_getProp(dbGroup, _MONEY, value);
+
 			return value;
 		}
 
@@ -4669,15 +4670,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMODIFIERS
-	{	
+	{
 	public:
 		
 	class TBONUS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -4786,11 +4787,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMALUS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -4948,11 +4949,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TDISABLE_CONSUMABLE
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -5040,15 +5041,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TBOTCHAT
-	{	
+	{
 	public:
 		
 	class TDM_CHOICE
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -5310,11 +5311,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TASCENSOR
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -5468,11 +5469,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TCHOOSE_MISSIONS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -5668,11 +5669,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TTRADING
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -6466,11 +6467,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TBRICK_FAMILY
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -6537,11 +6538,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TFABER_PLANS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -6608,19 +6609,19 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMISSIONS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 	class TGOALS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -6708,7 +6709,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TTARGET
-	{	
+	{
 	public:
 		
 
@@ -6793,11 +6794,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class THISTO
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -7138,15 +7139,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TEXECUTE_PHRASE
-	{	
+	{
 	public:
 		
 	class TLINK
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -7512,11 +7513,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TCHARACTER_INFO
-	{	
+	{
 	public:
 		
 	class TCHARACTERISTICS
-	{	
+	{
 	public:
 		
 
@@ -7562,7 +7563,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TSCORES
-	{	
+	{
 	public:
 		
 
@@ -7680,11 +7681,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMAGIC_RESISTANCE
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -7778,11 +7779,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMAGIC_PROTECTION
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -7900,7 +7901,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TDODGE
-	{	
+	{
 	public:
 		
 
@@ -7970,7 +7971,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TPARRY
-	{	
+	{
 	public:
 		
 
@@ -8040,11 +8041,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TSKILLS
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -8159,7 +8160,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TXP_CATALYSER
-	{	
+	{
 	public:
 		
 
@@ -8229,7 +8230,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TRING_XP_CATALYSER
-	{	
+	{
 	public:
 		
 
@@ -8299,7 +8300,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TPVP_FACTION_TAG
-	{	
+	{
 	public:
 		
 
@@ -8405,7 +8406,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TPVP_OUTPOST
-	{	
+	{
 	public:
 		
 
@@ -8532,15 +8533,15 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TSUCCESS_MODIFIER
-	{	
+	{
 	public:
 		
 	class TECO
-	{	
+	{
 	public:
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -8836,11 +8837,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TPACK_ANIMAL
-	{	
+	{
 	public:
 		
 	class TBEAST
-	{	
+	{
 	public:
 		
 
@@ -8855,7 +8856,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 		ICDBStructNode	*_POS;
 		ICDBStructNode	*_HUNGER;
 		ICDBStructNode	*_DESPAWN;
-		ICDBStructNode	*_NAME;		
+		ICDBStructNode	*_NAME;
 
 	public:
 		void init(ICDBStructNode *parent, uint index);
@@ -9089,7 +9090,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TDEBUG_INFO
-	{	
+	{
 	public:
 		
 
@@ -9132,11 +9133,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TMP_EVAL
-	{	
+	{
 	public:
 		
 	class TRESULT
-	{	
+	{
 	public:
 		
 
@@ -9284,7 +9285,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TRESULT_CRITICAL
-	{	
+	{
 	public:
 		
 
@@ -9481,7 +9482,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TCOMPASS
-	{	
+	{
 	public:
 		
 
@@ -9566,11 +9567,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TFAME
-	{	
+	{
 	public:
 		
 	class TPLAYER
-	{	
+	{
 	public:
 		
 
@@ -9655,7 +9656,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TTRIBE
-	{	
+	{
 	public:
 		
 
@@ -9860,7 +9861,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TSTATIC_DATA
-	{	
+	{
 	public:
 		
 
@@ -9903,11 +9904,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TDYN_CHAT
-	{	
+	{
 	public:
 		
 	class TCHANNEL
-	{	
+	{
 	public:
 		
 
@@ -10016,11 +10017,11 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TPVP_EFFECTS
-	{	
+	{
 	public:
 		
 	class TPVP_FACTION_POINTS
-	{	
+	{
 	public:
 		
 
@@ -10126,7 +10127,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TArray
-	{	
+	{
 	public:
 		
 
@@ -10240,7 +10241,7 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 		
 	class TWEATHER
-	{	
+	{
 	public:
 		
 
@@ -10483,4 +10484,4 @@ inline void _getProp(const CCDBSynchronised &db, ICDBStructNode *node, NLMISC::C
 	};
 	
 
-#endif // INCLUDED_database_PLR_H
+#endif // INCLUDED_DATABASE_PLR_H

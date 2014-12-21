@@ -937,7 +937,7 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 		return;
 	}
 
-	// if item is already referenced (maybe equiped), do not equip it
+	// if item is already referenced (maybe equipped), do not equip it
 	if (item->getRefInventory() != NULL)
 		return;
 
@@ -1097,7 +1097,7 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 		CPhraseManager::getInstance().disengage( _EntityRowId, true );
 	}
 
-	// Remove enchant weapon effects as they are linked to equiped item
+	// Remove enchant weapon effects as they are linked to equipped item
 	if (invId==INVENTORIES::handling && slot==0)
 	{
 		CSEffectPtr const effect = lookForActiveEffect(EFFECT_FAMILIES::PowerEnchantWeapon);
@@ -1325,22 +1325,7 @@ bool CCharacter::checkPreRequired(const CGameItemPtr & item, bool equipCheck )
 			}
 		}
 	}
-	/*
-	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();
-	bool neutralcult = (allegeance.first == PVP_CLAN::Neutral || allegeance.first == PVP_CLAN::None);
-	bool neutralciv = (allegeance.second == PVP_CLAN::Neutral || allegeance.second == PVP_CLAN::None);
-	if ((item->getRequiredFaction() == "kami" && (allegeance.first != PVP_CLAN::Kami || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "karavan" && (allegeance.first != PVP_CLAN::Karavan || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "marauder" && (!neutralcult || !neutralciv || getOrganization() != 5)) ||
-		(item->getRequiredFaction() == "neutralcult" && (!neutralcult || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "neutralciv" && (!neutralciv || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "neutral" && (!neutralcult || !neutralciv || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "fyros" && (allegeance.second != PVP_CLAN::Fyros || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "matis" && (allegeance.second != PVP_CLAN::Matis || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "tryker" && (allegeance.second != PVP_CLAN::Tryker || getOrganization() != 0)) ||
-		(item->getRequiredFaction() == "zorai" && (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0)))
-			requiredRespected = false;
-	*/
+
 	if( requiredRespected == false && equipCheck )
 	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage( _EntityRowId, "REQUIRED_EQUIP" );
@@ -1799,7 +1784,7 @@ CGameItemPtr CCharacter::removeItemFromInventory(INVENTORIES::TInventory invId, 
 		return NULL;
 	}
 
-	// if item is equiped, unequip
+	// if item is equipped, unequip
 	// TODO : still needed ?
 //	bool hand;
 //	uint16 slotImg;

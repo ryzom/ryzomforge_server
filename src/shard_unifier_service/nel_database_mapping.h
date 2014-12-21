@@ -632,7 +632,7 @@ namespace RSMGR
 	{
 	protected:
 		// 
-		uint32	_Prim;
+		uint32	_PermissionId;
 		// 
 		uint32	_UserId;
 		// 
@@ -726,7 +726,7 @@ namespace RSMGR
 	
 		bool operator == (const CNelPermission &other) const
 		{
-			return _Prim == other._Prim
+			return _PermissionId == other._PermissionId
 				&& _UserId == other._UserId
 				&& _DomainName == other._DomainName
 				&& _ShardId == other._ShardId
@@ -739,7 +739,7 @@ namespace RSMGR
 		CNelPermission()
 			: _PtrList(NULL),
 			_ObjectState(NOPE::os_transient),
-			_Prim(NOPE::INVALID_OBJECT_ID)
+			_PermissionId(NOPE::INVALID_OBJECT_ID)
 		{
 
 			// register the cache for this class (if not already done)
@@ -822,7 +822,7 @@ namespace RSMGR
 		time_t					_ReleaseDate;
 
 		/// The linked list of pointer on this object
-		CNelPermissionPtr		*_PtrList;			
+		CNelPermissionPtr		*_PtrList;
 
 		// Try to load the specified object from the memory cache, return NULL if the object is not in the cache
 		static CNelPermission *loadFromCache(uint32 objectId, bool unrelease);
@@ -857,7 +857,7 @@ namespace RSMGR
 		uint32 getObjectId() const
 		{
 
-			return _Prim;
+			return _PermissionId;
 		}
 
 		/** Set the object unique ID.
@@ -871,8 +871,8 @@ namespace RSMGR
 			// can only be set when in transient state
 			nlassert(getPersistentState() == NOPE::os_transient);
 			// can only be set once
-			nlassert(_Prim == NOPE::INVALID_OBJECT_ID);
-			_Prim = objectId;
+			nlassert(_PermissionId == NOPE::INVALID_OBJECT_ID);
+			_PermissionId = objectId;
 		}
 
 		/** Return the current persistent state of the object.*/

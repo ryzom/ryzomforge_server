@@ -435,7 +435,7 @@ bool getAIInstanceFromGroupName(string& groupName, uint32& instanceNumber)
 bool checkBannerPriv(const string &sheetName, CEntityId eid)
 {
 
-	if (sheetName.find("banner") == -1)
+	if (sheetName.find("banner") == string::npos)
 	{
 		// Not a banner
 		return true;
@@ -460,14 +460,14 @@ bool checkBannerPriv(const string &sheetName, CEntityId eid)
 		return false;
 	}
 
-	if (sheetName.find("_gu") != -1)
+	if (sheetName.find("_gu") != string::npos)
 	{
 		if (player->havePriv(":G:"))
 		{
 			return true;
 		}
 	}
-	else if (sheetName.find("_sgu") != -1)
+	else if (sheetName.find("_sgu") != string::npos)
 	{
 		if (player->havePriv(":SG:"))
 		{
@@ -479,21 +479,21 @@ bool checkBannerPriv(const string &sheetName, CEntityId eid)
 			return true;
 		}
 	}
-	else if (sheetName.find("_vgu") != -1)
+	else if (sheetName.find("_vgu") != string::npos)
 	{
 		if (player->havePriv(":VG:")) 
 		{
 			return true;
 		}
 	}
-	else if (sheetName.find("_gm") != -1)
+	else if (sheetName.find("_gm") != string::npos)
 	{
 		if (player->havePriv(":GM:")) 
 		{
 			return true;
 		}
 	}
-	else if (sheetName.find("_sgm") != -1)
+	else if (sheetName.find("_sgm") != string::npos)
 	{
 		if (player->havePriv(":SGM:")) 
 		{
@@ -3053,7 +3053,7 @@ void audit(const CAdminCommand *cmd, const string &rawCommand, const CEntityId &
 	string host = varHost->asString();
 	string page = varPage->asString();
 
-	if (host == "" || page == "")
+	if (host.empty() || page.empty())
 		return;
 
 	char params[1024];
@@ -4748,7 +4748,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		send_url = true;
 
 	bool save_index = false;
-	if (args.size() >= 8 && args[7] == "2") {
+	if (args.size() >= 8 && args[7] == "2")
+	{
 		send_url = true;
 		save_index = true;
 	}
@@ -4821,7 +4822,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				return false;
 		}
 	}
-	
+
 	string pName = CEntityIdTranslator::getInstance()->getByEntity(c->getId()).toString();
 	nlinfo("(%s ,%s) %s[%s]%d", c->getId().toString().c_str(), pName.c_str(), web_app_url.c_str(), command.c_str(), iindex);
 
@@ -8114,8 +8115,8 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
-                
-                size_t pos = 0;
+        
+		size_t pos = 0;
 		while((pos = arg.find("&nbsp&", pos)) != string::npos)
 		{
 			arg.replace(pos, 6, " ");

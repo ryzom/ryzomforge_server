@@ -36,6 +36,11 @@
 #include "nel_database_mapping.h"
 #include "character_sync.h"
 
+// defined by MySQL config file
+#ifdef access
+#undef access
+#endif
+
 using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
@@ -203,7 +208,7 @@ namespace RSMGR
 	public:
 		CRingSessionManager()
 			:	_DontUsePerm(false),
-				_CharSync(false)
+				_CharSync(NULL)
 		{
 			CRingSessionManagerSkel::init(this);
 			CWelcomeServiceClientSkel::init(this);

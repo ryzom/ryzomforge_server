@@ -318,7 +318,6 @@ bool CDynChatEGS::setHideBubble(TChanID chanID, bool hideBubble)
 //============================================================================================================
 bool CDynChatEGS::setUniversalChannel(TChanID chanID, bool universalChannel)
 {
-	
 	CDynChatChan *chan = _DynChat.getChan(chanID);
 	if (!chan) return false;
 	if (universalChannel == chan->UniversalChannel) return true; // already good value
@@ -358,7 +357,7 @@ void CDynChatEGS::cbServiceSetUniversalChannel(NLNET::CMessage& msgin, const std
 {
 	TChanID		chan;
 	bool		universalChannel;
-	
+
 	msgin.serial(chan);
 	msgin.serial(universalChannel);
 	DynChatEGS.setUniversalChannel(chan, universalChannel);

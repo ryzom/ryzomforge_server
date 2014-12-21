@@ -10035,7 +10035,7 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 
 		if (item->getRefInventory() == _Inventory[INVENTORIES::equipment])
 		{
-			nlwarning("<CCharacter sellItem> character %s try to sell an equiped item %s, must not permited by client", _Id.toString().c_str(), sheet.toString().c_str() );
+			nlwarning("<CCharacter sellItem> character %s try to sell an equipped item %s, must not permited by client", _Id.toString().c_str(), sheet.toString().c_str() );
 			return;
 		}
 
@@ -10351,7 +10351,6 @@ void CCharacter::setNewTitle(const string &title) {
 void CCharacter::setTagPvPA(const string &tag) {
 	_TagPvPA = tag;
 }
-
 
 //-----------------------------------------------------------------------------
 void CCharacter::setTagPvPB(const string &tag) {
@@ -12581,13 +12580,13 @@ bool CCharacter::autoFillExchangeView()
 				invItem = playerBagInvPointer->getItem(inventoryIndex);
 				if (invItem == NULL)
 					continue;
-					
+
 				if (invItem->getLockedByOwner())
 					continue;
 
 				if (invItem->getRefInventory() != NULL)
 					continue;
-				
+
 				itemsSeenCount++;
 				// Changed to support comparisons on sheetID masks
 				if (invItem->getSheetId() == validateSteps[stepCounter].Sheet)
@@ -13053,7 +13052,6 @@ void CCharacter::registerName(const ucstring &newName)
 	CMessage msgName("CHARACTER_NAME_LANG");
 	msgName.serial(_EntityRowId);
 
-	//string sTitle = CHARACTER_TITLE::toString(_Title);
 	string sTitle = getFullTitle();
 	ucstring RegisteredName;
 	if (newName.empty())
@@ -14356,7 +14354,7 @@ void CCharacter::sendCloseTempInventoryImpulsion()
 // setFameValuesPlayer
 //-----------------------------------------------
 void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint32 fameMax, uint16 fameTrend)
-{		
+{
 	uint32 firstTribeFameIndex = CStaticFames::getInstance().getFirstTribeFameIndex();
 	uint32 firstTribeDbIndex = CStaticFames::getInstance().getDatabaseIndex( firstTribeFameIndex );
 	uint32 fameIndexInDatabase = CStaticFames::getInstance().getDatabaseIndex( factionIndex );
@@ -19331,7 +19329,6 @@ void CCharacter::setStartupInstance(uint32 instanceId)
 
 void CCharacter::setTitle( CHARACTER_TITLE::ECharacterTitle title )
 {
-	//_Title = title;
 	setNewTitle(CHARACTER_TITLE::toString(title));
 }
 
