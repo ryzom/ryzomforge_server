@@ -11033,14 +11033,13 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 								items1[i]->quality(),
 								c->getName().toString().c_str());
 						}
-                                                if (_ExchangeMoney)
-                                                        nlinfo ("ADMIN: CSR (%s,%s) give %u dappers to %s",
-                                                                getId().toString().c_str(), 
-                                                                getName().toString().c_str(),
-                                                                _ExchangeMoney,
-                                                                c->getName().toString().c_str());
+						if (_ExchangeMoney)
+								nlinfo ("ADMIN: CSR (%s,%s) give %u dappers to %s",
+										getId().toString().c_str(), 
+										getName().toString().c_str(),
+										_ExchangeMoney,
+										c->getName().toString().c_str());
 
-					}
 					}
 
 					if (c->haveAnyPrivilege() && !haveAnyPrivilege())
@@ -11055,7 +11054,7 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 								items2[i]->quality(),
 								getName().toString().c_str());
 						}
-                                                if (c->_ExchangeMoney)
+						if (c->_ExchangeMoney)
 							nlinfo ("ADMIN: CSR (%s,%s) give %u dappers to %s",
 								c->getId().toString().c_str(), 
 								c->getName().toString().c_str(),
