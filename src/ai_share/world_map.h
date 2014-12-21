@@ -1173,9 +1173,10 @@ private:
 inline
 CDirectionLayer::CDirectionLayer()
 {
-	uint i;
-	for (i=0; i<9; ++i)
-		Grid[0][i] = NULL;
+	uint i, j;
+	for (i=0; i<3; ++i)
+		for (j=0; j<3; ++j)
+			Grid[i][j] = NULL;
 }
 
 inline

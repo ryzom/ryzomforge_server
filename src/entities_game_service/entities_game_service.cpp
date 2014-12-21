@@ -254,7 +254,7 @@ CCharacterBotChatBeginEnd	CharacterBotChatBeginEnd;
 CCharacterDynChatBeginEnd	CharacterDynChatBeginEnd;
 //*** Removed by Sadge ***
 //// Transport class for EGS asking information about creatures/Npc
-//CCreatureAskInformationMsg	CreatureNpcInformations;
+//CCreatureAskInformationMsg	CreatureNpcInformation;
 //*** ***
 //	Transport class sent to AIS to set bot mode as death.
 CBSAIDeathReport			BotDeathReport;
@@ -2236,9 +2236,11 @@ NLMISC_COMMAND(create_obj,"create a new object","<type>")
 	if( args.size() > 0 )
 	{
 		CWorldObjectLocation loc;
+		uint32 type;
 		uint16 quality = 0;
 		uint32 hp = 0;
-		WorldObjectManager.createObject(atoi(args[2].c_str()),loc,quality,hp);
+		NLMISC::fromString(args[0], type);
+		WorldObjectManager.createObject(type,loc,quality,hp);
 		return true;
 	}
 	return false;

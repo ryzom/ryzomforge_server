@@ -218,24 +218,27 @@ private:
 
 void CDirectionLayer::serial(NLMISC::IStream& f)
 {
-	uint i;
-	for (i=0; i<9; ++i)
+	uint i, j;
+	for (i=0; i<3; ++i)
 	{
-		if (f.isReading())
-		{
-			delete Grid[0][i];
-			Grid[0][i] = NULL;
-		}
-
-		bool	present = (Grid[0][i] != NULL);
-		f.serial(present);
-
-		if (present)
+		for (j=0; j<3; ++j)
 		{
 			if (f.isReading())
-				Grid[0][i] =	I16x16Layer::load(f);
-			else
-				I16x16Layer::save(f, Grid[0][i]);
+			{
+				delete Grid[i][j];
+				Grid[i][j] = NULL;
+			}
+
+			bool	present = (Grid[i][j] != NULL);
+			f.serial(present);
+
+			if (present)
+			{
+				if (f.isReading())
+					Grid[i][j] =	I16x16Layer::load(f);
+				else
+					I16x16Layer::save(f, Grid[i][j]);
+			}
 		}
 	}
 }

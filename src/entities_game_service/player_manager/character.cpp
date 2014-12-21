@@ -7908,9 +7908,9 @@ void CCharacter::endHarvest(bool sendCloseTempImpulsion)
 	_HarvestOpened = false;
 	_DepositSearchSkill = SKILLS::unknown;
 	_MpIndex = 0xff;
-	_DepositHarvestInformations.DepositIndex = 0xffffffff;
+	_DepositHarvestInformation.DepositIndex = 0xffffffff;
 
-	if ( _DepositHarvestInformations.Sheet != CSheetId::Unknown/*_DepositHarvestInformations.EndCherchingTime != 0xffffffff && _DepositHarvestInformations.EndCherchingTime > CTickEventHandler::getGameCycle()*/ )
+	if ( _DepositHarvestInformation.Sheet != CSheetId::Unknown/*_DepositHarvestInformation.EndCherchingTime != 0xffffffff && _DepositHarvestInformation.EndCherchingTime > CTickEventHandler::getGameCycle()*/ )
 	{
 		if ( sendCloseTempImpulsion )
 		{
@@ -13221,7 +13221,9 @@ void CCharacter::setPlaces(const std::vector<const CPlace*> & places)
 	const uint size = (uint)places.size();
 	_Places.resize(places.size());
 	for ( uint i = 0; i < size; i++ )
+	{
 		_Places[i] = places[i]->getId();
+	}
 }
 
 //-----------------------------------------------
