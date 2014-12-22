@@ -24,21 +24,21 @@ MACRO(NL_GEN_REVISION_H)
   IF(EXISTS ${CMAKE_SOURCE_DIR}/revision.h.in)
     SET(TOOL_FOUND OFF)
 
-    IF(EXISTS "${CMAKE_SOURCE_DIR}/.svn/")
+    IF(EXISTS "${CMAKE_SOURCE_DIR}/../.svn/")
       FIND_PACKAGE(Subversion)
 
       IF(SUBVERSION_FOUND)
         SET(TOOL_FOUND ON)
       ENDIF(SUBVERSION_FOUND)
-    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/.svn/")
+    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/../.svn/")
 
-    IF(EXISTS "${CMAKE_SOURCE_DIR}/.hg/")
+    IF(EXISTS "${CMAKE_SOURCE_DIR}/../.hg/")
       FIND_PACKAGE(Mercurial)
 
       IF(MERCURIAL_FOUND)
         SET(TOOL_FOUND ON)
       ENDIF(MERCURIAL_FOUND)
-    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/.hg/")
+    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/../.hg/")
 
     # if already generated
     IF(EXISTS ${CMAKE_SOURCE_DIR}/revision.h)
@@ -50,14 +50,11 @@ MACRO(NL_GEN_REVISION_H)
 
     IF(TOOL_FOUND)
       # a custom target that is always built
-      ADD_CUSTOM_TARGET(revision ALL)
-
-      # creates revision.h using cmake script
-      ADD_CUSTOM_COMMAND(TARGET revision
-        PRE_BUILD
+      ADD_CUSTOM_TARGET(revision ALL
         COMMAND ${CMAKE_COMMAND}
         -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-        -DROOT_DIR=${CMAKE_SOURCE_DIR}
+        -DROOT_DIR=${CMAKE_SOURCE_DIR}/..
+        -DCMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/CMakeModules
         -P ${CMAKE_SOURCE_DIR}/CMakeModules/GetRevision.cmake)
 
       # revision.h is a generated file
@@ -102,6 +99,11 @@ ENDMACRO(NL_TARGET_DRIVER)
 # Argument:
 ###
 MACRO(NL_DEFAULT_PROPS name label)
+  IF(HAVE_REVISION_H)
+    # explicitly say that the target depends on revision.h
+    ADD_DEPENDENCIES(${name} revision)
+  ENDIF(HAVE_REVISION_H)
+
   # Note: This is just a workaround for a CMake bug generating VS10 files with a colon in the project name.
   # CMake Bug ID: http://www.cmake.org/Bug/view.php?id=11819
   STRING(REGEX REPLACE "\\:" " -" proj_label ${label})
@@ -116,17 +118,13 @@ MACRO(NL_DEFAULT_PROPS name label)
     ENDIF(NL_LIB_PREFIX)
   ENDIF(${type} STREQUAL SHARED_LIBRARY)
 
-  IF(${type} STREQUAL EXECUTABLE AND WIN32)
+  IF(${type} STREQUAL EXECUTABLE AND WIN32 AND NOT MINGW)
     SET_TARGET_PROPERTIES(${name} PROPERTIES
       VERSION ${NL_VERSION}
       SOVERSION ${NL_VERSION_MAJOR}
       COMPILE_FLAGS "/GA"
-      LINK_FLAGS "/VERSION:${NL_VERSION}")
-  ENDIF(${type} STREQUAL EXECUTABLE AND WIN32)
-
-  IF(WITH_STLPORT AND WIN32)
-    SET_TARGET_PROPERTIES(${name} PROPERTIES COMPILE_FLAGS "/X")
-  ENDIF(WITH_STLPORT AND WIN32)
+      LINK_FLAGS "/VERSION:${NL_VERSION_MAJOR}.${NL_VERSION_MINOR}")
+  ENDIF(${type} STREQUAL EXECUTABLE AND WIN32 AND NOT MINGW)
 ENDMACRO(NL_DEFAULT_PROPS)
 
 ###
@@ -231,6 +229,10 @@ Remove the CMakeCache.txt file and try again from another folder, e.g.:
 ENDMACRO(CHECK_OUT_OF_SOURCE)
 
 MACRO(NL_SETUP_DEFAULT_OPTIONS)
+  IF(WITH_QT)
+    OPTION(WITH_STUDIO              "Build Core Studio"                             OFF )
+  ENDIF(WITH_QT)
+  
   ###
   # Features
   ###
@@ -245,6 +247,11 @@ MACRO(NL_SETUP_DEFAULT_OPTIONS)
   ELSE(WIN32)
     OPTION(WITH_STATIC            "With static libraries."                        OFF)
   ENDIF(WIN32)
+  IF (WITH_STATIC)
+    OPTION(WITH_STATIC_LIBXML2    "With static libxml2"                           ON )
+  ELSE(WITH_STATIC)
+    OPTION(WITH_STATIC_LIBXML2    "With static libxml2"                           OFF)
+  ENDIF(WITH_STATIC)
   OPTION(WITH_STATIC_DRIVERS      "With static drivers."                          OFF)
   IF(WIN32)
     OPTION(WITH_EXTERNAL          "With provided external."                       ON )
@@ -291,6 +298,7 @@ MACRO(NL_SETUP_NEL_DEFAULT_OPTIONS)
   ###
   OPTION(WITH_NET                 "Build NLNET"                                   ON )
   OPTION(WITH_3D                  "Build NL3D"                                    ON )
+  OPTION(WITH_GUI                 "Build GUI"                                     ON )
   OPTION(WITH_PACS                "Build NLPACS"                                  ON )
   OPTION(WITH_GEORGES             "Build NLGEORGES"                               ON )
   OPTION(WITH_LIGO                "Build NLLIGO"                                  ON )
@@ -316,6 +324,17 @@ MACRO(NL_SETUP_NEL_DEFAULT_OPTIONS)
   OPTION(WITH_NEL_MAXPLUGIN       "Build NeL 3dsMax Plugin"                       OFF)
   OPTION(WITH_NEL_SAMPLES         "Build NeL Samples"                             ON )
   OPTION(WITH_NEL_TESTS           "Build NeL Unit Tests"                          ON )
+
+  OPTION(WITH_LIBOVR              "With LibOVR support"                           OFF)
+  OPTION(WITH_LIBVR               "With LibVR support"                            OFF)
+  OPTION(WITH_PERFHUD             "With NVIDIA PerfHUD support"                   OFF)
+  
+  OPTION(WITH_SSE2                "With SSE2"                                     ON )
+  OPTION(WITH_SSE3                "With SSE3"                                     ON )
+  
+  IF(NOT MSVC)
+    OPTION(WITH_GCC_FPMATH_BOTH   "With GCC -mfpmath=both"                        OFF)
+  ENDIF(NOT MSVC)
 ENDMACRO(NL_SETUP_NEL_DEFAULT_OPTIONS)
 
 MACRO(NL_SETUP_NELNS_DEFAULT_OPTIONS)
@@ -334,12 +353,13 @@ MACRO(NL_SETUP_RYZOM_DEFAULT_OPTIONS)
   OPTION(WITH_RYZOM_TOOLS         "Build Ryzom Core Tools"                        ON )
   OPTION(WITH_RYZOM_SERVER        "Build Ryzom Core Services"                     ON )
   OPTION(WITH_RYZOM_SOUND         "Enable Ryzom Core Sound"                       ON )
+  OPTION(WITH_RYZOM_PATCH         "Enable Ryzom in-game patch support"            OFF)
 
   ###
   # Optional support
   ###
-  OPTION(WITH_LUA51               "Build Ryzom Core using Lua51"                  ON )
-  OPTION(WITH_RYZOM_CLIENT_UAC    "Ask to run as Administrator"                   ON )
+  OPTION(WITH_LUA51               "Build Ryzom Core using Lua 5.1"                ON )
+  OPTION(WITH_LUA52               "Build Ryzom Core using Lua 5.2"                OFF)
 ENDMACRO(NL_SETUP_RYZOM_DEFAULT_OPTIONS)
 
 MACRO(NL_SETUP_SNOWBALLS_DEFAULT_OPTIONS)
@@ -380,11 +400,11 @@ MACRO(NL_SETUP_BUILD)
 
   SET(HOST_CPU ${CMAKE_HOST_SYSTEM_PROCESSOR})
 
-  IF(HOST_CPU MATCHES "amd64")
+  IF(HOST_CPU MATCHES "(amd|AMD)64")
     SET(HOST_CPU "x86_64")
   ELSEIF(HOST_CPU MATCHES "i.86")
     SET(HOST_CPU "x86")
-  ENDIF(HOST_CPU MATCHES "amd64")
+  ENDIF(HOST_CPU MATCHES "(amd|AMD)64")
   
   # Determine target CPU
 
@@ -393,11 +413,11 @@ MACRO(NL_SETUP_BUILD)
     SET(TARGET_CPU ${CMAKE_SYSTEM_PROCESSOR})
   ENDIF(NOT TARGET_CPU)
 
-  IF(TARGET_CPU MATCHES "amd64")
+  IF(TARGET_CPU MATCHES "(amd|AMD)64")
     SET(TARGET_CPU "x86_64")
   ELSEIF(TARGET_CPU MATCHES "i.86")
     SET(TARGET_CPU "x86")
-  ENDIF(TARGET_CPU MATCHES "amd64")
+  ENDIF(TARGET_CPU MATCHES "(amd|AMD)64")
 
   IF(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     SET(CLANG ON)
@@ -409,8 +429,13 @@ MACRO(NL_SETUP_BUILD)
     MESSAGE(STATUS "Generating Xcode project")
   ENDIF(CMAKE_GENERATOR MATCHES "Xcode")
 
+  IF(CMAKE_GENERATOR MATCHES "NMake")
+    SET(NMAKE ON)
+    MESSAGE(STATUS "Generating NMake project")
+  ENDIF(CMAKE_GENERATOR MATCHES "NMake")
+
   # If target and host CPU are the same
-  IF("${HOST_CPU}" STREQUAL "${TARGET_CPU}")
+  IF("${HOST_CPU}" STREQUAL "${TARGET_CPU}" AND NOT CMAKE_CROSSCOMPILING)
     # x86-compatible CPU
     IF(HOST_CPU MATCHES "x86")
       IF(NOT CMAKE_SIZEOF_VOID_P)
@@ -431,9 +456,9 @@ MACRO(NL_SETUP_BUILD)
       MESSAGE(STATUS "Unknown architecture: ${HOST_CPU}")
     ENDIF(HOST_CPU MATCHES "x86")
     # TODO: add checks for PPC
-  ELSE("${HOST_CPU}" STREQUAL "${TARGET_CPU}")
+  ELSE("${HOST_CPU}" STREQUAL "${TARGET_CPU}" AND NOT CMAKE_CROSSCOMPILING)
     MESSAGE(STATUS "Compiling on ${HOST_CPU} for ${TARGET_CPU}")
-  ENDIF("${HOST_CPU}" STREQUAL "${TARGET_CPU}")
+  ENDIF("${HOST_CPU}" STREQUAL "${TARGET_CPU}" AND NOT CMAKE_CROSSCOMPILING)
 
   # Use values from environment variables
   SET(PLATFORM_CFLAGS "$ENV{CFLAGS} $ENV{CPPFLAGS} ${PLATFORM_CFLAGS}")
@@ -454,6 +479,7 @@ MACRO(NL_SETUP_BUILD)
   IF(NOT CMAKE_OSX_ARCHITECTURES)
     IF(TARGET_CPU STREQUAL "x86_64")
       SET(TARGET_X64 1)
+      SET(TARGET_X86 1)
     ELSEIF(TARGET_CPU STREQUAL "x86")
       SET(TARGET_X86 1)
     ELSEIF(TARGET_CPU STREQUAL "armv7s")
@@ -470,7 +496,37 @@ MACRO(NL_SETUP_BUILD)
       SET(TARGET_ARMV5 1)
     ELSEIF(TARGET_CPU STREQUAL "arm")
       SET(TARGET_ARM 1)
+    ELSEIF(TARGET_CPU STREQUAL "mips")
+      SET(TARGET_MIPS 1)
     ENDIF(TARGET_CPU STREQUAL "x86_64")
+
+    IF(TARGET_ARM)
+      IF(TARGET_ARMV7S)
+        ADD_PLATFORM_FLAGS("-DHAVE_ARMV7S")
+      ENDIF(TARGET_ARMV7S)
+
+      IF(TARGET_ARMV7)
+        ADD_PLATFORM_FLAGS("-DHAVE_ARMV7")
+      ENDIF(TARGET_ARMV7)
+
+      IF(TARGET_ARMV6)
+        ADD_PLATFORM_FLAGS("-HAVE_ARMV6")
+      ENDIF(TARGET_ARMV6)
+
+      ADD_PLATFORM_FLAGS("-DHAVE_ARM")
+    ENDIF(TARGET_ARM)
+
+    IF(TARGET_X86)
+      ADD_PLATFORM_FLAGS("-DHAVE_X86")
+    ENDIF(TARGET_X86)
+
+    IF(TARGET_X64)
+      ADD_PLATFORM_FLAGS("-DHAVE_X64 -DHAVE_X86_64")
+    ENDIF(TARGET_X64)
+
+    IF(TARGET_MIPS)
+      ADD_PLATFORM_FLAGS("-DHAVE_MIPS")
+    ENDIF(TARGET_MIPS)
   ENDIF(NOT CMAKE_OSX_ARCHITECTURES)
 
   # Fix library paths suffixes for Debian MultiArch
@@ -478,10 +534,9 @@ MACRO(NL_SETUP_BUILD)
     SET(CMAKE_LIBRARY_PATH /lib/${LIBRARY_ARCHITECTURE} /usr/lib/${LIBRARY_ARCHITECTURE} ${CMAKE_LIBRARY_PATH})
     IF(TARGET_X64)
       SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /lib64 /usr/lib64)
-    ENDIF(TARGET_X64)
-    IF(TARGET_X86)
+    ELSEIF(TARGET_X86)
       SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /lib32 /usr/lib32)
-    ENDIF(TARGET_X86)
+    ENDIF(TARGET_X64)
   ENDIF(LIBRARY_ARCHITECTURE)
 
   IF(APPLE AND NOT IOS)
@@ -489,32 +544,25 @@ MACRO(NL_SETUP_BUILD)
     SET(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
   ENDIF(APPLE AND NOT IOS)
 
-  IF(TARGET_ARM)
-    IF(TARGET_ARMV7)
-      ADD_PLATFORM_FLAGS("-DHAVE_ARMV7")
-    ENDIF(TARGET_ARMV7)
-
-    IF(TARGET_ARMV6)
-      ADD_PLATFORM_FLAGS("-HAVE_ARMV6")
-    ENDIF(TARGET_ARMV6)
-
-    ADD_PLATFORM_FLAGS("-DHAVE_ARM")
-  ENDIF(TARGET_ARM)
-
-  IF(TARGET_X86)
-    ADD_PLATFORM_FLAGS("-DHAVE_X86")
-  ENDIF(TARGET_X86)
-
-  IF(TARGET_X64)
-    ADD_PLATFORM_FLAGS("-DHAVE_X64 -DHAVE_X86_64")
-  ENDIF(TARGET_X64)
-
   IF(WITH_LOGGING)
     ADD_PLATFORM_FLAGS("-DENABLE_LOGS")
   ENDIF(WITH_LOGGING)
 
   IF(MSVC)
-    IF(MSVC10)
+    IF(MSVC_VERSION EQUAL "1700" AND NOT MSVC11)
+      SET(MSVC11 ON)
+    ENDIF(MSVC_VERSION EQUAL "1700" AND NOT MSVC11)
+
+    # Ignore default include paths
+    ADD_PLATFORM_FLAGS("/X")
+
+    IF(MSVC11)
+      ADD_PLATFORM_FLAGS("/Gy- /MP")
+      # /Ox is working with VC++ 2010, but custom optimizations don't exist
+      SET(RELEASE_CFLAGS "/Ox /GF /GS- ${RELEASE_CFLAGS}")
+      # without inlining it's unusable, use custom optimizations again
+      SET(DEBUG_CFLAGS "/Od /Ob1 /GF- ${DEBUG_CFLAGS}")
+    ELSEIF(MSVC10)
       ADD_PLATFORM_FLAGS("/Gy- /MP")
       # /Ox is working with VC++ 2010, but custom optimizations don't exist
       SET(RELEASE_CFLAGS "/Ox /GF /GS- ${RELEASE_CFLAGS}")
@@ -532,9 +580,9 @@ MACRO(NL_SETUP_BUILD)
       SET(RELEASE_CFLAGS "/Ox /GF /GS- ${RELEASE_CFLAGS}")
       # without inlining it's unusable, use custom optimizations again
       SET(DEBUG_CFLAGS "/Od /Ob1 ${DEBUG_CFLAGS}")
-    ELSE(MSVC10)
+    ELSE(MSVC11)
       MESSAGE(FATAL_ERROR "Can't determine compiler version ${MSVC_VERSION}")
-    ENDIF(MSVC10)
+    ENDIF(MSVC11)
 
     ADD_PLATFORM_FLAGS("/D_CRT_SECURE_NO_DEPRECATE /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS /DWIN32 /D_WINDOWS /Zm1000 /wd4250")
 
@@ -560,7 +608,7 @@ MACRO(NL_SETUP_BUILD)
 
     SET(NL_DEBUG_CFLAGS "/Zi /MDd /RTC1 /D_DEBUG ${DEBUG_CFLAGS} ${NL_DEBUG_CFLAGS}")
     SET(NL_RELEASE_CFLAGS "/MD /DNDEBUG ${RELEASE_CFLAGS} ${NL_RELEASE_CFLAGS}")
-    SET(NL_DEBUG_LINKFLAGS "/DEBUG /OPT:NOREF /OPT:NOICF /NODEFAULTLIB:msvcrt /INCREMENTAL:YES ${NL_DEBUG_LINKFLAGS}")
+    SET(NL_DEBUG_LINKFLAGS "/DEBUG /OPT:NOREF /OPT:NOICF /NODEFAULTLIB:msvcrt ${MSVC_INCREMENTAL_YES_FLAG} ${NL_DEBUG_LINKFLAGS}")
     SET(NL_RELEASE_LINKFLAGS "/OPT:REF /OPT:ICF /INCREMENTAL:NO ${NL_RELEASE_LINKFLAGS}")
 
     IF(WITH_WARNINGS)
@@ -577,26 +625,16 @@ MACRO(NL_SETUP_BUILD)
       ENDIF(CLANG)
     ENDIF(WIN32)
 
-    IF(TARGET_ARM)
-      ADD_PLATFORM_FLAGS("-mthumb")
-    ENDIF(TARGET_ARM)
+    IF(WITH_SSE3)
+      ADD_PLATFORM_FLAGS("-msse3")
+    ENDIF(WITH_SSE3)
+
+    IF(WITH_GCC_FPMATH_BOTH)
+      ADD_PLATFORM_FLAGS("-mfpmath=both")
+    ENDIF(WITH_GCC_FPMATH_BOTH)
 
     IF(APPLE)
-      IF(IOS)
-        SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.7" CACHE PATH "" FORCE)
-      ELSE(IOS)
-        IF(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-          SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.6" CACHE PATH "" FORCE)
-        ENDIF(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-      ENDIF(IOS)
-
-      IF(XCODE)
-        IF(IOS)
-          SET(CMAKE_OSX_SYSROOT "iphoneos" CACHE PATH "" FORCE)
-        ELSE(IOS)
-#          SET(CMAKE_OSX_SYSROOT "macosx" CACHE PATH "" FORCE)
-        ENDIF(IOS)
-      ELSE(XCODE)
+      IF(NOT XCODE)
         IF(CMAKE_OSX_ARCHITECTURES)
           SET(TARGETS_COUNT 0)
           SET(_ARCHS)
@@ -609,6 +647,11 @@ MACRO(NL_SETUP_BUILD)
               SET(_ARCHS "${_ARCHS} x86_64")
               SET(TARGET_X64 1)
               MATH(EXPR TARGETS_COUNT "${TARGETS_COUNT}+1")
+            ELSEIF(_ARCH STREQUAL "armv7s")
+              SET(_ARCHS "${_ARCHS} armv7s")
+              SET(TARGET_ARMV7S 1)
+              SET(TARGET_ARM 1)
+              MATH(EXPR TARGETS_COUNT "${TARGETS_COUNT}+1")
             ELSEIF(_ARCH STREQUAL "armv7")
               SET(_ARCHS "${_ARCHS} armv7")
               SET(TARGET_ARMV7 1)
@@ -619,16 +662,51 @@ MACRO(NL_SETUP_BUILD)
               SET(TARGET_ARMV6 1)
               SET(TARGET_ARM 1)
               MATH(EXPR TARGETS_COUNT "${TARGETS_COUNT}+1")
+            ELSEIF(_ARCH STREQUAL "mips")
+              SET(_ARCHS "${_ARCHS} mips")
+              SET(TARGET_MIPS 1)
+              MATH(EXPR TARGETS_COUNT "${TARGETS_COUNT}+1")
             ELSE(_ARCH STREQUAL "i386")
               SET(_ARCHS "${_ARCHS} unknwon(${_ARCH})")
             ENDIF(_ARCH STREQUAL "i386")
           ENDFOREACH(_ARCH)
           MESSAGE(STATUS "Compiling under Mac OS X for ${TARGETS_COUNT} architectures: ${_ARCHS}")
         ELSE(CMAKE_OSX_ARCHITECTURES)
-          SET(TARGETS_COUNT 1)
+          SET(TARGETS_COUNT 0)
         ENDIF(CMAKE_OSX_ARCHITECTURES)
 
         IF(TARGETS_COUNT EQUAL 1)
+          IF(TARGET_ARM)
+            IF(TARGET_ARMV7S)
+              ADD_PLATFORM_FLAGS("-arch armv7s -DHAVE_ARMV7S")
+            ENDIF(TARGET_ARMV7S)
+
+            IF(TARGET_ARMV7)
+              ADD_PLATFORM_FLAGS("-arch armv7 -DHAVE_ARMV7")
+            ENDIF(TARGET_ARMV7)
+
+            IF(TARGET_ARMV6)
+              ADD_PLATFORM_FLAGS("-arch armv6 -DHAVE_ARMV6")
+            ENDIF(TARGET_ARMV6)
+
+            IF(TARGET_ARMV5)
+              ADD_PLATFORM_FLAGS("-arch armv5 -DHAVE_ARMV5")
+            ENDIF(TARGET_ARMV5)
+
+            ADD_PLATFORM_FLAGS("-mthumb -DHAVE_ARM")
+          ENDIF(TARGET_ARM)
+
+          IF(TARGET_X64)
+            ADD_PLATFORM_FLAGS("-arch x86_64 -DHAVE_X64 -DHAVE_X86_64 -DHAVE_X86")
+          ELSEIF(TARGET_X86)
+            ADD_PLATFORM_FLAGS("-arch i386 -DHAVE_X86")
+          ENDIF(TARGET_X64)
+
+          IF(TARGET_MIPS)
+            ADD_PLATFORM_FLAGS("-arch mips -DHAVE_MIPS")
+          ENDIF(TARGET_MIPS)
+        ELSEIF(TARGETS_COUNT EQUAL 0)
+          # Not using CMAKE_OSX_ARCHITECTURES, HAVE_XXX already defined before
           IF(TARGET_ARM)
             IF(TARGET_ARMV7S)
               ADD_PLATFORM_FLAGS("-arch armv7s")
@@ -645,15 +723,19 @@ MACRO(NL_SETUP_BUILD)
             IF(TARGET_ARMV5)
               ADD_PLATFORM_FLAGS("-arch armv5")
             ENDIF(TARGET_ARMV5)
-          ENDIF(TARGET_ARM)
 
-          IF(TARGET_X86)
-            ADD_PLATFORM_FLAGS("-arch i386")
-          ENDIF(TARGET_X86)
+            ADD_PLATFORM_FLAGS("-mthumb")
+          ENDIF(TARGET_ARM)
 
           IF(TARGET_X64)
             ADD_PLATFORM_FLAGS("-arch x86_64")
+          ELSEIF(TARGET_X86)
+            ADD_PLATFORM_FLAGS("-arch i386")
           ENDIF(TARGET_X64)
+
+          IF(TARGET_MIPS)
+            ADD_PLATFORM_FLAGS("-arch mips")
+          ENDIF(TARGET_MIPS)
         ELSE(TARGETS_COUNT EQUAL 1)
           IF(TARGET_ARMV6)
             ADD_PLATFORM_FLAGS("-Xarch_armv6 -mthumb -Xarch_armv6 -DHAVE_ARM -Xarch_armv6 -DHAVE_ARMV6")
@@ -664,15 +746,21 @@ MACRO(NL_SETUP_BUILD)
           ENDIF(TARGET_ARMV7)
 
           IF(TARGET_X86)
-            ADD_PLATFORM_FLAGS("-arch i386 -Xarch_i386 -DHAVE_X86")
+            ADD_PLATFORM_FLAGS("-Xarch_i386 -DHAVE_X86")
           ENDIF(TARGET_X86)
 
           IF(TARGET_X64)
-            ADD_PLATFORM_FLAGS("-arch x86_64 -Xarch_x86_64 -DHAVE_X64 -Xarch_x86_64 -DHAVE_X86_64")
+            ADD_PLATFORM_FLAGS("-Xarch_x86_64 -DHAVE_X64 -Xarch_x86_64 -DHAVE_X86_64")
           ENDIF(TARGET_X64)
+
+          IF(TARGET_MIPS)
+            ADD_PLATFORM_FLAGS("-Xarch_mips -DHAVE_MIPS")
+          ENDIF(TARGET_MIPS)
         ENDIF(TARGETS_COUNT EQUAL 1)
 
         IF(IOS)
+          SET(CMAKE_OSX_SYSROOT "" CACHE PATH "" FORCE)
+
           IF(IOS_VERSION)
             PARSE_VERSION_STRING(${IOS_VERSION} IOS_VERSION_MAJOR IOS_VERSION_MINOR IOS_VERSION_PATCH)
             CONVERT_VERSION_NUMBER(${IOS_VERSION_MAJOR} ${IOS_VERSION_MINOR} ${IOS_VERSION_PATCH} IOS_VERSION_NUMBER)
@@ -681,38 +769,53 @@ MACRO(NL_SETUP_BUILD)
           ENDIF(IOS_VERSION)
 
           IF(CMAKE_IOS_SYSROOT)
-            ADD_PLATFORM_FLAGS("-isysroot${CMAKE_IOS_SYSROOT}")
-            ADD_PLATFORM_FLAGS("-miphoneos-version-min=${IOS_VERSION}")
-            SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -Wl,-iphoneos_version_min,${IOS_VERSION}")
+            IF(TARGET_ARMV7S)
+              IF(TARGETS_COUNT GREATER 1)
+                SET(XARCH "-Xarch_armv7s ")
+              ENDIF(TARGETS_COUNT GREATER 1)
+
+              ADD_PLATFORM_FLAGS("${XARCH}-isysroot${CMAKE_IOS_SYSROOT}")
+              ADD_PLATFORM_FLAGS("${XARCH}-miphoneos-version-min=${IOS_VERSION}")
+              SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} ${XARCH}-Wl,-iphoneos_version_min,${IOS_VERSION}")
+            ENDIF(TARGET_ARMV7S)
+
+            IF(TARGET_ARMV7)
+              IF(TARGETS_COUNT GREATER 1)
+                SET(XARCH "-Xarch_armv7 ")
+              ENDIF(TARGETS_COUNT GREATER 1)
+
+              ADD_PLATFORM_FLAGS("${XARCH}-isysroot${CMAKE_IOS_SYSROOT}")
+              ADD_PLATFORM_FLAGS("${XARCH}-miphoneos-version-min=${IOS_VERSION}")
+              SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} ${XARCH}-Wl,-iphoneos_version_min,${IOS_VERSION}")
+            ENDIF(TARGET_ARMV7)
+
+            IF(TARGET_ARMV6)
+              IF(TARGETS_COUNT GREATER 1)
+                SET(XARCH "-Xarch_armv6 ")
+              ENDIF(TARGETS_COUNT GREATER 1)
+
+              ADD_PLATFORM_FLAGS("${XARCH}-isysroot${CMAKE_IOS_SYSROOT}")
+              ADD_PLATFORM_FLAGS("${XARCH}-miphoneos-version-min=${IOS_VERSION}")
+              SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} ${XARCH}-Wl,-iphoneos_version_min,${IOS_VERSION}")
+            ENDIF(TARGET_ARMV6)
           ENDIF(CMAKE_IOS_SYSROOT)
 
           IF(CMAKE_IOS_SIMULATOR_SYSROOT AND TARGET_X86)
-            IF(TARGETS_COUNT EQUAL 1)
-              ADD_PLATFORM_FLAGS("-arch i386")
-            ELSE(TARGETS_COUNT EQUAL 1)
+            IF(TARGETS_COUNT GREATER 1)
               SET(XARCH "-Xarch_i386 ")
-            ENDIF(TARGETS_COUNT EQUAL 1)
+            ENDIF(TARGETS_COUNT GREATER 1)
 
-            # Always force -mmacosx-version-min to override environement variable
-            ADD_PLATFORM_FLAGS("${XARCH}-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
-            SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} ${XARCH}-Wl,-macosx_version_min,${CMAKE_OSX_DEPLOYMENT_TARGET}")
+            ADD_PLATFORM_FLAGS("${XARCH}-isysroot${CMAKE_IOS_SIMULATOR_SYSROOT}")
+            ADD_PLATFORM_FLAGS("${XARCH}-mios-simulator-version-min=${IOS_VERSION}")
+            IF(CMAKE_OSX_DEPLOYMENT_TARGET)
+              SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} ${XARCH}-Wl,-macosx_version_min,${CMAKE_OSX_DEPLOYMENT_TARGET}")
+            ENDIF(CMAKE_OSX_DEPLOYMENT_TARGET)
           ENDIF(CMAKE_IOS_SIMULATOR_SYSROOT AND TARGET_X86)
         ELSE(IOS)
-          FOREACH(_SDK ${_CMAKE_OSX_SDKS})
-            IF(${_SDK} MATCHES "MacOSX${CMAKE_OSX_DEPLOYMENT_TARGET}\\.sdk")
-              SET(CMAKE_OSX_SYSROOT ${_SDK} CACHE PATH "" FORCE)
-            ENDIF(${_SDK} MATCHES "MacOSX${CMAKE_OSX_DEPLOYMENT_TARGET}\\.sdk")
-          ENDFOREACH(_SDK)
-
-          IF(CMAKE_OSX_SYSROOT)
-            ADD_PLATFORM_FLAGS("-isysroot ${CMAKE_OSX_SYSROOT}")
-          ELSE(CMAKE_OSX_SYSROOT)
-            MESSAGE(FATAL_ERROR "CMAKE_OSX_SYSROOT can't be determinated")
-          ENDIF(CMAKE_OSX_SYSROOT)
-
           # Always force -mmacosx-version-min to override environement variable
-          ADD_PLATFORM_FLAGS("-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
-          SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -Wl,-macosx_version_min,${CMAKE_OSX_DEPLOYMENT_TARGET}")
+          IF(CMAKE_OSX_DEPLOYMENT_TARGET)
+            SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -Wl,-macosx_version_min,${CMAKE_OSX_DEPLOYMENT_TARGET}")
+          ENDIF(CMAKE_OSX_DEPLOYMENT_TARGET)
         ENDIF(IOS)
 
         SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -Wl,-headerpad_max_install_names")
@@ -720,7 +823,7 @@ MACRO(NL_SETUP_BUILD)
         IF(HAVE_FLAG_SEARCH_PATHS_FIRST)
           SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -Wl,-search_paths_first")
         ENDIF(HAVE_FLAG_SEARCH_PATHS_FIRST)
-      ENDIF(XCODE)
+      ENDIF(NOT XCODE)
     ELSE(APPLE)
       IF(HOST_CPU STREQUAL "x86_64" AND TARGET_CPU STREQUAL "x86")
         ADD_PLATFORM_FLAGS("-m32 -march=i686")
@@ -746,14 +849,54 @@ MACRO(NL_SETUP_BUILD)
       ENDIF(CLANG)
     ENDIF(WITH_WARNINGS)
 
+    IF(ANDROID)
+      ADD_PLATFORM_FLAGS("--sysroot=${PLATFORM_ROOT}")
+      ADD_PLATFORM_FLAGS("-ffunction-sections -funwind-tables")
+      ADD_PLATFORM_FLAGS("-DANDROID")
+      ADD_PLATFORM_FLAGS("-Wa,--noexecstack")
+
+      IF(TARGET_ARM)
+        ADD_PLATFORM_FLAGS("-fpic -fstack-protector")
+        ADD_PLATFORM_FLAGS("-D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__")
+
+        IF(TARGET_ARMV7)
+          ADD_PLATFORM_FLAGS("-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16")
+          SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -march=armv7-a -Wl,--fix-cortex-a8")
+        ELSEIF(TARGET_ARMV5)
+          ADD_PLATFORM_FLAGS("-march=armv5te -mtune=xscale -msoft-float")
+        ENDIF(TARGET_ARMV7)
+
+        SET(TARGET_THUMB ON)
+        IF(TARGET_THUMB)
+          ADD_PLATFORM_FLAGS("-mthumb -fno-strict-aliasing -finline-limit=64")
+          SET(DEBUG_CFLAGS "${DEBUG_CFLAGS} -marm")
+        ELSE(TARGET_THUMB)
+          ADD_PLATFORM_FLAGS("-funswitch-loops -finline-limit=300")
+          SET(DEBUG_CFLAGS "${DEBUG_CFLAGS} -fno-strict-aliasing")
+          SET(RELEASE_CFLAGS "${RELEASE_CFLAGS} -fstrict-aliasing")
+        ENDIF(TARGET_THUMB)
+      ELSEIF(TARGET_X86)
+        # Optimizations for Intel Atom
+        ADD_PLATFORM_FLAGS("-march=i686 -mtune=atom -mstackrealign -msse3 -mfpmath=sse -m32 -flto -ffast-math -funroll-loops")
+        ADD_PLATFORM_FLAGS("-fstack-protector -funswitch-loops -finline-limit=300")
+        SET(RELEASE_CFLAGS "${RELEASE_CFLAGS} -fstrict-aliasing")
+        SET(DEBUG_CFLAGS "${DEBUG_CFLAGS} -fno-strict-aliasing")
+      ELSEIF(TARGET_MIPS)
+        ADD_PLATFORM_FLAGS("-fpic -finline-functions -fmessage-length=0 -fno-inline-functions-called-once -fgcse-after-reload -frerun-cse-after-loop -frename-registers -fno-strict-aliasing")
+        SET(RELEASE_CFLAGS "${RELEASE_CFLAGS} -funswitch-loops -finline-limit=300")
+      ENDIF(TARGET_ARM)
+      SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now")
+      SET(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -L${PLATFORM_ROOT}/usr/lib")
+    ENDIF(ANDROID)
+
     IF(APPLE)
       ADD_PLATFORM_FLAGS("-gdwarf-2")
     ENDIF(APPLE)
 
     # Fix "relocation R_X86_64_32 against.." error on x64 platforms
-    IF(TARGET_X64 AND WITH_STATIC AND NOT WITH_STATIC_DRIVERS)
+    IF(TARGET_X64 AND WITH_STATIC AND NOT WITH_STATIC_DRIVERS AND NOT MINGW)
       ADD_PLATFORM_FLAGS("-fPIC")
-    ENDIF(TARGET_X64 AND WITH_STATIC AND NOT WITH_STATIC_DRIVERS)
+    ENDIF(TARGET_X64 AND WITH_STATIC AND NOT WITH_STATIC_DRIVERS AND NOT MINGW)
 
     SET(PLATFORM_CXXFLAGS "${PLATFORM_CXXFLAGS} -ftemplate-depth-48")
 
@@ -765,7 +908,7 @@ MACRO(NL_SETUP_BUILD)
       SET(NL_RELEASE_CFLAGS "${NL_RELEASE_CFLAGS} -g")
     ELSE(WITH_SYMBOLS)
       IF(APPLE)
-        SET(NL_RELEASE_LINKFLAGS "-Wl,-dead_strip -Wl,-x ${NL_RELEASE_LINKFLAGS}")
+        SET(NL_RELEASE_LINKFLAGS "-Wl,-dead_strip ${NL_RELEASE_LINKFLAGS}")
       ELSE(APPLE)
         SET(NL_RELEASE_LINKFLAGS "-Wl,-s ${NL_RELEASE_LINKFLAGS}")
       ENDIF(APPLE)
@@ -779,27 +922,30 @@ ENDMACRO(NL_SETUP_BUILD)
 MACRO(NL_SETUP_BUILD_FLAGS)
   SET(CMAKE_C_FLAGS ${PLATFORM_CFLAGS} CACHE STRING "" FORCE)
   SET(CMAKE_CXX_FLAGS ${PLATFORM_CXXFLAGS} CACHE STRING "" FORCE)
+  SET(CMAKE_EXE_LINKER_FLAGS ${PLATFORM_LINKFLAGS} CACHE STRING "" FORCE)
+  SET(CMAKE_MODULE_LINKER_FLAGS ${PLATFORM_LINKFLAGS} CACHE STRING "" FORCE)
+  SET(CMAKE_SHARED_LINKER_FLAGS ${PLATFORM_LINKFLAGS} CACHE STRING "" FORCE)
 
   ## Debug
   SET(CMAKE_C_FLAGS_DEBUG ${NL_DEBUG_CFLAGS} CACHE STRING "" FORCE)
   SET(CMAKE_CXX_FLAGS_DEBUG ${NL_DEBUG_CFLAGS} CACHE STRING "" FORCE)
-  SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${PLATFORM_LINKFLAGS} ${NL_DEBUG_LINKFLAGS}" CACHE STRING "" FORCE)
-  SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${PLATFORM_LINKFLAGS} ${NL_DEBUG_LINKFLAGS}" CACHE STRING "" FORCE)
-  SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${PLATFORM_LINKFLAGS} ${NL_DEBUG_LINKFLAGS}" CACHE STRING "" FORCE)
+  SET(CMAKE_EXE_LINKER_FLAGS_DEBUG ${NL_DEBUG_LINKFLAGS} CACHE STRING "" FORCE)
+  SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG ${NL_DEBUG_LINKFLAGS} CACHE STRING "" FORCE)
+  SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG ${NL_DEBUG_LINKFLAGS} CACHE STRING "" FORCE)
 
   ## Release
   SET(CMAKE_C_FLAGS_RELEASE ${NL_RELEASE_CFLAGS} CACHE STRING "" FORCE)
   SET(CMAKE_CXX_FLAGS_RELEASE ${NL_RELEASE_CFLAGS} CACHE STRING "" FORCE)
-  SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${PLATFORM_LINKFLAGS} ${NL_RELEASE_LINKFLAGS}" CACHE STRING "" FORCE)
-  SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${PLATFORM_LINKFLAGS} ${NL_RELEASE_LINKFLAGS}" CACHE STRING "" FORCE)
-  SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${PLATFORM_LINKFLAGS} ${NL_RELEASE_LINKFLAGS}" CACHE STRING "" FORCE)
+  SET(CMAKE_EXE_LINKER_FLAGS_RELEASE ${NL_RELEASE_LINKFLAGS} CACHE STRING "" FORCE)
+  SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE ${NL_RELEASE_LINKFLAGS} CACHE STRING "" FORCE)
+  SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE ${NL_RELEASE_LINKFLAGS} CACHE STRING "" FORCE)
 ENDMACRO(NL_SETUP_BUILD_FLAGS)
 
 # Macro to create x_ABSOLUTE_PREFIX from x_PREFIX
 MACRO(NL_MAKE_ABSOLUTE_PREFIX NAME_RELATIVE NAME_ABSOLUTE)
   IF(IS_ABSOLUTE "${${NAME_RELATIVE}}")
     SET(${NAME_ABSOLUTE} ${${NAME_RELATIVE}})
-  ELSE(IS_ABSOLUTE "${${{NAME_RELATIVE}}")
+  ELSE(IS_ABSOLUTE "${${NAME_RELATIVE}}")
     IF(WIN32)
       SET(${NAME_ABSOLUTE} ${${NAME_RELATIVE}})
     ELSE(WIN32)
@@ -946,48 +1092,14 @@ MACRO(SETUP_EXTERNAL)
   IF(WIN32)
     FIND_PACKAGE(External REQUIRED)
 
-    IF(NOT VC_DIR)
-      SET(VC_DIR $ENV{VC_DIR})
-    ENDIF(NOT VC_DIR)
-
-    IF(MSVC10)
-      IF(NOT MSVC10_REDIST_DIR)
-        # If you have VC++ 2010 Express, put x64/Microsoft.VC100.CRT/*.dll in ${EXTERNAL_PATH}/redist
-        SET(MSVC10_REDIST_DIR "${EXTERNAL_PATH}/redist")
-      ENDIF(NOT MSVC10_REDIST_DIR)
-
-      IF(NOT VC_DIR)
-        IF(NOT VC_ROOT_DIR)
-          GET_FILENAME_COMPONENT(VC_ROOT_DIR "[HKEY_CURRENT_USER\\Software\\Microsoft\\VisualStudio\\10.0_Config;InstallDir]" ABSOLUTE)
-          # VC_ROOT_DIR is set to "registry" when a key is not found
-          IF(VC_ROOT_DIR MATCHES "registry")
-            GET_FILENAME_COMPONENT(VC_ROOT_DIR "[HKEY_CURRENT_USER\\Software\\Microsoft\\VCExpress\\10.0_Config;InstallDir]" ABSOLUTE)
-            IF(VC_ROOT_DIR MATCHES "registry")
-              SET(VS100COMNTOOLS $ENV{VS100COMNTOOLS})
-              IF(VS100COMNTOOLS)
-                FILE(TO_CMAKE_PATH ${VS100COMNTOOLS} VC_ROOT_DIR)
-              ENDIF(VS100COMNTOOLS)
-              IF(NOT VC_ROOT_DIR)
-                MESSAGE(FATAL_ERROR "Unable to find VC++ 2010 directory!")
-              ENDIF(NOT VC_ROOT_DIR)
-            ENDIF(VC_ROOT_DIR MATCHES "registry")
-          ENDIF(VC_ROOT_DIR MATCHES "registry")
-        ENDIF(NOT VC_ROOT_DIR)
-        # convert IDE fullpath to VC++ path
-        STRING(REGEX REPLACE "Common7/.*" "VC" VC_DIR ${VC_ROOT_DIR})
-      ENDIF(NOT VC_DIR)
-    ELSE(MSVC10)
-      IF(NOT VC_DIR)
-        IF(${CMAKE_MAKE_PROGRAM} MATCHES "Common7")
-          # convert IDE fullpath to VC++ path
-          STRING(REGEX REPLACE "Common7/.*" "VC" VC_DIR ${CMAKE_MAKE_PROGRAM})
-        ELSE(${CMAKE_MAKE_PROGRAM} MATCHES "Common7")
-          # convert compiler fullpath to VC++ path
-          STRING(REGEX REPLACE "VC/bin/.+" "VC" VC_DIR ${CMAKE_CXX_COMPILER})
-        ENDIF(${CMAKE_MAKE_PROGRAM} MATCHES "Common7")
-      ENDIF(NOT VC_DIR)
-    ENDIF(MSVC10)
+    # If using custom boost, we need to define the right variables used by official boost CMake module
+    IF(DEFINED BOOST_DIR)
+      SET(BOOST_INCLUDEDIR ${BOOST_DIR}/include)
+      SET(BOOST_LIBRARYDIR ${BOOST_DIR}/lib)
+    ENDIF(DEFINED BOOST_DIR)
   ELSE(WIN32)
+    FIND_PACKAGE(External QUIET)
+
     IF(APPLE)
       IF(WITH_STATIC_EXTERNAL)
         SET(CMAKE_FIND_LIBRARY_SUFFIXES .a)
@@ -1003,15 +1115,22 @@ MACRO(SETUP_EXTERNAL)
     ENDIF(APPLE)
   ENDIF(WIN32)
 
+  # Android and iOS have pthread  
+  IF(ANDROID OR IOS)
+    SET(CMAKE_USE_PTHREADS_INIT 1)
+    SET(Threads_FOUND TRUE)
+  ELSE(ANDROID OR IOS)
+    FIND_PACKAGE(Threads REQUIRED)
+    # TODO: replace all -l<lib> by absolute path to <lib> in CMAKE_THREAD_LIBS_INIT
+  ENDIF(ANDROID OR IOS)
+
   IF(WITH_STLPORT)
     FIND_PACKAGE(STLport REQUIRED)
     INCLUDE_DIRECTORIES(${STLPORT_INCLUDE_DIR})
-    IF(MSVC)
-      SET(VC_INCLUDE_DIR "${VC_DIR}/include")
-
-      FIND_PACKAGE(WindowsSDK REQUIRED)
-      # use VC++ and Windows SDK include paths
-      INCLUDE_DIRECTORIES(${VC_INCLUDE_DIR} ${WINSDK_INCLUDE_DIR})
-    ENDIF(MSVC)
   ENDIF(WITH_STLPORT)
+
+  IF(MSVC)
+    FIND_PACKAGE(MSVC REQUIRED)
+    FIND_PACKAGE(WindowsSDK REQUIRED)
+  ENDIF(MSVC)
 ENDMACRO(SETUP_EXTERNAL)
