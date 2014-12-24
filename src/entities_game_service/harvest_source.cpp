@@ -1229,8 +1229,8 @@ bool forageTestDoExtract(
 	}
 
 	// Request and output results
-	FILE *f = fopen( "forage_test.csv", "at" );
-	FILE *f2 = fopen( "forage_test.log", "at" );
+	FILE *f = fopen( std::string(getLogDirectory() + "forage_test.csv").c_str(), "at" );
+	FILE *f2 = fopen( std::string(getLogDirectory() + "forage_test.log").c_str(), "at" );
 	float reqS = 1.0f / (reqPeriod * 10.0f);
 	float req [CHarvestSource::NbPosRTProps];
 	float abs [CHarvestSource::NbPosRTProps];
@@ -1259,7 +1259,7 @@ bool forageTestDoExtract(
 		testSource->extractMaterial( req, abs, ForageQualityCeilingFactor.get(), ForageQualitySlowFactor.get(), res, successFactor, 0, row, propDrop );
 		fprintf( f, "%g;%g;%g;%g;%g;%g;%g;%g;%g;%u;%u;\n",
 			res[CHarvestSource::A], res[CHarvestSource::Q],
-			testSource->getD(), testSource->getE(), 0 /*testSource->getC()*/,
+			testSource->getD(), testSource->getE(), 0.f /*testSource->getC()*/,
 			reqS, reqA, reqQ,
 			testSource->quantity(), testSource->getImpactScheme()*5, 127 );
 		if ( (!eventD) && (testSource->getD() > 127) )
