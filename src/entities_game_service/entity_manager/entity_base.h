@@ -502,7 +502,7 @@ public:
 
 	// Set speed factor
 	inline void setSpeedVariationModifier( sint32 speed ) { _PhysScores.SpeedVariationModifier = speed; }
-	
+
 	// get entity mounted
 	const TDataSetRow& getEntityMounted() const { return _EntityMounted(); }
 
@@ -779,7 +779,7 @@ public:
 	/** 
 	 * remove an effect on this entity. The effect is not deleted.
 	 * \param effect the effect to remove
-	 * \param activateSpleepîngEffect activate or not sleeping effects of the same family, default = true, only false when clearing all effects
+	 * \param activateSpleepingEffect activate or not sleeping effects of the same family, default = true, only false when clearing all effects
 	 * \return true if no other effect of this family is active, false otherwise
 	 */
 	virtual bool removeSabrinaEffect( CSEffect *effect, bool activateSleepingEffect = true );

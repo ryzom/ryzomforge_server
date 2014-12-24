@@ -2737,7 +2737,6 @@ void cbClientSetCharacterTitle( NLNET::CMessage& msgin, const std::string & serv
 	}
 
 	// kxu: TODO: check validity of title chosen by player
-	//c->setTitle( (CHARACTER_TITLE::ECharacterTitle) title );
 	c->setNewTitle(CHARACTER_TITLE::toString((CHARACTER_TITLE::ECharacterTitle)title));
 	c->registerName();
 }

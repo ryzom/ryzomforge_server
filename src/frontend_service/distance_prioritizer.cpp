@@ -864,7 +864,7 @@ inline void		CDistancePrioritizer::arbitrateCommonPosAndMode(const CPropertyHist
 	bool	posIsReady = TVPNodeServer::PrioContext.Sentity->positionIsInitialized();
 
 	GET_VP_NODE(POSITION)->BranchHasPayload = (!modeIsChanging) && posIsReady && positionHasChangedEnough();
-	GET_VP_NODE(ORIENTATION)->BranchHasPayload = (sheetIsChanging && posIsReady) || orientationHasChangedEnough( entry.Properties[PROPERTY_ORIENTATION],  36.0f ); // 5°
+	GET_VP_NODE(ORIENTATION)->BranchHasPayload = (sheetIsChanging && posIsReady) || orientationHasChangedEnough( entry.Properties[PROPERTY_ORIENTATION],  36.0f ); // 5 degrees
 }
 
 /*

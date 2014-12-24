@@ -8115,15 +8115,15 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
-        
+
 		size_t pos = 0;
 		while((pos = arg.find("&nbsp&", pos)) != string::npos)
 		{
 			arg.replace(pos, 6, " ");
 			pos ++;
 		}
-		
-                // Replace "(eid:<player name>)" with player Entity ID string
+
+		// Replace "(eid:<player name>)" with player Entity ID string
 		pos = arg.find("(eid:");
 		while (pos != string::npos)
 		{

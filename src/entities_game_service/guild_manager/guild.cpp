@@ -266,7 +266,6 @@ void CGuild::setMOTD( const std::string& motd, const NLMISC::CEntityId& eId)
 			// Show new MOTD to all members
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
 			params[0].Literal= _MessageOfTheDay;
-			//CCharacter::sendDynamicMessageToChatGroup(user->getEntityRowId(), "GMOTD", CChatGroup::guild, params);
 			sendMessageToGuildChat("GMOTD", params);
 		}
 	}
@@ -2097,7 +2096,7 @@ private:
 	FLAG0(CLEAR, clear())\
 	LSTRUCT_VECT(Child, if (0), ;/* do not store in old format anymore */, loadItem(pdr))
 
-#pragma message( PERSISTENT_GENERATION_MESSAGE )
+//#pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
 
 
@@ -2131,6 +2130,6 @@ private:
 	PROP2(DeclaredCiv,string,PVP_CLAN::toString(_DeclaredCiv),_DeclaredCiv=PVP_CLAN::fromString(val))\
 
 
-#pragma message( PERSISTENT_GENERATION_MESSAGE )
+//#pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
 

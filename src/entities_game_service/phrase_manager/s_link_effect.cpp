@@ -150,7 +150,8 @@ bool CSLinkEffect::update(CTimerEvent * event, bool)
 			CCharacter *player = dynamic_cast<CCharacter *> (caster);
 			if (player)
 			{
-				if (player->isDead()) {
+				if (player->isDead())
+				{
 					endEffect = true;
 				}
 				_Focus.init(player->getRightHandItem());

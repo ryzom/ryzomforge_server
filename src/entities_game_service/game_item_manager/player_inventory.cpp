@@ -1170,7 +1170,7 @@ NLMISC_COMMAND(dumpPlayerInventories, "dump inventories of the player (DEBUG)", 
 		}\
 	)\
 
-#pragma message( PERSISTENT_GENERATION_MESSAGE )
+//#pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
 
 // ****************************************************************************

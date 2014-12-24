@@ -994,13 +994,14 @@ void CBSAIDeathReport::callback(const std::string &name, NLNET::TServiceId id)
 				spawnGrp.getPersistent().processStateEvent(mgr.EventBotKilled);
 
 				std::string eventGroupKilled;
-				if (!spawnGrp.isGroupAlive(0*1)) {
+				if (!spawnGrp.isGroupAlive(0*1))
+				{
 					if (spawnGrp.getProfileParameter("event_group_killed", eventGroupKilled) && !eventGroupKilled.empty())
 					{
 						nlinfo("NPC: TRIGGER EVENT GROUP KILLED");
 					}
 					spawnGrp.getPersistent().processStateEvent(mgr.EventGrpEliminated);
-                                }
+				}
 
 				if (!eventBotKilled.empty() || !eventGroupKilled.empty())
 				{

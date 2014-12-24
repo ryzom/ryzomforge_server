@@ -537,8 +537,8 @@ bool loadAndResaveCheckCharacters( const std::vector<string>& files, NLMISC::CLo
 			{
 				id.Chars[i].Backup = id.Chars[i].File + ".tmp";
 				CFile::copyFile(
-					id.Chars[i].Backup.c_str(),
-					id.Chars[i].File.c_str());
+					id.Chars[i].Backup,
+					id.Chars[i].File);
 			}
 		}
 
@@ -605,8 +605,8 @@ bool loadAndResaveCheckCharacters( const std::vector<string>& files, NLMISC::CLo
 			for (i=0; i<id.Chars.size(); ++i)
 			{
 				CFile::copyFile(
-					id.Chars[i].File.c_str(),
-					id.Chars[i].Backup.c_str());
+					id.Chars[i].File,
+					id.Chars[i].Backup);
 				CFile::deleteFile(id.Chars[i].Backup);
 			}
 		}
@@ -2215,10 +2215,10 @@ NLMISC_COMMAND(obj_stat,"get or set an object stat","<oid><stat>[type|loc|qualit
 		uint32 oid;
 		NLMISC::fromString(args[0], oid);
 		CEntityId objectId(object,oid);
-		if( args[1] == "type" ) WorldObjectManager.getObject(objectId).setType(atoi(args[2].c_str()));
+		if( args[1] == "type" ) WorldObjectManager.getObject(objectId).setType(NLMISC::fromString(args[2].c_str()));
 		//if( args[1] == "loc" )
-		if( args[1] == "quality" ) WorldObjectManager.getObject(objectId).setQuality(atoi(args[2].c_str()));
-		if( args[1] == "hp" ) WorldObjectManager.getObject(objectId).setHP(atoi(args[2].c_str()));
+		if( args[1] == "quality" ) WorldObjectManager.getObject(objectId).setQuality(NLMISC::fromString(args[2].c_str()));
+		if( args[1] == "hp" ) WorldObjectManager.getObject(objectId).setHP(NLMISC::fromString(args[2].c_str()));
 		return true;
 	}
 
@@ -2294,7 +2294,7 @@ NLMISC_COMMAND(dump_stats,"dump stats of an object to the output win or log","<o
 {
 	if( args.size() > 0 )
 	{
-		CEntityId objId = CEntityId(object,atoi(args[0].c_str()));
+		CEntityId objId = CEntityId(object,NLMISC::fromString(args[0].c_str()));
 		if( args.size() > 1 )
 		{
 			WorldObjectManager.getObject(objId).dumpWorldObjectStats(args[1]);
@@ -2321,7 +2321,7 @@ NLMISC_COMMAND(changeMode," change_mode","<entity id(id:type:crea:dyn)> <mode>")
 		CEntityId id;
 		id.fromString( args[0].c_str() );
 
-		MBEHAV::EMode mode = MBEHAV::EMode(atoi(args[1].c_str()));
+		MBEHAV::EMode mode = MBEHAV::EMode(NLMISC::fromString(args[1].c_str()));
 
 		CEntityBase *e;
 		if( id.getType() == 0 )

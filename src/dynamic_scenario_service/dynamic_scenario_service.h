@@ -61,7 +61,7 @@ public:
 	void listTestClient() const;
 
 	void runTestClientLuaScript(const std::string & clientId, const std::string & cmd);
-	
+
 
 	static R2::CDynamicScenarioService & instance()  { return (CDynamicScenarioService&)*IService::getInstance(); }
 

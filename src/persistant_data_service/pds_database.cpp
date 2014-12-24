@@ -1195,7 +1195,7 @@ CDatabase*	CDatabase::adapt(const string& description)
 		if (!buildReference())
 		{
 			PDS_WARNING("adapt(): failed to buildReference()");
-			return false;
+			return NULL;
 		}
 	}
 
@@ -1600,7 +1600,7 @@ bool	CDatabase::buildDelta(const CTimestamp& starttime, const CTimestamp& endtim
 	std::string	statePath = _Reference.getRootPath();
 	std::string	stateName = CDatabaseState::fileName();
 	if (CFile::fileExists(statePath+stateName) &&
-		!CFile::copyFile((statePath+"previous_"+stateName).c_str(), (statePath+stateName).c_str(), false))
+		!CFile::copyFile(statePath+"previous_"+stateName, statePath+stateName, false))
 	{
 		PDS_WARNING("buildDelta(): failed copy state file to backup previous_state");
 	}

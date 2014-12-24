@@ -50,11 +50,6 @@
 #include <utility>
 #include <deque>
 
-#ifdef NL_OS_WINDOWS
-#	define NOMINMAX
-#	include <WinSock2.h>
-#	include <Windows.h>
-#endif // NL_OS_WINDOWS
 
 //----------------------------------------------------------------
 // nel

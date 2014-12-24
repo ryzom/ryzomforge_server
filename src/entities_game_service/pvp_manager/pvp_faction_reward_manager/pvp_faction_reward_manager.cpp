@@ -1379,7 +1379,7 @@ NLMISC_COMMAND(addFactionPoint, "add (or substract) faction point in faction poo
 	PROP(uint8,		Level)\
 	PROP(sint32,	FactionPointsPool)\
 
-#pragma message( PERSISTENT_GENERATION_MESSAGE )
+//#pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
 
 
@@ -1399,5 +1399,5 @@ NLMISC_COMMAND(addFactionPoint, "add (or substract) faction point in faction poo
 	PROP( uint32,						_NbTotems )\
 	STRUCT_ARRAY( _FactionsPossessions, PVP_CLAN::NbClans )\
 
-#pragma message( PERSISTENT_GENERATION_MESSAGE )
+//#pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"

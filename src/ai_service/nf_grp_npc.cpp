@@ -1712,7 +1712,6 @@ void receiveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 		// if LD use this the function outside a ring shard 
 		if (IsRingShard)
 		{
-		
 			// Here we destroy the item: so we do not want that a user create a scenario where we destroy
 			// other players precious items
 			
@@ -1739,7 +1738,6 @@ void receiveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 				nlwarning("!!!!!!!!!!!!");
 				return ;
 			}
-
 		}
 
 		uint32 quantity;
@@ -1881,7 +1879,6 @@ void giveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 				// if LD use this the function outside a ring shard 
 		if (IsRingShard)
 		{
-		
 			static std::set<CSheetId> r2PlotItemSheetId; // :TODO: use R2Share::CRingAccess
 			// lazy intialisation
 			if (r2PlotItemSheetId.empty())

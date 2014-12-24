@@ -683,7 +683,7 @@ public :
 	inline const std::string & getRequiredFaction() const { return _RequiredFaction;}
 	/// set Required Faction
 	inline void setRequiredFaction(const std::string & str){ _RequiredFaction = str;}
-	
+
 	inline bool getLockedByOwner() const { return _LockedByOwner; }
 	void setLockedByOwner(bool value);
 
@@ -692,7 +692,7 @@ public :
 
 	inline bool getUnMovable() const { return _UnMovable; }
 	inline void setUnMovable(bool value) { _UnMovable = value; }
-	
+
 	/// get required stat
 	inline CHARACTERISTICS::TCharacteristics getRequiredCharac() const { return _RequiredCharac; }
 	/// set required stat

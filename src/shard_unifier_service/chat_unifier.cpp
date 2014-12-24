@@ -217,7 +217,7 @@ nldebug("sendFarTell : no entity locator");
 nldebug("sendFarTell : can't finc character sync singleton");
 				return;
 			}
-			
+
 			ucstring senderName = charSync->getCharacterName(uint32(senderCharId.getShortId()));
 
 			if (senderName.empty())

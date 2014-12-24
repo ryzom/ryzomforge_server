@@ -573,7 +573,7 @@ void CPVPManager::enterPVPZone( CCharacter * user, TAIAlias pvpZoneAlias )
 		// Remove OP pvp interface
 		user->setOutpostAlias(0);
 		user->stopOutpostLeavingTimer();
-		
+
 		// add user to entering PVP zone users
 		NLMISC::TGameCycle endDate = CTickEventHandler::getGameCycle() + PVPZoneEnterBufferTime;
 		CPVPZonePendingUser pendingUser;

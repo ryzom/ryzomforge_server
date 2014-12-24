@@ -729,7 +729,7 @@ void CStringManager::broadcastSystemMessage(NLNET::CMessage &message, bool debug
 //		{
 //			// In ring shard, it is possible that the client autologin and 
 //			// autochoose the character rapidly, and if a string need to be resolved 
-//			// to dîsplay the char summary, it is possible client receive the 
+//			// to display the char summary, it is possible client receive the 
 //			// dynamic string from IOS after the EGS has passed the frontend in 
 //			// entityId mode.
 //			// So, the IOS receive a stringId request with a Eid not registered yet.
@@ -966,7 +966,7 @@ uint32	CStringManager::translateTitle(const std::string  &title, TLanguages lang
 {
 	const std::string colName("name");
 	const CStringManager::CEntityWords &ew = getEntityWords(language, STRING_MANAGER::title);
-	std::string rowName = NLMISC::strlwr(title);
+	std::string rowName = NLMISC::toLower(title);
 	uint32 stringId;
 	stringId = ew.getStringId(rowName, colName);
 

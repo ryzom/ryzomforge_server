@@ -17,7 +17,7 @@
 			<property type="std::string"	name="Privilege"		db_col="Privilege"	byref="true"/>
 			<property type="std::string"	name="ExtendedPrivilege" db_col="ExtendedPrivilege"	byref="true"/>
 			<property type="uint32"			name="GMId"				db_col="GMId"/>
-			
+
 		</class>
 
 		<class name="CNelPermission">

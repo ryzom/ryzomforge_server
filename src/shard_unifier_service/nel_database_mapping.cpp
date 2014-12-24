@@ -99,7 +99,7 @@ namespace RSMGR
 		{
 			nlwarning("ERROR : someone try to delete this object, but there are still ptr on it !");
 			CNelUserPtr *ptr = _PtrList;
-			do 
+			do
 			{
 				nlwarning("  Pointer created from '%s', line %u", ptr->_FileName, ptr->_LineNum);
 				ptr = _PtrList->getNextPtr();
@@ -107,7 +107,7 @@ namespace RSMGR
 			nlstop;
 		}
 		// remove object from cache map
-		if (_UserId != NOPE::INVALID_OBJECT_ID 
+		if (_UserId != NOPE::INVALID_OBJECT_ID
 			&& _ObjectState != NOPE::os_removed
 			&& _ObjectState != NOPE::os_transient)
 		{
@@ -424,7 +424,7 @@ namespace RSMGR
 		if(_ObjectState == NOPE::os_released && state == NOPE::os_removed)
 		{
 			// a release object gets removed (e.g. by remove by id)
-		
+
 			// delete the object
 			delete this;
 
@@ -578,7 +578,7 @@ namespace RSMGR
 		{
 			nlwarning("ERROR : someone try to delete this object, but there are still ptr on it !");
 			CNelPermissionPtr *ptr = _PtrList;
-			do 
+			do
 			{
 				nlwarning("  Pointer created from '%s', line %u", ptr->_FileName, ptr->_LineNum);
 				ptr = _PtrList->getNextPtr();
@@ -902,7 +902,7 @@ namespace RSMGR
 		if(_ObjectState == NOPE::os_released && state == NOPE::os_removed)
 		{
 			// a release object gets removed (e.g. by remove by id)
-		
+
 			// delete the object
 			delete this;
 

@@ -28,7 +28,9 @@
 #include "messages.h"
 
 #ifdef NL_OS_WINDOWS
-#	define NOMINMAX
+#	ifndef NL_COMP_MINGW
+#		define NOMINMAX
+#	endif
 #	include <WinSock2.h>
 #	include <Windows.h>
 typedef unsigned long ulong;
@@ -390,7 +392,7 @@ void clientAuthentication(CMessage &msgin, TSockId from, CCallbackNetBase &netba
 						{
 							if (strlen(row[0]) > 2)
 							{
-								std::string salt = std::string(row[0], row[0] + 2);								
+								std::string salt = std::string(row[0], row[0] + 2);
 								std::string cryptedVersion = CCrypt::crypt(password, salt);
 								if (cryptedVersion == row[0])
 								{
@@ -582,7 +584,7 @@ bool CMonitorService::update ()
 		if (var && (var->Type == CConfigFile::CVar::T_INT))
 			count = var->asInt();
 
-		// Loop to the begining
+		// Loop to the beginning
 		if (primitiveToUpdate >= Entites.size())
 			primitiveToUpdate = 0;
 
@@ -687,7 +689,7 @@ bool CMonitorService::update ()
 			// Next primitive
 			primitiveToUpdate++;
 
-			// Loop to the begining
+			// Loop to the beginning
 			if (primitiveToUpdate >= Entites.size())
 				primitiveToUpdate = 0;
 

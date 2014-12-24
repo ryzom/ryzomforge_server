@@ -125,7 +125,6 @@ uint32 IMissionStepTemplate::sendRpStepText(CCharacter * user,const std::vector<
 	}
 	else
 	{
-
 		if ( !_RoleplayText.empty() )
 		{
 			// build the param list
@@ -141,7 +140,7 @@ uint32 IMissionStepTemplate::sendRpStepText(CCharacter * user,const std::vector<
 			else
 				textPtr = &_RoleplayText;
 		}
-		
+
 		if( !textPtr )
 			return 0;
 
@@ -175,7 +174,6 @@ uint32 IMissionStepTemplate::sendStepText(CCharacter * user,const std::vector<ui
 	// If the text is overriden, add the overide parameters
 	if ( !_OverridenText.empty() )
 	{
-		
 		if (_OverridenText.substr(0, 6) == "WEBIG_")
 		{
 			string text = _OverridenText;
@@ -192,7 +190,6 @@ uint32 IMissionStepTemplate::sendStepText(CCharacter * user,const std::vector<ui
 		}
 		else
 		{
-				
 			if ( _AddDefaultParams )
 			{
 				params.reserve(params.size() + _AdditionalParams.size());

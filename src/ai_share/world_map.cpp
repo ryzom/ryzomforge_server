@@ -1363,7 +1363,7 @@ void	CWorldMap::countCells(uint &compute, uint &white, uint &simple, uint &multi
 			const	uint32	startMasterTopo=startTopoNode.getMasterTopo(possibleFlag);
 			const	uint32	endMasterTopo=endTopoNode.getMasterTopo(possibleFlag);
 			if	(	(startMasterTopo^endMasterTopo)!=0
-				||	startMasterTopo==~0)	// if not same masterTopo or invalid masterTopo then bypass ..
+				||	startMasterTopo == std::numeric_limits<uint32>::max())	// if not same masterTopo or invalid masterTopo then bypass ..
 				continue;
 
 			res.set(possibleFlag, startMasterTopo);
@@ -1492,14 +1492,14 @@ bool CWorldMap::findAStarPath(CWorldPosition const& start, CWorldPosition const&
 		++nbHeapSteps;
 
 		// Get best node (popping it)
-		father = ~0; // :TODO: Remove that useless statement (since do while first loop ALWAYS overwrite it)
+		father = std::numeric_limits<uint>::max(); // :TODO: Remove that useless statement (since do while first loop ALWAYS overwrite it)
 		do
 		{
 			father = heap.pop();
 		}
 		while (!nodes[father].isOpened() && !heap.empty());
 
-		if (father==~0)
+		if (father == std::numeric_limits<uint>::max())
 			break;
 
 		// Mark current node as closed

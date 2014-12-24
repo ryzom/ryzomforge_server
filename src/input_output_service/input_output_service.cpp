@@ -47,7 +47,9 @@
 */
 
 #ifdef NL_OS_WINDOWS
-#	define NOMINMAX
+#	ifndef NL_COMP_MINGW
+#		define NOMINMAX
+#	endif
 #	include <windows.h>
 #endif // NL_OS_WINDOWS
 
@@ -67,7 +69,6 @@ CInputOutputService * IOS = NULL;
 
 uint8 MaxDistSay = 1; 
 uint8 MaxDistShout = 3;
-
 
 // true if we display all chat received
 bool ShowChat = false;
@@ -315,7 +316,6 @@ bool CInputOutputService::update()
 		ticks_before_mongodb_check = MongoDBChatsCheckingDelay;
 		IOS->getChatManager().update();
 	}
-
 
 
 	return true;

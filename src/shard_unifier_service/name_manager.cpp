@@ -1118,7 +1118,6 @@ bool CNameManager::loadGuildsNamesFromTxt()
 	typedef map<TGuildSlot, TName> TGuildSlotToName;
 	TGuildSlotToName guildSlotToName;
 
-
 	vector<string> lines;
 	NLMISC::explode(string(input), string("\n"), lines, true);
 
@@ -1139,11 +1138,11 @@ bool CNameManager::loadGuildsNamesFromTxt()
 		// merge the first words until we have only 3 words
 		while (words.size() > 3)
 		{
-			words[0] += " "+words[1];
+			words[0] += " " + words[1];
 			words.erase(words.begin()+1);
 		}
 		BOMB_IF (words.size()!=3,"Invalid line "<<i+1<<" found in guild names file : '"<<line<<"'", continue);
-		
+
 		sint i1, i2;
 		NLMISC::fromString(words[1], i1);
 		NLMISC::fromString(words[2], i2);
@@ -1188,9 +1187,14 @@ bool CNameManager::loadForbiddenNames()
 	while (true)
 	{
 		char str[512];
-		fgets(str, 511, fp);
+		char *fgres = fgets(str, 511, fp);
 		if(feof(fp))
 			break;
+		if (fgres == NULL)
+		{
+			nlwarning("NAMEMGR: Error reading file");
+			break;
+		}
 		if (strlen(str) > 0)
 		{
 			str[strlen(str)-1] = '\0';

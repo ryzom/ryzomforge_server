@@ -560,7 +560,8 @@ void CGuildMemberModule::kickMember( uint16 index,uint8 session )const
 	}
 	// if the user is online reset its guild id
 	CGuildMemberModule * module = NULL;
-	if ( member->getReferencingModule( module ) )
+
+	if (member->getReferencingModule(module))
 	{
 		module->clearOnlineGuildProperties();
 	} else {
