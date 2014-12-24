@@ -300,7 +300,7 @@ void CGlobalPositionManagerService::init()
 	GET_VAR_FROM_CF(LoadPacsPrims, true);
 
 
-	CSheets::init();
+	CGpmSheets::init();
 
 	// World Position Manager init
 	if (!IsRingShard)
@@ -709,7 +709,7 @@ void CGlobalPositionManagerService::release()
 		CWorldPositionManager::release();
 	}
 
-	CSheets::release();
+	CGpmSheets::release();
 
 }// release //
 
