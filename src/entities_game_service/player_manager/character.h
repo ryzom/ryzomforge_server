@@ -31,7 +31,10 @@
 #include "game_share/people.h"
 #include "game_share/pvp_clan.h"
 #include "game_share/string_manager_sender.h"
+#include "game_share/r2_types.h"
 
+#include "server_share/pet_interface_msg.h"
+#include "server_share/r2_vision.h"
 
 // Misc
 #include "nel/misc/string_conversion.h"
@@ -55,10 +58,6 @@
 #include "mission_manager/ai_alias_translator.h"
 #include "ring_reward_points.h"
 #include "persistent_effect.h"
-
-#include "game_share/r2_types.h"
-#include "server_share/r2_vision.h"
-
 #include "character_interface.h"
 #include "database_plr.h"
 
@@ -2642,13 +2641,13 @@ public:
 	CGameItemPtr createItemInInventoryFreeSlot(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId & obtainedItem, const NLMISC::CEntityId & creatorId = NLMISC::CEntityId::Unknown, const std::string * phraseId = NULL);
 
 	/// action on an item in the temp inventory (move it to bag)
-	void itemTempInventoryToBag(uint32 scrSlot);
+	void itemTempInventoryToBag(uint32 scrSlot, bool sendCloseTempImpulsion = true);
 
 	/// clear temp inventory
 	void clearTempInventory();
 
 	/// get all items in temp inventory
-	void getAllTempInventoryItems();
+	void getAllTempInventoryItems(bool sendCloseTempImpulsion = true);
 
 	/// return true if temp inventory is empty
 	bool tempInventoryEmpty();
