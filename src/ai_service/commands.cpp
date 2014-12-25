@@ -2469,7 +2469,7 @@ NLMISC_COMMAND(addPetsToPlayer,"Add some pets specified with a sheet to the spec
 		return	false;	
 
 #ifdef NL_DEBUG
-	nlstop("Not Implemented");
+	nlstopex(("Not Implemented"));
 #endif
 	return	true;	
 }

@@ -212,8 +212,7 @@ void CPVPFactionRewardManager::init()
 		}
 		else
 		{
-			nlwarning("Pointer null in map of totem base found !!!!");
-			nlstop;
+			nlstopex(("Pointer null in map of totem base found !!!!"));
 		}
 	}
 

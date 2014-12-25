@@ -3931,7 +3931,7 @@ endOfWelcomeUserResult:
 		{
 			nldebug("RSM : setScenarioInfo char %u set scenario info for session %u", charId, sessionId.asInt());
 
-			nlstop("Deprecated");
+			nlstopex(("Deprecated"));
 
 //			// load the user
 //			CCharacterPtr character = CCharacter::load(_RingDb, charId, __FILE__, __LINE__);
