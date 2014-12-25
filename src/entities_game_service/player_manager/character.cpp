@@ -9059,7 +9059,7 @@ CEvalNumExpr::TReturnState CCharacter::evalValue (const char *value, double &res
 			return CEvalNumExpr::NoError;
 		}
 	}
-	return CEvalNumExpr::UnkownValue;
+	return CEvalNumExpr::UnknownValue;
 }
 
 //-----------------------------------------------------------------------------
@@ -13846,7 +13846,7 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 
 	SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
 	textParams[0].Literal= "WEB : "+url+control;
-	
+
 	TVectorParamCheck titleParams;
 	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "web_transactions", titleParams);
 	uint32 textId = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", textParams );
@@ -14246,7 +14246,7 @@ bool CCharacter::pickUpRawMaterial( uint32 indexInTempInv, bool * lastMaterial )
 		{
 			return false; // don't try to quarter an item for looting
 		}
-		
+
 		// Send url for Arcc triggers
 
 		vector<string> params = getCustomMissionParams("__LOOT_SHEET__");
@@ -19311,7 +19311,9 @@ bool CCharacter::setGuildId( uint32 guildId )
 
 		_GuildId = guildId;
 
+#ifdef HAVE_MONGO
 		CMongo::update("users", toString("{'game.cid':%"NL_I64"u}", _Id.getShortId()), toString("{$set:{'game.guildId':%d}}", guildId));
+#endif
 
 		return true;
 	}
