@@ -5140,7 +5140,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			nlinfo("fame : %d => %d", fame, value);
 		}
 
-		if (command_args.size() == 4 || (command_args.size () == 5 && command_args[4] != "0")) {
+		if (command_args.size() == 4 || (command_args.size () == 5 && command_args[4] != "0"))
+		{
 			// Make sure fame values are properly capped.
 			CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
 
@@ -5157,7 +5158,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		const CEntityId &target = c->getTarget();
 		
 		if (command_args.size () < 2) return false;
-		
+
 		if (command_args[1] == "leaguemate")
 		{
 			if (target == CEntityId::Unknown || target.getType() != RYZOMID::player)
@@ -5223,7 +5224,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 		else if (command_args[1] == "bot_name")
 		{
-
 			if (target == CEntityId::Unknown || target.getType() == RYZOMID::player)
 			{
 				if (send_url)
@@ -5557,8 +5557,8 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		for (uint32 i=2; i<nbString; ++i)
 		{
 			string arg = command_args[i]+";";
-			
-                        size_t pos = 0;
+
+			size_t pos = 0;
 			while((pos = arg.find("&nbsp&", pos)) != string::npos)
 			{
 				arg.replace(pos, 6, " ");
@@ -5976,7 +5976,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			c->applyRespawnEffects();
 		}
 
-                // Use same Cell
+		// Use same Cell
 		if (command_args.size () > 4 && command_args[4] == "1")
 		{
 			TDataSetRow dsr = c->getEntityRowId();
@@ -6162,7 +6162,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				building->addPlayer(c->getId());
 			}
 		}
-                else if (action == "get_access_room" && command_args.size () == 3)
+		else if (action == "get_access_room" && command_args.size () == 3)
 		{
 
 			CCharacter *owner = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[2]));
@@ -6694,8 +6694,11 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			{
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 			}
-		} else {
-			if (save_index) {
+		}
+		else
+		{
+			if (save_index)
+			{
 				c->validateWebCommandIndex(iindex);
 			}
 			if (send_url)
