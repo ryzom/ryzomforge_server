@@ -705,10 +705,14 @@ template <class T> void reloadSheetSet(const vector<string> &fileTypes, T &sheet
 	sheetMap.clear();
 	
 	// if the 'GeorgePaths' config file var exists then we try to perform a mini-scan for sheet files
-	if (IService::getInstance()->ConfigFile.getVarPtr(std::string("GeorgePaths"))!=NULL)
+	if (IService::isServiceInitialized() && (IService::getInstance()->ConfigFile.getVarPtr(std::string("GeorgePaths"))!=NULL))
 	{
 		scanGeorgePaths();
 		loadFormNoPackedSheet( fileTypes, sheetMap, wildcardFilter);
+	}
+	else
+	{
+		nlwarning("No GeorgePaths in EGS config");
 	}
 }
 
@@ -719,10 +723,14 @@ template <class T> void reloadSheetSet2(const vector<string> &fileTypes, T &shee
 	sheetMap.clear();
 	
 	// if the 'GeorgePaths' config file var exists then we try to perform a mini-scan for sheet files
-	if (IService::getInstance()->ConfigFile.getVarPtr(std::string("GeorgePaths"))!=NULL)
+	if (IService::isServiceInitialized() && (IService::getInstance()->ConfigFile.getVarPtr(std::string("GeorgePaths"))!=NULL))
 	{
 		scanGeorgePaths();
 		loadFormNoPackedSheet2( fileTypes, sheetMap, wildcardFilter);
+	}
+	else
+	{
+		nlwarning("No GeorgePaths in EGS config");
 	}
 }
 
