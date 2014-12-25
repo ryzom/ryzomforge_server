@@ -2401,7 +2401,7 @@ void CCharacter::applyRegenAndClipCurrentValue()
 			creature->setSpeedVariationModifier(_PhysScores.SpeedVariationModifier);
 		}
 	}
-	
+
 	// compute new value
 	_LastAppliedWeightMalus = getWeightMalus();
 	_PhysScores.SpeedVariationModifier += _LastAppliedWeightMalus;
@@ -3707,27 +3707,27 @@ void CCharacter::setTargetBotchatProgramm( CEntityBase * target, const CEntityId
 			// send the web page url
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
 			string url = c->getWebPage();
-			
+
 			// add ? or & with
 			if ( url.find('?') == string::npos )
 				url += NLMISC::toString("?urlidx=%d", getUrlIndex());
 			else
 				url += NLMISC::toString("&urlidx=%d", getUrlIndex());
-			
+
 			setUrlIndex(getUrlIndex()+1);
-			
+
 			url += "&player_eid="+getId().toString();
 
 			// add cheksum : pnj eid
 			url += "&teid="+c->getId().toString();
-			
+
 			string defaultSalt = toString(getLastConnectedDate());
 			nlinfo(defaultSalt.c_str());
 			nlinfo(url.c_str());
 			string control = "&hmac="+getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size()).toString();
-		
+
 			params[0].Literal= url+control;
-			
+
 			text = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", params );
 //			_PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_URL" , text );
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_URL(_PropertyDatabase, text );
@@ -3883,7 +3883,7 @@ void CCharacter::sendBetaTesterStatus()
 		_Title = CHARACTER_TITLE::Refugee;
 		registerName();
 	}*/
-	
+
 	if (!p->isBetaTester() && _NewTitle == "FBT")
 	{
 		_NewTitle = "Refugee";
@@ -3907,7 +3907,7 @@ void CCharacter::sendWindermeerStatus()
 		_Title = CHARACTER_TITLE::Refugee;
 		registerName();
 	}*/
-	
+
 	if ( !p->isWindermeerCommunity() && _NewTitle == "WIND")
 	{
 		_NewTitle = "Refugee";
@@ -11019,7 +11019,7 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 						TLogContext_Item_Swap logContext(c->_Id);
 						c->removeExchangeItems(items2, exchangePlayerPets2);
 					}
-					
+
 					if (haveAnyPrivilege() && !c->haveAnyPrivilege())
 					{
 						for (uint i = 0; i < items1.size(); ++i)
@@ -11038,7 +11038,6 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 										getName().toString().c_str(),
 										_ExchangeMoney,
 										c->getName().toString().c_str());
-
 					}
 
 					if (c->haveAnyPrivilege() && !haveAnyPrivilege())
@@ -16495,13 +16494,7 @@ void CCharacter::sendEmote( const NLMISC::CEntityId& id, MBEHAV::EBehaviour beha
 	}
 
 	CEntityId targetId = getTarget();
-	if ( targetId.getType() != RYZOMID::npc &&
-		 targetId.getType() != RYZOMID::player &&
-		 targetId.getType() != RYZOMID::creature &&
-		 targetId.getType() != RYZOMID::mount &&
-		 targetId.getType() != RYZOMID::pack_animal &&
-		 targetId.getType() != RYZOMID::flora
-		)
+	if (targetId.getType() > RYZOMID::creature_end)
 		targetId = CEntityId::Unknown;
 
 	TDataSetRow targetRow = TheDataset.getDataSetRow( targetId );
