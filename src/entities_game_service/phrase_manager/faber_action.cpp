@@ -390,8 +390,6 @@ protected:
 		CCharacter* character = ( CCharacter * ) CEntityBaseManager::getEntityBasePtr( phrase->getActor() );
 		if( character )
 		{
-			ITEMFAMILY::EItemFamily family	= phrase->getCraftedItemStaticForm()->Family;
-			ITEM_TYPE::TItemType	type	= phrase->getCraftedItemStaticForm()->Type;
 			// compute success factor
 			sint deltaLvl;
 			float successFactor = CFaberActionCommon::getSuccessFactor( character, phrase, deltaLvl );
@@ -514,6 +512,8 @@ protected:
 							// build random filters
 							vector<bool> scoresAllowed;
 							scoresAllowed.resize(SCORES::NUM_SCORES,true);
+							ITEMFAMILY::EItemFamily family	= phrase->getCraftedItemStaticForm()->Family;
+							ITEM_TYPE::TItemType	type	= phrase->getCraftedItemStaticForm()->Type;
 							if( type == ITEM_TYPE::MAGICIAN_STAFF )
 							{
 								scoresAllowed[SCORES::stamina]=false;
