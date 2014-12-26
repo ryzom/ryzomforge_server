@@ -5912,7 +5912,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			{
 
 				CEntityBase *entityBase = PlayerManager.getCharacterByName (CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), value));
-				if (entityBase == 0)
+				if (entityBase == NULL)
 				{
 					// try to find the bot name
 					vector<TAIAlias> aliases;
@@ -5937,7 +5937,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 					}
 
 				}
-				else
+				if (entityBase != NULL)
 				{
 					x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
 					y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
