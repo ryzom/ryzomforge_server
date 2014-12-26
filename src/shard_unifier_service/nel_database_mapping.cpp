@@ -586,7 +586,7 @@ namespace RSMGR
 			nlstop;
 		}
 		// remove object from cache map
-		if (_Prim != NOPE::INVALID_OBJECT_ID 
+		if (_Prim != NOPE::INVALID_OBJECT_ID
 			&& _ObjectState != NOPE::os_removed
 			&& _ObjectState != NOPE::os_transient)
 		{

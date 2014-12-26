@@ -4909,7 +4909,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		numberItem = quantity;
 		numberEqualItem = quantity;
-		for ( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
+		for(uint32 i = 0; i < inventory->getSlotCount(); ++i)
 		{
 			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if ( itemPtr != NULL )
@@ -4928,7 +4928,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 						if(numberItem == 0)
 							break;
 					}
-					
 				}
 			}
 		}
@@ -5035,7 +5034,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				customValue.fromUtf8(command_args[6]);
 				new_item->setCustomText(customValue);
 			}
-			
+
 			if (command_args.size() >= 8)
 			{
 				new_item->setMovable(command_args[7] == "1");
