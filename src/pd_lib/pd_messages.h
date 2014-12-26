@@ -262,6 +262,7 @@ public:
 		else if (sizeof(value) == 2)	{ sz = 1; _Value1[0] = *(uint16*)(&value); }
 		else if (sizeof(value) == 4)	{ sz = 2; _Value2[0] = *(uint32*)(&value); }
 		else if (sizeof(value) == 8)	{ sz = 3; _Value3[0] = *(uint64*)(&value); }
+		else sz = 0;
 
 		_ColumnAndSize = (uint16)(column | (sz << 14));
 	}
@@ -278,6 +279,7 @@ public:
 		else if (sizeof(value) == 2)	{ sz = 1; _Value1[0] = *(uint16*)(&value); }
 		else if (sizeof(value) == 4)	{ sz = 2; _Value2[0] = *(uint32*)(&value); }
 		else if (sizeof(value) == 8)	{ sz = 3; _Value3[0] = *(uint64*)(&value); }
+		else sz = 0;
 
 		_ColumnAndSize = (uint16)(column | (sz << 14));
 
