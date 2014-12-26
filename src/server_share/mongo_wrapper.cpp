@@ -18,6 +18,7 @@
 
 #include "mongo_wrapper.h"
 
+#ifdef HAVE_MONGO
 
 using namespace std;
 using namespace NLMISC;
@@ -29,66 +30,88 @@ DBClientConnection CMongo::conn(true);
 string CMongo::dbname;
 
 
-void CMongo::init() {
-	if (IService::getInstance()->getShardId() == 301) {
-	    dbname = "megacorp_dev";
-	} else {
+void CMongo::init()
+{
+	if (IService::getInstance()->getShardId() == 301)
+	{
+		dbname = "megacorp_dev";
+	}
+	else
+	{
 		dbname = "megacorp_live";
 	}
 
-    try {
+	try
+	{
 		bool res;
 		string errmsg;
 
-        res = conn.connect("ryzom.com:22110", errmsg);
+		res = conn.connect("ryzom.com:22110", errmsg);
 		if(!res) nlerror("mongo: init failed, cannot connect '%s'", errmsg.c_str());
 		else nlinfo("mongo: connection ok");
 
-        res = conn.auth(dbname, "megacorp", MongoPassword.get(), errmsg);
+		res = conn.auth(dbname, "megacorp", MongoPassword.get(), errmsg);
 		if(!res) nlerror("mongo: init failed, cannot auth '%s'", errmsg.c_str());
 		else nlinfo("mongo: auth ok");
-    } catch(DBException& e) {
-        nlerror("mongo: init failed, caught DBException '%s'", e.toString().c_str());
-    }
+	}
+	catch(const DBException& e)
+	{
+		nlerror("mongo: init failed, caught DBException '%s'", e.toString().c_str());
+	}
 }
 
-void CMongo::insert(const string &collection, const string &json) {
+void CMongo::insert(const string &collection, const string &json)
+{
 	nlinfo("mongo: try to insert into '%s': '%s'", collection.c_str(), json.c_str());
 
-	try {
+	try
+	{
 		conn.insert(dbname+"."+collection, fromjson(json));
 		string e = conn.getLastError();
 		if(!e.empty()) nlwarning("mongo: insert failed '%s'", e.c_str());
-	} catch(DBException& e) {
+	}
+	catch(const DBException& e)
+	{
 		nlwarning("mongo: insert failed, caught DBException '%s'", e.toString().c_str());
 	}
 }
 
-auto_ptr<DBClientCursor> CMongo::query(const string &collection, const string &json) {
+auto_ptr<DBClientCursor> CMongo::query(const string &collection, const string &json)
+{
 //	nlinfo("mongo: try to query in '%s': '%s'", collection.c_str(), json.c_str());
 
-    try {
+	try
+	{
 		return conn.query(dbname+"."+collection, json);
-    } catch(DBException& e) {
+	}
+	catch(const DBException& e)
+	{
 		nlwarning("mongo: query failed, caught DBException '%s'", e.toString().c_str());
 		return auto_ptr<DBClientCursor>(0);
-    }
+	}
 }
 
-void CMongo::update(const string &collection, const string &jsonQuery, const string &jsonObj, bool upsert, bool multi) {
+void CMongo::update(const string &collection, const string &jsonQuery, const string &jsonObj, bool upsert, bool multi)
+{
 	nlinfo("mongo: try to update in '%s' '%s': '%s'", collection.c_str(), jsonQuery.c_str(), jsonObj.c_str());
 
-    try {
+	try
+	{
 		conn.update(dbname+"."+collection, jsonQuery, fromjson(jsonObj), upsert, multi);
-    } catch(DBException& e) {
+	}
+	catch(const DBException& e)
+	{
 		nlwarning("mongo: update failed, caught DBException '%s'", e.toString().c_str());
-    }
+	}
 }
 
-string CMongo::quote(const string &s) {
+string CMongo::quote(const string &s)
+{
 	string ret;
-	for ( std::string::const_iterator i = s.begin(); i != s.end(); ++i ) {
-		switch ( *i ) {
+	for ( std::string::const_iterator i = s.begin(); i != s.end(); ++i )
+	{
+		switch ( *i )
+		{
 		case '"':
 			ret += "\\\"";
 			break;
@@ -114,15 +137,19 @@ string CMongo::quote(const string &s) {
 			ret += "\\t";
 			break;
 		default:
-			if ( *i >= 0 && *i <= 0x1f ) {
+			if ( *i >= 0 && *i <= 0x1f )
+			{
 				//TODO: these should be utf16 code-units not bytes
 				char c = *i;
 				ret += "\\u00" + toHexLower(&c, 1);
 			}
-			else {
+			else
+			{
 				ret += *i;
 			}
 		}
 	}
 	return ret;
 }
+
+#endif

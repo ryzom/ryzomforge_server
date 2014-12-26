@@ -564,8 +564,12 @@ void CGuildMemberModule::kickMember( uint16 index,uint8 session )const
 	if (member->getReferencingModule(module))
 	{
 		module->clearOnlineGuildProperties();
-	} else {
+	}
+	else
+	{
+#ifdef HAVE_MONGO
 		CMongo::update("users", toString("{'game.cid':%"NL_I64"u}", member->getIngameEId().getShortId()), "{$set:{'game.guildId':0}}");
+#endif
 	}
 
 	// send system message

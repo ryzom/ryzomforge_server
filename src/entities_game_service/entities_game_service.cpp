@@ -1323,7 +1323,9 @@ void CPlayerService::init()
 
 	initAdmin ();
 
+#ifdef HAVE_MONGO
 	CMongo::init();
+#endif
 
 	//uint16 i = SKILLS::NUM_SKILLS;
 

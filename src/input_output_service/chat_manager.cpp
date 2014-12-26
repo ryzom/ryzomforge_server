@@ -88,24 +88,28 @@ void CChatManager::init( /*const string& staticDBFileName, const string& dynDBFi
 //	if (!dynDBFileName.empty())
 //		_DynDB.load( dynDBFileName );
 
+#ifdef HAVE_MONGO
 	CMongo::init();
 
 	// reset all muted players
 	CMongo::update("users", "{ 'game.muted': true}", toString("{ $set:{ 'game.muted': false } }"), false, true);
+#endif
 
 	/* Now make a connection to MongoDB. */
 /*b
-	if( mongo_client( &conn, "ryzom.com", 22110 ) != MONGO_OK ) {
-		switch( conn.err ) {
-        	case MONGO_CONN_SUCCESS:
+	if( mongo_client( &conn, "ryzom.com", 22110 ) != MONGO_OK )
+	{
+		switch( conn.err )
+		{
+			case MONGO_CONN_SUCCESS:
 			break;
-	        case MONGO_CONN_NO_SOCKET:
+			case MONGO_CONN_NO_SOCKET:
 			nlwarning( "FAIL: Could not create a socket!\n" );
 			break;
-        	case MONGO_CONN_FAIL:
+			case MONGO_CONN_FAIL:
 			nlwarning( "FAIL: Could not connect to mongod. Make sure it's listening at 127.0.0.1:27017.\n" );
 			break;
-	        default:
+			default:
 			nlwarning( "MongoDB connection error number %d.\n", conn.err );
 			break;
 		}
@@ -124,7 +128,8 @@ void CChatManager::init( /*const string& staticDBFileName, const string& dynDBFi
 		mongo_col = "megacorp_live.chats";
 	}
 
-	if( mongo_cmd_authenticate(&conn, mongo_db.c_str(), "megacorp", "feFrvs3rfdcef4")  != MONGO_OK ) {
+	if( mongo_cmd_authenticate(&conn, mongo_db.c_str(), "megacorp", "feFrvs3rfdcef4")  != MONGO_OK )
+	{
 		nlwarning( "FAIL: Failed to auth %d\n", conn.err );
 		exit( 1 );
 	}
@@ -210,28 +215,36 @@ bool CChatManager::checkClient( const TDataSetRow& id )
 
 void CChatManager::addMutedUser( const NLMISC::CEntityId &eid )
 {
+#ifdef HAVE_MONGO
 	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': true } }"));
+#endif
 
 	_MutedUsers.insert( eid );
 }
 
 void CChatManager::removeMutedUser( const NLMISC::CEntityId &eid )
 {
+#ifdef HAVE_MONGO
 	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': false } }"));
+#endif
 
 	_MutedUsers.erase( eid );
 }
 
 void CChatManager::addUniverseMutedUser( const NLMISC::CEntityId &eid )
 {
+#ifdef HAVE_MONGO
 	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': true } }"));
+#endif
 
 	_MutedUniverseUsers.insert( eid );
 }
 
 void CChatManager::removeUniverseMutedUser( const NLMISC::CEntityId &eid )
 {
+#ifdef HAVE_MONGO
 	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': false } }"));
+#endif
 
 	_MutedUniverseUsers.erase( eid );
 }
@@ -710,17 +723,17 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				/// MONGODB
 				//
 
-                double date = 1000.0*(double)CTime::getSecondsSince1970();
+				double date = 1000.0*(double)CTime::getSecondsSince1970();
 
-                string name = senderName;
+				string name = senderName;
 
 				string::size_type pos = senderName.find('(');
-                if (pos != string::npos)
-                    name = senderName.substr(0, pos);
-                else
-                    name = senderName;
+				if (pos != string::npos)
+					name = senderName.substr(0, pos);
 
+#ifdef HAVE_MONGO
 				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': 'all', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), date));
+#endif
 
 /*b
 				bson base;
@@ -782,7 +795,9 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				else
 					name = senderName;
 
+#ifdef HAVE_MONGO
 				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'guildId', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), sGuildId.str().c_str(), date));
+#endif
 
 /*b
 				bson base;
@@ -841,8 +856,8 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					//
 
 
-					if (chanId.getShortId() < 5) {
-
+					if (chanId.getShortId() < 5)
+					{
 						const std::string *tmpChatId = _ChanNames.getB(chanId);
 						string chatId;
 						if (tmpChatId)
@@ -859,7 +874,9 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 						else
 							name = senderName;
 
+#ifdef HAVE_MONGO
 						CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
+#endif
 
 /*b
 						bson base;
@@ -2272,7 +2289,8 @@ void CChatManager::tell( const TDataSetRow& sender, const string& receiverIn, co
 
 void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstring &senderName, bool havePrivilege, const ucstring& receiver, const ucstring& ucstr  )
 {
-	if (receiver[0] == '~') {
+	if (receiver[0] == '~')
+	{
 		/// MONGODB
 		//
 
@@ -2288,9 +2306,11 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 		if (pos != string::npos)
 			chatId = chatId.substr(0, pos);
 
+#ifdef HAVE_MONGO
 		CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'username', 'chatId': '%s', 'date': %f, 'ig': true }", username.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
+#endif
 
-/*b
+/*
 		bson base;
 		bson_init( &base );
 			bson_append_string( &base, "username", username.c_str() );
@@ -2687,6 +2707,7 @@ void CChatManager::unsubscribeCharacterInRingUniverse(const NLMISC::CEntityId &c
 /// Update from input_output_service.cpp to check MongoDb changes
 void CChatManager::update()
 {
+#ifdef HAVE_MONGO
 	try {
 		TTime before = CTime::getLocalTime();
 		std::auto_ptr<DBClientCursor> cursor = CMongo::query("chats", toString("{'date': { $gt: %f }  }", last_mongo_chat_date));
@@ -2694,7 +2715,8 @@ void CChatManager::update()
 
 		if(!cursor.get()) return;
 
-		while (cursor->more()) {
+		while (cursor->more())
+		{
 			mongo::BSONObj obj = cursor->next();
 			nlinfo("mongo: new entry to parse '%s'", obj.jsonString().c_str());
 
@@ -2763,9 +2785,12 @@ void CChatManager::update()
 			}
 			farChatInGroup(grpId, 0, text, ucstring("~")+ucstring(name));
 		}
-	} catch(DBException& e) {
+	}
+	catch(const DBException& e)
+	{
 		cout << "caught DBException " << e.toString() << endl;
 	}
+#endif
 
 /*b
  	mongo_cursor cursor;
@@ -2773,17 +2798,19 @@ void CChatManager::update()
 
 	bson_init( &query );
 	bson_append_start_object( &query, "$query" );
-	  bson_append_start_object( &query, "date" );
-	    bson_append_double( &query, "$gt", last_mongo_chat_date );
+		bson_append_start_object( &query, "date" );
+		bson_append_double( &query, "$gt", last_mongo_chat_date );
 	  bson_append_finish_object( &query );
 	bson_append_finish_object( &query );
 	bson_finish( &query );
 
 
-	if(mongo_check_connection(&conn) == MONGO_ERROR) {
+	if(mongo_check_connection(&conn) == MONGO_ERROR)
+	{
 		nlwarning("boom");
 		mongo_reconnect(&conn);
-		if( mongo_cmd_authenticate(&conn, mongo_db.c_str(), "megacorp", "feFrvs3rfdcef4")  != MONGO_OK ) {
+		if( mongo_cmd_authenticate(&conn, mongo_db.c_str(), "megacorp", "feFrvs3rfdcef4")  != MONGO_OK )
+		{
 			nlwarning( "FAIL: Failed to auth %d\n", conn.err );
 		}
 	}
