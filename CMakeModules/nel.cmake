@@ -1094,12 +1094,6 @@ MACRO(SETUP_EXTERNAL)
 
   IF(WIN32)
     FIND_PACKAGE(External REQUIRED)
-
-    # If using custom boost, we need to define the right variables used by official boost CMake module
-    IF(DEFINED BOOST_DIR)
-      SET(BOOST_INCLUDEDIR ${BOOST_DIR}/include)
-      SET(BOOST_LIBRARYDIR ${BOOST_DIR}/lib)
-    ENDIF(DEFINED BOOST_DIR)
   ELSE(WIN32)
     FIND_PACKAGE(External QUIET)
 
