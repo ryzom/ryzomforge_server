@@ -10,7 +10,8 @@ CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 		-I$(NEL_INCLUDE) \
 		-I$(RYZOM_COMMON_SRC) \
 		-I.. \
-		-I.
+		-I. \
+		-DHAVE_MONGO
 
 LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L$(NEL_PATH)/lib \

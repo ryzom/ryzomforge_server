@@ -25,6 +25,11 @@ TARGET_LINK_LIBRARIES(ryzom_ios_service
 					nelgeorges
 					nelligo)
 
+IF(MONGO_FOUND)
+  TARGET_LINK_LIBRARIES(ryzom_ios_service ${MONGO_LIBRARIES})
+  ADD_DEFINITIONS(${MONGO_DEFINITIONS})
+ENDIF()
+
 NL_DEFAULT_PROPS(ryzom_ios_service "Ryzom, Services: Input Output Service (IOS)")
 NL_ADD_RUNTIME_FLAGS(ryzom_ios_service)
 

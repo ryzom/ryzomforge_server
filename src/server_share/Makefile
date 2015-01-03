@@ -18,7 +18,8 @@ CXXFLAGS     = $(FLAGS_CMN) $(FLAGS_DBG_$(DBG)) \
 		-I./character_structure \
 		-I./egs_sheets \
 		-I./entity_structure \
-		-I./game_item_manager
+		-I./game_item_manager \
+		-DHAVE_MONGO
 
 # The flags for the linker
 LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \

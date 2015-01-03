@@ -17,8 +17,6 @@
 #ifndef MONGODB_WRAPPER_H
 #define MONGODB_WRAPPER_H
 
-#define HAVE_MONGO
-
 #ifdef HAVE_MONGO
 
 #include <mongo/client/dbclient.h>
