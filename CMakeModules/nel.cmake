@@ -1020,6 +1020,9 @@ MACRO(NL_SETUP_PREFIX_PATHS)
   ENDIF(NOT NL_DRIVER_PREFIX)
   NL_MAKE_ABSOLUTE_PREFIX(NL_DRIVER_PREFIX NL_DRIVER_ABSOLUTE_PREFIX)
 
+  IF(WIN32 AND TARGET_X64)
+    SET(LIB_SUFFIX "64")
+  ENDIF()
 ENDMACRO(NL_SETUP_PREFIX_PATHS)
 
 MACRO(RYZOM_SETUP_PREFIX_PATHS)
@@ -1082,7 +1085,6 @@ MACRO(RYZOM_SETUP_PREFIX_PATHS)
     ENDIF(WIN32)
   ENDIF(NOT RYZOM_GAMES_PREFIX)
   NL_MAKE_ABSOLUTE_PREFIX(RYZOM_GAMES_PREFIX RYZOM_GAMES_ABSOLUTE_PREFIX)
-
 ENDMACRO(RYZOM_SETUP_PREFIX_PATHS)
 
 MACRO(SETUP_EXTERNAL)
@@ -1135,3 +1137,309 @@ MACRO(SETUP_EXTERNAL)
     FIND_PACKAGE(WindowsSDK REQUIRED)
   ENDIF(MSVC)
 ENDMACRO(SETUP_EXTERNAL)
+
+MACRO(CONVERT_NUMBER_VERSION _VERSION_NUMBER _BASE _OUT)
+  SET(${_OUT})
+  SET(_NUMBER ${_VERSION_NUMBER})
+  WHILE(_NUMBER GREATER 0)
+    MATH(EXPR _TEMP "${_NUMBER} % ${_BASE}")
+    LIST(APPEND ${_OUT} ${_TEMP})
+    MATH(EXPR _NUMBER "${_NUMBER} / ${_BASE}")
+  ENDWHILE()
+ENDMACRO(CONVERT_NUMBER_VERSION)
+
+FUNCTION(JOIN VALUES GLUE OUTPUT)
+  STRING(REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
+  STRING(REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
+  SET(${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
+ENDFUNCTION()
+
+MACRO(PARSE_VERSION_OTHER FILENAME)
+  IF(EXISTS ${FILENAME})
+    SET(_FILTER_ARRAY ${ARGN})
+    JOIN("${_FILTER_ARRAY}" "|" _FILTER_REGEX)
+    FILE(STRINGS ${FILENAME} _FILE REGEX "(${_FILTER_REGEX})[ \t=\(\)\"]+([0-9.]+)")
+
+    IF(_FILE)
+      FOREACH(_LINE ${_FILE})
+        FOREACH(_VAR ${_FILTER_ARRAY})
+          IF(NOT ${_VAR})
+            STRING(REGEX REPLACE "^.*${_VAR}[ \t=\(\)\"]+([0-9.]+).*$" "\\1" ${_VAR} "${_LINE}")
+            IF(${_VAR} STREQUAL "${_LINE}")
+              SET(${_VAR})
+            ELSE()
+            ENDIF()
+            IF(NOT ${_VAR} AND NOT STREQUAL "0")
+              SET(${_VAR} 0)
+            ENDIF()
+          ENDIF()
+        ENDFOREACH()
+      ENDFOREACH()
+    ENDIF()
+  ENDIF()
+ENDMACRO(PARSE_VERSION_OTHER)
+
+MACRO(FIND_PACKAGE_HELPER NAME INCLUDE)
+  # Looks for a directory containing NAME.
+  #
+  # NAME is the name of the library, lowercase and uppercase can be mixed
+  # It should be EXACTLY (same case) the same part as XXXX in FindXXXX.cmake
+  #
+  # INCLUDE is the file to check for includes
+  #
+  # Following parameters are optional variables and must be prefixed by:
+  #
+  # RELEASE is the list of libraries to check in release mode
+  # DEBUG is the list of libraries to check in debug mode
+  # SUFFIXES is the PATH_SUFFIXES to check for include file
+  #
+  # The first match will be used in the specified order and next matches will be ignored
+  #
+  # The following values are defined
+  # NAME_INCLUDE_DIR - where to find NAME
+  # NAME_LIBRARIES   - link against these to use NAME
+  # NAME_FOUND       - True if NAME is available.
+
+  SET(_PARAMS ${ARGN})
+
+  SET(_RELEASE_LIBRARIES)
+  SET(_DEBUG_LIBRARIES)
+  SET(_SUFFIXES)
+  
+  SET(_IS_RELEASE OFF)
+  SET(_IS_DEBUG OFF)
+  SET(_IS_SUFFIXES OFF)
+  
+  IF(_PARAMS)
+    FOREACH(_PARAM ${_PARAMS})
+      IF(_PARAM STREQUAL RELEASE)
+        SET(_IS_RELEASE ON)
+        SET(_IS_DEBUG OFF)
+        SET(_IS_SUFFIXES OFF)
+      ELSEIF(_PARAM STREQUAL DEBUG)
+        SET(_IS_RELEASE OFF)
+        SET(_IS_DEBUG ON)
+        SET(_IS_SUFFIXES OFF)
+      ELSEIF(_PARAM STREQUAL SUFFIXES)
+        SET(_IS_RELEASE OFF)
+        SET(_IS_DEBUG OFF)
+        SET(_IS_SUFFIXES ON)
+      ELSEIF(_PARAM STREQUAL QUIET)
+        SET(_IS_RELEASE OFF)
+        SET(_IS_DEBUG OFF)
+        SET(_IS_SUFFIXES OFF)
+        SET(${NAME}_FIND_QUIETLY ON)
+      ELSEIF(_PARAM STREQUAL REQUIRED)
+        SET(_IS_RELEASE OFF)
+        SET(_IS_DEBUG OFF)
+        SET(_IS_SUFFIXES OFF)
+        SET(${NAME}_FIND_REQUIRED ON)
+      ELSE()
+        IF(_IS_RELEASE)
+          LIST(APPEND _RELEASE_LIBRARIES ${_PARAM})
+        ELSEIF(_IS_DEBUG)
+          LIST(APPEND _DEBUG_LIBRARIES ${_PARAM})
+        ELSEIF(_IS_SUFFIXES)
+          LIST(APPEND _SUFFIXES ${_PARAM})
+        ELSE()
+          MESSAGE(STATUS "parameter ${_PARAM} with no prefix")
+        ENDIF()
+      ENDIF()
+    ENDFOREACH(_PARAM)
+  ENDIF()
+
+  # Fixes names if invalid characters are found  
+  IF("${NAME}" MATCHES "^[a-zA-Z0-9]+$")
+    SET(_NAME_FIXED ${NAME})
+  ELSE()
+    # if invalid characters are detected, replace them by valid ones
+    STRING(REPLACE "+" "p" _NAME_FIXED ${NAME})
+  ENDIF()
+
+  # Create uppercase and lowercase versions of NAME
+  STRING(TOUPPER ${NAME} _UPNAME)
+  STRING(TOLOWER ${NAME} _LOWNAME)
+
+  STRING(TOUPPER ${_NAME_FIXED} _UPNAME_FIXED)
+  STRING(TOLOWER ${_NAME_FIXED} _LOWNAME_FIXED)
+
+  SET(_SUFFIXES ${_SUFFIXES} ${_LOWNAME} ${_LOWNAME_FIXED} ${_NAME})
+
+  IF(NOT WIN32 AND NOT IOS)
+    FIND_PACKAGE(PkgConfig QUIET)
+    SET(_MODULES ${_LOWNAME} ${_RELEASE_LIBRARIES})
+    LIST(REMOVE_DUPLICATES _MODULES)
+    IF(PKG_CONFIG_EXECUTABLE)
+      PKG_SEARCH_MODULE(PKG_${_NAME_FIXED} QUIET ${_MODULES})
+    ENDIF()
+  ENDIF()
+
+  SET(_INCLUDE_PATHS)
+  SET(_LIBRARY_PATHS)
+
+  # Check for root directories passed to CMake with -DXXX_DIR=...
+  IF(DEFINED ${_UPNAME_FIXED}_DIR)
+    LIST(APPEND _INCLUDE_PATHS ${${_UPNAME_FIXED}_DIR}/include ${${_UPNAME_FIXED}_DIR})
+    LIST(APPEND _LIBRARY_PATHS ${${_UPNAME_FIXED}_DIR}/lib${LIB_SUFFIX})
+  ENDIF()
+
+  IF(DEFINED ${_UPNAME}_DIR)
+    LIST(APPEND _INCLUDE_PATHS ${${_UPNAME}_DIR}/include ${${_UPNAME}_DIR})
+    LIST(APPEND _LIBRARY_PATHS ${${_UPNAME}_DIR}/lib${LIB_SUFFIX})
+  ENDIF()
+
+  IF(UNIX)
+    # Append UNIX standard include paths
+    SET(_UNIX_INCLUDE_PATHS)
+
+    # Append multiarch include paths
+    IF(CMAKE_LIBRARY_ARCHITECTURE)
+      LIST(APPEND _UNIX_INCLUDE_PATHS
+        /usr/local/include/${CMAKE_LIBRARY_ARCHITECTURE}
+        /usr/include/${CMAKE_LIBRARY_ARCHITECTURE})
+    ENDIF()
+
+    LIST(APPEND _UNIX_INCLUDE_PATHS
+      /usr/local/include
+      /usr/include
+      /sw/include
+      /opt/local/include
+      /opt/csw/include
+      /opt/include)
+  ENDIF()
+
+  # Search for include directory
+  FIND_PATH(${_UPNAME_FIXED}_INCLUDE_DIR 
+    ${INCLUDE}
+    HINTS ${PKG_${_NAME_FIXED}_INCLUDE_DIRS}
+    PATHS
+    ${_INCLUDE_PATHS}
+    $ENV{${_UPNAME}_DIR}/include
+    $ENV{${_UPNAME_FIXED}_DIR}/include
+    $ENV{${_UPNAME}_DIR}
+    $ENV{${_UPNAME_FIXED}_DIR}
+    ${_UNIX_INCLUDE_PATHS}
+    PATH_SUFFIXES
+    ${_SUFFIXES}
+  )
+
+  # Append environment variables XXX_DIR
+  LIST(APPEND _LIBRARY_PATHS
+    $ENV{${_UPNAME}_DIR}/lib${LIB_SUFFIX}
+    $ENV{${_UPNAME_FIXED}_DIR}/lib${LIB_SUFFIX})
+
+  IF(UNIX)
+    SET(_UNIX_LIBRARY_PATHS)
+
+    # Append multiarch libraries paths
+    IF(CMAKE_LIBRARY_ARCHITECTURE)
+      LIST(APPEND _UNIX_LIBRARY_PATHS
+        /usr/local/lib/${CMAKE_LIBRARY_ARCHITECTURE}
+        /lib/${CMAKE_LIBRARY_ARCHITECTURE}
+        /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE})
+    ENDIF()
+
+    # Append UNIX standard libraries paths
+    LIST(APPEND _UNIX_LIBRARY_PATHS
+      /usr/local/lib
+      /usr/lib
+      /lib
+      /usr/local/X11R6/lib
+      /usr/X11R6/lib
+      /sw/lib
+      /opt/local/lib
+      /opt/csw/lib
+      /opt/lib
+      /usr/freeware/lib${LIB_SUFFIX})
+  ENDIF()
+
+  IF(WITH_STLPORT)
+    LIST(APPEND _RELEASE_LIBRARIES ${_LOWNAME}_stlport ${_LOWNAME_FIXED}_stlport ${NAME}_stlport ${_NAME_FIXED}_stlport)
+    LIST(APPEND _DEBUG_LIBRARIES ${_LOWNAME}_stlportd ${_LOWNAME_FIXED}_stlportd ${NAME}_stlportd ${_NAME_FIXED}_stlportd)
+  ENDIF()
+
+  LIST(APPEND _RELEASE_LIBRARIES ${_LOWNAME} ${_LOWNAME_FIXED} ${NAME} ${_NAME_FIXED})
+  LIST(APPEND _DEBUG_LIBRARIES ${_LOWNAME}d ${_LOWNAME_FIXED}d ${NAME}d ${_NAME_FIXED}d)
+
+  # Under Windows, some libs may need the lib prefix
+  IF(WIN32)
+    SET(_LIBS ${_RELEASE_LIBRARIES})
+    FOREACH(_LIB ${_LIBS})
+      LIST(APPEND _RELEASE_LIBRARIES lib${_LIB})
+    ENDFOREACH()
+
+    SET(_LIBS ${_DEBUG_LIBRARIES})
+    FOREACH(_LIB ${_LIBS})
+      LIST(APPEND _DEBUG_LIBRARIES lib${_LIB})
+    ENDFOREACH()
+  ENDIF()
+
+  LIST(REMOVE_DUPLICATES _RELEASE_LIBRARIES)
+  LIST(REMOVE_DUPLICATES _DEBUG_LIBRARIES)
+
+  # Search for release library
+  FIND_LIBRARY(${_UPNAME_FIXED}_LIBRARY_RELEASE
+    NAMES
+    ${_RELEASE_LIBRARIES}
+    HINTS ${PKG_${_NAME_FIXED}_LIBRARY_DIRS}
+    PATHS
+    ${_LIBRARY_PATHS}
+    ${_UNIX_LIBRARY_PATHS}
+    NO_CMAKE_SYSTEM_PATH
+  )
+
+  # Search for debug library
+  FIND_LIBRARY(${_UPNAME_FIXED}_LIBRARY_DEBUG
+    NAMES
+    ${_DEBUG_LIBRARIES}
+    HINTS ${PKG_${_NAME_FIXED}_LIBRARY_DIRS}
+    PATHS
+    ${_LIBRARY_PATHS}
+    ${_UNIX_LIBRARY_PATHS}
+    NO_CMAKE_SYSTEM_PATH
+  )
+
+  SET(${_UPNAME_FIXED}_FOUND OFF)
+
+  IF(${_UPNAME_FIXED}_INCLUDE_DIR)
+    # Set also _INCLUDE_DIRS
+    SET(${_UPNAME_FIXED}_INCLUDE_DIRS ${${_UPNAME_FIXED}_INCLUDE_DIR})
+
+    # Library has been found if at least only one library and include are found
+    IF(${_UPNAME_FIXED}_LIBRARY_RELEASE AND ${_UPNAME_FIXED}_LIBRARY_DEBUG)
+      # Release and debug libraries found
+      SET(${_UPNAME_FIXED}_FOUND ON)
+      SET(${_UPNAME_FIXED}_LIBRARIES optimized ${${_UPNAME_FIXED}_LIBRARY_RELEASE} debug ${${_UPNAME_FIXED}_LIBRARY_DEBUG})
+      SET(${_UPNAME_FIXED}_LIBRARY ${${_UPNAME_FIXED}_LIBRARY_RELEASE})
+    ELSEIF(${_UPNAME_FIXED}_LIBRARY_RELEASE)
+      # Release library found
+      SET(${_UPNAME_FIXED}_FOUND ON)
+      SET(${_UPNAME_FIXED}_LIBRARIES ${${_UPNAME_FIXED}_LIBRARY_RELEASE})
+      SET(${_UPNAME_FIXED}_LIBRARY ${${_UPNAME_FIXED}_LIBRARY_RELEASE})
+    ELSEIF(${_UPNAME_FIXED}_LIBRARY_DEBUG)
+      # Debug library found
+      SET(${_UPNAME_FIXED}_FOUND ON)
+      SET(${_UPNAME_FIXED}_LIBRARIES ${${_UPNAME_FIXED}_LIBRARY_DEBUG})
+      SET(${_UPNAME_FIXED}_LIBRARY ${${_UPNAME_FIXED}_LIBRARY_DEBUG})
+    ENDIF()
+  ENDIF()
+
+  IF(${_UPNAME_FIXED}_FOUND)
+    IF(NOT ${NAME}_FIND_QUIETLY)
+      MESSAGE(STATUS "Found ${NAME}: ${${_UPNAME_FIXED}_LIBRARIES}")
+    ENDIF()
+  ELSE()
+    IF(${NAME}_FIND_REQUIRED)
+      MESSAGE(FATAL_ERROR "Error: Unable to find ${NAME}!")
+    ENDIF()
+    IF(NOT ${NAME}_FIND_QUIETLY)
+      MESSAGE(STATUS "Warning: Unable to find ${NAME}!")
+    ENDIF()
+  ENDIF()
+
+  MARK_AS_ADVANCED(${_UPNAME_FIXED}_LIBRARY_RELEASE ${_UPNAME_FIXED}_LIBRARY_DEBUG)
+ENDMACRO(FIND_PACKAGE_HELPER)
+
+MACRO(MESSAGE_VERSION_PACKAGE_HELPER NAME VERSION)
+  MESSAGE(STATUS "Found ${NAME} ${VERSION}: ${ARGN}")
+ENDMACRO(MESSAGE_VERSION_PACKAGE_HELPER)
