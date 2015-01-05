@@ -237,6 +237,7 @@ nldebug("sendFarTell : can't finc character sync singleton");
 				hostShardId = el->getShardIdForChar(destName); // Use receiver shardId
 
 			nlinfo("MongoDB : hostShardId : %d", hostShardId);
+
 			if (hostShardId == 0)
 			{
 				// the character is not online
@@ -245,15 +246,17 @@ nldebug("sendFarTell : can't finc character sync singleton");
 				return;
 			}
 
+			// This player is online, we can forward the tell to him
+
 			// lookup in the IOS proxies
 			const TModuleProxyPtr *pproxy = _ChatClients.getA(hostShardId);
 			if (pproxy == NULL)
 			{
 				// no IOS for the hosting shard !
 				cucSender.recvFarTellFail(this, senderCharId, destName, TFailInfo::fi_no_ios_module);
-				nldebug("sendFatTell : no module proxy for shard %u", hostShardId);
+				nldebug("sendFarTell : no module proxy for shard %u", hostShardId);
 				return;
-			};
+			}
 
 			// ok, we can send the far tell
 			CChatUnifierClientProxy cucDest(*pproxy);

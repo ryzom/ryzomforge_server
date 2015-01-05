@@ -83,16 +83,19 @@ public:		// Methods.
 	// a few handy utility methods
 	inline	CAngle	angleTo(const CAIPos &dest)			const;
 	inline	double	distTo(const CAIPos &dest)			const;
+	inline	double	distSqTo(const CAIPos &dest)		const;
 	inline	double	quickDistTo(const CAIPos &dest)		const;
 	
 	inline	CAngle	angleTo(const CAIVector &dest)		const;
 	inline	double	distTo(const CAIVector &dest)		const;
+	inline	double	distSqTo(const CAIVector &dest)		const;
 	inline	double	quickDistTo(const CAIVector &dest)	const;
 	
 	inline	CAngle	angleTo(const CAIVectorMirror &dest) const;
 	inline	double	distTo(const CAIVectorMirror &dest)  const;
+	inline	double	distSqTo(const CAIVectorMirror &dest)  const;
 	inline	double	quickDistTo(const CAIVectorMirror &dest) const;
-	
+
 protected:
 	inline void	setX(const CAICoord &x)	{ _x=x;	}
 	inline void	setY(const CAICoord &y)	{ _y=y;	}

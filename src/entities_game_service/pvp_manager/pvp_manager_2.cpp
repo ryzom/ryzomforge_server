@@ -211,7 +211,8 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 	result.clear();
 
 	// Add lang channel, should be first.
-	if (!user->getLangChannel().empty()) {
+	if (!user->getLangChannel().empty())
+	{
 		std::vector<std::string> langChannels;
 		NLMISC::splitString(user->getLangChannel(), " ", langChannels);
 		for ( uint i = 0; i < langChannels.size(); i++ )
@@ -222,7 +223,9 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 				result.push_back((*it).second);
 			}
 		}
-	} else {
+	}
+	else
+	{
 		TMAPExtraFactionChannel::iterator it = _ExtraFactionChannel.find("en");
 		if (it != _ExtraFactionChannel.end())
 		{
@@ -770,7 +773,6 @@ PVP_RELATION::TPVPRelation CPVPManager2::getPVPRelation( CCharacter * actor, CEn
 		////////////////////////////////////////////////////////
 	}
 
-	
 	uint i;
 	for( i=0; i<_PVPInterface.size(); ++i )
 	{
