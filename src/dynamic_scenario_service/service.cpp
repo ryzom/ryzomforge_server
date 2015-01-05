@@ -54,10 +54,8 @@ static void foo()
 namespace R2
 {
 // The ligo config
-NLLIGO::CLigoConfig* LigoConfigPtr;
-CR2LigoConfig R2LigoConfig;
-
-
+	extern NLLIGO::CLigoConfig* LigoConfigPtr;
+	CR2LigoConfig R2LigoConfig;
 }
 
 
