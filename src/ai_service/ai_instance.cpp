@@ -695,6 +695,11 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 			bot->equipmentInit();
 			bot->initEnergy(/*groupEnergyCoef()*/0);
 			CAIVector rpos(pos);
+			if (dispersionRadius == 0)
+			{
+				nlinfo("Stucked !");
+				bot->setStuck(true);
+			}
 			// Spawn all randomly except if only 1 bot
 			if (nbBots > 1)
 			{
@@ -854,6 +859,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 	uint32 instanceNumber;
 	sint32 x;
 	sint32 y;
+	sint32 z;
 	sint32 orientation;
 	uint32 nbBots;
 	NLMISC::CSheetId sheetId;
@@ -869,6 +875,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 	msgin.serial(playerId);
 	msgin.serial(x);
 	msgin.serial(y);
+	msgin.serial(z);
 	msgin.serial(orientation);
 	msgin.serial(nbBots);
 	msgin.serial(sheetId);
@@ -880,7 +887,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 	CAIInstance* instance = CAIS::instance().getAIInstance(instanceNumber);
 	if (instance)
 	{
-		CGroupNpc* npcGroup = instance->eventCreateNpcGroup(nbBots, sheetId, CAIVector((double)x/1000., (double)y/1000.), dispersionRadius, spawnBots, (double)orientation/1000., botsName, look);
+		CGroupNpc* npcGroup = instance->eventCreateNpcGroup(nbBots, sheetId, CAIVector(((double)x)/1000.0, ((double)y)/1000.0), dispersionRadius, spawnBots, ((double)orientation)/1000.0, botsName, look);
 		if (npcGroup != NULL)
 		{
 			_PlayersLastCreatedNpcGroup[playerId] = npcGroup->getName();
@@ -891,7 +898,6 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 				if (pbot!=NULL)
 				{		
 					CEntityId id = pbot->getEntityId();
-					sint32 z = 0;
 					float t = 0;
 					uint8 cont = 0;
 					uint8 one = 1;
