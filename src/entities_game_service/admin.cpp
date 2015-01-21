@@ -1260,6 +1260,17 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 				z *= 1000;
 			}
 		}
+		else if ( value.find('@') != string::npos )
+		{
+			x = e->getState().X();
+			y = e->getState().Y();
+			z = e->getState().Z();
+			explode (value, string("@"), res);
+			if (res.size() == 1)
+			{
+				fromString(res[0], cell);
+			}
+		}
 		else
 		{
 			if ( value.find(".creature") != string::npos )
@@ -1307,7 +1318,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 					return;
 				}
 				CEntityBase *entityBase = PlayerManager.getCharacterByName (CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), value));
-				if (entityBase == 0)
+				if (entityBase == NULL)
 				{
 					// try to find the bot name
 					vector<TAIAlias> aliases;
@@ -1332,7 +1343,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 					}
 
 				}
-				if (entityBase != 0)
+				else
 				{
 					x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
 					y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
@@ -1713,7 +1724,7 @@ NLMISC_COMMAND(createNamedItemInBag, "create a named item in bag", "<eId> <item>
 	{
 		quantity = 1;
 	}
-
+	
 	TLogNoContext_Item noLog;
 	CGameItemPtr item = CNamedItems::getInstance().createNamedItem(args[1], quantity);
 	if (item == NULL)
@@ -4755,7 +4766,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		save_index = true;
 	}
 
- 	c->setAfkState(false);
+	c->setAfkState(false);
 
 	string web_app_url = args[1];
 	string index = args[2];
@@ -4910,7 +4921,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		numberItem = quantity;
 		numberEqualItem = quantity;
-		for(uint32 i = 0; i < inventory->getSlotCount(); ++i)
+		for ( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
 		{
 			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if ( itemPtr != NULL )
@@ -5430,6 +5441,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		uint32 instanceNumber = c->getInstanceNumber();
 		sint32 x = c->getX();
 		sint32 y = c->getY();
+		sint32 z = c->getZ();
 		sint32 orientation = 6666; // used to specify a random orientation
 
 		uint32 nbBots;
@@ -5490,19 +5502,49 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			}
 		}
 
-		std::string look;
 		if (command_args.size() > 8)
 		{
-			look = command_args[8];
-			if (look.find(".creature") == string::npos)
-				look += ".creature";
+			if (command_args[8] != "*") {
+				NLMISC::fromString(command_args[7], z);
+			}
 		}
+
+		std::string look;
+		if (command_args.size() > 9)
+		{
+			if (command_args[9] != "*")
+			{
+				look = command_args[9];
+				if (look.find(".creature") == string::npos)
+					look += ".creature";
+			}
+		}
+
+		 //[[inVillage=0/1][inOutpost=0/1][inStable=0/1][InAtys=0/1]] 
+		std::string validation;
+		if (command_args.size() > 10)
+		{
+			validation = command_args[10];
+			if (validation.length() == 4)
+			{
+				bool inVillage = validation[0] == '1';
+				bool inOutpost = validation[1] == '1';
+				bool inStable = validation[2] == '1';
+				bool inAtys = validation[3] == '1';
+				
+				if (!c->isSpawnValid(inVillage, inOutpost, inStable, inAtys))
+					return false;
+			}
+
+		}
+
 
 		// See if another AI instance has been specified
 		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
 		{
 			return false;
 		}
+
 
 		TDataSetRow dsr = c->getEntityRowId();
 		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
@@ -5517,6 +5559,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		msgout.serial(playerId);
 		msgout.serial(x);
 		msgout.serial(y);
+		msgout.serial(z);
 		msgout.serial(orientation);
 		msgout.serial(nbBots);
 		msgout.serial(sheetId);
@@ -5557,7 +5600,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		for (uint32 i=2; i<nbString; ++i)
 		{
 			string arg = command_args[i]+";";
-
 			size_t pos = 0;
 			while((pos = arg.find("&nbsp&", pos)) != string::npos)
 			{
@@ -5565,7 +5607,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				pos ++;
 			}
 			pos = 0;
-			while((pos = arg.find("_NBSP_", pos)) != string::npos)
+			while((pos = arg.find("__NBSP__", pos)) != string::npos)
 			{
 				arg.replace(pos, 6, " ");
 				pos ++;
@@ -5835,15 +5877,41 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//***************** teleport
 	//*************************************************
 
-	else if (command_args[0] == "teleport") // teleport![x,y,z|player name|bot name]!teleport mektoub?!check pvpflag?
+	else if (command_args[0] == "teleport") // teleport![x,y,z|player name|bot name]!teleport mektoub?!checks!Same Cell?
 	{
 		if (command_args.size () < 2) return false;
-		
-		bool pvpValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);			
-		if (command_args.size () > 3 && command_args[3] == "1" && !pvpValid)
+
+
+		// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
+		if (command_args.size () > 3)
 		{
-			CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
-			return true;
+			bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
+			if (command_args[3][0] == '1' && !pvpFlagValid) {
+				CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
+				return true;
+			}
+	
+			bool pvpTagValid =  c->getPVPFlag() == false;
+			if (command_args[3].length() > 1 && command_args[3][1] == '1' && !pvpTagValid)
+			{
+				CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
+				return true;
+			}
+
+			if (command_args[3].length() > 2)
+			{
+				CBypassCheckFlags bypassCheckFlags;
+				bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, command_args[3].length() > 2 && command_args[3][2] == '1');
+				bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, command_args[3].length() > 3 && command_args[3][3] == '1');
+				bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, command_args[3].length() > 4 && command_args[3][4] == '1');
+				bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, command_args[3].length() > 5 && command_args[3][5] == '1');
+				bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, command_args[3].length() > 6 && command_args[3][6] == '1');
+				bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, command_args[3].length() > 7 && command_args[3][7] == '1');
+				bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, command_args[3].length() > 8 && command_args[3][8] == '1');
+
+				if (!c->canEntityUseAction(bypassCheckFlags, true))
+					return true;
+			}
 		}
 
 		string value = command_args[1];
@@ -5937,7 +6005,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 					}
 
 				}
-				if (entityBase != NULL)
+				else
 				{
 					x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
 					y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
@@ -6062,7 +6130,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			}
 		}
 	}
-
 
 	//*************************************************
 	//***************** rename_animal
@@ -6698,9 +6765,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		else
 		{
 			if (save_index)
-			{
 				c->validateWebCommandIndex(iindex);
-			}
 			if (send_url)
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 		}
@@ -7952,7 +8017,7 @@ NLMISC_COMMAND(setOrganizationStatus, "set the organization status of a player",
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <nbBots> <sheet> [<dispersionRadius=10m> [<spawnBots=true> [<orientation=random|self|-360..360> [<name> [<x> [<y>]]]]]]")
+NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <nbBots> <sheet> [<dispersionRadius=10m>] [<spawnBots=true>] [<orientation=random|self|-360..360>] [<name>] [<x>] [<y>] [client_sheet] [inVIllage?inOutpost?inStable?inAtys?]")
 {
 	if (args.size () < 3) return false;
 	GET_CHARACTER
@@ -7960,6 +8025,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	uint32 instanceNumber = c->getInstanceNumber();
 	sint32 x = c->getX();
 	sint32 y = c->getY();
+	sint32 z = c->getZ();
 	sint32 orientation = 6666; // used to specify a random orientation
 
 	uint32 nbBots;
@@ -8027,10 +8093,17 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		}
 	}
 
-	std::string look;
 	if (args.size() > 9)
 	{
-		look = args[9];
+		if (args[9] != "*") {
+			NLMISC::fromString(args[9], z);
+		}
+	}
+
+	std::string look;
+	if (args.size() > 10)
+	{
+		look = args[10];
 		if (look.find(".creature") == string::npos)
 			look += ".creature";
 	}
@@ -8054,6 +8127,7 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	msgout.serial(playerId);
 	msgout.serial(x);
 	msgout.serial(y);
+	msgout.serial(z);
 	msgout.serial(orientation);
 	msgout.serial(nbBots);
 	msgout.serial(sheetId);
@@ -8118,7 +8192,6 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
-
 		size_t pos = 0;
 		while((pos = arg.find("&nbsp&", pos)) != string::npos)
 		{
@@ -8179,7 +8252,7 @@ NLMISC_COMMAND(eventSetBotScale, "changes the scale of a bot (in % up to 255)", 
 	NLMISC::fromString(args[1], scale);
 	if (scale>255)
 		scale = 0;
- 	CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, row, DSPropertyVPB );
+	CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, row, DSPropertyVPB );
 	SET_STRUCT_MEMBER( visualPropertyB, PropertySubData.Scale, scale );
 
 	return true;
@@ -8959,12 +9032,6 @@ NLMISC_COMMAND(eventSetBotURL, "changes the url of a bot", "<bot eid> [<url>]")
 	uint32 program = creature->getBotChatProgram();
 	if(!(program & (1<<BOTCHATTYPE::WebPageFlag)))
 	{
-		if(program != 0)
-		{
-			log.displayNL("This creature already had a program 0x%x, cannot add a web program", program);
-			return false;
-		}
-
 		log.displayNL("Add web program on this creature");
 		program |= 1 << BOTCHATTYPE::WebPageFlag;
 		creature->setBotChatProgram(program);
