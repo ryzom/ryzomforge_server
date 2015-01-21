@@ -13285,6 +13285,66 @@ void CCharacter::setPlaces(const std::vector<const CPlace*> & places)
 }
 
 //-----------------------------------------------
+//	isSpawnValid
+//-----------------------------------------------
+bool CCharacter::isSpawnValid(bool inVillage, bool inOutpost, bool inStable, bool inAtys)
+{
+	if (inVillage)
+		nlinfo("inVillage");
+	if (inOutpost)
+		nlinfo("inOutpost");
+	if (inStable)
+		nlinfo("inStable");
+	if (inAtys)
+		nlinfo("inAtys");
+
+	const uint size = (uint)_Places.size();
+	for ( uint i = 0; i < size; i++ )
+	{
+		CPlace * p = CZoneManager::getInstance().getPlaceFromId( _Places[i] );
+		if (p)
+		{
+			PLACE_TYPE::TPlaceType place_type = p->getPlaceType();
+			nlinfo("Place type = %s", PLACE_TYPE::toString(p->getPlaceType()).c_str());
+			if (!inVillage && (place_type == PLACE_TYPE::Village || place_type == PLACE_TYPE::Capital))
+			{
+				CCharacter::sendDynamicSystemMessage( _EntityRowId, "NO_ACTION_IN_VILLAGE" );
+				return false;
+			}
+			
+			TAIAlias outpostAlias = getOutpostAlias();
+			if (!inOutpost && outpostAlias != 0)
+			{
+				CSmartPtr<COutpost> outpost = COutpostManager::getInstance().getOutpostFromAlias( outpostAlias );
+				if( outpost && outpost->getState() != OUTPOSTENUMS::Peace )
+				{
+					CCharacter::sendDynamicSystemMessage( _EntityRowId, "NO_ACTION_IN_OUPOST" );
+					return false;
+				}
+			}
+
+			if( !inStable && _CurrentStable != 0xFFFF )
+			{
+				CCharacter::sendDynamicSystemMessage( _EntityRowId, "NO_ACTION_IN_STABLE" );
+				return false;
+			}
+
+			TDataSetRow dsr = getEntityRowId();
+			CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+			sint32 cell = srcCell;
+
+			if (!inAtys && cell >= 0)
+			{
+				CCharacter::sendDynamicSystemMessage( _EntityRowId, "NO_ACTION_IN_ATYS" );
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------
 // memorize
 //-----------------------------------------------
 void CCharacter::memorize(uint8 memorizationSet, uint8 index, uint16 phraseId, const vector<CSheetId> &bricks)

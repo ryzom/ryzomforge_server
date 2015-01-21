@@ -1554,6 +1554,9 @@ public:
 	/// client (in)validate melee combat
 	void validateMeleeCombat(bool flag);
 
+	/// check is player can spawn npc group in here position
+	bool isSpawnValid(bool inVillage, bool inOutpost, bool inStable, bool inAtys);
+
 	/// memorize a phrase 
 	void memorize(uint8 memorizationSet, uint8 index, uint16 phraseId, const std::vector<NLMISC::CSheetId> &bricks);
 
