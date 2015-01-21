@@ -204,7 +204,7 @@ namespace CHATUNI
 			{
 				// no entity locator, can't forward messages
 				cucSender.recvFarTellFail(this, senderCharId, destName, TFailInfo::fi_no_entity_locator);
-nldebug("sendFarTell : no entity locator");
+				nldebug("sendFarTell : no entity locator");
 				return;
 			}
 
@@ -214,7 +214,7 @@ nldebug("sendFarTell : no entity locator");
 			{
 				// no character synchronizer to retrieve sender name !
 				cucSender.recvFarTellFail(this, senderCharId, destName, TFailInfo::fi_no_char_sync);
-nldebug("sendFarTell : can't finc character sync singleton");
+				nldebug("sendFarTell : can't finc character sync singleton");
 				return;
 			}
 

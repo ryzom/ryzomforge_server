@@ -707,7 +707,8 @@ void initSalt()
 	}
 }
 
-string getStringFromHash(const string &hash) {
+string getStringFromHash(const string &hash)
+{
 	ucstring finaltext;
 	getUCstringFromHash(hash, finaltext);
 	
@@ -4609,7 +4610,8 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
 		string current_channels = c->getLangChannel();
-		if (leave) {
+		if (leave)
+		{
 			strFindReplace(current_channels, lang+" ", "");
 			strFindReplace(current_channels, " "+lang, "");
 			inst->removeFactionChannelForCharacter(channel, c);
@@ -8014,13 +8016,15 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 
 	if (args.size() > 8)
 	{
-		if (args[7] != "*") {
+		if (args[7] != "*")
+		{
 			float userX;
 			NLMISC::fromString(args[7], userX);
 			x = (sint32)(userX * 1000.0);
 		}
 
-		if (args[8] != "*") {
+		if (args[8] != "*")
+		{
 			float userY;
 			NLMISC::fromString(args[8], userY);
 			y = (sint32)(userY * 1000.0);

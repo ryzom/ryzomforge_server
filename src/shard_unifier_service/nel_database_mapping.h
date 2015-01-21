@@ -667,8 +667,6 @@ namespace RSMGR
 			return _DomainName;
 		}
 
-
-
 		void setDomainName(const std::string &value)
 		{
 
