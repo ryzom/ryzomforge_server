@@ -850,7 +850,7 @@ bool CGrpFauna::spawnPop(uint popVersion)
 	popVersion = ~0;
 	
 	//	if we are in a cycle.
-	if (_CurrentCycle!=~0)
+	if (_CurrentCycle!=std::numeric_limits<sint32>::max())
 	{
 		Cycle const& cycle = _Cycles[_CurrentCycle];
 		
@@ -872,7 +872,7 @@ bool CGrpFauna::spawnPop(uint popVersion)
 		
 		if (popVersion==~0)
 		{
-			_CurrentCycle = ~0;
+			_CurrentCycle = std::numeric_limits<sint32>::max();
 		}
 	}
 	
