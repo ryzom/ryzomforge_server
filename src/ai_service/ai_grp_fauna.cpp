@@ -608,7 +608,7 @@ CGrpFauna::CGrpFauna(CMgrFauna* mgr, CAIAliasDescriptionNode* aliasTree, RYAI_MA
 	
 	_CurPopulation = std::numeric_limits<uint32>::max();
 	
-	_CurrentCycle = std::numeric_limits<sint32>::max();
+	_CurrentCycle = std::numeric_limits<uint32>::max();
 	
 	// default values.	
 	setTimer(EAT_TIME, refTimer(EAT_TIME));
@@ -850,7 +850,7 @@ bool CGrpFauna::spawnPop(uint popVersion)
 	popVersion = ~0;
 	
 	//	if we are in a cycle.
-	if (_CurrentCycle!=std::numeric_limits<sint32>::max())
+	if (_CurrentCycle!=std::numeric_limits<uint32>::max())
 	{
 		Cycle const& cycle = _Cycles[_CurrentCycle];
 		
@@ -872,7 +872,7 @@ bool CGrpFauna::spawnPop(uint popVersion)
 		
 		if (popVersion==~0)
 		{
-			_CurrentCycle = std::numeric_limits<sint32>::max();
+			_CurrentCycle = std::numeric_limits<uint32>::max();
 		}
 	}
 	
