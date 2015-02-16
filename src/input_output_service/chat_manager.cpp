@@ -48,6 +48,10 @@ using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
 
+#ifdef LOG_INFO
+#undef LOG_INFO
+#endif
+
 /*b
 mongo conn;
 string mongo_db;
