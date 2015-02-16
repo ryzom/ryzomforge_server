@@ -707,7 +707,8 @@ void initSalt()
 	}
 }
 
-string getStringFromHash(const string &hash) {
+string getStringFromHash(const string &hash)
+{
 	ucstring finaltext;
 	getUCstringFromHash(hash, finaltext);
 	
@@ -4620,7 +4621,8 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
 		string current_channels = c->getLangChannel();
-		if (leave) {
+		if (leave)
+		{
 			strFindReplace(current_channels, lang+" ", "");
 			strFindReplace(current_channels, " "+lang, "");
 			inst->removeFactionChannelForCharacter(channel, c);
@@ -4921,7 +4923,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		numberItem = quantity;
 		numberEqualItem = quantity;
-		for ( uint32 i = 0; i < inventory->getSlotCount(); ++ i)
+		for(uint32 i = 0; i < inventory->getSlotCount(); ++i)
 		{
 			const CGameItemPtr itemPtr = inventory->getItem(i);
 			if ( itemPtr != NULL )
@@ -5607,7 +5609,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				pos ++;
 			}
 			pos = 0;
-			while((pos = arg.find("__NBSP__", pos)) != string::npos)
+			while((pos = arg.find("_NBSP_", pos)) != string::npos)
 			{
 				arg.replace(pos, 6, " ");
 				pos ++;
@@ -6065,7 +6067,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	else if (command_args[0] == "slide") // x,y,z,a!building![player name|guild name]!teleport mektoub?
 	{
-		if (command_args.size () < 3) return false;
+		if (command_args.size () < 4) return false;
 
 		nlinfo("ok");
 		string value = command_args[1];
@@ -6765,7 +6767,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		else
 		{
 			if (save_index)
+			{
 				c->validateWebCommandIndex(iindex);
+			}
 			if (send_url)
 				c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=finished", getSalt());
 		}
@@ -8080,13 +8084,15 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 
 	if (args.size() > 8)
 	{
-		if (args[7] != "*") {
+		if (args[7] != "*")
+		{
 			float userX;
 			NLMISC::fromString(args[7], userX);
 			x = (sint32)(userX * 1000.0);
 		}
 
-		if (args[8] != "*") {
+		if (args[8] != "*")
+		{
 			float userY;
 			NLMISC::fromString(args[8], userY);
 			y = (sint32)(userY * 1000.0);
