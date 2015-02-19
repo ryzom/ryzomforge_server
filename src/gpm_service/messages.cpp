@@ -574,7 +574,7 @@ void cbEntityTeleportation( CMessage& msgin, const string &serviceName, NLNET::T
 		}
 		else
 		{
-			nlinfo("MSG: Teleporting entity %d to continent %d (%d, %d, %d) at tick: %d",index.getIndex(),continent,x,y,z,tick);
+			nlinfo("MSG: Teleporting entity %d to continent %d cell %d (%d, %d, %d) at tick: %d",index.getIndex(),continent,cell,x,y,z,tick);
 			CWorldPositionManager::teleport(index, x, y, z, t, continent, cell, tick);
 		}
 	}
