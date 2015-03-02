@@ -93,9 +93,9 @@ uint32 CCharacterVersionAdapter::currentVersionNumber() const
 	// 22 : (15/05/2006) reset flag pvp for resolve migration timer pb
 	// 23 : (05/04/2013) fix post merge marauder plan issue
 	// 24 : (23/10/2014) fix post merge rite bonus issue
+	// 25 : (05/03/2015) fix required faction in items on inventory
 	////////////////////////////////////
-	//TODO: change to 25 !!!!!!
-	return 24;
+	return 25;
 }
 
 
@@ -107,7 +107,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	{
 	case 0: adaptToVersion1(character);
 	case 1: adaptToVersion2(character);
-    case 2: adaptToVersion3(character);
+	case 2: adaptToVersion3(character);
 	case 3: adaptToVersion4(character);
 	case 4: adaptToVersion5(character);
 	case 5: adaptToVersion6(character);
@@ -129,7 +129,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	case 21: adaptToVersion22(character);
 	case 22: adaptToVersion23(character);
 	case 23: adaptToVersion24(character);
-	//case 24: adaptToVersion25(character);
+	case 24: adaptToVersion25(character);
 	default:;
 	}
 }
@@ -1190,146 +1190,153 @@ void CCharacterVersionAdapter::adaptToVersion25(CCharacter &character) const
 				string phraseId = item->getPhraseId();
 
 				if (    (phraseId == "shield_ep2_kami50_1") ||
-				        (phraseId == "shield_ep2_kami50_2") ||
-				        (phraseId == "shield_ep2_kami100_1") ||
-				        (phraseId == "shield_ep2_kami100_2") ||
-				        (phraseId == "shield_ep2_kami150_1") ||
-				        (phraseId == "shield_ep2_kami150_2") ||
-				        (phraseId == "shield_ep2_kami200_1") ||
-				        (phraseId == "shield_ep2_kami200_2") ||
-				        (phraseId == "shield_ep2_kami250_1") ||
-				        (phraseId == "shield_ep2_kami250_2") ||
-				        (phraseId == "magic_dress_ep2_kami50_1") ||
-				        (phraseId == "magic_dress_ep2_kami50_2") ||
-				        (phraseId == "magic_dress_ep2_kami100_1") ||
-				        (phraseId == "magic_dress_ep2_kami100_2") ||
-				        (phraseId == "magic_dress_ep2_kami150_1") ||
-				        (phraseId == "magic_dress_ep2_kami150_2") ||
-				        (phraseId == "magic_dress_ep2_kami200_1") ||
-				        (phraseId == "magic_dress_ep2_kami200_2") ||
-				        (phraseId == "magic_dress_ep2_kami250_1") ||
-				        (phraseId == "magic_dress_ep2_kami250_2") ||
-				        (phraseId == "foragetool_kami_ep2_50_1") ||
-				        (phraseId == "foragetool_kami_ep2_50_2") ||
-				        (phraseId == "foragetool_kami_ep2_100_1") ||
-				        (phraseId == "foragetool_kami_ep2_100_2") ||
-				        (phraseId == "foragetool_kami_ep2_150_1") ||
-				        (phraseId == "foragetool_kami_ep2_150_2") ||
-				        (phraseId == "foragetool_kami_ep2_200_1") ||
-				        (phraseId == "foragetool_kami_ep2_200_2") ||
-				        (phraseId == "foragetool_kami_ep2_250_1") ||
-				        (phraseId == "foragetool_kami_ep2_250_2"))
+						(phraseId == "shield_ep2_kami50_2") ||
+						(phraseId == "shield_ep2_kami100_1") ||
+						(phraseId == "shield_ep2_kami100_2") ||
+						(phraseId == "shield_ep2_kami150_1") ||
+						(phraseId == "shield_ep2_kami150_2") ||
+						(phraseId == "shield_ep2_kami200_1") ||
+						(phraseId == "shield_ep2_kami200_2") ||
+						(phraseId == "shield_ep2_kami250_1") ||
+						(phraseId == "shield_ep2_kami250_2") ||
+						(phraseId == "magic_dress_ep2_kami50_1") ||
+						(phraseId == "magic_dress_ep2_kami50_2") ||
+						(phraseId == "magic_dress_ep2_kami100_1") ||
+						(phraseId == "magic_dress_ep2_kami100_2") ||
+						(phraseId == "magic_dress_ep2_kami150_1") ||
+						(phraseId == "magic_dress_ep2_kami150_2") ||
+						(phraseId == "magic_dress_ep2_kami200_1") ||
+						(phraseId == "magic_dress_ep2_kami200_2") ||
+						(phraseId == "magic_dress_ep2_kami250_1") ||
+						(phraseId == "magic_dress_ep2_kami250_2")/* ||
+						(phraseId == "foragetool_kami_ep2_50_1") ||
+						(phraseId == "foragetool_kami_ep2_50_2") ||
+						(phraseId == "foragetool_kami_ep2_100_1") ||
+						(phraseId == "foragetool_kami_ep2_100_2") ||
+						(phraseId == "foragetool_kami_ep2_150_1") ||
+						(phraseId == "foragetool_kami_ep2_150_2") ||
+						(phraseId == "foragetool_kami_ep2_200_1") ||
+						(phraseId == "foragetool_kami_ep2_200_2") ||
+						(phraseId == "foragetool_kami_ep2_250_1") ||
+						(phraseId == "foragetool_kami_ep2_250_2")*/)
 				{
-				        item->setRequiredFaction("kami");
+						item->setRequiredFaction("kami");
+						item->addHp(item->durability());
+
 				}
 
-
+/*
 				if (    (phraseId == "foragetool_tryker_50") ||
-				        (phraseId == "foragetool_tryker_100") ||
-				        (phraseId == "foragetool_tryker_150") ||
-				        (phraseId == "foragetool_tryker_200") ||
-				        (phraseId == "foragetool_tryker_250") ||
-				        (phraseId == "foragetool_tryker_sfx"))
+						(phraseId == "foragetool_tryker_100") ||
+						(phraseId == "foragetool_tryker_150") ||
+						(phraseId == "foragetool_tryker_200") ||
+						(phraseId == "foragetool_tryker_250") ||
+						(phraseId == "foragetool_tryker_sfx"))
 				{
-				        item->setRequiredFaction("tryker");
+						item->setRequiredFaction("tryker");
 				}
 
 
 				if (    (phraseId == "foragetool_zorai_50") ||
-				        (phraseId == "foragetool_zorai_100") ||
-				        (phraseId == "foragetool_zorai_150") ||
-				        (phraseId == "foragetool_zorai_200") ||
-				        (phraseId == "foragetool_zorai_250") ||
-				        (phraseId == "foragetool_zorai_sfx"))
+						(phraseId == "foragetool_zorai_100") ||
+						(phraseId == "foragetool_zorai_150") ||
+						(phraseId == "foragetool_zorai_200") ||
+						(phraseId == "foragetool_zorai_250") ||
+						(phraseId == "foragetool_zorai_sfx"))
 				{
-				        item->setRequiredFaction("zorai");
+						item->setRequiredFaction("zorai");
 				}
-
+*/
 
 				if (    (phraseId == "shield_pvp_50") ||
-				        (phraseId == "shield_pvp_100") ||
-				        (phraseId == "shield_pvp_150") ||
-				        (phraseId == "shield_pvp_200") ||
-				        (phraseId == "shield_pvp_250") ||
-				        (phraseId == "magic_dress_pvp_50") ||
-				        (phraseId == "magic_dress_pvp_100") ||
-				        (phraseId == "magic_dress_pvp_150") ||
-				        (phraseId == "magic_dress_pvp_200") ||
-				        (phraseId == "magic_dress_pvp_250"))
+						(phraseId == "shield_pvp_100") ||
+						(phraseId == "shield_pvp_150") ||
+						(phraseId == "shield_pvp_200") ||
+						(phraseId == "shield_pvp_250") ||
+						(phraseId == "magic_dress_pvp_50") ||
+						(phraseId == "magic_dress_pvp_100") ||
+						(phraseId == "magic_dress_pvp_150") ||
+						(phraseId == "magic_dress_pvp_200") ||
+						(phraseId == "magic_dress_pvp_250"))
 				{
-				        item->setRequiredFaction("neutralcult");
+						item->setRequiredFaction("neutralcult");
+						item->addHp(item->durability());
+
 				}
 
-
+/*
 				if (    (phraseId == "foragetool_fyros_50") ||
-				        (phraseId == "foragetool_fyros_100") ||
-				        (phraseId == "foragetool_fyros_150") ||
-				        (phraseId == "foragetool_fyros_200") ||
-				        (phraseId == "foragetool_fyros_250") ||
-				        (phraseId == "foragetool_fyros_sfx"))
+						(phraseId == "foragetool_fyros_100") ||
+						(phraseId == "foragetool_fyros_150") ||
+						(phraseId == "foragetool_fyros_200") ||
+						(phraseId == "foragetool_fyros_250") ||
+						(phraseId == "foragetool_fyros_sfx"))
 				{
-				        item->setRequiredFaction("fyros");
+						item->setRequiredFaction("fyros");
 				}
 
 
 				if (    (phraseId == "foragetool_matis_50") ||
-				        (phraseId == "foragetool_matis_100") ||
-				        (phraseId == "foragetool_matis_150") ||
-				        (phraseId == "foragetool_matis_200") ||
-				        (phraseId == "foragetool_matis_250") ||
-				        (phraseId == "foragetool_matis_sfx"))
+						(phraseId == "foragetool_matis_100") ||
+						(phraseId == "foragetool_matis_150") ||
+						(phraseId == "foragetool_matis_200") ||
+						(phraseId == "foragetool_matis_250") ||
+						(phraseId == "foragetool_matis_sfx"))
 				{
-				        item->setRequiredFaction("matis");
+						item->setRequiredFaction("matis");
 				}
-
+*/
 
 				if (    (phraseId == "shield_ep2_karavan50_1") ||
-				        (phraseId == "shield_ep2_karavan50_2") ||
-				        (phraseId == "shield_ep2_karavan100_1") ||
-				        (phraseId == "shield_ep2_karavan100_2") ||
-				        (phraseId == "shield_ep2_karavan150_1") ||
-				        (phraseId == "shield_ep2_karavan150_2") ||
-				        (phraseId == "shield_ep2_karavan200_1") ||
-				        (phraseId == "shield_ep2_karavan200_2") ||
-				        (phraseId == "shield_ep2_karavan250_1") ||
-				        (phraseId == "shield_ep2_karavan250_2") ||
-				        (phraseId == "magic_dress_ep2_karavan50_1") ||
-				        (phraseId == "magic_dress_ep2_karavan50_2") ||
-				        (phraseId == "magic_dress_ep2_karavan100_1") ||
-				        (phraseId == "magic_dress_ep2_karavan100_2") ||
-				        (phraseId == "magic_dress_ep2_karavan150_1") ||
-				        (phraseId == "magic_dress_ep2_karavan150_2") ||
-				        (phraseId == "magic_dress_ep2_karavan200_1") ||
-				        (phraseId == "magic_dress_ep2_karavan200_2") ||
-				        (phraseId == "magic_dress_ep2_karavan250_1") ||
-				        (phraseId == "magic_dress_ep2_karavan250_2") ||
-				        (phraseId == "foragetool_karavan_ep2_50_1") ||
-				        (phraseId == "foragetool_karavan_ep2_50_2") ||
-				        (phraseId == "foragetool_karavan_ep2_100_1") ||
-				        (phraseId == "foragetool_karavan_ep2_100_2") ||
-				        (phraseId == "foragetool_karavan_ep2_150_1") ||
-				        (phraseId == "foragetool_karavan_ep2_150_2") ||
-				        (phraseId == "foragetool_karavan_ep2_200_1") ||
-				        (phraseId == "foragetool_karavan_ep2_200_2") ||
-				        (phraseId == "foragetool_karavan_ep2_250_1") ||
-				        (phraseId == "foragetool_karavan_ep2_250_2"))
+						(phraseId == "shield_ep2_karavan50_2") ||
+						(phraseId == "shield_ep2_karavan100_1") ||
+						(phraseId == "shield_ep2_karavan100_2") ||
+						(phraseId == "shield_ep2_karavan150_1") ||
+						(phraseId == "shield_ep2_karavan150_2") ||
+						(phraseId == "shield_ep2_karavan200_1") ||
+						(phraseId == "shield_ep2_karavan200_2") ||
+						(phraseId == "shield_ep2_karavan250_1") ||
+						(phraseId == "shield_ep2_karavan250_2") ||
+						(phraseId == "magic_dress_ep2_karavan50_1") ||
+						(phraseId == "magic_dress_ep2_karavan50_2") ||
+						(phraseId == "magic_dress_ep2_karavan100_1") ||
+						(phraseId == "magic_dress_ep2_karavan100_2") ||
+						(phraseId == "magic_dress_ep2_karavan150_1") ||
+						(phraseId == "magic_dress_ep2_karavan150_2") ||
+						(phraseId == "magic_dress_ep2_karavan200_1") ||
+						(phraseId == "magic_dress_ep2_karavan200_2") ||
+						(phraseId == "magic_dress_ep2_karavan250_1") ||
+						(phraseId == "magic_dress_ep2_karavan250_2") ||
+						(phraseId == "foragetool_karavan_ep2_50_1")/* ||
+						(phraseId == "foragetool_karavan_ep2_50_2") ||
+						(phraseId == "foragetool_karavan_ep2_100_1") ||
+						(phraseId == "foragetool_karavan_ep2_100_2") ||
+						(phraseId == "foragetool_karavan_ep2_150_1") ||
+						(phraseId == "foragetool_karavan_ep2_150_2") ||
+						(phraseId == "foragetool_karavan_ep2_200_1") ||
+						(phraseId == "foragetool_karavan_ep2_200_2") ||
+						(phraseId == "foragetool_karavan_ep2_250_1") ||
+						(phraseId == "foragetool_karavan_ep2_250_2")*/)
 				{
-				        item->setRequiredFaction("karavan");
+						item->setRequiredFaction("karavan");
+						item->addHp(item->durability());
+
 				}
 
 
 				if (    (phraseId == "shield_mar_50") ||
-				        (phraseId == "shield_mar_100") ||
-				        (phraseId == "shield_mar_150") ||
-				        (phraseId == "shield_mar_200") ||
-				        (phraseId == "shield_mar_250") ||
-				        (phraseId == "magic_dress_mar_50") ||
-				        (phraseId == "magic_dress_mar_100") ||
-				        (phraseId == "magic_dress_mar_150") ||
-				        (phraseId == "magic_dress_mar_200") ||
-				        (phraseId == "magic_dress_mar_250"))
+						(phraseId == "shield_mar_100") ||
+						(phraseId == "shield_mar_150") ||
+						(phraseId == "shield_mar_200") ||
+						(phraseId == "shield_mar_250") ||
+						(phraseId == "magic_dress_mar_50") ||
+						(phraseId == "magic_dress_mar_100") ||
+						(phraseId == "magic_dress_mar_150") ||
+						(phraseId == "magic_dress_mar_200") ||
+						(phraseId == "magic_dress_mar_250"))
 				{
-				        item->setRequiredFaction("marauder");
+						item->setRequiredFaction("marauder");
+						item->addHp(item->durability());
 				}
 			}
 		}

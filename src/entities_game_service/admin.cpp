@@ -881,24 +881,6 @@ void GET_CHARACTER_Helper(std::string& command, const NLMISC::CEntityId& id, con
 	COfflineCharacterCommand::getInstance()->addOfflineCommandWithoutApply( command );
 }
 
-#define GET_ENTITY \
-	if (args.size() < 1) { nlwarning ("Missing argument number 0 that should be the eid"); return false; } \
-	CEntityId eid(args[0]); \
-	if (eid == CEntityId::Unknown) \
-		return true; \
-	TLogContext_Character_AdminCommand commandContext(eid); \
-	CEntityBase *e = CEntityBaseManager::getEntityBasePtr(eid); \
-	if(e == 0) \
-	{ \
-		nlwarning ("Unknown entity '%s'", eid.toString().c_str()); \
-		return true; \
-	} \
-	if(!TheDataset.isAccessible(e->getEntityRowId())) \
-	{ \
-		nlwarning ("'%s' is not valid in mirror", eid.toString().c_str()); \
-		return true; \
-	}
-
 #define TRY_GET_CHARACTER \
 	if (args.size() < 1) { nlwarning ("Missing argument number 0 that should be the eid"); return false; } \
 	CEntityId eid(args[0]); \
@@ -6112,23 +6094,23 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if (building->getTemplate()->Type == BUILDING_TYPES::Player)
 			{
 
-				TDataSetRow dsr = c->getEntityRowId();
+				/*TDataSetRow dsr = c->getEntityRowId();
 				CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
-				sint32 cell = srcCell;
+				sint32 cell = srcCell;*/
 
-				if (cell >= 0)
-				{
+				/*if (cell >= 0)
+				{*/
 					CBuildingPhysicalPlayer * buildingPlayer = dynamic_cast<CBuildingPhysicalPlayer *>( building );
 
 					CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[3]));
-					if (entityBase)
+					if (buildingPlayer && entityBase)
 					{
 						CBuildingManager::getInstance()->removePlayerFromRoom( c );
 						uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
 						buildingPlayer->addUser(c, 0, ownerId, cell);
 						c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
 					}
-				}
+				//}
 			}
 		}
 	}

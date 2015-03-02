@@ -37,6 +37,7 @@
 #include "admin.h"
 #include "creature_manager/creature_manager.h"
 
+
 using namespace NLMISC;
 using namespace NLNET;
 using namespace std;
@@ -552,4 +553,373 @@ NLMISC_COMMAND(addMission,"Add mission to character","<character_id> <Mission gi
 		args[0].c_str());
 
 	return true;
+}
+
+
+
+/// Commands used by ARK
+
+
+CInventoryPtr getInventory(CCharacter *c, const string &inv)
+{
+	CInventoryPtr inventoryPtr = NULL;
+	if (!inv.empty())
+	{
+		INVENTORIES::TInventory selectedInv = INVENTORIES::toInventory(inv);
+		switch (selectedInv)
+		{
+			case INVENTORIES::temporary:
+			case INVENTORIES::bag:
+			case INVENTORIES::equipment:
+			case INVENTORIES::pet_animal1:
+			case INVENTORIES::pet_animal2:
+			case INVENTORIES::pet_animal3:
+			case INVENTORIES::pet_animal4:
+			case INVENTORIES::guild:
+			case INVENTORIES::player_room:
+				inventoryPtr = c->getInventory(selectedInv);
+				break;
+
+			default:
+				// No-op
+				break;
+		}
+	}
+	return inventoryPtr;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	log.displayNL("%s", c->getId().toString().c_str());
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<uid> [bag sheet quantity_min quantity_max quality_min quality_max extra_infos]")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	std::vector<INVENTORIES::TInventory> inventories;
+
+	string selected_inv = "*";
+	string filter = "*";
+	uint32 quantity_min = 0;
+	uint32 quantity_max = 999;
+	uint32 quality_min = 0;
+	uint32 quality_max = 999;
+
+	string extra;
+
+	if (args.size() > 1)
+		selected_inv = args[1];
+
+	if (args.size() > 2)
+		filter = args[2];
+
+	if (args.size() > 3)
+		fromString(args[3], quantity_min);
+
+	if (args.size() > 4)
+		fromString(args[4], quantity_max);
+
+	if (args.size() > 5)
+		fromString(args[5], quality_min);
+
+	if (args.size() > 6)
+		fromString(args[6], quality_max);
+
+	if (args.size() > 7)
+		extra = args[7];
+
+	string msg;
+
+	if (selected_inv != "*")
+	{
+		std::vector<string> invs;
+		NLMISC::splitString(selected_inv, ",", invs);
+		for (uint32 i=0; i<invs.size(); i++)
+		{
+			INVENTORIES::TInventory selectedInv = INVENTORIES::toInventory(invs[i]);
+			if (selectedInv != INVENTORIES::UNDEFINED)
+				inventories.push_back(selectedInv);
+		}
+	} else {
+		inventories.push_back(INVENTORIES::equipment);
+		inventories.push_back(INVENTORIES::bag);
+		inventories.push_back(INVENTORIES::pet_animal1);
+		inventories.push_back(INVENTORIES::pet_animal2);
+		inventories.push_back(INVENTORIES::pet_animal3);
+		inventories.push_back(INVENTORIES::pet_animal4);
+		inventories.push_back(INVENTORIES::guild);
+		inventories.push_back(INVENTORIES::player_room);
+	}
+
+	if (inventories.empty()) {
+		log.displayNL("ERR: invalid inventories");
+		return false;
+	}
+
+	for (uint32 i=0; i<inventories.size(); i++)
+	{
+		CInventoryPtr childSrc = c->getInventory(inventories[i]);
+		if (childSrc != NULL)
+		{
+			uint32 k = 0;
+			log.displayNL("#%s", INVENTORIES::toString(inventories[i]).c_str());
+
+			for ( uint j = 0; j < childSrc->getSlotCount(); j++ )
+			{
+				CGameItemPtr itemPtr = childSrc->getItem(j);
+				if (itemPtr != NULL)
+				{
+					string sheet = itemPtr->getSheetId().toString();
+					if (testWildCard(sheet, filter))
+					{
+						uint32 item_stack = itemPtr->getStackSize();
+						uint32 item_quality = itemPtr->quality();
+						if (item_stack >= quantity_min && item_stack <= quantity_max
+							&& item_quality >= quality_min && item_quality <= quality_max)
+						{
+							string item_stats = toString("%3d|%s|", j, sheet.c_str());
+							if (!extra.empty())
+								itemPtr->getStats(extra, item_stats);
+							log.displayNL(item_stats.c_str());
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getNamedItemList, "get list of named items of character by filter", "<uid> [bag named quantity_min quantity_max quality_min quality_max extra_infos]")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	std::vector<INVENTORIES::TInventory> inventories;
+
+	string selected_inv = "*";
+	string filter = "*";
+	uint32 quantity_min = 0;
+	uint32 quantity_max = 999;
+	uint32 quality_min = 0;
+	uint32 quality_max = 999;
+
+	string extra;
+
+	if (args.size() > 1)
+		selected_inv = args[1];
+
+	if (args.size() > 2)
+		filter = args[2];
+
+	if (args.size() > 3)
+		fromString(args[3], quantity_min);
+
+	if (args.size() > 4)
+		fromString(args[4], quantity_max);
+
+	if (args.size() > 5)
+		fromString(args[5], quality_min);
+
+	if (args.size() > 6)
+		fromString(args[6], quality_max);
+
+	if (args.size() > 7)
+		extra = args[7];
+
+	string msg;
+
+	if (selected_inv != "*")
+	{
+		std::vector<string> invs;
+		NLMISC::splitString(selected_inv, ",", invs);
+		for (uint32 i=0; i<invs.size(); i++)
+		{
+			INVENTORIES::TInventory selectedInv = INVENTORIES::toInventory(invs[i]);
+			if (selectedInv != INVENTORIES::UNDEFINED)
+				inventories.push_back(selectedInv);
+		}
+	} else {
+		inventories.push_back(INVENTORIES::equipment);
+		inventories.push_back(INVENTORIES::bag);
+		inventories.push_back(INVENTORIES::pet_animal1);
+		inventories.push_back(INVENTORIES::pet_animal2);
+		inventories.push_back(INVENTORIES::pet_animal3);
+		inventories.push_back(INVENTORIES::pet_animal4);
+		inventories.push_back(INVENTORIES::guild);
+		inventories.push_back(INVENTORIES::player_room);
+	}
+
+	for (uint32 i=0; i<inventories.size(); i++)
+	{
+		CInventoryPtr childSrc = c->getInventory(inventories[i]);
+		if (childSrc != NULL)
+		{
+			uint32 k = 0;
+			log.displayNL("#%s", INVENTORIES::toString(inventories[i]).c_str());
+
+			for ( uint j = 0; j < childSrc->getSlotCount(); j++ )
+			{
+				CGameItemPtr itemPtr = childSrc->getItem(j);
+				if (itemPtr != NULL)
+				{
+					string phraseId = itemPtr->getPhraseId();
+					if (!phraseId.empty() && testWildCard(phraseId, filter))
+					{
+						uint32 item_stack = itemPtr->getStackSize();
+						uint32 item_quality = itemPtr->quality();
+						if (item_stack >= quantity_min && item_stack <= quantity_max
+							&& item_quality >= quality_min && item_quality <= quality_max)
+						{
+							string item_stats = toString("%3d|%s|", j, phraseId.c_str());
+							if (!extra.empty())
+								itemPtr->getStats(extra, item_stats);
+							log.displayNL(item_stats.c_str());
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getPosition, "get position of entity", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	double x = 0, y = 0, z = 0, h = 0;
+	sint32 cell = 0;
+
+	x = c->getState().X / 1000.;
+	y = c->getState().Y / 1000.;
+	z = c->getState().Z / 1000.;
+	h = c->getState().Heading;
+
+	TDataSetRow dsr = c->getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+	cell = srcCell;
+
+	log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getFame, "get fame of player", "<uid> faction")
+{
+
+	if (args.size () < 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+
+	uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex(args[1]);
+	if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
+	{
+		log.displayNL("ERR: invalid fame");
+		return false;
+	}
+	
+	sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
+	log.displayNL("%d", fame);
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	const CEntityId &target = c->getTarget();
+	string msg = target.toString()+"|";
+
+	if (target == CEntityId::Unknown)
+	{
+		log.displayNL("0");
+		return true;
+	}
+
+	if (target.getType() == RYZOMID::creature)
+		msg += "c|";
+	else if (target.getType() == RYZOMID::npc)
+		msg += "n|";
+	else if (target.getType() == RYZOMID::player)
+		msg += "p|";
+	else
+		msg += "0";
+
+	if (target.getType() == RYZOMID::player)
+	{
+		CCharacter * cTarget = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
+		msg += c->getName().toString()+"|";
+
+		if (c->getGuildId() != 0 && c->getGuildId() == cTarget->getGuildId())
+			msg += "g|";
+		else
+			msg += "0|";
+
+		if (c->getTeamId() != CTEAM::InvalidTeamId && c->getTeamId() == cTarget->getTeamId())
+			msg += "t";
+		else
+			msg += "0";
+	}
+	
+	log.displayNL(msg.c_str());
+	
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getMoney, "get money of player", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	string value = toString("%"NL_I64"u", c->getMoney());
+
+	log.displayNL(value.c_str());
+}
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getPvpPoints, "get pvp points of player", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	string value = toString("%u", c->getPvpPoint());
+
+	log.displayNL(value.c_str());
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance = c->getAllegiance();
+
+
+	log.displayNL("%s|%s|%u", PVP_CLAN::toString(allegiance.first).c_str(), PVP_CLAN::toString(allegiance.second).c_str(), c->getOrganization());
 }

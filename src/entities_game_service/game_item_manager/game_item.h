@@ -648,6 +648,7 @@ public :
 	 * display item infos
 	 */
 	void displayInLog(NLMISC::CLog &log);
+	bool getStats(const std::string &stats, std::string &final );
 
 	/// accessors to the action latency end date
 	inline NLMISC::TGameCycle getLatencyEndDate(){ return _LatencyEndDate; }
