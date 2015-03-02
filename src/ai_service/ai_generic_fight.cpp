@@ -575,32 +575,20 @@ bool CFightOrganizer::reorganizeIteration(CBot* bot)
 					if (entity->getRyzomType() == RYZOMID::player)
 					{
 						CBotPlayer const* const player = NLMISC::safe_cast<CBotPlayer const*>(entity);
-						if ( ptarget && player && (
-							ptarget->getCurrentTeamId() == CTEAM::InvalidTeamId ||
-							player->getCurrentTeamId() == CTEAM::InvalidTeamId ||
-							player->getCurrentTeamId() != ptarget->getCurrentTeamId()) )
+
+						if ( ptarget && player && spawnBot->getAggroFor(entity->dataSetRow()) <= 0.4 && (
+								ptarget->getCurrentTeamId() == CTEAM::InvalidTeamId ||
+								player->getCurrentTeamId() == CTEAM::InvalidTeamId ||
+								player->getCurrentTeamId() != ptarget->getCurrentTeamId()
+								)
+							)
 						{
 							score = 0;
 						}
 					}
 				}
 			}
-			else
-			{
-				if (entity != target)
-				{
-					if (entity->getRyzomType() == RYZOMID::player)
-					{
-						CBotPlayer const* const player = NLMISC::safe_cast<CBotPlayer const*>(entity);
-						if (player && spawnBot->getLastTargetTeam() != CTEAM::InvalidTeamId && (
-							player->getCurrentTeamId() == CTEAM::InvalidTeamId ||
-							player->getCurrentTeamId() != spawnBot->getLastTargetTeam()) )
-						{
-							score = 0;
-						}
-					}
-				}
-			}
+			
 
 			if	(score>=BestChooseScore) // add distance and bot profile compatibility.
 			{
