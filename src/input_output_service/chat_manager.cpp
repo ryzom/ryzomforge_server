@@ -2714,7 +2714,7 @@ void CChatManager::update()
 #ifdef HAVE_MONGO
 	try {
 		TTime before = CTime::getLocalTime();
-		std::auto_ptr<DBClientCursor> cursor = CMongo::query("chats", toString("{'date': { $gt: %f }  }", last_mongo_chat_date));
+		std::auto_ptr<DBClientCursor> cursor = CMongo::query("chats", toString("{'date': { $gt: %f }, 'ig': false }", last_mongo_chat_date));
 		TTime after = CTime::getLocalTime();
 
 		if(!cursor.get()) return;
