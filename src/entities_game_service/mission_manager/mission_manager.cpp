@@ -575,7 +575,10 @@ void CMissionManager::checkVisitPlaceMissions()
 					const CMission *missionInstance = character->getMission( stepId.MissionAlias );
 					
 					// OLD: BOMB_IF( ! (step && missionInstance), NLMISC::toString( "Invalid Visit Place step or mission %s", CPrimitivesParser::getInstance().aliasToString( stepId.MissionAlias ).c_str() ).c_str(), ++its; continue );
-					if (! (step && missionInstance)) continue;
+					if (! (step && missionInstance)) {
+						++its;
+						continue;	
+					} 
 
 					// Test if the iterated "visit place" steps match the current places with contraints
 					bool placeProcessed = false;
