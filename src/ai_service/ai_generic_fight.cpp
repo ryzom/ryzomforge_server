@@ -575,8 +575,7 @@ bool CFightOrganizer::reorganizeIteration(CBot* bot)
 					if (entity->getRyzomType() == RYZOMID::player)
 					{
 						CBotPlayer const* const player = NLMISC::safe_cast<CBotPlayer const*>(entity);
-
-						if ( ptarget && player && spawnBot->getAggroFor(entity->dataSetRow()) <= 0.4 && (
+						if ( ptarget && player && spawnBot->getAggroFor(entity->dataSetRow()) <= spawnBot->getAggroFor(ptarget->dataSetRow()) && (
 								ptarget->getCurrentTeamId() == CTEAM::InvalidTeamId ||
 								player->getCurrentTeamId() == CTEAM::InvalidTeamId ||
 								player->getCurrentTeamId() != ptarget->getCurrentTeamId()
