@@ -169,7 +169,7 @@ void cbOnSaveShardRootModified( NLMISC::IVariable& var )
 }
 
 CVariable<string>	IncrementalBackupDirectory("backup", "IncrementalBackupDirectory", "Directory to find incremental backuped archives", "", 0, true);
-CVariable<string>	SaveShardRoot("backup", "SaveShardRoot", "Root directory of all saved data by BS", "/home/nevrax/save_shard", 0, true, cbOnSaveShardRootModified); // (SaveShardRoot from game_share/backup_service_interface.cpp is not instanciated because the nothing is used from that file)
+CVariable<string>	SaveShardRootBackupService("backup", "SaveShardRoot", "Root directory of all saved data by BS", "/home/nevrax/save_shard", 0, true, cbOnSaveShardRootModified); // (SaveShardRoot from game_share/backup_service_interface.cpp is not instanciated because the nothing is used from that file)
 CVariable<string>	SaveTemplatePath("backup", "SaveTemplatePath", "Directory to find saves (with shard and account replacement strings)", "$shard/characters/account_$userid_$charid$ext", 0, true);
 CVariable<string>	SaveExtList("backup", "SaveExtList", "List of possible extensions for save files (space separated)", "_pdr.bin _pdr.xml .bin", 0, true);
 
@@ -209,7 +209,7 @@ void	cbGetSaveList(CMemStream &msgin, TSockId host)
 	explode(str, string("%%"), params, true);
 
 	string	incrementalDir = IncrementalBackupDirectory;
-	string	saveShardRoot = SaveShardRoot;
+	string	saveShardRoot = SaveShardRootBackupService;
 	string	templatePath = SaveTemplatePath;
 	string	extList = SaveExtList;
 
@@ -292,7 +292,7 @@ void	cbRestoreSave(CMemStream &msgin, TSockId host)
 
 	explode(str, string("%%"), params, true);
 
-	string	saveShardRoot = SaveShardRoot;
+	string	saveShardRoot = SaveShardRootBackupService;
 	string	templatePath = SaveTemplatePath;
 
 	string	shard;
@@ -367,7 +367,7 @@ void	cbCopyOverSave(CMemStream &msgin, TSockId host)
 
 	explode(str, string("%%"), params, true);
 
-	string	saveShardRoot = SaveShardRoot;
+	string	saveShardRoot = SaveShardRootBackupService;
 	string	templatePath = SaveTemplatePath;
 	string	extList = SaveExtList;
 
