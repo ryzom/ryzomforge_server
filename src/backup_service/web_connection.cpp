@@ -208,10 +208,10 @@ void	cbGetSaveList(CMemStream &msgin, TSockId host)
 
 	explode(str, string("%%"), params, true);
 
-	string	incrementalDir = IncrementalBackupDirectory;
-	string	saveShardRoot = SaveShardRootBackupService;
-	string	templatePath = SaveTemplatePath;
-	string	extList = SaveExtList;
+	string	incrementalDir = IncrementalBackupDirectory.get();
+	string	saveShardRoot = SaveShardRootBackupService.get();
+	string	templatePath = SaveTemplatePath.get();
+	string	extList = SaveExtList.get();
 
 	string	shard;
 	string	userid;
@@ -292,8 +292,8 @@ void	cbRestoreSave(CMemStream &msgin, TSockId host)
 
 	explode(str, string("%%"), params, true);
 
-	string	saveShardRoot = SaveShardRootBackupService;
-	string	templatePath = SaveTemplatePath;
+	string	saveShardRoot = SaveShardRootBackupService.get();
+	string	templatePath = SaveTemplatePath.get();
 
 	string	shard;
 	string	userid;
@@ -367,9 +367,9 @@ void	cbCopyOverSave(CMemStream &msgin, TSockId host)
 
 	explode(str, string("%%"), params, true);
 
-	string	saveShardRoot = SaveShardRootBackupService;
-	string	templatePath = SaveTemplatePath;
-	string	extList = SaveExtList;
+	string	saveShardRoot = SaveShardRootBackupService.get();
+	string	templatePath = SaveTemplatePath.get();
+	string	extList = SaveExtList.get();
 
 	string	shard;
 	string	userid;
