@@ -966,13 +966,12 @@ void AISHEETS::CSheets::release()
 	_RaceStatsSheets.clear();
 }
 
-uint32 AISHEETS::CSheets::getGroupPropertiesIndex(std::string groupIndexName)
+uint32 AISHEETS::CSheets::getGroupPropertiesIndex(const std::string &groupIndexName)
 {
 	if (groupIndexName.empty())
 		return	~0;
 	
-	NLMISC::strupr(groupIndexName);
-	std::map<string, uint32>::iterator it = _NameToGroupIndex.find(groupIndexName);
+	std::map<string, uint32>::iterator it = _NameToGroupIndex.find(NLMISC::toUpper(groupIndexName));
 	if (it==_NameToGroupIndex.end())
 	{
 		uint32 groupIndex = (uint32)_NameToGroupIndex.size();

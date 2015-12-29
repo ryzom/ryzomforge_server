@@ -636,7 +636,7 @@ static CAIVector randomPos(double dispersionRadius)
 	{
 		return CAIVector(0., 0.);
 	}
-	uint32 const maxLimit=((uint32)~0U)>>1;
+	const uint32 maxLimit = std::numeric_limits<uint32>::max() >> 1;
 	double rval = (double)CAIS::rand32(maxLimit)/(double)maxLimit; // [0-1[
 	double r = dispersionRadius*sqrt(rval);
 	rval = (double)CAIS::rand32(maxLimit)/(double)maxLimit; // [0-1[
@@ -896,12 +896,12 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 			{
 				CSpawnBot* pbot = botIt->getSpawnObj();
 				if (pbot!=NULL)
-				{		
+				{
 					CEntityId id = pbot->getEntityId();
 					float t = 0;
 					uint8 cont = 0;
 					uint8 one = 1;
-					NLMISC::TGameCycle tick = CTickEventHandler::getGameCycle() + 1;					
+					NLMISC::TGameCycle tick = CTickEventHandler::getGameCycle() + 1;
 					CMessage msgout2("ENTITY_TELEPORTATION");
 					msgout2.serial( id   );
 					msgout2.serial( x );
@@ -912,7 +912,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 					msgout2.serial( cont );
 					msgout2.serial( cell );
 					msgout2.serial( one  );
-					
+
 					sendMessageViaMirror("GPMS", msgout2);
 				}
 			}
@@ -931,7 +931,7 @@ void cbEventNpcGroupScript( NLNET::CMessage& msgin, const std::string &serviceNa
 	msgin.serial(messageVersion);
 	nlassert(messageVersion==1);
 	msgin.serial(nbString);
-	
+
 	string eid;
 	string firstCommand;
 	msgin.serial(eid); // Player or boteid

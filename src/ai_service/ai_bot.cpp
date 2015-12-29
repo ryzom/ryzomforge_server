@@ -699,13 +699,15 @@ void CBot::setClientSheet(const std::string & clientSheetName)
 		}
 
 		AISHEETS::ICreatureCPtr sheet = AISHEETS::CSheets::getInstance()->lookup(NLMISC::CSheetId(clientSheetName));
+
 		if (!sheet || sheet->SheetId() == NLMISC::CSheetId::Unknown)
 		{
 			nlwarning("Unknown sheet %s", clientSheetName.c_str());
 			return;
 		}
-		
+
 		_ClientCSheet = sheet;
+
 		sheetChanged();
 	}
 }
