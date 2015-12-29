@@ -52,12 +52,6 @@ using namespace NLNET;
 #undef LOG_INFO
 #endif
 
-/*b
-mongo conn;
-string mongo_db;
-string mongo_col;
-*/
-
 void	logChatDirChanged(IVariable &var)
 {
 	// LogChatDirectory variable changed, reset it!
@@ -100,7 +94,7 @@ void CChatManager::init( /*const string& staticDBFileName, const string& dynDBFi
 #endif
 
 	/* Now make a connection to MongoDB. */
-/*b
+/*
 	if( mongo_client( &conn, "ryzom.com", 22110 ) != MONGO_OK )
 	{
 		switch( conn.err )
@@ -2796,7 +2790,7 @@ void CChatManager::update()
 	}
 #endif
 
-/*b
+/*
  	mongo_cursor cursor;
 	bson query;
 

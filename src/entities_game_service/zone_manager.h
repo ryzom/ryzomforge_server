@@ -179,7 +179,7 @@ private:
 	std::vector<uint16> _RespawnPoints;
 	/// persistant alias
 	TAIAlias	_Alias;
-		// place type: capital, village etc
+	/// place type: capital, village etc
 	PLACE_TYPE::TPlaceType	_PlaceType;
 };
 

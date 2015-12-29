@@ -1707,7 +1707,7 @@ NLMISC_COMMAND(createNamedItemInBag, "create a named item in bag", "<eId> <item>
 	{
 		quantity = 1;
 	}
-	
+
 	TLogNoContext_Item noLog;
 	CGameItemPtr item = CNamedItems::getInstance().createNamedItem(args[1], quantity);
 	if (item == NULL)
@@ -2250,7 +2250,7 @@ NLMISC_CATEGORISED_COMMAND(pdr,loadFromXML,"load a character from an XML file","
 		uint32				guildId= c->getGuildId();
 		NLMISC::CEntityId	id=		 c->getId();
 
-		static CPersistentDataRecord	pdr;
+		static CPersistentDataRecord pdr;
 		pdr.clear();
 		pdr.readFromTxtFile((fileName+".xml").c_str());
 		c->apply(pdr);
@@ -2276,7 +2276,7 @@ NLMISC_CATEGORISED_COMMAND(pdr,saveToPDR,"save a character to a binary PDR file"
 	if (args.size () < 2) return false;
 	GET_CHARACTER
 
-		std::string fileName = args[1];
+	std::string fileName = args[1];
 
 	if( c )
 	{
@@ -2307,7 +2307,7 @@ NLMISC_CATEGORISED_COMMAND(pdr,loadFromPDR,"load a character from a binary PDR f
 		uint32				guildId= c->getGuildId();
 		NLMISC::CEntityId	id=		 c->getId();
 
-		static CPersistentDataRecord	pdr;
+		static CPersistentDataRecord pdr;
 		pdr.clear();
 		pdr.readFromBinFile((fileName+".pdr").c_str());
 		c->apply(pdr);
@@ -5522,13 +5522,11 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		}
 
-
 		// See if another AI instance has been specified
 		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
 		{
 			return false;
 		}
-
 
 		TDataSetRow dsr = c->getEntityRowId();
 		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
@@ -5584,6 +5582,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		for (uint32 i=2; i<nbString; ++i)
 		{
 			string arg = command_args[i]+";";
+
 			size_t pos = 0;
 			while((pos = arg.find("&nbsp&", pos)) != string::npos)
 			{
@@ -5864,7 +5863,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	else if (command_args[0] == "teleport") // teleport![x,y,z|player name|bot name]!teleport mektoub?!checks!Same Cell?
 	{
 		if (command_args.size () < 2) return false;
-
 
 		// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
 		if (command_args.size () > 3)
@@ -8180,6 +8178,7 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
+
 		size_t pos = 0;
 		while((pos = arg.find("&nbsp&", pos)) != string::npos)
 		{

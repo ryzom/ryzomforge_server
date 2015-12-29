@@ -1965,13 +1965,15 @@ void	CWorldPositionManager::computePlayerDeltaVision( CPlayerInfos *infos, CVisi
 
 		// if flag is not set -> entity is out
 		if (!e->TempVisionState)
+		{
 			addToEntitiesOut(infos, e, i, visionDelta);
+		}
 		else
+		{
 			// unset the flag so that only the entities not browsed yet still have the flag set
 			e->TempVisionState = false;
+		}
 	}
-
-	
 
 	infos->Entity->TempVisionState = false;
 

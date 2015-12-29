@@ -1876,7 +1876,7 @@ void giveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 		}
 
 
-				// if LD use this the function outside a ring shard 
+		// if LD use this the function outside a ring shard 
 		if (IsRingShard)
 		{
 			static std::set<CSheetId> r2PlotItemSheetId; // :TODO: use R2Share::CRingAccess

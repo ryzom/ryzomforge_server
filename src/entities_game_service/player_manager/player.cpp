@@ -127,7 +127,7 @@ void CPlayer::checkCrashMarker()
 			wipeAndRestore(NLMISC::toString("%s/account_%u_%d_pdr.bin", PlayerManager.getCharacterPath(userId, false).c_str(), userId, charId));
 			
 			//			string fileName = makeCharacterFileName(lastBad[0], lastBad[1]);
-			//			CFile::moveFile((fileName+".wiped").c_str(), fileName.c_str());
+			//			CFile::moveFile(fileName+".wiped", fileName);
 			//
 			//			// try to restore a backup
 			//			if (CFile::isExists(fileName+".last_good"))

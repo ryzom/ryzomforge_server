@@ -1750,11 +1750,11 @@ public:
 													}
 													if (tmp.getTopologyNode().Id == topNode.Id)
 													{
-														stacks[0].insert(make_pair<sint, CWorldPosition>(ndist, tmp));
+														stacks[0].insert(std::pair<sint, CWorldPosition>(ndist, tmp));
 													}
 													else
 													{
-														stacks[tmpflags+1].insert(make_pair<sint, CWorldPosition>(ndist, tmp));
+														stacks[tmpflags + 1].insert(std::pair<sint, CWorldPosition>(ndist, tmp));
 													}
 												}										
 											}

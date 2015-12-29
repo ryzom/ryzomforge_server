@@ -460,6 +460,7 @@ bool CMissionManager::parsePrimForMissions(const NLLIGO::IPrimitive* prim,const 
 			nlinfo("Mission validation: mission %s is not valid and not loaded", templ->getMissionName().c_str());
 			delete templ;
 		}
+
 		return true;
 	}
 	//this is not a mission node, so lookup recursively in the children
@@ -573,9 +574,10 @@ void CMissionManager::checkVisitPlaceMissions()
 					BOMB_IF( ! missionTemplate, NLMISC::toString( "Invalid VisitPlace template %s", CPrimitivesParser::getInstance().aliasToString( stepId.MissionAlias ).c_str() ).c_str(), ++its; continue );
 					const IMissionStepTemplate *step = missionTemplate->getStep( stepId.StepIndex );
 					const CMission *missionInstance = character->getMission( stepId.MissionAlias );
-					
+
 					// OLD: BOMB_IF( ! (step && missionInstance), NLMISC::toString( "Invalid Visit Place step or mission %s", CPrimitivesParser::getInstance().aliasToString( stepId.MissionAlias ).c_str() ).c_str(), ++its; continue );
-					if (! (step && missionInstance)) {
+					if (! (step && missionInstance))
+					{
 						++its;
 						continue;	
 					} 
