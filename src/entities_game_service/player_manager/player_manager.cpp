@@ -847,7 +847,7 @@ void CPlayerManager::savePlayerCharRecurs( uint32 userId, sint32 idx, std::set<C
 				}
 				{
 					H_AUTO(SavePlayerPDRSave);
-					pdr.writeToFile(pdrPathFileName.c_str());
+					pdr.writeToFile(pdrPathFileName);
 				}
 			}
 			catch(const Exception &)
