@@ -1651,7 +1651,7 @@ public:
 									first.flags = (topNode.isInWater() ? 1 : 0) + (topNode.isInNogo() ? 2 : 0);
 
 									// push first position
-									stacks[first.flags].insert(make_pair<sint, CWorldPosition>(first.flags, stwp));
+									stacks[first.flags].insert(std::pair<sint, CWorldPosition>(first.flags, stwp));
 
 									while (true)
 									{
