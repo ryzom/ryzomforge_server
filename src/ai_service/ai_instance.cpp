@@ -413,7 +413,7 @@ CAIEntity* CAIInstance::tryToGetEntity(char const* str, CAIS::TSearchType search
 	CManager	*mgrPtr=NULL;
 	CGroup		*grpPtr=NULL;
 	CBot		*botPtr=NULL;
-	uint32		localIndex=~0;
+	uint32		localIndex = std::numeric_limits<uint32>::max();
 
 	mgr	=	id;
 	while((*id!=':')&&(*id!=0))		id++;
