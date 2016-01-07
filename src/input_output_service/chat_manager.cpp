@@ -161,7 +161,6 @@ void CChatManager::onServiceDown(const std::string &serviceShortName)
 				case CChatGroup::shout:
 				case CChatGroup::player:
 				case CChatGroup::nbChatMode:
-				case CChatGroup::yubo_chat:
 					continue;
 				case CChatGroup::team:
 				case CChatGroup::guild:
