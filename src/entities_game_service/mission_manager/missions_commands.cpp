@@ -1067,8 +1067,8 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> player_name number"
 				uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
 				sint32 cell;
 				buildingPlayer->addUser(c, 0, ownerId, cell);
-				c->setPowoCell(cell);
-				CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
+//				c->setPowoCell(cell);
+//				CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
 				log.displayNL("%d", cell);
 			}
 		} else {
@@ -1098,7 +1098,7 @@ NLMISC_COMMAND(slide, "slide to the powo", "<uid> x y cell [z] [h]")
 	
 	sint32 x;
 	sint32 y;
-	sint32 cell = c->getPowoCell();
+	sint32 cell = 0; // c->getPowoCell();
 	sint32 z = 0;
 	float h = 0;
 
