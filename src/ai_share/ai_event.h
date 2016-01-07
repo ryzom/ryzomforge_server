@@ -65,7 +65,7 @@ public:
 	{
 		*this=other;
 	}
-	
+
 	CAIEventType(const char *typeName)
 	{
 		// copy text from input string to _val variable
@@ -75,7 +75,7 @@ public:
 
 		// if type name is longer than 8 characters it won't fit in an int64!
 		nlassert(typeName[i]==0);
-		
+
 		// pad out _val variable with 0s
 		while(i<8)
 			((char *)&_val)[i++]=0;
@@ -133,7 +133,7 @@ private:
 // base class IAIEvent
 //-----------------------------------------------------------------------------------
 // This is the base class for classes of event sent from the game dev services to
-// the AI. Note that the serial has a special syntax to allow for skipping of 
+// the AI. Note that the serial has a special syntax to allow for skipping of
 // unrecognised events.
 
 class IAIEvent
@@ -173,7 +173,7 @@ public:
 	// note serial should serialise: <Type> <uint16 sizeof(EventClass)> <event_parameters>
 	// the 'read' version of the serial should test the <sizeof> to ensure version robustness
 	virtual void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
-	
+
 public:
 	/// the stunned creature id
 	NLMISC::CEntityId	CreatureId;
@@ -199,7 +199,7 @@ public:
 	// note serial should serialise: <Type> <uint16 sizeof(EventClass)> <event_parameters>
 	// the 'read' version of the serial should test the <sizeof> to ensure version robustness
 	virtual void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
-	
+
 public:
 	/// the waked creature id
 	NLMISC::CEntityId	CreatureId;
@@ -227,7 +227,7 @@ public:
 	// note serial should serialise: <Type> <uint16 sizeof(EventClass)> <event_parameters>
 	// the 'read' version of the serial should test the <sizeof> to ensure version robustness
 	virtual void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
-	
+
 public:
 	/// the creature Id
 	NLMISC::CEntityId	CreatureId;
@@ -259,7 +259,7 @@ public:
 	// note serial should serialise: <Type> <uint16 sizeof(EventClass)> <event_parameters>
 	// the 'read' version of the serial should test the <sizeof> to ensure version robustness
 	virtual void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
-	
+
 public:
 	/// the affected creature id
 	NLMISC::CEntityId	CreatureId;
@@ -291,7 +291,7 @@ public:
 	// note serial should serialise: <Type> <uint16 sizeof(EventClass)> <event_parameters>
 	// the 'read' version of the serial should test the <sizeof> to ensure version robustness
 	virtual void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
-	
+
 public:
 	/// the creature id
 	NLMISC::CEntityId	CreatureId;
@@ -317,7 +317,7 @@ public:
 	// note serial should serialise: <Type> <uint16 sizeof(EventClass)> <event_parameters>
 	// the 'read' version of the serial should test the <sizeof> to ensure version robustness
 	virtual void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
-	
+
 public:
 	/// the creature id
 	NLMISC::CEntityId	CreatureId;
@@ -342,7 +342,7 @@ public:
 	// note serial should serialise: <Type> <uint16 sizeof(EventClass)> <event_parameters>
 	// the 'read' version of the serial should test the <sizeof> to ensure version robustness
 	virtual void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
-	
+
 public:
 	/// the affected creature id
 	NLMISC::CEntityId	CreatureId;
