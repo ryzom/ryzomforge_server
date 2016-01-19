@@ -94,8 +94,9 @@ uint32 CCharacterVersionAdapter::currentVersionNumber() const
 	// 23 : (05/04/2013) fix post merge marauder plan issue
 	// 24 : (23/10/2014) fix post merge rite bonus issue
 	// 25 : (05/03/2015) fix required faction in items on inventory
+	// 26 : (23/04/2015) fix foragetool HP
 	////////////////////////////////////
-	return 25;
+	return 26;
 }
 
 
@@ -130,6 +131,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	case 22: adaptToVersion23(character);
 	case 23: adaptToVersion24(character);
 	case 24: adaptToVersion25(character);
+	case 25: adaptToVersion26(character);
 	default:;
 	}
 }
@@ -1343,4 +1345,28 @@ void CCharacterVersionAdapter::adaptToVersion25(CCharacter &character) const
 	}
 
 	character.unequipCharacter( INVENTORIES::handling, INVENTORIES::left );
+}
+
+
+//---------------------------------------------------
+void CCharacterVersionAdapter::adaptToVersion26(CCharacter &character) const
+{
+
+	const uint sizeInv = INVENTORIES::NUM_INVENTORY;
+	for ( uint i = 0; i < sizeInv ; ++i )
+	if (character._Inventory[i] != NULL)
+	{
+		CInventoryPtr childSrc = character._Inventory[i];
+		for ( uint j = 0; j < childSrc->getSlotCount(); j++ )
+		{
+			CGameItemPtr item = childSrc->getItem(j);
+			if (item != NULL)
+			{
+				string phraseId = item->getPhraseId();
+
+				if (phraseId.substr(0, 11) == "foragetool_")
+					item->addHp(item->durability());
+			}
+		}
+	}
 }

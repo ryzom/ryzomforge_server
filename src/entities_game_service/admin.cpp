@@ -422,7 +422,7 @@ bool getAIInstanceFromGroupName(string& groupName, uint32& instanceNumber)
 	{
 		string continent = groupName.substr(0, groupName.find('@'));
 		uint32 nr = CUsedContinent::instance().getInstanceForContinent(continent);
-		if (nr == ~0)
+		if (nr == std::numeric_limits<uint32>::max())
 		{
 			return false;
 		}
@@ -840,7 +840,7 @@ void __name##Class::pointer(CEntityId entity, bool get, std::string &value)
 #define ENTITY_GET_ENTITY \
 	TLogContext_Character_AdminCommand commandContext(entity); \
 	CEntityBase *e = CEntityBaseManager::getEntityBasePtr(entity); \
-	if(e == 0) \
+	if(e == NULL) \
 	{ \
 		nlwarning ("Unknown entity '%s'", entity.toString().c_str()); \
 		if(get) value = "UnknownEntity"; \
@@ -856,7 +856,7 @@ void __name##Class::pointer(CEntityId entity, bool get, std::string &value)
 #define ENTITY_GET_CHARACTER \
 	TLogContext_Character_AdminCommand commandContext(entity); \
 	CCharacter *c = PlayerManager.getChar(entity); \
-	if(c == 0) \
+	if(c == NULL) \
 	{ \
 		nlwarning ("Unknown player '%s'", entity.toString().c_str()); \
 		if(get) value = "UnknownPlayer"; \
@@ -1158,7 +1158,7 @@ ENTITY_VARIABLE (Priv, "User privilege")
 	ENTITY_GET_CHARACTER
 
 	CPlayer *p = PlayerManager.getPlayer(PlayerManager.getPlayerId(c->getId()));
-	if (p == 0)
+	if (p == NULL)
 	{
 		nlwarning ("Can't find player with UserId %d for checking privilege, assume no priv", PlayerManager.getPlayerId(c->getId()));
 		return;
@@ -1326,7 +1326,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 					}
 
 				}
-				else
+				if (entityBase != NULL)
 				{
 					x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
 					y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
@@ -1489,7 +1489,7 @@ NLMISC_COMMAND (createItemInBag, "Create an item and put it in the player bag", 
 	}
 
 	const CStaticItem *form = CSheets::getForm (sheet);
-	if (form == 0)
+	if (form == NULL)
 	{
 		log.displayNL ("sheetId '%s' is not found", sheetName.c_str());
 		return false;
@@ -1573,7 +1573,7 @@ NLMISC_COMMAND (createItemInTmpInv, "Create an item and put it in the player tem
 	}
 
 	const CStaticItem *form = CSheets::getForm (sheet);
-	if (form == 0)
+	if (form == NULL)
 	{
 		log.displayNL ("sheetId '%s' is not found", sheetName.c_str());
 		return false;
@@ -1640,7 +1640,7 @@ NLMISC_COMMAND (createItemInInv, "Create items and put them in the given invento
 	}
 
 	const CStaticItem *form = CSheets::getForm (sheet);
-	if (form == 0)
+	if (form == NULL)
 	{
 		log.displayNL ("sheetId '%s' is not found", sheetName.c_str());
 		return false;
@@ -1707,7 +1707,7 @@ NLMISC_COMMAND(createNamedItemInBag, "create a named item in bag", "<eId> <item>
 	{
 		quantity = 1;
 	}
-	
+
 	TLogNoContext_Item noLog;
 	CGameItemPtr item = CNamedItems::getInstance().createNamedItem(args[1], quantity);
 	if (item == NULL)
@@ -2226,7 +2226,7 @@ NLMISC_CATEGORISED_COMMAND(pdr,saveToXML,"save a character to an XML file","<eid
 		static CPersistentDataRecordRyzomStore	pdr;
 		pdr.clear();
 		c->store(pdr);
-		pdr.writeToTxtFile((fileName+".xml").c_str());
+		pdr.writeToTxtFile(fileName+".xml");
 		return true;
 	}
 
@@ -2250,9 +2250,9 @@ NLMISC_CATEGORISED_COMMAND(pdr,loadFromXML,"load a character from an XML file","
 		uint32				guildId= c->getGuildId();
 		NLMISC::CEntityId	id=		 c->getId();
 
-		static CPersistentDataRecord	pdr;
+		static CPersistentDataRecord pdr;
 		pdr.clear();
-		pdr.readFromTxtFile((fileName+".xml").c_str());
+		pdr.readFromTxtFile(fileName+".xml");
 		c->apply(pdr);
 		c->setName(name);
 		c->setGuildId(guildId);
@@ -2276,14 +2276,14 @@ NLMISC_CATEGORISED_COMMAND(pdr,saveToPDR,"save a character to a binary PDR file"
 	if (args.size () < 2) return false;
 	GET_CHARACTER
 
-		std::string fileName = args[1];
+	std::string fileName = args[1];
 
 	if( c )
 	{
 		static CPersistentDataRecordRyzomStore	pdr;
 		pdr.clear();
 		c->store(pdr);
-		pdr.writeToBinFile((fileName+".pdr").c_str());
+		pdr.writeToBinFile(fileName+".pdr");
 		return true;
 	}
 
@@ -2307,9 +2307,9 @@ NLMISC_CATEGORISED_COMMAND(pdr,loadFromPDR,"load a character from a binary PDR f
 		uint32				guildId= c->getGuildId();
 		NLMISC::CEntityId	id=		 c->getId();
 
-		static CPersistentDataRecord	pdr;
+		static CPersistentDataRecord pdr;
 		pdr.clear();
-		pdr.readFromBinFile((fileName+".pdr").c_str());
+		pdr.readFromBinFile(fileName+".pdr");
 		c->apply(pdr);
 
 		c->setName(name);
@@ -3079,7 +3079,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 
 	// find the character
 	CCharacter *c = PlayerManager.getChar( eid );
-	if (c == 0)
+	if (c == NULL)
 	{
 		nlwarning ("ADMIN: Unknown player %s", eid.toString().c_str());
 		chatToPlayer (eid, "Unknown player");
@@ -3225,7 +3225,7 @@ void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceNam
 
 	// find the character
 	CCharacter *c = PlayerManager.getChar( eid );
-	if (c == 0)
+	if (c == NULL)
 	{
 		nlwarning ("ADMIN: Unknown player %s", eid.toString().c_str());
 		chatToPlayer (eid, "Unknown player");
@@ -3698,7 +3698,7 @@ NLMISC_COMMAND( killMob, "kill a mob ( /a killMob )", "<CSR eId>" )
 	TRY_GET_CHARACTER
 
 	CCreature * creature = CreatureManager.getCreature( c->getTarget() );
-	if( creature == 0 )
+	if (creature == NULL)
 	{
 		nlwarning ("Unknown creature '%s'", c->getTarget().toString().c_str() );
 		return false;
@@ -3730,7 +3730,7 @@ NLMISC_COMMAND( dssTarget, "target a mob and send information to dss( /b dssTarg
 	TRY_GET_CHARACTER
 
 	CCreature * creature = CreatureManager.getCreature( c->getTarget() );
-	if( creature == 0 )
+	if (creature == NULL)
 	{
 		nlwarning ("Unknown creature '%s'", c->getTarget().toString().c_str() );
 		return false;
@@ -5489,7 +5489,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (command_args.size() > 8)
 		{
 			if (command_args[8] != "*") {
-				NLMISC::fromString(command_args[7], z);
+				NLMISC::fromString(command_args[8], z);
 			}
 		}
 
@@ -5522,13 +5522,11 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		}
 
-
 		// See if another AI instance has been specified
 		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
 		{
 			return false;
 		}
-
 
 		TDataSetRow dsr = c->getEntityRowId();
 		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
@@ -5584,6 +5582,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		for (uint32 i=2; i<nbString; ++i)
 		{
 			string arg = command_args[i]+";";
+
 			size_t pos = 0;
 			while((pos = arg.find("&nbsp&", pos)) != string::npos)
 			{
@@ -5865,7 +5864,6 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	{
 		if (command_args.size () < 2) return false;
 
-
 		// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
 		if (command_args.size () > 3)
 		{
@@ -5989,7 +5987,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 					}
 
 				}
-				else
+				if (entityBase != NULL)
 				{
 					x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
 					y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
@@ -6107,7 +6105,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 					{
 						CBuildingManager::getInstance()->removePlayerFromRoom( c );
 						uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
+						nlinfo("Gettting ownerId : %d", ownerId);
+
 						buildingPlayer->addUser(c, 0, ownerId, cell);
+
+						//CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
+						nlinfo("Gettting cell : %d", cell);
 						c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
 					}
 				//}
@@ -6669,6 +6672,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			c->removeMission(missionAlias, 0);
 			c->removeMissionFromHistories(missionAlias);
 		}
+		else if (action == "finish")
+		{
+			TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(command_args[2]);
+			c->removeMission(missionAlias, 0, true);
+			c->removeMissionFromHistories(missionAlias);
+		}
 		else if (action == "add_compass" && command_args.size() == 4)
 		{
 			TVectorParamCheck params(1);
@@ -7017,7 +7026,7 @@ NLMISC_COMMAND(roomInvite, "send a room invite to a player character", "<eid> <m
 
 	CCharacter * target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
 
-	if(target == 0 || target->getEnterFlag() == false )
+	if(target == NULL || target->getEnterFlag() == false )
 	{
 		CCharacter::sendDynamicSystemMessage( user->getId(), "TEAM_INVITED_CHARACTER_MUST_BE_ONLINE" );
 		return true;
@@ -7062,7 +7071,7 @@ NLMISC_COMMAND(roomKick, "kick player from room", "<eid> <member name>")
 	}
 	CCharacter * target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
 
-	if(target == 0 || target->getEnterFlag() == false )
+	if(target == NULL || target->getEnterFlag() == false )
 	{
 		CCharacter::sendDynamicSystemMessage( user->getId(), "TEAM_KICKED_CHARACTER_MUST_BE_ONLINE" );
 		return true;
@@ -8180,6 +8189,7 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	for (uint32 i=2; i<nbString; ++i)
 	{
 		string arg = args[i]+";";
+
 		size_t pos = 0;
 		while((pos = arg.find("&nbsp&", pos)) != string::npos)
 		{
@@ -8619,7 +8629,7 @@ NLMISC_COMMAND(displayPositionStack, "Display the position stack of a character 
 	if (eid == CEntityId::Unknown)
 		return true;
 	CCharacter *c = PlayerManager.getChar(eid);
-	if(c == 0)
+	if (c == NULL)
 	{
 		log.displayNL( "Character not found" );
 		return true;
@@ -8751,7 +8761,7 @@ NLMISC_COMMAND(farTPSubst, "Substitute a position in the stack (no immediate far
 	if (eid == CEntityId::Unknown)
 		return true;
 	CCharacter *c = PlayerManager.getChar(eid);
-	if(c == 0)
+	if (c == NULL)
 	{
 		log.displayNL( "Character not found" );
 		return true;
@@ -8821,7 +8831,7 @@ NLMISC_COMMAND(teamInvite, "send a team invite to a player character", "<eid> <m
 
 	// Get target
 	CCharacter	*invitedCharacter= PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
-	if(invitedCharacter == 0 || invitedCharacter->getEnterFlag() == false )
+	if (invitedCharacter == NULL || invitedCharacter->getEnterFlag() == false )
 	{
 		CCharacter::sendDynamicSystemMessage( user->getId(),"TEAM_INVITED_CHARACTER_MUST_BE_ONLINE" );
 		return true;
@@ -8863,7 +8873,7 @@ NLMISC_COMMAND(leagueInvite, "send a League invite to a player character", "<eid
 
 	// Get target
 	CCharacter	*invitedCharacter= PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
-	if(invitedCharacter == 0 || invitedCharacter->getEnterFlag() == false )
+	if (invitedCharacter == NULL || invitedCharacter->getEnterFlag() == false )
 	{
 		CCharacter::sendDynamicSystemMessage( user->getId(),"TEAM_INVITED_CHARACTER_MUST_BE_ONLINE" );
 		return true;
@@ -8905,7 +8915,7 @@ NLMISC_COMMAND(leagueKick, "kick a player character from league", "<eid> <member
 
 	// Get target
 	CCharacter	*invitedCharacter= PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(user->getHomeMainlandSessionId(), args[1]));
-	if(invitedCharacter == 0 || invitedCharacter->getEnterFlag() == false )
+	if (invitedCharacter == NULL || invitedCharacter->getEnterFlag() == false )
 	{
 		CCharacter::sendDynamicSystemMessage( user->getId(),"TEAM_INVITED_CHARACTER_MUST_BE_ONLINE" );
 		return true;

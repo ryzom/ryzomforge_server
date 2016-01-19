@@ -2792,19 +2792,47 @@ class CMissionActionCompassNpc : public IMissionAction
 	bool buildAction ( uint32 line, const std::vector< std::string > & script, CMissionGlobalParsingData & globalData, CMissionSpecificParsingData & missionData)
 	{
 		_SourceLine = line;
+		IsDynamic = false;
+
 		if ( script.size() != 2)
 		{
 			MISLOGSYNTAXERROR("<bot>");
 			return false;
 		}
-		if ( !CMissionParser::parseBotName(script[1],Alias,missionData) )
-			return false;
+		if (CMissionParser::getNoBlankString(script[1]) == "#dynamic#") {
+			IsDynamic = true;
+			MissionData = &missionData;
+		}
+		else
+		{
+			if ( !CMissionParser::parseBotName(script[1],Alias,missionData) )
+				return false;
+		}
 		return true;
 	}
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
 		LOGMISSIONACTION("add_compass_npc");
 		TAIAlias alias;
+		if (IsDynamic) {
+			const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( instance->getTemplateId() );
+			if (templ) {
+					vector<TDataSetRow> entities;
+					instance->getEntities( entities );
+					if (entities.size() >= 1) {
+							CCharacter *c = PlayerManager.getChar(entities.front());
+							if (c != NULL)
+							{
+									vector<string> params = c->getCustomMissionParams(toUpper(templ->getMissionName()));
+									if (params.size() >= 2)
+									{
+											CMissionParser::parseBotName(params[1],Alias,*MissionData);
+									}
+							}
+					}
+			}
+		}
+
 		if ( Alias == CAIAliasTranslator::Invalid )
 			alias = instance->getGiver();
 		else
@@ -2813,6 +2841,8 @@ class CMissionActionCompassNpc : public IMissionAction
 		instance->addCompassTarget(alias,true);
 	}
 	TAIAlias Alias;
+	bool IsDynamic;
+	CMissionSpecificParsingData *MissionData;
 
 	MISSION_ACTION_GETNEWPTR(CMissionActionCompassNpc)
 };

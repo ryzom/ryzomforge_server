@@ -242,6 +242,9 @@ private:
 	CManagerPlayer* _PlayerManager;
 	///	event npc Manager.
 	CMgrNpc* _EventNpcManager;
+
+	uint32 _LastSpawnAlias;
+	
 	///	easter egg manager
 	NLMISC::CRefPtr<CMgrNpc> _EasterEggManager;
 

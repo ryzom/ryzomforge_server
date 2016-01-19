@@ -1345,7 +1345,7 @@ public:
 	/// add a mission to this player
 	void addMission(CMissionSolo * mission);
 	/// remove a mission from this player
-	void removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result);
+	void removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result, bool doNotClearJournal = false);
 	/// player abandon a mission
 	void abandonMission(uint8 index);
 	/// Clear the list of succesfull mission, i.e. reset the success count
@@ -1960,6 +1960,9 @@ public:
 
 		void setInRoomOfPlayer(const NLMISC::CEntityId &id);
 		const NLMISC::CEntityId& getInRoomOfPlayer();
+
+		void setPowoCell(sint32 cell);
+		sint32 getPowoCell();
 
 		/// get if player have acces to room
 		bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
@@ -3409,6 +3412,8 @@ private:
 
 	std::vector<NLMISC::CEntityId>	_RoomersList; // Players who have acces to player's room
 	NLMISC::CEntityId				_inRoomOfPlayer;
+	sint32							_PowoCell;
+
 
 	// friends list
 	std::vector<CContactId>	_FriendsList;

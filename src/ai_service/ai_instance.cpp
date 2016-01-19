@@ -42,6 +42,7 @@ CAIInstance::CAIInstance(CAIS* owner)
 	_EventNpcManager = static_cast<CMgrNpc*>(newMgr(AITYPES::MgrTypeNpc, 0, "Event NPCs Manager", "MapName: Event NPCs Manager", ""));
 	_EasterEggManager = static_cast<CMgrNpc*>(newMgr(AITYPES::MgrTypeNpc, 0, "Easter Eggs Manager", "MapName: Easter Eggs Manager", ""));
 	_SquadFamily = new COutpostSquadFamily(this, 0, "Squads");
+	_LastSpawnAlias =  900 << LigoConfig.getDynamicAliasSize();
 }
 
 CAIInstance::~CAIInstance()
@@ -413,7 +414,7 @@ CAIEntity* CAIInstance::tryToGetEntity(char const* str, CAIS::TSearchType search
 	CManager	*mgrPtr=NULL;
 	CGroup		*grpPtr=NULL;
 	CBot		*botPtr=NULL;
-	uint32		localIndex=~0;
+	uint32		localIndex = std::numeric_limits<uint32>::max();
 
 	mgr	=	id;
 	while((*id!=':')&&(*id!=0))		id++;
@@ -636,7 +637,7 @@ static CAIVector randomPos(double dispersionRadius)
 	{
 		return CAIVector(0., 0.);
 	}
-	uint32 const maxLimit=((uint32)~0U)>>1;
+	const uint32 maxLimit = std::numeric_limits<uint32>::max() >> 1;
 	double rval = (double)CAIS::rand32(maxLimit)/(double)maxLimit; // [0-1[
 	double r = dispersionRadius*sqrt(rval);
 	rval = (double)CAIS::rand32(maxLimit)/(double)maxLimit; // [0-1[
@@ -683,13 +684,15 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 
 	{
 		// build unnamed bot
-		for	(uint i=0; i<nbBots; ++i)
+		for	(uint i=0; i<nbBots; ++i) 
 		{
-			grp->bots().addChild(new CBotNpc(grp, 0, botsName.empty() ? grp->getName():botsName), i); // Doub: 0 instead of getAlias()+i otherwise aliases are wrong
+			nlinfo("Spawn with alias : %d", _LastSpawnAlias+1);
+			grp->bots().addChild(new CBotNpc(grp, _LastSpawnAlias++, botsName.empty() ? grp->getName():botsName), i); // Doub: 0 instead of getAlias()+i otherwise aliases are wrong
 
 			CBotNpc* const bot = NLMISC::safe_cast<CBotNpc*>(grp->bots()[i]);
 
 			bot->setSheet(sheet);
+			bot->setPrimAlias(900);
 			if (!look.empty())
 				bot->setClientSheet(look);
 			bot->equipmentInit();
@@ -896,12 +899,12 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 			{
 				CSpawnBot* pbot = botIt->getSpawnObj();
 				if (pbot!=NULL)
-				{		
+				{
 					CEntityId id = pbot->getEntityId();
 					float t = 0;
 					uint8 cont = 0;
 					uint8 one = 1;
-					NLMISC::TGameCycle tick = CTickEventHandler::getGameCycle() + 1;					
+					NLMISC::TGameCycle tick = CTickEventHandler::getGameCycle() + 1;
 					CMessage msgout2("ENTITY_TELEPORTATION");
 					msgout2.serial( id   );
 					msgout2.serial( x );
@@ -912,7 +915,7 @@ void cbEventCreateNpcGroup( NLNET::CMessage& msgin, const std::string &serviceNa
 					msgout2.serial( cont );
 					msgout2.serial( cell );
 					msgout2.serial( one  );
-					
+
 					sendMessageViaMirror("GPMS", msgout2);
 				}
 			}
@@ -931,7 +934,7 @@ void cbEventNpcGroupScript( NLNET::CMessage& msgin, const std::string &serviceNa
 	msgin.serial(messageVersion);
 	nlassert(messageVersion==1);
 	msgin.serial(nbString);
-	
+
 	string eid;
 	string firstCommand;
 	msgin.serial(eid); // Player or boteid

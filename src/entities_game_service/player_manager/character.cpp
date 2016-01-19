@@ -10038,7 +10038,9 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 
 		// compute bot item buy price
 		uint32 basePrice;
+		uint32 ufBasePrice;
 		queryItemPrice( item, basePrice );
+		ufBasePrice = basePrice;
 
 		float famePriceFactor = 1.0f - CShopTypeManager::getFamePriceFactor( fame );
 		basePrice = uint32(basePrice * famePriceFactor);
@@ -10047,6 +10049,11 @@ void CCharacter::sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quan
 		{
 			nlwarning("<CCharacter sellItem> character %s try to sell an item %s below it's base price (base price %d, sell price %d), must not permited by client", _Id.toString().c_str(), sheet.toString().c_str(), basePrice, sellPrice );
 			return;
+		}
+
+		if( sellPrice > ufBasePrice && sellPrice != 0 )
+		{
+			nlwarning("<CCharacter sellItem> character %s try to sell an item %s above it's base price (base price %d, sell price %d, margin %d), must not permited by client", _Id.toString().c_str(), sheet.toString().c_str(), ufBasePrice, sellPrice, uint32(((sellPrice - ufBasePrice) * 100.0f) / ufBasePrice));
 		}
 
 		if (item->getRefInventory() == _Inventory[INVENTORIES::equipment])
@@ -11962,7 +11969,8 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result)
 
 //		EGSPD::missionLog(MissionResultStatLogTag[result], _Id, tpl->getMissionName());
 
-		mission->clearUsersJournalEntry();
+		if (!doNotClearJournal)
+			mission->clearUsersJournalEntry();
 	}
 
 	CMissionManager::getInstance()->deInstanciateMission(mission);
@@ -15235,6 +15243,17 @@ const NLMISC::CEntityId& CCharacter::getInRoomOfPlayer()
 {
 	return _inRoomOfPlayer;
 }
+
+void CCharacter::setPowoCell(sint32 cell)
+{
+	_PowoCell = cell;
+}
+
+sint32 CCharacter::getPowoCell()
+{
+	return _PowoCell;
+}
+
 
 //--------------------------------------------------------------
 // CCharacter::havePlayerRoomAccess

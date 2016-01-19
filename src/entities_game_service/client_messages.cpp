@@ -3053,9 +3053,12 @@ void cbClientQuitGameRequest( NLNET::CMessage& msgin, const std::string & servic
 {
 	CEntityId charId;
 	bool bypassDisconnectionTimer = false;
+
 	try
 	{
 		msgin.serial(charId);
+		CPlayer *player = PlayerManager.getPlayer(uint32(charId.getShortId()) >> 4);
+
 		if (IsRingShard)
 			bypassDisconnectionTimer = true;
 		else
@@ -3067,13 +3070,15 @@ void cbClientQuitGameRequest( NLNET::CMessage& msgin, const std::string & servic
 				H_AUTO(BypassDiscoTimer);
 				CSecurityCheckForFastDisconnection securityCheck;
 				securityCheck.receiveSecurityCode(msgin);
-				CPlayer *player = PlayerManager.getPlayer(uint32(charId.getShortId()) >> 4);
 				if (player)
 					securityCheck.setCookie(player->getLoginCookie()); // if not set (null player), the check won't pass
 
 				securityCheck.check("QtXp1o1t?");
 			}
 		}
+
+		if (player != NULL && player->havePriv( ":DEV:SGM:GM:" ))
+			bypassDisconnectionTimer = true;
 	}
 	catch (const Exception &e) // will catch any serialization/security exception
 	{
@@ -3085,7 +3090,7 @@ void cbClientQuitGameRequest( NLNET::CMessage& msgin, const std::string & servic
 	TDataSetRow rowId = TheDataset.getDataSetRow(charId);
 	const uint32 playerId = PlayerManager.getPlayerId(charId);
 
-	if (rowId.isNull() || !rowId.isValid())
+	if (!rowId.isValid())
 	{
 		PlayerManager.disconnectPlayer(playerId);
 	}

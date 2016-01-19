@@ -164,6 +164,8 @@ class CMissionStepTalk : public IMissionStepTemplate
 	virtual uint32 sendContextText(const TDataSetRow& user, const TDataSetRow& interlocutor, CMission * instance, bool & gift, const NLMISC::CEntityId & giver )
 	{
 
+		CCreature * bot = CreatureManager.getCreature( interlocutor );
+
 		if (_IsDynamic)
 		{
 			if (!getDynamicBot(_Bot) || _User == NULL)
@@ -182,20 +184,17 @@ class CMissionStepTalk : public IMissionStepTemplate
 				if (text.empty())
 					return 0;
 			}
-			TVectorParamCheck params;
-			ucstring phrase = ucstring(_PhraseId+"(){["+text+"]}");
-			NLNET::CMessage	msgout("SET_PHRASE");
-			msgout.serial(_PhraseId);
-			msgout.serial(phrase);
-			sendMessageViaMirror("IOS", msgout);
-
-			return STRING_MANAGER::sendStringToClient( user, _PhraseId, params );
-
-/*			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-			params[0].Literal= text;*/
+			if ( bot )
+			{
+				if ( ( _Bot != CAIAliasTranslator::Invalid && _Bot == bot->getAlias() ) ||
+					 ( _Bot == CAIAliasTranslator::Invalid && bot->getAlias() == instance->getGiver() ) )
+				{
+					SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+					params[0].Literal.fromUtf8(text);
+					return STRING_MANAGER::sendStringToClient( user, "LITERAL", params );
+				}
+			}
 		}
-
-		CCreature * bot = CreatureManager.getCreature( interlocutor );
 
 		if ( bot )
 		{

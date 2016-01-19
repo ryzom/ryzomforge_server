@@ -2441,7 +2441,7 @@ uint32 CMissionTemplate::testPrerequisits( CCharacter * user, CPrerequisitInfos 
 
 uint32 CMissionTemplate::sendTitleText( const TDataSetRow & userRow, const TDataSetRow & giver ) const
 {
-	if (TitleText.substr(0, 6) == "WEBIG_")
+	if (TitleText.substr(0, 6) == "WEBIG_" || TitleText.substr(0, 4) == "ARK_")
 	{
 		string text = TitleText;
 		CCharacter *user = PlayerManager.getChar(getEntityIdFromRow(userRow));
@@ -2469,7 +2469,7 @@ uint32 CMissionTemplate::sendTitleText( const TDataSetRow & userRow, const TData
 
 uint32 CMissionTemplate::sendAutoText( const TDataSetRow & userRow,const NLMISC::CEntityId & giver) const
 {
-	if (AutoText.substr(0, 6) == "WEBIG_")
+	if (AutoText.substr(0, 6) == "WEBIG_" || AutoText.substr(0, 4) == "ARK_")
 	{
 		string text = AutoText;
 		CCharacter *user = PlayerManager.getChar(getEntityIdFromRow(userRow));
@@ -2480,9 +2480,19 @@ uint32 CMissionTemplate::sendAutoText( const TDataSetRow & userRow,const NLMISC:
 			if (text.empty())
 				return 0;
 		}
-		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-		params[0].Literal.fromUtf8(text);
-		return STRING_MANAGER::sendStringToClient( userRow, "LITERAL", params );
+
+		TVectorParamCheck vect;
+		STRING_MANAGER::TParam param;
+
+		param.Type = STRING_MANAGER::bot;
+		param.setEIdAIAlias(giver, CAIAliasTranslator::getInstance()->getAIAlias(giver));
+		vect.push_back( param );
+
+		param.Type = STRING_MANAGER::literal;
+		param.Literal.fromUtf8(text);
+		vect.push_back(param);
+
+		return STRING_MANAGER::sendStringToClient( userRow, "LITERAL_BOT", vect );
 	}
 	else
 	{
@@ -2494,7 +2504,7 @@ uint32 CMissionTemplate::sendAutoText( const TDataSetRow & userRow,const NLMISC:
 
 uint32 CMissionTemplate::sendDescText( const TDataSetRow & userRow, const TDataSetRow & giver, uint32 descIndex) const
 {
-	if (DescText.substr(0, 6) == "WEBIG_")
+	if (DescText.substr(0, 6) == "WEBIG_" || DescText.substr(0, 4) == "ARK_")
 	{
 		string text = DescText;
 		CCharacter *user = PlayerManager.getChar(getEntityIdFromRow(userRow));

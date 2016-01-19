@@ -76,6 +76,7 @@ public:
 	 * \param ret : vector of names
 	 */
 	inline void getNPCAliasesFromName(const std::string & botName, std::vector<TAIAlias> & ret) const;
+	inline void setNameForNPCAliases(const std::string &name, TAIAlias id);
 
 	/**
 	 * Get a bot unique id from its name
@@ -171,6 +172,12 @@ inline void CAIAliasTranslator::getNPCAliasesFromName(const std::string & botNam
 	{
 		ret.push_back( (*it).second );
 	}
+}
+
+inline void CAIAliasTranslator::setNameForNPCAliases(const std::string &name, TAIAlias id)
+{
+	_BotIdsToNames.insert( make_pair((uint)id,name) );
+	_BotNamesToIds.insert( make_pair(name,id) );
 }
 
 //-----------------------------------------------

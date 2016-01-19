@@ -574,6 +574,7 @@ CInventoryPtr getInventory(CCharacter *c, const string &inv)
 			case INVENTORIES::temporary:
 			case INVENTORIES::bag:
 			case INVENTORIES::equipment:
+			case INVENTORIES::handling:
 			case INVENTORIES::pet_animal1:
 			case INVENTORIES::pet_animal2:
 			case INVENTORIES::pet_animal3:
@@ -653,6 +654,7 @@ NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<
 				inventories.push_back(selectedInv);
 		}
 	} else {
+		inventories.push_back(INVENTORIES::handling);
 		inventories.push_back(INVENTORIES::equipment);
 		inventories.push_back(INVENTORIES::bag);
 		inventories.push_back(INVENTORIES::pet_animal1);
@@ -754,6 +756,7 @@ NLMISC_COMMAND(getNamedItemList, "get list of named items of character by filter
 				inventories.push_back(selectedInv);
 		}
 	} else {
+		inventories.push_back(INVENTORIES::handling);
 		inventories.push_back(INVENTORIES::equipment);
 		inventories.push_back(INVENTORIES::bag);
 		inventories.push_back(INVENTORIES::pet_animal1);
@@ -896,6 +899,36 @@ NLMISC_COMMAND(getPosition, "get position of entity", "<uid>")
 
 	return true;
 }
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getTargetPosition, "get position of entity", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	double x = 0, y = 0, z = 0, h = 0;
+	sint32 cell = 0;
+	
+	CCreature * target = CreatureManager.getCreature( c->getTarget() );
+	if(target)
+	{
+		x = target->getState().X / 1000.;
+		y = target->getState().Y / 1000.;
+		z = target->getState().Z / 1000.;
+		h = target->getState().Heading;
+
+		TDataSetRow dsr = target->getEntityRowId();
+		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+		cell = srcCell;
+
+		log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
+
+		return true;
+	}
+	return false;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getFame, "get fame of player", "<uid> faction")
@@ -1068,7 +1101,7 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> player_name number"
 				sint32 cell;
 				buildingPlayer->addUser(c, 0, ownerId, cell);
 				c->setPowoCell(cell);
-				CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
+				//CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
 				log.displayNL("%d", cell);
 			}
 		} else {
@@ -1228,6 +1261,131 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 	msgout.serial(look);
 	msgout.serial(cell);
 	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(temporaryRename, "rename a player for the event", "<uid> <new name>" )
+{
+	if ( args.size() != 2 ) {
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+	ucstring newName( args[2] );
+	
+	c->registerName(newName);
+
+	return true;
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getArkMissions,"dump character ark missions","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	string text;
+	uint i = 0;
+	for ( map<TAIAlias, CMission*>::iterator it = c->getMissionsBegin(); it != c->getMissionsEnd(); ++it )
+	{
+		const string& name = CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId((*it).first);
+		if (name.substr(0, 4) == "ark_")
+			log.displayNL("%s", name.c_str());
+	}
+
+	return true;
+}
+
+
+//-----------------------------------------------
+NLMISC_COMMAND(getPlayerStats,"get_player_stats","<uid> <stat1,stat2,stat3..>")
+{
+	
+	if (args.size() <= 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	std::vector< std::string > stats;
+	NLMISC::splitString( args[1],",",stats );
+	uint32 i=0;
+	
+	const CInventoryPtr & userBag = c->getInventory(INVENTORIES::bag);
+
+	if (i < stats.size() && stats[i] == "wmal") // wear malus
+	{
+		log.displayNL("%f", c->wearMalus());
+		i++;
+	}
+
+	if (i < stats.size() && stats[i] == "ibulk") // inventory bulk
+	{
+		log.displayNL("%d", userBag->getInventoryBulk());
+		i++;
+	}
+
+	if (i < stats.size() && stats[i] == "mbulk") // inventory max bulk
+	{
+		log.displayNL("%d", userBag->getMaxBulk());
+		i++;
+	}
+
+	if (i < stats.size() && stats[i] == "iwegt") // inventory weight
+	{
+		log.displayNL("%d", userBag->getInventoryWeight());
+		i++;
+	}
+
+	if (i < stats.size() && stats[i] == "mwegt") // inventory max weight
+	{
+		log.displayNL("%d", userBag->getMaxWeight());
+		i++;
+	}
+
+	if (i < stats.size() && stats[i] == "slots") // inventory nb slots
+	{
+		log.displayNL("%d", userBag->getUsedSlotCount());
+		i++;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getServerStats,"get_server_stats","<stat1,stat2,stat3..>")
+{
+	
+	if (args.size() <= 0)
+		return false;
+
+	std::vector< std::string > stats;
+	NLMISC::splitString( args[0],",",stats );
+	uint32 i=0;
+	
+	
+	if (i < stats.size() && stats[i] == "time") // Atys time
+	{
+		log.displayNL("%f", CTimeDateSeasonManager::getRyzomTimeReference().getRyzomTime ());
+		i++;
+	}
+
+	if (i < stats.size() && stats[i] == "date") // Atys date
+	{
+		log.displayNL("%d", CTimeDateSeasonManager::getRyzomTimeReference().getRyzomDay ());
+		i++;
+	}
+
+	if (i < stats.size() && stats[i] == "season") // Atys date
+	{
+		log.displayNL("%s", EGSPD::CSeason::toString(CTimeDateSeasonManager::getRyzomTimeReference().getRyzomSeason()).c_str());
+		i++;
+	}
 
 	return true;
 }
