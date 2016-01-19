@@ -1876,7 +1876,7 @@ void giveMissionItems_ssc_(CStateInstance* entity, CScriptStack& stack)
 		}
 
 
-				// if LD use this the function outside a ring shard 
+		// if LD use this the function outside a ring shard 
 		if (IsRingShard)
 		{
 			static std::set<CSheetId> r2PlotItemSheetId; // :TODO: use R2Share::CRingAccess
@@ -2540,7 +2540,7 @@ void emote_css_(CStateInstance* entity, CScriptStack& stack)
 
 	// Is the emote valid
 	uint32 emoteId = CAIS::instance().getEmotNumber(emoteName);
-	if (emoteId == ~0)
+	if (emoteId == std::numeric_limits<uint32>::max())
 	{
 		return;
 	}
@@ -2571,7 +2571,7 @@ void emote_ss_(CStateInstance* entity, CScriptStack& stack)
 
 	// Is the emote valid
 	uint32 emoteId = CAIS::instance().getEmotNumber(emoteName);
-	if (emoteId == ~0)
+	if (emoteId == std::numeric_limits<uint32>::max())
 	{
 		return;
 	}
@@ -2597,7 +2597,7 @@ void emote_s_(CStateInstance* entity, CScriptStack& stack)
 
 	// Is the emote valid
 	uint32 emoteId = CAIS::instance().getEmotNumber(emoteName);
-	if (emoteId == ~0)
+	if (emoteId == std::numeric_limits<uint32>::max())
 		return;
 
 	// Get the behaviour Id

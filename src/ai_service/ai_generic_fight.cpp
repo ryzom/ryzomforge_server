@@ -513,7 +513,7 @@ bool CFightOrganizer::reorganizeIteration(CBot* bot)
 	
 	CAIVector	movingVector;
 	double		fear=1.0f;
-	
+
 	CAIEntityPhysical*	target = (CAIEntityPhysical*)spawnBot->getTarget();
 
 	FOREACH(it, std::vector<CAIEntityPhysical*>, botList)
@@ -587,7 +587,6 @@ bool CFightOrganizer::reorganizeIteration(CBot* bot)
 					}
 				}
 			}
-			
 
 			if	(score>=BestChooseScore) // add distance and bot profile compatibility.
 			{

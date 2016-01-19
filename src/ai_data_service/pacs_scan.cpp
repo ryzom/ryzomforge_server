@@ -48,7 +48,7 @@
 
 
 // Server share
-#include "server_share/bmp4image.h"
+#include "game_share/bmp4image.h"
 #include "server_share/continent_container.h"
 
 
@@ -1346,12 +1346,14 @@ public:
 				CComputeCell	*cell =	_WorldMap.getComputeCell(scanline);
 
 				{
-					uint	i;
-					for (i=0; i<16*16; ++i)
+					for (uint i = 0; i < 16; ++i)
 					{
-						toposGridList[0][i].topos[0]	=
-						toposGridList[0][i].topos[1]	=
-						toposGridList[0][i].topos[2]	=	-1;
+						for (uint j = 0; j < 16; ++j)
+						{
+							toposGridList[i][j].topos[0]	=
+							toposGridList[i][j].topos[1]	=
+							toposGridList[i][j].topos[2]	=	-1;
+						}
 					}
 				}
 
@@ -1651,7 +1653,7 @@ public:
 									first.flags = (topNode.isInWater() ? 1 : 0) + (topNode.isInNogo() ? 2 : 0);
 
 									// push first position
-									stacks[first.flags].insert(make_pair<sint, CWorldPosition>(first.flags, stwp));
+									stacks[first.flags].insert(std::pair<sint, CWorldPosition>(first.flags, stwp));
 
 									while (true)
 									{
@@ -1750,11 +1752,11 @@ public:
 													}
 													if (tmp.getTopologyNode().Id == topNode.Id)
 													{
-														stacks[0].insert(make_pair<sint, CWorldPosition>(ndist, tmp));
+														stacks[0].insert(std::pair<sint, CWorldPosition>(ndist, tmp));
 													}
 													else
 													{
-														stacks[tmpflags+1].insert(make_pair<sint, CWorldPosition>(ndist, tmp));
+														stacks[tmpflags + 1].insert(std::pair<sint, CWorldPosition>(ndist, tmp));
 													}
 												}										
 											}

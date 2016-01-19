@@ -2628,7 +2628,7 @@ void CCharacter::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
 void CCharacter::setPositionToDefaultRespawnPoint()
 {
 	CContinent * continent = CZoneManager::getInstance().getContinent( getX(), getY() );
-	uint16 zoneId = (uint16)~0;
+	uint16 zoneId = std::numeric_limits<uint16>::max();
 	if( continent == 0 )
 	{
 		nlwarning("<CHAR_TP_TOWN: Character %s : continent null for pos %d %d", getId().toString().c_str(), getX(), getY());
@@ -2677,7 +2677,7 @@ void CCharacter::setPositionToDefaultRespawnPoint()
 		break;
 	}
 
-	if( zoneId != (uint16)~0 )
+	if( zoneId != std::numeric_limits<uint16>::max() )
 	{
 		// get the tp coords
 		const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone( zoneId );
@@ -8140,7 +8140,7 @@ void CCharacter::setStartStatistics( const CCreateCharMsg& createCharMsg )
 	}
 
 	// create character start skills, skill point and money
-	string s = CreateCharacterStartSkillsValue;
+	string s = CreateCharacterStartSkillsValue.get();
 	if( s.size() > 0 )
 	{
 		CSString skillValue = s;

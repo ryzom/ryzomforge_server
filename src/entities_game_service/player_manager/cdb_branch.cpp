@@ -30,7 +30,7 @@
 //////////////
 #include "player_manager/cdb_branch.h"
 #include "player_manager/cdb_leaf.h"
-#include "game_share/xml_auto_ptr.h"
+#include "nel/misc/xml_auto_ptr.h"
 #include <libxml/parser.h>
 
 ////////////////
@@ -284,7 +284,7 @@ void CCDBStructNodeBranch::init( xmlNodePtr node, NLMISC::IProgressCallback &pro
 		{
 			// dealing with an array of entries
 			uint countAsInt;
-			NLMISC::fromString(count, countAsInt);
+			NLMISC::fromString(count.str(), countAsInt);
 			nlassert((const char *) count != NULL);
 
 			for (uint i=0;i<countAsInt;i++)
@@ -347,7 +347,7 @@ void CCDBStructNodeBranch::init( xmlNodePtr node, NLMISC::IProgressCallback &pro
 		{
 			// dealing with an array of entries
 			uint countAsInt;
-			NLMISC::fromString(count, countAsInt);
+			NLMISC::fromString(count.str(), countAsInt);
 			nlassert((const char *) count != NULL);
 
 			for (uint i=0;i<countAsInt;i++)

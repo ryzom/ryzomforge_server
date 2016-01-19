@@ -6,6 +6,9 @@ IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
+# Declare CMAKE_CONFIGURATION_TYPES before PROJECT
+SET(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
 ###
 # Helper macro that generates .pc and installs it.
 # Argument: name - the name of the .pc package, e.g. "nel-pacs.pc"
@@ -16,60 +19,6 @@ MACRO(NL_GEN_PC name)
     INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/${name}" DESTINATION ${NL_LIB_PREFIX}/pkgconfig)
   ENDIF(NOT WIN32 AND WITH_INSTALL_LIBRARIES)
 ENDMACRO(NL_GEN_PC)
-
-###
-# Helper macro that generates revision.h from revision.h.in
-###
-MACRO(NL_GEN_REVISION_H)
-  IF(EXISTS ${CMAKE_SOURCE_DIR}/revision.h.in)
-    SET(TOOL_FOUND OFF)
-
-    IF(EXISTS "${CMAKE_SOURCE_DIR}/../.svn/")
-      FIND_PACKAGE(Subversion)
-
-      IF(SUBVERSION_FOUND)
-        SET(TOOL_FOUND ON)
-      ENDIF(SUBVERSION_FOUND)
-    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/../.svn/")
-
-    IF(EXISTS "${CMAKE_SOURCE_DIR}/../.hg/")
-      FIND_PACKAGE(Mercurial)
-
-      IF(MERCURIAL_FOUND)
-        SET(TOOL_FOUND ON)
-      ENDIF(MERCURIAL_FOUND)
-    ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/../.hg/")
-
-    # if already generated
-    IF(EXISTS ${CMAKE_SOURCE_DIR}/revision.h)
-      # copy it
-      MESSAGE(STATUS "Copying provided revision.h...")
-      FILE(COPY ${CMAKE_SOURCE_DIR}/revision.h DESTINATION ${CMAKE_BINARY_DIR})
-      SET(HAVE_REVISION_H ON)
-    ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/revision.h)
-
-    IF(TOOL_FOUND)
-      # a custom target that is always built
-      ADD_CUSTOM_TARGET(revision ALL
-        COMMAND ${CMAKE_COMMAND}
-        -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-        -DROOT_DIR=${CMAKE_SOURCE_DIR}/..
-        -DCMAKE_MODULE_PATH=${CMAKE_SOURCE_DIR}/CMakeModules
-        -P ${CMAKE_SOURCE_DIR}/CMakeModules/GetRevision.cmake)
-
-      # revision.h is a generated file
-      SET_SOURCE_FILES_PROPERTIES(${CMAKE_BINARY_DIR}/revision.h
-        PROPERTIES GENERATED TRUE
-        HEADER_FILE_ONLY TRUE)
-      SET(HAVE_REVISION_H ON)
-    ENDIF(TOOL_FOUND)
-
-    IF(HAVE_REVISION_H)
-      INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
-      ADD_DEFINITIONS(-DHAVE_REVISION_H)
-    ENDIF(HAVE_REVISION_H)
-  ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/revision.h.in)
-ENDMACRO(NL_GEN_REVISION_H)
 
 ###
 #
@@ -99,10 +48,10 @@ ENDMACRO(NL_TARGET_DRIVER)
 # Argument:
 ###
 MACRO(NL_DEFAULT_PROPS name label)
-  IF(HAVE_REVISION_H)
+  IF(TARGET revision)
     # explicitly say that the target depends on revision.h
     ADD_DEPENDENCIES(${name} revision)
-  ENDIF(HAVE_REVISION_H)
+  ENDIF()
 
   # Note: This is just a workaround for a CMake bug generating VS10 files with a colon in the project name.
   # CMake Bug ID: http://www.cmake.org/Bug/view.php?id=11819
@@ -252,6 +201,16 @@ MACRO(NL_SETUP_DEFAULT_OPTIONS)
   ELSE(WITH_STATIC)
     OPTION(WITH_STATIC_LIBXML2    "With static libxml2"                           OFF)
   ENDIF(WITH_STATIC)
+  IF (WITH_STATIC)
+    OPTION(WITH_STATIC_CURL       "With static curl"                              ON )
+  ELSE(WITH_STATIC)
+    OPTION(WITH_STATIC_CURL       "With static curl"                              OFF)
+  ENDIF(WITH_STATIC)
+  IF(APPLE)
+    OPTION(WITH_LIBXML2_ICONV     "With libxml2 using iconv"                      ON )
+  ELSE(APPLE)
+    OPTION(WITH_LIBXML2_ICONV     "With libxml2 using iconv"                      OFF)
+  ENDIF(APPLE)
   OPTION(WITH_STATIC_DRIVERS      "With static drivers."                          OFF)
   IF(WIN32)
     OPTION(WITH_EXTERNAL          "With provided external."                       ON )
@@ -259,13 +218,21 @@ MACRO(NL_SETUP_DEFAULT_OPTIONS)
     OPTION(WITH_EXTERNAL          "With provided external."                       OFF)
   ENDIF(WIN32)
   OPTION(WITH_STATIC_EXTERNAL     "With static external libraries"                OFF)
+  IF(UNIX AND NOT APPLE)
+    OPTION(WITH_UNIX_STRUCTURE    "Use UNIX structure (bin, include, lib)"        ON )
+  ELSE()
+    OPTION(WITH_UNIX_STRUCTURE    "Use UNIX structure (bin, include, lib)"        OFF)
+  ENDIF()
   OPTION(WITH_INSTALL_LIBRARIES   "Install development files."                    ON )
 
+  OPTION(WITH_ASSIMP              "Use assimp exporter"                           OFF)
+  
   ###
   # GUI toolkits
   ###
   OPTION(WITH_GTK                 "With GTK Support"                              OFF)
-  OPTION(WITH_QT                  "With QT Support"                               OFF)
+  OPTION(WITH_QT                  "With Qt 4 Support"                             OFF)
+  OPTION(WITH_QT5                 "With Qt 5 Support"                             OFF)
 
   IF(WIN32 AND MFC_FOUND)
     OPTION(WITH_MFC               "With MFC Support"                              ON )
@@ -353,14 +320,17 @@ MACRO(NL_SETUP_RYZOM_DEFAULT_OPTIONS)
   OPTION(WITH_RYZOM_TOOLS         "Build Ryzom Core Tools"                        ON )
   OPTION(WITH_RYZOM_SERVER        "Build Ryzom Core Services"                     ON )
   OPTION(WITH_RYZOM_SOUND         "Enable Ryzom Core Sound"                       ON )
-  OPTION(WITH_RYZOM_PATCH         "Enable Ryzom in-game patch support"            OFF)
 
   ###
   # Optional support
   ###
   OPTION(WITH_LUA51               "Build Ryzom Core using Lua 5.1"                ON )
   OPTION(WITH_LUA52               "Build Ryzom Core using Lua 5.2"                OFF)
-  OPTION(WITH_RYZOM_CLIENT_UAC    "Ask to run as Administrator"                   ON )
+  OPTION(WITH_LUA53               "Build Ryzom Core using Lua 5.3"                OFF)
+  OPTION(WITH_RYZOM_CLIENT_UAC    "Ask to run as Administrator"                   OFF)
+  OPTION(WITH_RYZOM_PATCH         "Enable Ryzom in-game patch support"            OFF)
+  OPTION(WITH_RYZOM_CUSTOM_PATCH_SERVER "Only use patch server from CFG file"     OFF)
+  OPTION(WITH_RYZOM_STEAM         "Enable Steam features"                         OFF)
 ENDMACRO(NL_SETUP_RYZOM_DEFAULT_OPTIONS)
 
 MACRO(NL_SETUP_SNOWBALLS_DEFAULT_OPTIONS)
@@ -384,8 +354,6 @@ MACRO(NL_SETUP_BUILD)
   # None                  = NL_RELEASE
   # Debug                 = NL_DEBUG
   # Release               = NL_RELEASE
-
-  SET(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
   IF(CMAKE_BUILD_TYPE MATCHES "Debug")
     SET(NL_BUILD_MODE "NL_DEBUG")
@@ -557,9 +525,15 @@ MACRO(NL_SETUP_BUILD)
     # Ignore default include paths
     ADD_PLATFORM_FLAGS("/X")
 
-    IF(MSVC11)
+    IF(MSVC12)
       ADD_PLATFORM_FLAGS("/Gy- /MP")
-      # /Ox is working with VC++ 2010, but custom optimizations don't exist
+      # /Ox is working with VC++ 2013, but custom optimizations don't exist
+      SET(RELEASE_CFLAGS "/Ox /GF /GS- ${RELEASE_CFLAGS}")
+      # without inlining it's unusable, use custom optimizations again
+      SET(DEBUG_CFLAGS "/Od /Ob1 /GF- ${DEBUG_CFLAGS}")
+    ELSEIF(MSVC11)
+      ADD_PLATFORM_FLAGS("/Gy- /MP")
+      # /Ox is working with VC++ 2012, but custom optimizations don't exist
       SET(RELEASE_CFLAGS "/Ox /GF /GS- ${RELEASE_CFLAGS}")
       # without inlining it's unusable, use custom optimizations again
       SET(DEBUG_CFLAGS "/Od /Ob1 /GF- ${DEBUG_CFLAGS}")
@@ -581,9 +555,9 @@ MACRO(NL_SETUP_BUILD)
       SET(RELEASE_CFLAGS "/Ox /GF /GS- ${RELEASE_CFLAGS}")
       # without inlining it's unusable, use custom optimizations again
       SET(DEBUG_CFLAGS "/Od /Ob1 ${DEBUG_CFLAGS}")
-    ELSE(MSVC11)
+    ELSE(MSVC12)
       MESSAGE(FATAL_ERROR "Can't determine compiler version ${MSVC_VERSION}")
-    ENDIF(MSVC11)
+    ENDIF(MSVC12)
 
     ADD_PLATFORM_FLAGS("/D_CRT_SECURE_NO_DEPRECATE /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS /DWIN32 /D_WINDOWS /Zm1000 /wd4250")
 
@@ -843,11 +817,6 @@ MACRO(NL_SETUP_BUILD)
 
     IF(WITH_WARNINGS)
       ADD_PLATFORM_FLAGS("-Wall -W -Wpointer-arith -Wsign-compare -Wno-deprecated-declarations -Wno-multichar -Wno-unused")
-      IF(CLANG)
-        ADD_PLATFORM_FLAGS("-std=gnu99")
-      ELSE(CLANG)
-        ADD_PLATFORM_FLAGS("-ansi")
-      ENDIF(CLANG)
     ENDIF(WITH_WARNINGS)
 
     IF(ANDROID)
@@ -946,78 +915,78 @@ ENDMACRO(NL_SETUP_BUILD_FLAGS)
 MACRO(NL_MAKE_ABSOLUTE_PREFIX NAME_RELATIVE NAME_ABSOLUTE)
   IF(IS_ABSOLUTE "${${NAME_RELATIVE}}")
     SET(${NAME_ABSOLUTE} ${${NAME_RELATIVE}})
-  ELSE(IS_ABSOLUTE "${${NAME_RELATIVE}}")
-    IF(WIN32)
-      SET(${NAME_ABSOLUTE} ${${NAME_RELATIVE}})
-    ELSE(WIN32)
+  ELSE()
+    IF(WITH_UNIX_STRUCTURE)
       SET(${NAME_ABSOLUTE} ${CMAKE_INSTALL_PREFIX}/${${NAME_RELATIVE}})
-    ENDIF(WIN32)
+    ELSE()
+      SET(${NAME_ABSOLUTE} ${${NAME_RELATIVE}})
+    ENDIF()
   ENDIF(IS_ABSOLUTE "${${NAME_RELATIVE}}")
 ENDMACRO(NL_MAKE_ABSOLUTE_PREFIX)
 
 MACRO(NL_SETUP_PREFIX_PATHS)
   ## Allow override of install_prefix/etc path.
   IF(NOT NL_ETC_PREFIX)
-    IF(WIN32)
-      SET(NL_ETC_PREFIX "." CACHE PATH "Installation path for configurations")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(NL_ETC_PREFIX "etc/nel" CACHE PATH "Installation path for configurations")
-    ENDIF(WIN32)
-  ENDIF(NOT NL_ETC_PREFIX)
+    ELSE()
+      SET(NL_ETC_PREFIX "." CACHE PATH "Installation path for configurations")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(NL_ETC_PREFIX NL_ETC_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/share path.
   IF(NOT NL_SHARE_PREFIX)
-    IF(WIN32)
-      SET(NL_SHARE_PREFIX "." CACHE PATH "Installation path for data.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(NL_SHARE_PREFIX "share/nel" CACHE PATH "Installation path for data.")
-    ENDIF(WIN32)
-  ENDIF(NOT NL_SHARE_PREFIX)
+    ELSE()
+      SET(NL_SHARE_PREFIX "." CACHE PATH "Installation path for data.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(NL_SHARE_PREFIX NL_SHARE_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/sbin path.
   IF(NOT NL_SBIN_PREFIX)
-    IF(WIN32)
-      SET(NL_SBIN_PREFIX "." CACHE PATH "Installation path for admin tools and services.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(NL_SBIN_PREFIX "sbin" CACHE PATH "Installation path for admin tools and services.")
-    ENDIF(WIN32)
-  ENDIF(NOT NL_SBIN_PREFIX)
+    ELSE()
+      SET(NL_SBIN_PREFIX "." CACHE PATH "Installation path for admin tools and services.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(NL_SBIN_PREFIX NL_SBIN_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/bin path.
   IF(NOT NL_BIN_PREFIX)
-    IF(WIN32)
-      SET(NL_BIN_PREFIX "." CACHE PATH "Installation path for tools and applications.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(NL_BIN_PREFIX "bin" CACHE PATH "Installation path for tools and applications.")
-    ENDIF(WIN32)
-  ENDIF(NOT NL_BIN_PREFIX)
+    ELSE()
+      SET(NL_BIN_PREFIX "." CACHE PATH "Installation path for tools and applications.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(NL_BIN_PREFIX NL_BIN_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/lib path.
   IF(NOT NL_LIB_PREFIX)
     IF(LIBRARY_ARCHITECTURE)
       SET(NL_LIB_PREFIX "lib/${LIBRARY_ARCHITECTURE}" CACHE PATH "Installation path for libraries.")
-    ELSE(LIBRARY_ARCHITECTURE)
+    ELSE()
       SET(NL_LIB_PREFIX "lib" CACHE PATH "Installation path for libraries.")
-    ENDIF(LIBRARY_ARCHITECTURE)
-  ENDIF(NOT NL_LIB_PREFIX)
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(NL_LIB_PREFIX NL_LIB_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/lib path.
   IF(NOT NL_DRIVER_PREFIX)
-    IF(WIN32)
-      SET(NL_DRIVER_PREFIX "." CACHE PATH "Installation path for drivers.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       IF(LIBRARY_ARCHITECTURE)
         SET(NL_DRIVER_PREFIX "lib/${LIBRARY_ARCHITECTURE}/nel" CACHE PATH "Installation path for drivers.")
-      ELSE(LIBRARY_ARCHITECTURE)
+      ELSE()
         SET(NL_DRIVER_PREFIX "lib/nel" CACHE PATH "Installation path for drivers.")
-      ENDIF(LIBRARY_ARCHITECTURE)
-    ENDIF(WIN32)
-  ENDIF(NOT NL_DRIVER_PREFIX)
+      ENDIF()
+    ELSE()
+      SET(NL_DRIVER_PREFIX "." CACHE PATH "Installation path for drivers.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(NL_DRIVER_PREFIX NL_DRIVER_ABSOLUTE_PREFIX)
 
   IF(WIN32 AND TARGET_X64)
@@ -1028,63 +997,64 @@ ENDMACRO(NL_SETUP_PREFIX_PATHS)
 MACRO(RYZOM_SETUP_PREFIX_PATHS)
   ## Allow override of install_prefix/etc path.
   IF(NOT RYZOM_ETC_PREFIX)
-    IF(WIN32)
-      SET(RYZOM_ETC_PREFIX "." CACHE PATH "Installation path for configurations")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(RYZOM_ETC_PREFIX "etc/ryzom" CACHE PATH "Installation path for configurations")
-    ENDIF(WIN32)
+    ELSE()
+      SET(RYZOM_ETC_PREFIX "." CACHE PATH "Installation path for configurations")
+    ENDIF()
   ENDIF(NOT RYZOM_ETC_PREFIX)
   NL_MAKE_ABSOLUTE_PREFIX(RYZOM_ETC_PREFIX RYZOM_ETC_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/share path.
   IF(NOT RYZOM_SHARE_PREFIX)
-    IF(WIN32)
-      SET(RYZOM_SHARE_PREFIX "." CACHE PATH "Installation path for data.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(RYZOM_SHARE_PREFIX "share/ryzom" CACHE PATH "Installation path for data.")
-    ENDIF(WIN32)
-  ENDIF(NOT RYZOM_SHARE_PREFIX)
+    ELSE()
+      SET(RYZOM_SHARE_PREFIX "." CACHE PATH "Installation path for data.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(RYZOM_SHARE_PREFIX RYZOM_SHARE_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/sbin path.
   IF(NOT RYZOM_SBIN_PREFIX)
-    IF(WIN32)
-      SET(RYZOM_SBIN_PREFIX "." CACHE PATH "Installation path for admin tools and services.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(RYZOM_SBIN_PREFIX "sbin" CACHE PATH "Installation path for admin tools and services.")
-    ENDIF(WIN32)
-  ENDIF(NOT RYZOM_SBIN_PREFIX)
+    ELSE()
+      SET(RYZOM_SBIN_PREFIX "." CACHE PATH "Installation path for admin tools and services.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(RYZOM_SBIN_PREFIX RYZOM_SBIN_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/bin path.
   IF(NOT RYZOM_BIN_PREFIX)
-    IF(WIN32)
-      SET(RYZOM_BIN_PREFIX "." CACHE PATH "Installation path for tools and applications.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(RYZOM_BIN_PREFIX "bin" CACHE PATH "Installation path for tools.")
-    ENDIF(WIN32)
-  ENDIF(NOT RYZOM_BIN_PREFIX)
+    ELSE()
+      SET(RYZOM_BIN_PREFIX "." CACHE PATH "Installation path for tools and applications.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(RYZOM_BIN_PREFIX RYZOM_BIN_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/lib path.
   IF(NOT RYZOM_LIB_PREFIX)
     IF(LIBRARY_ARCHITECTURE)
       SET(RYZOM_LIB_PREFIX "lib/${LIBRARY_ARCHITECTURE}" CACHE PATH "Installation path for libraries.")
-    ELSE(LIBRARY_ARCHITECTURE)
+    ELSE()
       SET(RYZOM_LIB_PREFIX "lib" CACHE PATH "Installation path for libraries.")
-    ENDIF(LIBRARY_ARCHITECTURE)
+    ENDIF()
   ENDIF(NOT RYZOM_LIB_PREFIX)
   NL_MAKE_ABSOLUTE_PREFIX(RYZOM_LIB_PREFIX RYZOM_LIB_ABSOLUTE_PREFIX)
 
   ## Allow override of install_prefix/games path.
   IF(NOT RYZOM_GAMES_PREFIX)
-    IF(WIN32)
-      SET(RYZOM_GAMES_PREFIX "." CACHE PATH "Installation path for tools and applications.")
-    ELSE(WIN32)
+    IF(WITH_UNIX_STRUCTURE)
       SET(RYZOM_GAMES_PREFIX "games" CACHE PATH "Installation path for client.")
-    ENDIF(WIN32)
-  ENDIF(NOT RYZOM_GAMES_PREFIX)
+    ELSE()
+      SET(RYZOM_GAMES_PREFIX "." CACHE PATH "Installation path for tools and applications.")
+    ENDIF()
+  ENDIF()
   NL_MAKE_ABSOLUTE_PREFIX(RYZOM_GAMES_PREFIX RYZOM_GAMES_ABSOLUTE_PREFIX)
+
 ENDMACRO(RYZOM_SETUP_PREFIX_PATHS)
 
 MACRO(SETUP_EXTERNAL)
@@ -1094,6 +1064,12 @@ MACRO(SETUP_EXTERNAL)
 
   IF(WIN32)
     FIND_PACKAGE(External REQUIRED)
+
+    # If using custom boost, we need to define the right variables used by official boost CMake module
+    IF(DEFINED BOOST_DIR)
+      SET(BOOST_INCLUDEDIR ${BOOST_DIR}/include)
+      SET(BOOST_LIBRARYDIR ${BOOST_DIR}/lib)
+    ENDIF(DEFINED BOOST_DIR)
   ELSE(WIN32)
     FIND_PACKAGE(External QUIET)
 
@@ -1125,6 +1101,14 @@ MACRO(SETUP_EXTERNAL)
     FIND_PACKAGE(STLport REQUIRED)
     INCLUDE_DIRECTORIES(${STLPORT_INCLUDE_DIR})
   ENDIF(WITH_STLPORT)
+
+  IF(WIN32)
+    # Must include DXSDK before WINSDK
+    FIND_PACKAGE(DirectXSDK REQUIRED)
+    # IF(DXSDK_INCLUDE_DIR)
+    #   INCLUDE_DIRECTORIES(${DXSDK_INCLUDE_DIR})
+    # ENDIF()
+  ENDIF(WIN32)
 
   IF(MSVC)
     FIND_PACKAGE(MSVC REQUIRED)

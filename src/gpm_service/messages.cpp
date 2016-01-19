@@ -566,7 +566,6 @@ void cbEntityTeleportation( CMessage& msgin, const string &serviceName, NLNET::T
 	}
 	else
 	{
-	
 		if (move_to_new_cell == 1)
 		{
 			nlinfo("MSG: Sliding entity %d to cell %d) at tick: %d",index.getIndex(),cell,tick);

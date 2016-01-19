@@ -282,7 +282,6 @@ static void s_calcRanges(
 	else
 		_RangeMax += _Bot->getPersistent().getSheet()->Radius() * _Bot->getPersistent().getSheet()->Scale();
 
-	
 	_RangeCalculated = true;
 }	
 

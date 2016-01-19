@@ -1356,7 +1356,7 @@ void	CStringManager::mergeEntityWords(CEntityWords& dest, const CEntityWords& so
 	std::map<std::string, uint32>::const_iterator	iti;
 	for (iti=source._ColumnInfo.begin(); iti!=source._ColumnInfo.end(); ++iti)
 		if (dest._ColumnInfo.find((*iti).first) == dest._ColumnInfo.end())
-			extraColumns.push_back(std::make_pair<std::string, uint32>((*iti).first, osz+(uint32)extraColumns.size()));
+			extraColumns.push_back(std::pair<std::string, uint32>((*iti).first, osz + (uint32)extraColumns.size()));
 
 	for (iti=source._RowInfo.begin(); iti!=source._RowInfo.end(); ++iti)
 		if (dest._RowInfo.find((*iti).first) == dest._RowInfo.end())
@@ -1864,14 +1864,18 @@ void CStringManager::init(NLMISC::CLog *log)
 	
 	if (_SheetInfo.empty())
 	{
-		std::map<std::string, TSheetInfo> container;
 		// Load the sheet
 		std::vector<std::string> exts;
 		exts.push_back("creature");
 		//exts.push_back("item");
 		//exts.push_back("sitem");	// not more needed !
 		exts.push_back("race_stats");
-		loadForm(exts, NLNET::IService::getInstance()->WriteFilesDirectory.toString() + "ios_sheets.packed_sheets", _SheetInfo, false, false);
+
+		// if the 'GeorgePaths' config file var exists then we try to perform a mini-scan for sheet files
+		if (IService::isServiceInitialized() && (IService::getInstance()->ConfigFile.getVarPtr(std::string("GeorgePaths"))!=NULL))
+		{
+			loadForm(exts, NLNET::IService::getInstance()->WriteFilesDirectory.toString() + "ios_sheets.packed_sheets", _SheetInfo, false, false);
+		}
 
 		if (_SheetInfo.empty())
 		{

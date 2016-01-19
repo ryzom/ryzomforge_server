@@ -284,6 +284,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\string_manager_sheet.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\string_manager.h"
 			>
 		</File>
