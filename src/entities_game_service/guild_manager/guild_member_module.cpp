@@ -358,19 +358,19 @@ void CGuildMemberModule::_inviteCharacterInGuild(CGuildCharProxy& invitor, CGuil
 	// check marauders case (character is neutral/neutral)
 	if (invitedAllegiance.first == PVP_CLAN::Neutral && invitedAllegiance.second == PVP_CLAN::Neutral)
 	{
-		// get the black_kami index, that's the fame used by marauders (a hack)
-		uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex("black_kami");
+		// get the marauder index
+		uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex("marauder");
 
 		if (factionIndex != CStaticFames::INVALID_FACTION_INDEX)
 		{
-			// get black_kami fame for invited character
+			// get marauder fame for invited character
 			sint32 characterFactionFame = CFameInterface::getInstance().getFameIndexed(invitedChar->getId(), factionIndex);
 
-			// character is a marauder only if his black_kami fame is at least REQUIRED_MARAUDER_FAME
+			// character is a marauder only if his marauder fame is at least REQUIRED_MARAUDER_FAME
 			if (characterFactionFame >= REQUIRED_MARAUDER_FAME)
 			{
 #if 0
-				// get black_kami fame for the guild (only marauder guilds can guild marauders)
+				// get marauder fame for the guild (only marauder guilds can guild marauders)
 				sint32 guildFactionFame = CFameInterface::getInstance().getFameIndexed(guild->getEId(), factionIndex);
 
 				// check if the guild is marauder
@@ -406,7 +406,7 @@ void CGuildMemberModule::_inviteCharacterInGuild(CGuildCharProxy& invitor, CGuil
 		}
 		else
 		{
-			nlwarning("Unable to find faction 'black_kami'");
+			nlwarning("Unable to find faction 'marauder'");
 		}
 	}
 
