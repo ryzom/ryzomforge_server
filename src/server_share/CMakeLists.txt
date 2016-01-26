@@ -1,6 +1,6 @@
 FILE(GLOB SRC *.cpp *.h)
 
-FILE(GLOB R2 
+FILE(GLOB R2
 	r2_*.h r2_*.cpp)
 
 LIST(REMOVE_ITEM SRC R2)
@@ -10,7 +10,7 @@ SOURCE_GROUP("R2" FILES ${R2})
 
 NL_TARGET_LIB(ryzom_servershare ${SRC} ${R2})
 
-INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR} ${MYSQL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIR} ${MYSQL_INCLUDE_DIR})
 
 TARGET_LINK_LIBRARIES(ryzom_servershare
 						nelmisc
@@ -18,8 +18,7 @@ TARGET_LINK_LIBRARIES(ryzom_servershare
 						nelgeorges
 						nelnet
 						ryzom_gameshare
-						${MYSQL_LIBRARIES}
-						${ZLIB_LIBRARIES})
+						${MYSQL_LIBRARIES})
 
 IF(MONGO_FOUND)
   TARGET_LINK_LIBRARIES(ryzom_servershare ${MONGO_LIBRARIES})
