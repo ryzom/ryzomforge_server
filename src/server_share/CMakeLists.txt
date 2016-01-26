@@ -18,7 +18,8 @@ TARGET_LINK_LIBRARIES(ryzom_servershare
 						nelgeorges
 						nelnet
 						ryzom_gameshare
-						${MYSQL_LIBRARIES})
+						${MYSQL_LIBRARIES}
+						${ZLIB_LIBRARIES})
 
 IF(MONGO_FOUND)
   TARGET_LINK_LIBRARIES(ryzom_servershare ${MONGO_LIBRARIES})
