@@ -19,7 +19,8 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lnelmisc \
 		-lxml2 \
 		-lrt\
-		-ldl
+		-ldl\
+		-lpthread
 
 #############################################################################
 # The bit that changes each time we cut paste and hack this file :o)

@@ -32,9 +32,9 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) -L$(HOME)/install/$(DIR_DBG_$(DBG))/lib \
 		-lnelmisc \
 		-lxml2 \
 		-lstlport \
-		-lpthread \
+		-lpthread -lssl -lcrypto\
+		-lmongoclient -lboost_thread -lboost_filesystem -lboost_program_options -lboost_system \
 		-lld
-
 #############################################################################
 # The bit that changes each time we cut paste and hack this file :o)
 

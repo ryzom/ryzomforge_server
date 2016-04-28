@@ -18,14 +18,14 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L../admin_modules \
 		-L$(RYZOM_COMMON_SRC)/game_share \
         -L../ai_share \
-        -L../server_share \
+    	-L../server_share \
 		-L../pd_lib \
 		-L../gameplay_module_lib \
 		-ladmin_modules \
 		-lpd_lib \
 		-lai_share \
-        -lserver_share \
 		-lgame_share \
+		-lserver_share \
 		-lnelligo \
 		-lnelgeorges \
 		-lgameplay_module_lib \
@@ -34,8 +34,10 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-lpd_lib \
 		-lxml2 \
 		-lrt\
-        -lmongoclient -lboost_thread -lboost_filesystem -lboost_program_options -lboost_system \
-		-ldl
+		-lpthread \
+		/usr/lib/libmongoclient.a -lboost_thread -lboost_filesystem -lboost_program_options -lboost_system -lssl -lcrypto \
+		-ldl \
+
 
 #############################################################################
 # The bit that changes each time we cut paste and hack this file :o)

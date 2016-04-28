@@ -17,12 +17,13 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L../server_share \
 		-L../admin_modules \
 		-ladmin_modules \
-        -lserver_share \
+	        -lserver_share \
 		-lgame_share \
 		-lnelnet \
 		-lnelmisc \
 		-lxml2 \
 		-lrt\
+		-lpthread\
 		-ldl
 
 #############################################################################

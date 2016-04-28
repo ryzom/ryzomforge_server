@@ -16,13 +16,14 @@ LDFLAGS      = 	$(LD_FLAGS_CMN) \
 		-L../server_share \
 		-L$(RYZOM_COMMON_SRC)/game_share \
 		-L../admin_modules \
-        -lserver_share \
+	        -lserver_share \
 		-lgame_share \
 		-lnelnet \
 		-lnelmisc \
 		-ladmin_modules \
 		-lxml2 \
 		-lrt\
+		-lpthread\
 		-ldl
 
 #############################################################################

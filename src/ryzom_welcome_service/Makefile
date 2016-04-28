@@ -19,6 +19,7 @@ LDFLAGS      = $(LD_FLAGS_CMN) \
 		-ladmin_modules \
 		-lxml2 \
 		-lrt\
+		-lpthread\
 		-ldl
 
 #############################################################################
