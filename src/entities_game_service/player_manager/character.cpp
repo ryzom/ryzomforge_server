@@ -11934,7 +11934,7 @@ void CCharacter::addMission(CMissionSolo * mission)
 //-----------------------------------------------
 // removeMission
 //-----------------------------------------------
-void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result)
+void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result, bool doNotClearJournal)
 {
 	CMission * mission = _Missions->getMissions(alias);
 	if ( mission == NULL )
