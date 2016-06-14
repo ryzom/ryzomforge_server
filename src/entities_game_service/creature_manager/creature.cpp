@@ -204,6 +204,11 @@ CCreature::~CCreature()
 	PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->removeCreature(this);
 
 	CAIAliasTranslator::getInstance()->removeAssociation(_Id);
+	if (_PrimAlias == 900) // Spawned Bots
+	{
+		nlinfo("Delete Alias : %u", _AIAlias);
+		CAIAliasTranslator::getInstance()->removeNPCAlias(_AIAlias);
+	}
 
 	if(_Merchant)
 	{

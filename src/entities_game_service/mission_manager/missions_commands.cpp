@@ -24,6 +24,7 @@
 #include "player_manager/character.h"
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"
+#include "phrase_manager/phrase_manager.h"
 #include "mission_manager/mission_manager.h"
 #include "primitives_parser.h"
 #include "team_manager/team.h"
@@ -35,10 +36,13 @@
 #include "guild_manager/guild.h"
 #include "building_manager/building_manager.h"
 #include "building_manager/building_physical.h"
+#include "progression/progression_pvp.h"
+#include "zone_manager.h"
 
 #include "admin.h"
 #include "creature_manager/creature_manager.h"
 #include "world_instances.h"
+
 
 
 using namespace NLMISC;
@@ -907,26 +911,114 @@ NLMISC_COMMAND(getTargetPosition, "get position of entity", "<uid>")
 
 	GET_ACTIVE_CHARACTER
 
-	double x = 0, y = 0, z = 0, h = 0;
-	sint32 cell = 0;
-	
 	CCreature * target = CreatureManager.getCreature( c->getTarget() );
 	if(target)
 	{
-		x = target->getState().X / 1000.;
-		y = target->getState().Y / 1000.;
-		z = target->getState().Z / 1000.;
-		h = target->getState().Heading;
+		double x = target->getState().X / 1000.;
+		double y = target->getState().Y / 1000.;
+		double z = target->getState().Z / 1000.;
+		double h = target->getState().Heading;
 
 		TDataSetRow dsr = target->getEntityRowId();
 		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
-		cell = srcCell;
+		sint32 cell = srcCell;
 
 		log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
-
-		return true;
+	} else {
+		log.displayNL("0");
 	}
-	return false;
+
+	return true;
+}
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
+{
+	if (args.size() < 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	bool found = false;
+
+
+	if ( args[1].find(".creature") != string::npos )
+	{
+		CSheetId creatureSheetId(args[1]);
+		if( creatureSheetId != CSheetId::Unknown )
+		{
+			double minDistance = -1.;
+			CCreature * creature = NULL;
+
+			TMapCreatures::const_iterator it;
+			const TMapCreatures& creatures = CreatureManager.getCreature();
+			for( it = creatures.begin(); it != creatures.end(); ++it )
+			{
+				CSheetId sheetId = (*it).second->getType();
+				if( sheetId == creatureSheetId )
+				{
+					double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
+					if( !creature || (creature && distance < minDistance) )
+					{
+						creature = (*it).second;
+						minDistance = distance;
+					}
+				}
+			}
+
+			if( creature )
+			{
+				double x = creature->getState().X() / 1000.;
+				double y = creature->getState().Y() / 1000.;
+				double z = creature->getState().Z() / 1000.;
+				double h = creature->getState().Heading();
+
+
+				TDataSetRow dsr = creature->getEntityRowId();
+				CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+				sint32 cell = mirrorCell;
+				found = true;
+				log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
+			}
+		}
+	}
+	else 
+	{
+		vector<TAIAlias> aliases;
+		CAIAliasTranslator::getInstance()->getNPCAliasesFromName(args[1], aliases );
+		if ( !aliases.empty() )
+		{
+			for (uint i = 0; i < aliases.size(); i++)
+			{
+				TAIAlias alias = aliases[i];
+
+				const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
+				if ( botId != CEntityId::Unknown )
+				{
+					CEntityBase *entityBase = CreatureManager.getCreature (botId);
+					if (entityBase != NULL)
+					{
+						double x = entityBase->getState().X / 1000.;
+						double y = entityBase->getState().Y / 1000.;
+						double z = entityBase->getState().Z / 1000.;
+						double h = entityBase->getState().Heading;
+
+						TDataSetRow dsr = entityBase->getEntityRowId();
+						CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+						sint32 cell = mirrorCell;
+						found = true;
+						log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
+					}
+				}
+			}
+		}
+	}
+
+	if (!found)
+		log.displayNL("0");
+
+	return true;
 }
 
 
@@ -1093,16 +1185,23 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> player_name number"
 
 			CBuildingPhysicalPlayer * buildingPlayer = dynamic_cast<CBuildingPhysicalPlayer *>( building );
 
-			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[2]));
+			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[1]));
 			if (buildingPlayer && entityBase)
 			{
+				nlinfo("OK");
 				CBuildingManager::getInstance()->removePlayerFromRoom( c );
+				nlinfo("OK");
 				uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
+				nlinfo("OK");
 				sint32 cell;
-				buildingPlayer->addUser(c, 0, ownerId, cell);				c->setPowoCell(cell);
+				nlinfo("OK");
+				buildingPlayer->addUser(c, 0, ownerId, cell);
+				nlinfo("OK");
 				c->setPowoCell(cell);
-//				CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
+				nlinfo("OK");
+				//CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
 				log.displayNL("%d", cell);
+				nlinfo("OK");
 			}
 		} else {
 			log.displayNL("ERR: invalid number");
@@ -1156,6 +1255,203 @@ NLMISC_COMMAND(slide, "slide to the powo", "<uid> x y cell [z] [h]")
 	return true;
 }
 
+
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] teleportMektoub? checks sameCell")
+{
+	if (args.size () < 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+
+	// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
+	if (args.size () > 3)
+	{
+		bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
+		if (args[3][0] == '1' && !pvpFlagValid) {
+			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			return false;
+		}
+
+		bool pvpTagValid =  c->getPVPFlag() == false;
+		if (args[3].length() > 1 && args[3][1] == '1' && !pvpTagValid)
+		{
+			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			return false;
+		}
+
+		if (args[3].length() > 2)
+		{
+			CBypassCheckFlags bypassCheckFlags;
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[3].length() > 2 && args[3][2] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[3].length() > 3 && args[3][3] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[3].length() > 4 && args[3][4] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[3].length() > 5 && args[3][5] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[3].length() > 6 && args[3][6] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[3].length() > 7 && args[3][7] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[3].length() > 8 && args[3][8] == '1');
+
+			if (!c->canEntityUseAction(bypassCheckFlags, true)) {
+				log.displayNL("ERR: PVP_TP_FORBIDEN");
+				return true;
+			}
+		}
+	}
+
+	string value = args[1];
+	
+	vector<string> res;
+	sint32 x = 0, y = 0, z = 0;
+	float h = 0;
+	sint32 cell;
+	if ( value.find(',') != string::npos ) // Position x,y,z,a
+	{
+		explode (value, string(","), res);
+		if (res.size() >= 2)
+		{
+			fromString(res[0], x);
+			x *= 1000;
+			fromString(res[1], y);
+			y *= 1000;
+		}
+		if (res.size() >= 3)
+		{
+			fromString(res[2], z);
+			z *= 1000;
+		}
+		if (res.size() >= 4)
+			fromString(res[3], h);
+	}
+	else
+	{
+		if ( value.find(".creature") != string::npos )
+		{
+			CSheetId creatureSheetId(value);
+			if( creatureSheetId != CSheetId::Unknown )
+			{
+				double minDistance = -1.;
+				CCreature * creature = NULL;
+
+				TMapCreatures::const_iterator it;
+				const TMapCreatures& creatures = CreatureManager.getCreature();
+				for( it = creatures.begin(); it != creatures.end(); ++it )
+				{
+					CSheetId sheetId = (*it).second->getType();
+					if( sheetId == creatureSheetId )
+					{
+						double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
+						if( !creature || (creature && distance < minDistance) )
+						{
+							creature = (*it).second;
+							minDistance = distance;
+						}
+					}
+				}
+				if( creature )
+				{
+					x = creature->getState().X();
+					y = creature->getState().Y();
+					z = creature->getState().Z();
+					h = creature->getState().Heading();
+				}
+			}
+			else
+			{
+				log.displayNL("ERR: INVALID_CREATURE");
+			}
+		}
+		else
+		{
+
+			CEntityBase *entityBase = PlayerManager.getCharacterByName (CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), value));
+			if (entityBase == NULL)
+			{
+				// try to find the bot name
+				vector<TAIAlias> aliases;
+				CAIAliasTranslator::getInstance()->getNPCAliasesFromName( value, aliases );
+				if ( aliases.empty() )
+				{
+					log.displayNL("ERR: INVALID_BOT");
+					return false;
+				}
+
+				TAIAlias alias = aliases[0];
+
+				const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
+				if ( botId != CEntityId::Unknown )
+				{
+					entityBase = CreatureManager.getCreature (botId);
+				}
+				else
+				{
+					log.displayNL("ERR: BOT_NOT_SPAWNED");
+					return false;
+				}
+
+			}
+			if (entityBase != NULL)
+			{
+				x = entityBase->getState().X + sint32 (cos (entityBase->getState ().Heading) * 2000);
+				y = entityBase->getState().Y + sint32 (sin (entityBase->getState ().Heading) * 2000);
+				z = entityBase->getState().Z;
+				h = entityBase->getState().Heading;
+
+				TDataSetRow dsr = entityBase->getEntityRowId();
+				CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+				cell = mirrorCell;
+			}
+		}
+	}
+
+	if (x == 0 && y == 0 && z == 0)
+	{
+		log.displayNL("ERR: INVALID_POSITION");
+		return true;
+	}
+
+	CContinent * cont = CZoneManager::getInstance().getContinent(x,y);
+
+	bool allowPetTp = false;
+	if (args.size () > 2 && args[2] == "1")
+		allowPetTp = true;
+
+	if (allowPetTp)
+		c->allowNearPetTp();
+	else
+		c->forbidNearPetTp(); 
+
+	// Respawn player if dead
+	if (c->isDead())
+	{
+		PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->playerRespawn(c);
+		// apply respawn effects because user is dead
+		c->applyRespawnEffects();
+	}
+
+	// Use same Cell
+	if (args.size () > 4 && args[4] == "1")
+	{
+		TDataSetRow dsr = c->getEntityRowId();
+		CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+		cell = mirrorCell;
+	}
+
+	c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
+
+	if ( cont )
+	{
+		c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
+	}
+}
+
+
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientation groupname x y look cell")
 {
@@ -1191,28 +1487,23 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 		return true;
 
 	double dispersionRadius = 10.;
-	if (args.size()>3)
-	{
-		fromString(args[3], dispersionRadius);
-		if (dispersionRadius < 0.) {
-			log.displayNL("ERR: invalid dispersion");
-			return false;
-		}
+
+	fromString(args[3], dispersionRadius);
+	if (dispersionRadius < 0.) {
+		log.displayNL("ERR: invalid dispersion");
+		return false;
 	}
 
 	bool spawnBots = true;
 
-	if (args.size()>4)
+	if (args[4] == "self")
 	{
-		if (args[4] == "self")
-		{
-			orientation = (sint32)(c->getHeading() * 1000.0);
-		}
-		else if (args[4] != "random")
-		{
-			NLMISC::fromString(args[4], orientation);
-			orientation = (sint32)((double)orientation / 360.0 * (NLMISC::Pi * 2.0) * 1000.0);
-		}
+		orientation = (sint32)(c->getHeading() * 1000.0);
+	}
+	else if (args[4] != "random")
+	{
+		NLMISC::fromString(args[4], orientation);
+		orientation = (sint32)((double)orientation / 360.0 * (NLMISC::Pi * 2.0) * 1000.0);
 	}
 
 	string botsName = args[5];
@@ -1225,22 +1516,26 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 	NLMISC::fromString(args[7], userY);
 	y = (sint32)(userY * 1000.0);
 
-	string look = args[8];
+	string look;
+	if (args[8] != "*")
+	{
+		look = args[8];
+		if (look.find(".creature") == string::npos)
+			look += ".creature";
+	}
+
 	NLMISC::fromString(args[9], cell);
 
-	// See if another AI instance has been specified
-	if (botsName.find("@") != string::npos)
+	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
+
+	uint32 aiInstance = CUsedContinent::instance().getInstanceForContinent((CONTINENT::TContinent)continent->getId());
+
+	if (aiInstance == ~0)
 	{
-		string continent = botsName.substr(0, botsName.find('@'));
-		uint32 nr = CUsedContinent::instance().getInstanceForContinent(continent);
-		if (nr == ~0)
-		{
-			log.displayNL("ERR: invalid continent");
-			return false;
-		}
-		instanceNumber = nr;
-		botsName = botsName.substr(botsName.find('@') + 1, botsName.size());
+		log.displayNL("ERR: invalid continent");
+		return false;
 	}
+	instanceNumber = aiInstance;
 
 	CEntityId playerId = c->getId();
 
@@ -1264,6 +1559,125 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 
 	return true;
 }
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(grpScript, "executes a script on an event npc group", "<uid> <groupname> <script>")
+{
+	if (args.size () < 3) return false;
+
+	GET_ACTIVE_CHARACTER
+
+	uint32 instanceNumber = c->getInstanceNumber();
+
+	uint32 nbString = (uint32)args.size();
+ 
+	string botsName = args[1];
+	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+	{
+		return false;
+	}
+
+	CMessage msgout("EVENT_NPC_GROUP_SCRIPT");
+	uint32 messageVersion = 1;
+	msgout.serial(messageVersion);
+	msgout.serial(nbString);
+
+	string playerEid = c->getId().toString();
+	msgout.serial(playerEid);
+	msgout.serial(botsName);
+	for (uint32 i=2; i<nbString; ++i)
+	{
+		string arg = args[i]+";";
+
+		size_t pos = 0;
+		while((pos = arg.find("&nbsp&", pos)) != string::npos)
+		{
+			arg.replace(pos, 6, " ");
+			pos ++;
+		}
+		pos = 0;
+		while((pos = arg.find("__OR__", pos)) != string::npos)
+		{
+			arg.replace(pos, 6, "|");
+			pos ++;
+		}
+		msgout.serial(arg);
+	}
+	CWorldInstances::instance().msgToAIInstance2(instanceNumber, msgout);
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setUrl, "changes the url of a bot", "<uid> <groupname> [<url>] [<name>]")
+{
+	if (args.size () < 2) return false;
+
+	GET_ACTIVE_CHARACTER
+
+	uint32 instanceNumber = c->getInstanceNumber();
+ 
+	string groupname = args[1];
+	if ( ! getAIInstanceFromGroupName(groupname, instanceNumber))
+	{
+		log.displayNL("ERR: INVALID_AI_INSTANCE");
+		return false;
+	}
+
+
+	// try to find the bot name
+	vector<TAIAlias> aliases;
+
+	log.displayNL("NAME: %s", groupname.c_str());
+	CAIAliasTranslator::getInstance()->getNPCAliasesFromName( groupname, aliases );
+	if ( aliases.empty() )
+	{
+		log.displayNL("ERR: INVALID_BOT");
+		return false;
+	}
+
+	TAIAlias alias = aliases[0];
+
+	const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
+	if ( botId != CEntityId::Unknown )
+	{
+
+		CCreature* creature = CreatureManager.getCreature(botId);
+
+		uint32 program = creature->getBotChatProgram();
+		if(!(program & (1<<BOTCHATTYPE::WebPageFlag)))
+		{
+			program |= 1 << BOTCHATTYPE::WebPageFlag;
+			creature->setBotChatProgram(program);
+		}
+
+		const string &wp = creature->getWebPage();
+		if(args.size() < 3)
+		{
+			(string &)wp = "";
+			program &= ~(1 << BOTCHATTYPE::WebPageFlag);
+			creature->setBotChatProgram(program);
+		}
+		else
+		{
+			(string &)wp = args[2];
+			if(args.size() > 3)
+			{
+				const string &wpn = creature->getWebPageName();
+				(string &)wpn = args[3];
+			}
+		}
+	}
+	else
+	{
+		log.displayNL("ERR: BOT_NOT_SPAWNED");
+		return false;
+	}
+
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(temporaryRename, "rename a player for the event", "<uid> <new name>" )
@@ -1389,3 +1803,5 @@ NLMISC_COMMAND(getServerStats,"get_server_stats","<stat1,stat2,stat3..>")
 
 	return true;
 }
+
+

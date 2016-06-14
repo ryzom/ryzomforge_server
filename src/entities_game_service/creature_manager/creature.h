@@ -379,6 +379,10 @@ public:
 	/// enable loot rights for given team
 	void enableLootRights(uint16 teamId);
 
+	inline void lockLoot(uint16 teamId) { _LockedLoot = teamId; }
+
+	inline uint16 getLockLoot() { return _LockedLoot; }
+
 	/// get the resist value associated to effect type
 	uint32 getMagicResistance(EFFECT_FAMILIES::TEffectFamily effectFamily);
 
