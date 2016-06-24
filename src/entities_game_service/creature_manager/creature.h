@@ -616,6 +616,7 @@ private:
 	// loot rights management
 	std::vector< TDataSetRow >		_LootRight;					// list of CCharacter have loot right after creature death, if emty all have loot right
 	NLMISC::TGameCycle				_LootRightDuration;			// Duration of loot right before all have loot right
+	uint16						_LockedLoot;				// Loot is locked by the player
 
 //#ifdef NL_DEBUG
 	// Looking for a 'Zombie' bug (creature dead on EGS, but not on AIS)

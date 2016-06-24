@@ -146,6 +146,9 @@ CCreature::CCreature() : CEntityBase(true)
 	_MaxHitRangeForPC = -1.f;
 
 	_Organization = 0;
+
+	_LockedLoot = CTEAM::InvalidTeamId;
+
 //	_MissionIconFlags.IsMissionStepIconDisplayable = true;
 //	_MissionIconFlags.IsMissionGiverIconDisplayable = true;
 }
