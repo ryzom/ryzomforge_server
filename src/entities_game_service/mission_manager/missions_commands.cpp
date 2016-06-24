@@ -1524,7 +1524,14 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 			look += ".creature";
 	}
 
-	NLMISC::fromString(args[9], cell);
+	if (args[9] == "*")
+	{
+		TDataSetRow dsr = c->getEntityRowId();
+		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+		cell = srcCell;
+	}
+	else
+		NLMISC::fromString(args[9], cell);
 
 	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
 
