@@ -386,7 +386,6 @@ CCharacter::CCharacter():	CEntityBase(false),
 //	_NextDecayTickTime = CTickEventHandler::getGameCycle() + uint32(CarriedItemsDecayRate / CTickEventHandler::getGameTimeStep());
 	_LastTickSufferGooDamage= CTickEventHandler::getGameCycle();
 	_LastTickSaved = CTickEventHandler::getGameCycle();
-	_LastTickActionDone = CTickEventHandler::getGameCycle();
 	_LastTickCompassUpdated = CTickEventHandler::getGameCycle();
 
 	// harvest related
@@ -1001,13 +1000,6 @@ uint32 CCharacter::tickUpdate()
 	// save character if save delay is elapsed
 	saveCharacter();
 
-/*	if (_LastTickActionDone < CTickEventHandler::getGameCycle() - 4800)
-	{
-		PlayerManager.disconnectPlayer(PlayerManager.getPlayerId( _Id ));
-		return (uint32)-1;
-	}
-*/
-
 	{
 		H_AUTO(CharacterLinkToMatrix);
 		EntityMatrix.linkToMatrix(getState().X, getState().Y, _ListLink);
@@ -1263,19 +1255,6 @@ uint32 CCharacter::tickUpdate()
 				sint32 skillBaseValue = targetChar->getSkillBaseValue( targetChar->getBestSkill() );
 //				_PropertyDatabase.setProp( _DataIndexReminder->TARGET.PLAYER_LEVEL, skillBaseValue );
 				CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, checkedCast<uint8>(skillBaseValue) );
-			} else {
-				CCreature * creature = dynamic_cast< CCreature *>(target);
-				if( creature )
-				{
-					if (creature->getLockLoot() != CTEAM::InvalidTeamId) {
-						if (creature->getLockLoot() == _TeamId)
-							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
-						else
-							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
-					}
-					else
-						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
-				}
 			}
 
 			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after update target HP/STA/SAP !!!") )
@@ -3405,15 +3384,6 @@ void CCharacter::setTarget( const CEntityId &targetId, bool sendMessage )
 				{
 					rangeLevel = ( ((form->getLevel() - 1) / 5) << 1) + ( ((form->getLevel()-1) % 5) >= 2 ? 2 : 1 );
 
-					if (creature->getLockLoot() != CTEAM::InvalidTeamId) {
-						if (creature->getLockLoot() == _TeamId)
-							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
-						else
-							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
-					}
-					else
-						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
-
 					if (rangeLevel > 11)
 						rangeLevel = 11;
 				}
@@ -3571,7 +3541,6 @@ void CCharacter::setTarget( const CEntityId &targetId, bool sendMessage )
 //		PHRASE_UTILITIES::sendDynamicSystemMessage( _Id, "TARGET_NONE");
 	}
 	//_PropertyDatabase.setProp( "TARGET:AGGRESSIVE", agressiveness );
-//	CBankAccessor_PLR::getTARGET().setAGGRESSIVE(_PropertyDatabase, 0 );
 //	_PropertyDatabase.setProp( "TARGET:FORCE_RATIO", rangeLevel );
 	CBankAccessor_PLR::getTARGET().setFORCE_RATIO(_PropertyDatabase, rangeLevel );
 } // setTarget //
@@ -16359,8 +16328,6 @@ void CCharacter::onDisconnection(bool bCrashed)
 //----------------------------------------------------------------------------
 void CCharacter::setAfkState( bool isAfk )
 {
-	_LastTickActionDone = CTickEventHandler::getGameCycle();
-
 	if (_ContextualProperty.directAccessForStructMembers().afk() != isAfk)
 	{
 		_ContextualProperty.directAccessForStructMembers().afk(isAfk);

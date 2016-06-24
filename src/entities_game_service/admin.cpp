@@ -675,8 +675,6 @@ void initPositionFlags(const std::string & fileName)
 	if (CFile::fileExists(fileNameAndPath))
 	{
 		CPositionFlagManager::getInstance().loadFromFile(fileName);
-	} else {
-		nlinfo("ADMIN: file '%s' not found", fileNameAndPath.c_str());
 	}
 	PositionFlagsFileName = fileName;
 }

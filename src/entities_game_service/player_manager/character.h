@@ -3120,7 +3120,6 @@ private:
 	sint32								_OldFocusBarSentToPlayer;
 	
 	NLMISC::TGameCycle					_LastTickSaved;
-	NLMISC::TGameCycle					_LastTickActionDone;
 	NLMISC::TGameCycle					_LastTickCompassUpdated;
 
 	/// permanent score modifiers (given by bricks)

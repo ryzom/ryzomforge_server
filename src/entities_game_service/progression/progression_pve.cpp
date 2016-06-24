@@ -342,17 +342,11 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 
 			float factor = CStaticSuccessTable::getXPGain(SUCCESS_TABLE_TYPE::FightPhrase, deltaLevel);
 
-			uint16 teamLooter;
-
-			if (creaturePtr->getLockLoot() != CTEAM::InvalidTeamId)
-				teamLooter = creaturePtr->getLockLoot();
-			else
-				teamLooter = creatureTakenDmg.PlayerInflictedDamage[index].TeamId;
 			// dispatch Xp for all validated team members
-			if (teamLooter != CTEAM::InvalidTeamId)
+			if (creatureTakenDmg.PlayerInflictedDamage[index].TeamId != CTEAM::InvalidTeamId)
 			{
 				// validate loot right for team on this creature
-				creaturePtr->enableLootRights(teamLooter);
+				creaturePtr->enableLootRights(creatureTakenDmg.PlayerInflictedDamage[index].TeamId);
 
 				// get team members list
 				CTeam *team = TeamManager.getTeam(creatureTakenDmg.PlayerInflictedDamage[index].TeamId);

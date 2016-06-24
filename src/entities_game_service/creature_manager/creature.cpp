@@ -208,7 +208,8 @@ CCreature::~CCreature()
 
 	CAIAliasTranslator::getInstance()->removeAssociation(_Id);
 	if (_PrimAlias == 900) // Spawned Bots
-	{ 
+	{
+		nlinfo("Delete Alias : %u", _AIAlias);
 		CAIAliasTranslator::getInstance()->removeNPCAlias(_AIAlias);
 	}
 
@@ -1475,7 +1476,6 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 				nlwarning("parseBotOption -> invalid number of params in command '%s' for bot %u", result[0].c_str(), _AIAlias );
 			else
 			{
-				nlinfo("Seting name %s to alias %u", result[1].c_str(), _AIAlias);
 				CAIAliasTranslator::getInstance()->setNameForNPCAliases(result[1], _AIAlias);
 			}
 		} else
@@ -2014,16 +2014,15 @@ void CCreature::addAggressivenessAgainstPlayerCharacter( TDataSetRow PlayerRowId
 {
 	if( _Agressiveness.find( PlayerRowId ) == _Agressiveness.end() )
 	{
+		_Agressiveness.insert( PlayerRowId );
+
 		// if it's a player, inc _NbOfPlayersInAggroList
 		CCharacter * pChar = PlayerManager.getChar(PlayerRowId);
 		if ( pChar != NULL )
 		{
-			nlinfo("%s enters the aggro", pChar->getName().toString().c_str());
 			++_NbOfPlayersInAggroList;
 			pChar->incAggroCount();
 		}
-
-		_Agressiveness.insert( PlayerRowId );
 	}
 }
 
@@ -2040,7 +2039,6 @@ void CCreature::removeAggressivenessAgainstPlayerCharacter( TDataSetRow PlayerRo
 		CCharacter * pChar = PlayerManager.getChar(PlayerRowId);
 		if ( pChar != NULL )
 		{
-			nlinfo("%s leaves the aggro", pChar->getName().toString().c_str());
 			--_NbOfPlayersInAggroList;
 			pChar->decAggroCount();
 
@@ -2094,57 +2092,6 @@ uint32 CCreature::tickUpdate()
 		{
 			CreatureDespawnMsg.Entities.push_back(_EntityRowId);
 			_DespawnSentToAI = true;
-		}
-	}
-
-	if (!isDead() && (_NbOfPlayersInAggroList || _LockedLoot != CTEAM::InvalidTeamId))
-	{
-		if (_LockedLoot != CTEAM::InvalidTeamId)
-		{
-			bool keepLock = false;
-			for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
-			{
-				CCharacter * pChar = PlayerManager.getChar( *it );
-				if (pChar && pChar->getTeamId() == _LockedLoot)
-				{
-					keepLock = true;
-					break;
-				}
-			}
-
-			if (!keepLock)
-			{
-				_LockedLoot = CTEAM::InvalidTeamId;
-				nlinfo("unlock me");
-			}
-		}
-		else
-		{
-			vector< uint16 > teams;
-
-			for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
-			{
-
-				CCharacter * pChar = PlayerManager.getChar( *it );
-				if (pChar && pChar->getTeamId() != CTEAM::InvalidTeamId)
-				{
-					uint16 pTeam = pChar->getTeamId();
-					for( vector< uint16 >::const_iterator itTeam = teams.begin(); itTeam != teams.end(); ++itTeam )
-					{
-						if (pTeam == *itTeam)
-						{
-							_LockedLoot = *itTeam;
-							break;
-						}
-					}
-					teams.push_back(pTeam);
-				}
-
-				if (_LockedLoot != CTEAM::InvalidTeamId) {
-					nlinfo("lock me");
-					break;
-				}
-			}
 		}
 	}
 

@@ -413,12 +413,12 @@ retry_pending_command:
 						<<" --step "<<toString(gd.getSamplePeriod())
 						<<" DS:var:GAUGE:"<<toString(gd.getSamplePeriod()*2)
 						<<":U:U RRA:AVERAGE:0.5:1:1000 RRA:AVERAGE:0.5:10:1000 RRA:AVERAGE:0.5:100:1000";
-					//launchProgram(IService::getInstance()->ConfigFile.getVar("RRDToolPath").asString(), arg);
+					launchProgram(IService::getInstance()->ConfigFile.getVar("RRDToolPath").asString(), arg);
 					arg = "";
 				}
 
 				arg<<"update "<<rrdfilename<<" "<<toString (graphDatas.getCurrentTime())<<":"<<toString(gd.getValue());
-				//launchProgram(IService::getInstance()->ConfigFile.getVar("RRDToolPath").asString(), arg);
+				launchProgram(IService::getInstance()->ConfigFile.getVar("RRDToolPath").asString(), arg);
 			}
 		}
 
