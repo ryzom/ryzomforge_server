@@ -48,6 +48,7 @@ void initSalt();
 const std::string &getSalt();
 void getUCstringFromHash(const std::string & hash, ucstring & finaltext);
 std::string getStringFromHash(const std::string &hash);
+bool getAIInstanceFromGroupName(std::string& groupName, uint32& instanceNumber);
 
 CAdminCommand * findAdminCommand(const std::string & name);
 
