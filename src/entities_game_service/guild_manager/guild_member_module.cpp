@@ -359,7 +359,7 @@ void CGuildMemberModule::_inviteCharacterInGuild(CGuildCharProxy& invitor, CGuil
 	if (invitedAllegiance.first == PVP_CLAN::Neutral && invitedAllegiance.second == PVP_CLAN::Neutral)
 	{
 		// get the marauder index
-		uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex("marauder");
+		uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex("black_kami");
 
 		if (factionIndex != CStaticFames::INVALID_FACTION_INDEX)
 		{
@@ -406,7 +406,7 @@ void CGuildMemberModule::_inviteCharacterInGuild(CGuildCharProxy& invitor, CGuil
 		}
 		else
 		{
-			nlwarning("Unable to find faction 'marauder'");
+			nlwarning("Unable to find faction 'black_kami'");
 		}
 	}
 

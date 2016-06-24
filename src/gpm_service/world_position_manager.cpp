@@ -1475,27 +1475,47 @@ void	CWorldPositionManager::computeVision()
 		cell->setVisionUpdateCycle(CTickEventHandler::getGameCycle());
 		H_TIME(ComputeCellVision, computeCellVision(cell, cellVisionArray, numEntities, player->Entity););
 
-		CPlayerInfos	*plv;
-		for (plv=cell->getPlayersList(); plv!=NULL; plv=plv->Next)
+		if (!cell->isIndoor())
 		{
-			CFrontEndData	&fe = (*(plv->ItFrontEnd)).second;
+			CPlayerInfos	*plv;
+			for (plv=cell->getPlayersList(); plv!=NULL; plv=plv->Next)
+			{
+				CFrontEndData	&fe = (*(plv->ItFrontEnd)).second;
+				// if player's fe reached its maximum for this tick, get to next entity
+				if (fe.CurrentVisionsAtTick >= fe.MaxVisionsPerTick || plv->DelayVision > CTickEventHandler::getGameCycle())
+					continue;
+
+				// else set cell vision to the player
+				H_TIME(SetVisionToPlayer, setCellVisionToEntity(plv->Entity, cellVisionArray, numEntities););
+				++numVision;
+				plv->LastVisionTick = CTickEventHandler::getGameCycle();
+
+				//
+				++(fe.CurrentVisionsAtTick);
+
+				// put player at the end of the update list
+				if (plv == *itpl)
+					itpl = updateVisionState(itpl);
+				else
+					updateVisionState(plv->ItUpdatePlayer);
+			}
+		}
+		else
+		{
+			CFrontEndData	&fe = (*(player->ItFrontEnd)).second;
 			// if player's fe reached its maximum for this tick, get to next entity
-			if (fe.CurrentVisionsAtTick >= fe.MaxVisionsPerTick || plv->DelayVision > CTickEventHandler::getGameCycle())
+			if (fe.CurrentVisionsAtTick >= fe.MaxVisionsPerTick || player->DelayVision > CTickEventHandler::getGameCycle())
 				continue;
 
 			// else set cell vision to the player
-			H_TIME(SetVisionToPlayer, setCellVisionToEntity(plv->Entity, cellVisionArray, numEntities););
+			H_TIME(SetVisionToPlayer, setCellVisionToEntity(player->Entity, cellVisionArray, numEntities););
 			++numVision;
-			plv->LastVisionTick = CTickEventHandler::getGameCycle();
+			player->LastVisionTick = CTickEventHandler::getGameCycle();
 
 			//
 			++(fe.CurrentVisionsAtTick);
 
-			// put player at the end of the update list
-			if (plv == *itpl)
-				itpl = updateVisionState(itpl);
-			else
-				updateVisionState(plv->ItUpdatePlayer);
+			itpl = updateVisionState(itpl);
 		}
 	}
 

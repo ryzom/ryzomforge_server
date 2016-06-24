@@ -2799,9 +2799,10 @@ class CMissionActionCompassNpc : public IMissionAction
 			MISLOGSYNTAXERROR("<bot>");
 			return false;
 		}
+		nlinfo("Bot Name : '%s'", script[1].c_str());
 		if (CMissionParser::getNoBlankString(script[1]) == "#dynamic#") {
+			nlinfo("Dynamic");
 			IsDynamic = true;
-			MissionData = &missionData;
 		}
 		else
 		{
@@ -2814,23 +2815,41 @@ class CMissionActionCompassNpc : public IMissionAction
 	{
 		LOGMISSIONACTION("add_compass_npc");
 		TAIAlias alias;
+		nlinfo("Here");
 		if (IsDynamic) {
-			const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( instance->getTemplateId() );
-			if (templ) {
+			nlinfo("Here");
+				nlinfo("Here");
+				const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( instance->getTemplateId() );
+				if (templ) {
+					nlinfo("Here");
 					vector<TDataSetRow> entities;
 					instance->getEntities( entities );
 					if (entities.size() >= 1) {
-							CCharacter *c = PlayerManager.getChar(entities.front());
-							if (c != NULL)
+						nlinfo("Here");
+						CCharacter *c = PlayerManager.getChar(entities.front());
+						if (c != NULL)
+						{
+							nlinfo("Here : '%s'", toUpper(templ->getMissionName()).c_str());
+							vector<string> params = c->getCustomMissionParams(toUpper(templ->getMissionName()));
+							if (params.size() >= 2)
 							{
-									vector<string> params = c->getCustomMissionParams(toUpper(templ->getMissionName()));
-									if (params.size() >= 2)
-									{
-											CMissionParser::parseBotName(params[1],Alias,*MissionData);
-									}
+								nlinfo("Bot name is: '%s'", params[1].c_str());
+								nlinfo("ok");
+
+								vector<TAIAlias> aliases;
+								CAIAliasTranslator::getInstance()->getNPCAliasesFromName( params[1] , aliases );
+								if ( aliases.empty() )
+								{
+									MISLOG( "<parseBotName> Invalid bot %s",params[1].c_str() );
+									return;
+								}
+								nlinfo("ok");
+								Alias = aliases[0];
+								nlinfo("ok");
 							}
+						}
 					}
-			}
+				}
 		}
 
 		if ( Alias == CAIAliasTranslator::Invalid )
@@ -2842,7 +2861,6 @@ class CMissionActionCompassNpc : public IMissionAction
 	}
 	TAIAlias Alias;
 	bool IsDynamic;
-	CMissionSpecificParsingData *MissionData;
 
 	MISSION_ACTION_GETNEWPTR(CMissionActionCompassNpc)
 };
