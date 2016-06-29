@@ -594,7 +594,7 @@ void CBotNpc::fillDescriptionMsg(RYMSG::TGenNpcDescMsg& msg) const
 			msg.getLootList().push_back(sheetRef);
 	}
 
-	if (_PrimAlias == 900) //Spawned bots
+	if (_PrimAlias >= 900 && _PrimAlias <= 999) //Spawned bots
 		msg.getOptionalProperties().push_back("Name:"+getName());
 
 	CGroupNpc::TFactionAttackableSet const& factionAttackableAbove = grp().getFactionAttackableAbove();

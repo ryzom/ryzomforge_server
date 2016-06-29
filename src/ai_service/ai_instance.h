@@ -228,6 +228,8 @@ private:
 	CAliasCont<CManager> _Managers;
 	//@}
 	
+	static NLLIGO::CLigoConfig	_LigoConfig;
+	
 	/// The ai instance continent name (multi ai system)
 	std::string _ContinentName;
 	/// The ai instance number (multi ai system)

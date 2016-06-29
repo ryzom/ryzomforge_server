@@ -26,6 +26,8 @@
 
 #include "ai_instance_inline.h"
 
+#include "nel/ligo/primitive_utils.h"
+
 #include "commands.h"
 #include "messages.h"
 
@@ -33,6 +35,10 @@ using namespace std;
 using namespace NLMISC;
 using namespace NLNET;
 using namespace MULTI_LINE_FORMATER;
+using namespace NLLIGO;
+
+NLLIGO::CLigoConfig		CAIInstance::_LigoConfig;
+
 
 CAIInstance::CAIInstance(CAIS* owner)
 : CChild<CAIS>(owner)
@@ -42,7 +48,6 @@ CAIInstance::CAIInstance(CAIS* owner)
 	_EventNpcManager = static_cast<CMgrNpc*>(newMgr(AITYPES::MgrTypeNpc, 0, "Event NPCs Manager", "MapName: Event NPCs Manager", ""));
 	_EasterEggManager = static_cast<CMgrNpc*>(newMgr(AITYPES::MgrTypeNpc, 0, "Easter Eggs Manager", "MapName: Easter Eggs Manager", ""));
 	_SquadFamily = new COutpostSquadFamily(this, 0, "Squads");
-	_LastSpawnAlias =  900 << LigoConfig.getDynamicAliasSize();
 }
 
 CAIInstance::~CAIInstance()
@@ -209,6 +214,8 @@ void CAIInstance::initInstance(string const& continentName, uint32 instanceNumbe
 {
 	_ContinentName = continentName;
 	_InstanceNumber = instanceNumber;
+
+	_LastSpawnAlias =  (900 + _InstanceNumber) << LigoConfig.getDynamicAliasSize();
 
 	sendInstanceInfoToEGS();
 
@@ -686,13 +693,14 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 		// build unnamed bot
 		for	(uint i=0; i<nbBots; ++i) 
 		{
-			nlinfo("Spawn with alias : %d", _LastSpawnAlias+1);
-			grp->bots().addChild(new CBotNpc(grp, _LastSpawnAlias++, botsName.empty() ? grp->getName():botsName), i); // Doub: 0 instead of getAlias()+i otherwise aliases are wrong
+			_LastSpawnAlias++;
+			nlinfo("Spawn with alias : %d (%s)", _LastSpawnAlias, _LigoConfig.aliasToString(_LastSpawnAlias).c_str());
+			grp->bots().addChild(new CBotNpc(grp, _LastSpawnAlias, botsName.empty() ? grp->getName():botsName), i); // Doub: 0 instead of getAlias()+i otherwise aliases are wrong
 
 			CBotNpc* const bot = NLMISC::safe_cast<CBotNpc*>(grp->bots()[i]);
 
 			bot->setSheet(sheet);
-			bot->setPrimAlias(900);
+			bot->setPrimAlias(900+_InstanceNumber);
 			if (!look.empty())
 				bot->setClientSheet(look);
 			bot->equipmentInit();
