@@ -8105,10 +8105,15 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 			look += ".creature";
 	}
 
-	// See if another AI instance has been specified
-	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+
+	//Get instance number from position
+	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
+	uint32 instanceNumber = CUsedContinent::instance().getInstanceForContinent((CONTINENT::TContinent)continent->getId());
+
+	if (instanceNumber == ~0)
 	{
-		return true;
+		log.displayNL("ERR: invalid continent");
+		return false;
 	}
 
 	TDataSetRow dsr = c->getEntityRowId();
