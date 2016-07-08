@@ -8017,7 +8017,6 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 	if (args.size () < 3) return false;
 	GET_CHARACTER
 
-	uint32 instanceNumber = c->getInstanceNumber();
 	sint32 x = c->getX();
 	sint32 y = c->getY();
 	sint32 z = c->getZ();
