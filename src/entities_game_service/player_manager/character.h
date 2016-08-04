@@ -3814,6 +3814,13 @@ private:
 	sint8			_AggroableSave;
 	/// General god flag for persistence
 	bool			_GodModeSave;
+	
+	/// General flags for powos
+	bool			_PowoCanXP;
+	bool			_PowoCantDead;
+	bool			_PowoCanTeleport;
+	bool			_PowoCanSpeedUp;
+	
 public:
 
 	void			setWebCommandIndex(uint32 index) { _LastWebCommandIndex = index;}
@@ -3837,6 +3844,27 @@ public:
 	/// Set the aggroable save flag, NB : just for persistence, do not change nothing.
 	void			setAggroableSave(sint8 aggroable)		{ _AggroableSave = aggroable;}
 
+	bool			getPowoFlag(const std::string &flag) const	{
+		if (flag == "xp") return _PowoCanXP;
+		if (flag == "dead") return _PowoCantDead;
+		if (flag == "teleport") return _PowoCanTeleport;
+		if (flag == "speed") return _PowoCanSpeedUp;
+	}
+
+	bool			setPowoFlag(const std::string &flag, bool value) {
+		if (flag == "xp") _PowoCanXP = value;
+		if (flag == "dead") _PowoCantDead = value;
+		if (flag == "teleport") _PowoCanTeleport = value;
+		if (flag == "speed") _PowoCanSpeedUp = value;
+	}
+	
+	void			resetPowoFlags() {
+		_PowoCanXP = false;
+		_PowoCantDead = false;
+		_PowoCanTeleport = false;
+		_PowoCanSpeedUp  = false;
+	}
+	
 	bool			getGodModeSave() const	{ return _GodModeSave;}
 	/// Set the gobmode save flag, NB : just for persistence, do not change nothing.
 	void			setGodModeSave(bool godMode)	{ _GodModeSave = godMode;}
