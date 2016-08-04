@@ -106,22 +106,17 @@ uint32 IMissionStepTemplate::sendRpStepText(CCharacter * user,const std::vector<
 
 	if (_RoleplayText.compare(0, 6, "WEBIG_") == 0 || _RoleplayText.compare(0, 4, "ARK_") == 0)
 	{
-		TVectorParamCheck params;
-		string name = _RoleplayText;
+		string text = _RoleplayText;
 		if (user)
 		{
 			uint32 userId = PlayerManager.getPlayerId(user->getId());
-			string text = user->getCustomMissionText(_RoleplayText);
+			text = user->getCustomMissionText(_RoleplayText);
 			if (text.empty())
-				return 0;
-			name = _RoleplayText+"_"+toString(userId);
-			ucstring phrase = ucstring(name+"(){["+text+"]}");
-			NLNET::CMessage	msgout("SET_PHRASE");
-			msgout.serial(name);
-			msgout.serial(phrase);
-			sendMessageViaMirror("IOS", msgout);
+				text = _RoleplayText;
 		}
-		return STRING_MANAGER::sendStringToClient( user->getEntityRowId(), name, params );
+		SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
+		params[0].Literal.fromUtf8(text);
+		return STRING_MANAGER::sendStringToClient( user->getEntityRowId(), "LITERAL", params );
 	}
 	else
 	{

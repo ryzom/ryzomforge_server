@@ -1188,20 +1188,17 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> player_name number"
 			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[1]));
 			if (buildingPlayer && entityBase)
 			{
-				nlinfo("OK");
 				CBuildingManager::getInstance()->removePlayerFromRoom( c );
-				nlinfo("OK");
 				uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
-				nlinfo("OK");
 				sint32 cell;
-				nlinfo("OK");
 				buildingPlayer->addUser(c, 0, ownerId, cell);
-				nlinfo("OK");
 				c->setPowoCell(cell);
-				nlinfo("OK");
-				//CBuildingManager::getInstance()->setRoomLifeTime(cell, TGameCycle(NLMISC::TGameTime(4*60*60) / CTickEventHandler::getGameTimeStep()));
+				if (powoFlags[0] == '1') c->setPowoFlag("xp", true);
+				if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
+				if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
+				if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
+					
 				log.displayNL("%d", cell);
-				nlinfo("OK");
 			}
 		} else {
 			log.displayNL("ERR: invalid number");
