@@ -1176,6 +1176,9 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> player_name number"
 	else
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName("building_instance_ZO_player_111");
 
+	string powoFlags = "";
+	if (args.size () >= 4)
+		powoFlags = args[3];
 
 	if ( building )
 	{
