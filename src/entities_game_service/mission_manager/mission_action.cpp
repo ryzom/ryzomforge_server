@@ -2801,7 +2801,6 @@ class CMissionActionCompassNpc : public IMissionAction
 		}
 		if (CMissionParser::getNoBlankString(script[1]) == "#dynamic#") {
 			IsDynamic = true;
-			MissionData = &missionData;
 		}
 		else
 		{
@@ -2814,22 +2813,32 @@ class CMissionActionCompassNpc : public IMissionAction
 	{
 		LOGMISSIONACTION("add_compass_npc");
 		TAIAlias alias;
-		if (IsDynamic) {
+		if (IsDynamic)
+		{
 			const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( instance->getTemplateId() );
-			if (templ) {
-					vector<TDataSetRow> entities;
-					instance->getEntities( entities );
-					if (entities.size() >= 1) {
-							CCharacter *c = PlayerManager.getChar(entities.front());
-							if (c != NULL)
+			if (templ)
+			{
+				vector<TDataSetRow> entities;
+				instance->getEntities(entities);
+				if (entities.size() >= 1)
+				{
+					CCharacter *c = PlayerManager.getChar(entities.front());
+					if (c != NULL)
+					{
+						vector<string> params = c->getCustomMissionParams(toUpper(templ->getMissionName()));
+						if (params.size() >= 2)
+						{
+							vector<TAIAlias> aliases;
+							CAIAliasTranslator::getInstance()->getNPCAliasesFromName( params[1] , aliases );
+							if (aliases.empty())
 							{
-									vector<string> params = c->getCustomMissionParams(toUpper(templ->getMissionName()));
-									if (params.size() >= 2)
-									{
-											CMissionParser::parseBotName(params[1],Alias,*MissionData);
-									}
+								MISLOG( "<parseBotName> Invalid bot %s",params[1].c_str() );
+								return;
 							}
+							Alias = aliases[aliases.size() - 1];
+						}
 					}
+				}
 			}
 		}
 
@@ -2842,7 +2851,6 @@ class CMissionActionCompassNpc : public IMissionAction
 	}
 	TAIAlias Alias;
 	bool IsDynamic;
-	CMissionSpecificParsingData *MissionData;
 
 	MISSION_ACTION_GETNEWPTR(CMissionActionCompassNpc)
 };
