@@ -252,6 +252,17 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 			result.push_back((*it).second);
 		}
 	}
+	
+	// Organizations
+	if (user->getOrganization() == 5) // marauder
+	{
+		TMAPExtraFactionChannel::iterator it = _ExtraFactionChannel.find("marauders");
+		if (it != _ExtraFactionChannel.end())
+		{
+			result.push_back((*it).second);
+		}
+	}
+		
 
 	/*
 	bool matis = CFameInterface::getInstance().getFameIndexed(user->getId(), 0) >= PVPFameRequired*6000;
@@ -1124,9 +1135,10 @@ void CPVPManager2::onIOSMirrorUp()
 	/*
 	createExtraFactionChannel("hominists");
 	createExtraFactionChannel("urasies");
-	createExtraFactionChannel("marauders");
 	createExtraFactionChannel("agnos");
 	*/
+
+	createExtraFactionChannel("marauders");
 
 	// Community Channels
 	createExtraFactionChannel("en", true);
