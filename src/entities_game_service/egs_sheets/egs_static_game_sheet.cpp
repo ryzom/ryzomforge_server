@@ -688,7 +688,7 @@ void CStaticCreatures::readGeorges( const NLMISC::CSmartPtr<NLGEORGES::UForm> &f
 		for( i = 0; i < SLOT_EQUIPMENT::NB_SLOT_EQUIPMENT; ++i )
 		{
 			root.getValueByName( sheetName, (string("Basics.Equipment.") + SLOT_EQUIPMENT::toString( (SLOT_EQUIPMENT::TSlotEquipment) i ) + string(".Item" )).c_str() );
-			if( sheetName != string("") && sheetName.find(".item") != std::string::npos )
+			if( !sheetName.empty() && sheetName.find(".item") != std::string::npos )
 			{
 				sheet = CSheetId( sheetName );
 				_Items[ i ].IdSheet = sheet.asInt();
