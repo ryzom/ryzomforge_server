@@ -43,6 +43,8 @@
 #include "creature_manager/creature_manager.h"
 #include "world_instances.h"
 
+#include "server_share/used_continent.h"
+#include "game_share/shard_names.h"
 
 
 using namespace NLMISC;
@@ -1134,9 +1136,11 @@ NLMISC_COMMAND(getMoney, "get money of player", "<uid>")
 {
 	GET_ACTIVE_CHARACTER
 
-	string value = toString("%"NL_I64"u", c->getMoney());
+	string value = toString(c->getMoney());
 
 	log.displayNL(value.c_str());
+
+	return true;
 }
 
 
@@ -1148,6 +1152,8 @@ NLMISC_COMMAND(getPvpPoints, "get pvp points of player", "<uid>")
 	string value = toString("%u", c->getPvpPoint());
 
 	log.displayNL(value.c_str());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1159,6 +1165,8 @@ NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>"
 
 
 	log.displayNL("%s|%s|%u", PVP_CLAN::toString(allegiance.first).c_str(), PVP_CLAN::toString(allegiance.second).c_str(), c->getOrganization());
+
+	return true;
 }
 
 
