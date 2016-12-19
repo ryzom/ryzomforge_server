@@ -395,7 +395,7 @@ bool	CDbManager::mapRow(TDatabaseId id, const RY_PDS::CObjectIndex &index, uint6
 	CDatabase*	db = getDatabase(id);
 	if (db == NULL)
 	{
-		nlwarning("Unable to mapRow() '%016"NL_I64"X' to row '%d':'%d' in db '%d' , not created yet", key, index.table(), index.row(), id);
+		nlwarning("Unable to mapRow() '%016" NL_I64 "X' to row '%d':'%d' in db '%d' , not created yet", key, index.table(), index.row(), id);
 		return false;
 	}
 
@@ -415,7 +415,7 @@ bool	CDbManager::unmapRow(TDatabaseId id, RY_PDS::TTableIndex tableIndex, uint64
 	CDatabase*	db = getDatabase(id);
 	if (db == NULL)
 	{
-		nlwarning("Unable to unmapRow() '%016"NL_I64"X' in '%d':'%d' in db '%d' , not created yet", key, tableIndex, id);
+		nlwarning("Unable to unmapRow() '%016" NL_I64 "X' in '%d':'%d' in db '%d' , not created yet", key, tableIndex, id);
 		return false;
 	}
 
