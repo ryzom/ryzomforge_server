@@ -1233,16 +1233,19 @@ void CPlayerService::initConfigFileVars()
 		MaxNbNpcSpawnedByEGS = varMaxNbPlayers->asInt();
 	else
 		MaxNbNpcSpawnedByEGS = 50;
+
 	CConfigFile::CVar *varMaxNbForageSources = ConfigFile.getVarPtr("NbForageSourcesLimit");
 	if ( varMaxNbForageSources )
 		MaxNbForageSources = varMaxNbForageSources->asInt();
 	else
 		MaxNbForageSources = 2000;
+
 	CConfigFile::CVar *varMaxNbToxicClouds = ConfigFile.getVarPtr("NbToxicCloudsLimit");
 	if ( varMaxNbToxicClouds )
 		MaxNbToxicClouds = varMaxNbToxicClouds->asInt();
 	else
 		MaxNbToxicClouds = 1000;
+
 	nlinfo( "NbPlayersLimit=%u NbObjectsLimit=%u NbNpcSpawnedByEGSLimit=%u NbForageSourcesLimit=%u NbToxicCloudsLimit=%u NbGuildLimit=%u", MaxNbPlayers, MaxNbObjects, MaxNbNpcSpawnedByEGS, MaxNbForageSources, MaxNbToxicClouds, MaxNbGuilds );
 
 	CConfigFile::CVar *varExportDepositContents = ConfigFile.getVarPtr("ExportDepositContents");
@@ -1619,7 +1622,7 @@ nlassert(nodeLeaf->getType() == ICDBStructNode::TEXT);
 // {
 // 	if( args.size() == 0 )
 // 		return false;
-// 
+//
 // 	NLMEMORY::StatisticsReport( args[0].c_str(), args.size() > 1 );
 // 	return true;
 //}
@@ -1899,7 +1902,7 @@ void CPlayerService::release()
 //---------------------------------------------------
 void cbConnection( const std::string &serviceName, NLNET::TServiceId serviceId, void *arg )
 {
-	// inform player about the service event that occured
+	// inform player about the service event that occurred
 #if !FINAL_VERSION
 	PlayerManager.broadcastMessage( 1, 0, 0, string("System event : Service UP : ")+serviceName);
 #endif
@@ -3874,7 +3877,7 @@ NLMISC_COMMAND(displayDatabaseEntry," display a database entry value","<entity i
 		}
 		else
 		{
-			log.displayNL("Unknown entity %s ",id.toString().c_str());
+			log.displayNL("Unknown entity %s ", id.toString().c_str());
 		}
 		return true;
 	}

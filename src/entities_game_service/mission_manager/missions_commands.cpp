@@ -532,7 +532,7 @@ NLMISC_COMMAND(removeMission,"Remove mission of character","<character_id> <miss
 }
 
 //-----------------------------------------------
-// removeMission
+// addMission
 //-----------------------------------------------
 NLMISC_COMMAND(addMission,"Add mission to character","<character_id> <Mission giver Alias> <mission alias>")
 {
@@ -1132,7 +1132,6 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getMoney, "get money of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	string value = toString("%"NL_I64"u", c->getMoney());
@@ -1144,7 +1143,6 @@ NLMISC_COMMAND(getMoney, "get money of player", "<uid>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getPvpPoints, "get pvp points of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	string value = toString("%u", c->getPvpPoint());
@@ -1155,7 +1153,6 @@ NLMISC_COMMAND(getPvpPoints, "get pvp points of player", "<uid>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance = c->getAllegiance();

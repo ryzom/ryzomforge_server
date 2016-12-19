@@ -447,7 +447,7 @@ namespace LS
 			{
 				// invalid user !
 				nldebug("on_logout : invalid user %u", userId);
-				logoutResult(from, 1, "unkown user");
+				logoutResult(from, 1, "unknown user");
 				return;
 			}
 

@@ -1469,7 +1469,7 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 						nlwarning("parseBotOption -> invalid parameter '%s' for 'altar' command in bot %u", result[i].c_str(), _AIAlias );
 				}
 			}
-		} 
+		}
 		else if ( NLMISC::strlwr(result[0]) == "name" )
 		{
 			if ( result.size() != 2 )
@@ -1478,7 +1478,8 @@ void CCreature::setBotDescription( const CGenNpcDescMsgImp& description )
 			{
 				CAIAliasTranslator::getInstance()->setNameForNPCAliases(result[1], _AIAlias);
 			}
-		} else
+		}
+		else
 			nlwarning("parseBotOption -> invalid command '%s' in bot %u", result[0].c_str(), _AIAlias );
 	}
 	// if the bot has a special trade list, it can trade

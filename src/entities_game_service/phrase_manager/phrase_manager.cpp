@@ -466,7 +466,7 @@ void CPhraseManager::updatePhrases()
 	sendEventReports();
 	//
 	sendAIEvents();
-}
+} // updatePhrases()
 
 //--------------------------------------------------------------
 //						updateEntityCurrentAction()  
@@ -703,7 +703,7 @@ afterPhraseProcessing:
 		// go to next action for this entity
 		entityPhrases.goToNextAction();
 	}
-} // updatePhrases //
+} // updateEntityCurrentAction //
 
 
 //-----------------------------------------------
