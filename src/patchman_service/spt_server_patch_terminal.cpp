@@ -18,14 +18,6 @@
 // includes
 //-----------------------------------------------------------------------------
 
-#include "nel/misc/types_nl.h"
-
-#ifdef NL_OS_WINDOWS
-#define NOMINMAX
-#include	<WinSock2.h>
-#include	<windows.h>
-#endif // NL_OS_WINDOWS
-
 // nel
 #include "nel/misc/variable.h"
 #include "nel/misc/common.h"
