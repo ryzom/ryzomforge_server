@@ -1054,7 +1054,7 @@ NLMISC_COMMAND(mapRow, "map a row in a table of a given database with a 64bits k
 	RY_PDS::TRowIndex	rowId;
 	NLMISC::fromString(args[2], rowId);
 	uint64				key;
-	sscanf(args[3].c_str(), "%"NL_I64"X", &key);
+	sscanf(args[3].c_str(), "%" NL_I64 "X", &key);
 
 	CDatabase*			database = CDbManager::getDatabase(databaseId);
 
@@ -1079,7 +1079,7 @@ NLMISC_COMMAND(unmapRow, "unmap a row in a table of a given database with a 64bi
 	NLMISC::fromString(args[0], databaseId);
 	const std::string&	tableName = args[1];
 	uint64				key;
-	sscanf(args[2].c_str(), "%"NL_I64"X", &key);
+	sscanf(args[2].c_str(), "%" NL_I64 "X", &key);
 
 	CDatabase*			database = CDbManager::getDatabase(databaseId);
 
