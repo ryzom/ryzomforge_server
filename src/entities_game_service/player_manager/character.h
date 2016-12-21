@@ -1682,19 +1682,25 @@ public:
 	void sendUrl(const std::string &url, const std::string &salt);
 
 	/// set custom mission param
- 	void setCustomMissionParams(const std::string &missionName, const std::string &params);
+	void setCustomMissionParams(const std::string &missionName, const std::string &params);
 
- 	/// add custom mission param
- 	void addCustomMissionParam(const std::string &missionName, const std::string &param);
+	/// add custom mission param
+	void addCustomMissionParam(const std::string &missionName, const std::string &param);
 
- 	/// get custom mission params
- 	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
+	/// get custom mission params
+	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
 
- 	/// get custom mission texts
- 	std::string getCustomMissionText(const std::string &missionName);
+	/// get custom mission texts
+	std::string getCustomMissionText(const std::string &missionName);
 
- 	/// validate dynamic mission step sending url
- 	void validateDynamicMissionStep(const std::string &url);
+	/// add Ark position check
+	void addPositionCheck(sint32 x, sint32 y, uint32 r, const std::string &name, bool use_compass);
+
+	/// get Ark position check
+	void getPositionCheck(const std::string &name, sint32 &x, sint32 &y, std::string &textName);
+
+	/// validate dynamic mission step sending url
+	void validateDynamicMissionStep(const std::string &url);
 
 	/// add web command validation check
 	void addWebCommandCheck(const std::string &url, const std::string &data, const std::string &salt);

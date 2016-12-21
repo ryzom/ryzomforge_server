@@ -13977,6 +13977,50 @@ string CCharacter::getCustomMissionText(const string &missionName)
 }
 
 
+/// add Ark position check
+void CCharacter::addPositionCheck(sint32 x, sint32 y, uint32 r, const std::string &name, bool use_compass)
+{
+	if (x == 0 && y == 0)
+	{
+		for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end();)
+		{
+			if ((*it).Name == name)
+				it = _CheckPos.erase(it);
+			else
+				++it;
+		}
+		return;
+	}
+	SCheckPosCoordinate poscheck;
+	poscheck.X = x;
+	poscheck.Y = y;
+	poscheck.Radius = r;
+	poscheck.Name = name;
+	_CheckPos.push_back(poscheck);
+	nlinfo("Checking : %d, %d, %d, %s", x, y , r, name.c_str());
+}
+
+/// get Ark position check
+void CCharacter::getPositionCheck(const string &name, sint32 &x, sint32 &y, string &textName)
+{
+	x = 0;
+	y = 0;
+	textName = "EMPTY";
+	for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end();)
+	{
+		if ((*it).Name == name)
+		{
+			textName = getCustomMissionText((*it).Name + "_COMPASS_TEXT");
+			if (!textName.empty())
+			{
+				x = (*it).X;
+				y = (*it).Y;
+			}
+		}
+		++it;
+	}
+}
+
 // !!! Deprecated !!!
 void CCharacter::addWebCommandCheck(const string &url, const string &data, const string &salt)
 {

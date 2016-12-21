@@ -487,6 +487,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	)\
 	PROP_VECT(CEntityId,_IsFriendOf)\
 	PROP_VECT(CEntityId,_IsIgnoredBy)\
+	STRUCT_VECT(_CheckPos)\
 \
 	STRUCT(_MemorizedPhrases)\
 	STRUCT2(_ForbidPowerDates, _ForbidPowerDates.store(pdr), _ForbidPowerDates.apply(pdr))\
@@ -717,6 +718,24 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	FLAG0(CLEAR,clear())\
 	PROP(uint8,PactNature)\
 	PROP(uint8,PactType)\
+
+//#pragma message( PERSISTENT_GENERATION_MESSAGE )
+#include "game_share/persistent_data_template.h"
+
+
+
+//-----------------------------------------------------------------------------
+// Persistent data for SCheckPosCoordinate
+//-----------------------------------------------------------------------------
+
+#define PERSISTENT_CLASS SCheckPosCoordinate
+
+#define PERSISTENT_DATA\
+	FLAG0(CLEAR,clear())\
+	PROP(sint32,X)\
+	PROP(sint32,Y)\
+	PROP(uint32,Radius)\
+	PROP(string,Name)\
 
 //#pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"
