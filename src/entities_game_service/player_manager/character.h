@@ -194,6 +194,42 @@ struct SGameCoordinate
 	}
 };
 
+/*
+ *	SCheckPosCoordinate
+ */
+struct SCheckPosCoordinate
+{
+
+	DECLARE_PERSISTENCE_METHODS
+
+	sint32	X;
+	sint32	Y;
+	uint32  Radius;
+	std::string	Name;
+
+	SCheckPosCoordinate()
+	{
+		clear();
+	}
+
+	void clear()
+	{
+		X = 0;
+		Y = 0;
+		Radius = 0;
+		Name = "";
+	}
+
+	void serial(NLMISC::IStream &f)
+	{
+		f.serial(X);
+		f.serial(Y);
+		f.serial(Radius);
+		f.serial(Name);
+	}
+};
+
+
 
 /* Storage class for mission history data.
 */
@@ -3354,7 +3390,9 @@ private:
 	/// last web url index
 	uint32						_LastUrlIndex;
 
- 	std::map<std::string, std::string>	_CustomMissionsParams;
+	std::map<std::string, std::string>	_CustomMissionsParams;
+
+	std::vector<SCheckPosCoordinate>    _CheckPos;
 
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange {
