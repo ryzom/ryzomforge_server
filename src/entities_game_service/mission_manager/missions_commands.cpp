@@ -1166,7 +1166,7 @@ NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>"
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [instance] [can_xp,cant_dead,can_teleport,can_speedup]")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [can_xp,cant_dead,can_teleport,can_speedup]")
 {
 	GET_ACTIVE_CHARACTER
 
@@ -1188,11 +1188,15 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [instance] [can_xp,
 
 			CBuildingPhysicalPlayer * buildingPlayer = dynamic_cast<CBuildingPhysicalPlayer *>( building );
 
-			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[1]));
-			if (buildingPlayer && entityBase)
+			CEntityId playerEid = CEntityIdTranslator::getInstance()->getByEntity( ucstring(args[1]) );
+			nlinfo("playerEid = %s", playerEid.toString().c_str());
+			//CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[1]));
+			if (buildingPlayer && playerEid != CEntityId::Unknown/*entityBase*/)
 			{
 				CBuildingManager::getInstance()->removePlayerFromRoom( c );
-				uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
+				//uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
+				uint16 ownerId = buildingPlayer->getOwnerIdx( playerEid );
+				nlinfo("ownerId = %d", ownerId);
 				sint32 cell;
 				buildingPlayer->addUser(c, 0, ownerId, cell);
 				c->setPowoCell(cell);
@@ -1456,6 +1460,33 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 	}
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setRespawn, "set respawn point for the player", "<uid> x y cell")
+{
+	if (args.size () < 4)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+	
+	sint32 x;
+	sint32 y;
+	uint32 cell;
+	
+	fromString(args[1], x);
+	x *= 1000;
+	
+	fromString(args[2], y);
+	y *= 1000;
+
+	fromString(args[3], cell);
+	
+	c->getRespawnPoints().setArkRespawnpoint(x, y, cell);
+	
+	return true;
+}
 
 
 //----------------------------------------------------------------------------

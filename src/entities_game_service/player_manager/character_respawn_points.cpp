@@ -223,6 +223,16 @@ bool CCharacterRespawnPoints::setRingAdventureRespawnpoint(const CFarPosition &f
 }
 
 //-----------------------------------------------------------------------------
+void CCharacterRespawnPoints::setArkRespawnpoint(sint32 x, sint32 y, uint32 cell)
+{
+	_RingRespawnPoint.SessionId = TSessionId(cell);
+	_RingRespawnPoint.PosState = _Char.getState();
+	_RingRespawnPoint.PosState.X = x;
+	_RingRespawnPoint.PosState.Y = y;
+	resetUserDb();
+}
+
+//-----------------------------------------------------------------------------
 void CCharacterRespawnPoints::clearRingRespawnpoint()
 {
 	_RingRespawnPoint.SessionId = TSessionId(0);

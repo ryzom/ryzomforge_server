@@ -107,12 +107,18 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 		owner = user;
 	}
 
+	IRoomInstance * roomInstance;
+	
+	if (_Rooms[roomIdx].Cells[ownerIdx] != 0)
+	{
+		roomInstance = CBuildingManager::getInstance()->getRoomInstanceFromCell(_Rooms[roomIdx].Cells[ownerIdx]);
+	}
 
 	// if the room is not already instanciated, we have to do it
-	if ( _Rooms[roomIdx].Cells[ownerIdx] == 0 )
+	if ( _Rooms[roomIdx].Cells[ownerIdx] == 0 || roomInstance == NULL)
 	{
 		// create a new room of the appropriate type
-		IRoomInstance * roomInstance =  CBuildingManager::getInstance()->allocateRoom(_Rooms[roomIdx].Cells[ownerIdx],_Template->Type);
+		roomInstance =  CBuildingManager::getInstance()->allocateRoom(_Rooms[roomIdx].Cells[ownerIdx],_Template->Type);
 		if ( roomIdx >= _Template->Rooms.size() )
 		{
 			nlwarning("<BUILDING>Invalid room idx %u count is %u. Mismatch between template and instance?",ownerIdx,_Template->Rooms.size());
@@ -121,18 +127,9 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 		// init the room
 		if( !roomInstance->create(this,roomIdx,ownerIdx, _Rooms[roomIdx].Cells[ownerIdx]) )
 			return false;
-		roomInstance->addUser(user, owner);
 	}
-	else
-	{
-		IRoomInstance * roomInstance =  CBuildingManager::getInstance()->getRoomInstanceFromCell(_Rooms[roomIdx].Cells[ownerIdx]);
-		if ( roomInstance == NULL )
-		{
-			nlwarning("<BUILDING>%s invalid room cell %d.",user->getId().toString().c_str(),_Rooms[roomIdx].Cells[ownerIdx]);
-			return false;
-		}
-		roomInstance->addUser(user, owner);
-	}
+	
+	roomInstance->addUser(user, owner);
 
 	user->setBuildingExitZone( _DefaultExitSpawn );
 	_UsersInside.push_back( user->getEntityRowId() );

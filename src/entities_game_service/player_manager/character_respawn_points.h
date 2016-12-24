@@ -70,6 +70,9 @@ public:
 	/// return true if ring adventure re-spawn point are changed
 	bool setRingAdventureRespawnpoint(const CFarPosition &farPos);
 
+	void setArkRespawnpoint(sint32 x, sint32 y, uint32 cell);
+
+
 	/// remove Ring adventure respawn point
 	void clearRingRespawnpoint();
 
