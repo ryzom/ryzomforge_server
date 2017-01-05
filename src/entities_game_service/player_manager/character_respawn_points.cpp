@@ -373,10 +373,10 @@ bool CCharacterRespawnPoints::isUsableRegularRespawnPoint(CONTINENT::TContinent 
 		return false;
 
 	// check if the player is kami or karavan 	 
-	static const uint32 kamiFaction = CStaticFames::getInstance().getFactionIndex("kami"); 	 
-	static const uint32 karavanFaction = CStaticFames::getInstance().getFactionIndex("karavan"); 	 
-	sint32 kamiFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), kamiFaction); 	 
-	sint32 karavanFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), karavanFaction); 	 
+	static const uint32 kamiFaction = CStaticFames::getInstance().getFactionIndex("kami");
+	static const uint32 karavanFaction = CStaticFames::getInstance().getFactionIndex("karavan");
+	sint32 kamiFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), kamiFaction);
+	sint32 karavanFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), karavanFaction);
 	bool isKami = (kamiFame >= karavanFame); 	 
   	 
 	if (zone->getType() == RESPAWN_POINT::KAMI && !isKami) 	 

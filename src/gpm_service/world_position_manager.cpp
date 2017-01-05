@@ -2227,17 +2227,12 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 	// only consider (x,y) motion for speed and position correction
 	if (master->PlayerInfos != NULL /*&& master->PlayerInfos->CheckSpeed && CheckPlayerSpeed && fabs(movVector.x)+fabs(movVector.y) > maxDist*/)
 	{
-		double		movNorm = sqr(movVector.x)+sqr(movVector.y); // already done if (entity != master) but here is a rare overspeed case
+		double movNorm = sqr(movVector.x)+sqr(movVector.y); // already done if (entity != master) but here is a rare overspeed case
 
 		if (movNorm > sqr(maxDist))
 		{
 			if (movNorm > sqr(5 * SecuritySpeedFactor * CTickEventHandler::getGameTimeStep() * ticksSinceLastUpdate)) {
 				movVector *= (maxDist / sqrt(movNorm));
-				nlwarning("Player limitSpeed=%2.f, entitySpeed=%.2f, masterSpeed=%.2f", limitSpeedToUse, maxSpeed(), mountWalkSpeed);
-			}
-			else
-			{
-				nlwarning("Player limitSpeed=%2.f, entitySpeed=%.2f, masterSpeed=%.2f", limitSpeedToUse, maxSpeed(), mountWalkSpeed);
 			}
 		}
 	}
@@ -2289,7 +2284,7 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 		}
 
 		// if the final position is more than one meter away from the param position, correct entity position
-		CVectorD	diff2d = targetPos-finalPos;
+		CVectorD diff2d = targetPos-finalPos;
 		diff2d.z = 0.0;
 		if (diff2d.sqrnorm() > 1.0 )
 		{

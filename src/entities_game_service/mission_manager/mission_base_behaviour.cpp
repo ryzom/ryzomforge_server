@@ -137,7 +137,6 @@ void CMissionBaseBehaviour::sendContextTexts(const TDataSetRow& user, const TDat
 	CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
 	nlassert(templ);
 
-		nlinfo("ONLOAD");
 	const NLMISC::CEntityId & giver = CAIAliasTranslator::getInstance()->getEntityId( _Mission->getGiver() );
 	// send mission progress context
 	for ( map<uint32, EGSPD::CActiveStepPD>::const_iterator it = _Mission->getStepsBegin(); it != _Mission->getStepsEnd(); ++it )

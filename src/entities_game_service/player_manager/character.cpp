@@ -13294,15 +13294,6 @@ void CCharacter::setPlaces(const std::vector<const CPlace*> & places)
 //-----------------------------------------------
 bool CCharacter::isSpawnValid(bool inVillage, bool inOutpost, bool inStable, bool inAtys)
 {
-	if (inVillage)
-		nlinfo("inVillage");
-	if (inOutpost)
-		nlinfo("inOutpost");
-	if (inStable)
-		nlinfo("inStable");
-	if (inAtys)
-		nlinfo("inAtys");
-
 	const uint size = (uint)_Places.size();
 	for ( uint i = 0; i < size; i++ )
 	{
