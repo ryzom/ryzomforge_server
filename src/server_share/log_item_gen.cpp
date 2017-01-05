@@ -1393,7 +1393,7 @@ void _log_Item_Delete(INVENTORIES::TItemId itemId, const NLMISC::CSheetId &sheet
 
 	
 	// Context parameter
-		NLMISC::CEntityId	charId;
+	NLMISC::CEntityId	charId;
 	if (!ItemDesc.getContextVar_charId(charId))
 	{
 		// If this bomb is thrown, you need to add a log context (or eventualy a 'noContext').
@@ -1401,17 +1401,11 @@ void _log_Item_Delete(INVENTORIES::TItemId itemId, const NLMISC::CSheetId &sheet
 		return;
 	}
 
-			
 	logInfo.getParams()[0] = LGS::TParamValue(charId);
-			
 	logInfo.getParams()[1] = LGS::TParamValue(itemId);
-		
 	logInfo.getParams()[2] = LGS::TParamValue(sheetId);
-		
 	logInfo.getParams()[3] = LGS::TParamValue(quantity);
-		
 	logInfo.getParams()[4] = LGS::TParamValue(quality);
-		
 
 	logInfo.setTimeStamp(NLMISC::CTime::getSecondsSince1970());
 

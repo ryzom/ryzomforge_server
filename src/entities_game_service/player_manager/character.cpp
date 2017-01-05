@@ -137,6 +137,7 @@
 #include "outpost_manager/outpost_manager.h"
 #include "game_event_manager.h"
 #include "stat_db.h"
+#include "admin_log.h"
 #include "pvp_manager/pvp_faction_reward_manager/pvp_faction_reward_manager.h"
 #include "entities_game_service/egs_variables.h"
 #include "modules/shard_unifier_client.h"
@@ -11047,40 +11048,36 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 					{
 						for (uint i = 0; i < items1.size(); ++i)
 						{
-							nlinfo ("ADMIN: CSR (%s,%s) exchange %ux%s Q%u with %s",
-								getId().toString().c_str(), 
+							ADMINLOG("/a %s %s exchange %u %s Q%u",
 								getName().toString().c_str(),
+								c->getName().toString().c_str(),
 								items1[i]->getStackSize(),
 								items1[i]->getSheetId().toString().c_str(),
-								items1[i]->quality(),
-								c->getName().toString().c_str());
+								items1[i]->quality());
 						}
 						if (_ExchangeMoney)
-								nlinfo ("ADMIN: CSR (%s,%s) give %u dappers to %s",
-										getId().toString().c_str(), 
+								ADMINLOG("/a %s %s give_dappers %u",
 										getName().toString().c_str(),
-										_ExchangeMoney,
-										c->getName().toString().c_str());
+										c->getName().toString().c_str(),
+										_ExchangeMoney);
 					}
 
 					if (c->haveAnyPrivilege() && !haveAnyPrivilege())
 					{
 						for (uint i = 0; i < items2.size(); ++i)
 						{
-							nlinfo ("ADMIN: CSR (%s,%s) exchange %ux%s Q%u with %s",
-								c->getId().toString().c_str(), 
+							ADMINLOG("/a %s %s exchange %u %s Q%u",
 								c->getName().toString().c_str(),
+								getName().toString().c_str(),
 								items2[i]->getStackSize(),
 								items2[i]->getSheetId().toString().c_str(),
-								items2[i]->quality(),
-								getName().toString().c_str());
+								items2[i]->quality());
 						}
 						if (c->_ExchangeMoney)
-							nlinfo ("ADMIN: CSR (%s,%s) give %u dappers to %s",
-								c->getId().toString().c_str(), 
+							ADMINLOG("/a %s %s give_dappers %u",
 								c->getName().toString().c_str(),
-								c->_ExchangeMoney,
-								getName().toString().c_str());
+								getName().toString().c_str(),
+								c->_ExchangeMoney);
 					}
 
 

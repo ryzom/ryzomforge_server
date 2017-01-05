@@ -92,6 +92,7 @@
 #include "player_manager/character_game_event.h"
 #include "game_event_manager.h"
 #include "dyn_chat_egs.h"
+#include "admin_log.h"
 
 #include "pvp_manager/pvp.h"
 #include "pvp_manager/pvp_manager_2.h"
@@ -415,6 +416,7 @@ static void loadCommandsPrivileges(const string & fileName, bool init);
 void cbRemoteClientCallback (uint32 rid, const std::string &cmd, const std::string &entityNames);
 //
 
+
 // get AI instance and remove it form the group name
 bool getAIInstanceFromGroupName(string& groupName, uint32& instanceNumber)
 {
@@ -547,6 +549,13 @@ void initAdmin ()
 
 void initCommandsPrivileges(const std::string & fileName)
 {
+	//init the admin log system
+	CConfigFile::CVar *varPtr = IService::getInstance()->ConfigFile.getVarPtr("AdminLogFile");
+	if ( !varPtr )
+		AdminLog.init("admin_cmds.log");
+	else
+		AdminLog.init( varPtr->asString() );
+
 	H_AUTO(initCommandsPrivileges);
 
 	initSalt();
@@ -3149,7 +3158,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 			}
 		}
 
-		std::string targetName = string("implicite");
+		std::string targetName = string("Implicite");
 
 		// add the eid of the player or target if necessary
 		if (cmd->AddEId)
@@ -3159,7 +3168,7 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 				log_Command_ExecOnTarget(c->getTarget(), cmdName, arg);
 				res += c->getTarget().toString();
 				targetEid = c->getTarget();
-				targetName = NLMISC::toString("(%s,%s)", c->getTarget().toString().c_str(), CEntityIdTranslator::getInstance()->getByEntity(c->getTarget()).toString().c_str());
+				targetName = NLMISC::toString("%s,%s", c->getTarget().toString().c_str(), CEntityIdTranslator::getInstance()->getByEntity(c->getTarget()).toString().c_str());
 			}
 			else
 			{
@@ -3183,9 +3192,10 @@ void cbClientAdmin (NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 			strFindReplace(res, "#target", c->getTarget().toString().c_str());
 			strFindReplace(res, "#gtarget", string("#"+c->getTarget().toString()).c_str());
 		}
-		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
+		ADMINLOG("/a %s %s %s", csName.c_str(), targetName.c_str(), res.c_str());
+//		nlinfo ("ADMIN: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
 
-		audit(cmd, res, eid, csName, targetName);
+		//audit(cmd, res, eid, csName, targetName);
 
 		CLightMemDisplayer *CmdDisplayer = new CLightMemDisplayer("CmdDisplayer");
 		CLog *CmdLogger = new CLog( CLog::LOG_NO );
@@ -3221,7 +3231,8 @@ void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceNam
 	string cmdName, arg;
 	msgin.serial (cmdName, arg);
 
-	nlinfo("ADMIN: Executing admin /c command: eid=%s onTarget=%s cmdName=%s arg=%s",eid.toString().c_str(),characterName.c_str(),cmdName.c_str(),arg.c_str());
+	ADMINLOG("/c %s %s %s", eid.toString().c_str(), characterName.c_str(), cmdName.c_str(), arg.c_str());
+	//nlinfo("ADMIN: Executing admin /c command: eid=%s onTarget=%s cmdName=%s arg=%s",eid.toString().c_str(),characterName.c_str(),cmdName.c_str(),arg.c_str());
 
 	// find the character
 	CCharacter *c = PlayerManager.getChar( eid );
@@ -3301,7 +3312,8 @@ void cbClientAdminOffline (NLNET::CMessage& msgin, const std::string &serviceNam
 	std::string csName = CEntityIdTranslator::getInstance()->getByEntity(eid).toString();
 	std::string targetName = NLMISC::toString("(%s,%s)", CEntityIdTranslator::getInstance()->getByEntity( ucstring(characterName) ).toString().c_str(), characterName.c_str() );
 
-	nlinfo("ADMINOFFLINE: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
+	ADMINLOG("/o %s %s %s", csName.c_str(), targetName.c_str(), res.c_str());
+	//nlinfo("ADMINOFFLINE: Player (%s,%s) will execute client admin command '%s' on target %s", eid.toString().c_str(), csName.c_str(), res.c_str(), targetName.c_str());
 	NLMISC::ICommand::execute(res, *InfoLog);
 }
 
