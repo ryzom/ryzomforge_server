@@ -1762,12 +1762,6 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 					}
 
 					oldRegion->removePlayer( user->getId() );
-
-					// check if user leaves newbieland
-					if ( region != 0 && oldRegion->isNewbieRegion() && !region->isNewbieRegion() )
-					{
-						user->getRespawnPoints().clearRespawnPoints();
-					}
 				}
 
 				if( region == 0 )
@@ -1807,12 +1801,6 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 			user->setCurrentRegion( region->getId() );
 			((CRegion*)region)->addPlayer( user->getId() );
 			
-			// check if user leaves newbieland
-			if ( oldRegion != 0 && oldRegion->isNewbieRegion() && !region->isNewbieRegion() )
-			{
-				user->getRespawnPoints().clearRespawnPoints();
-			}
-
 			// add new spire effects for Pvp-flagged players
 			if ( user->getPVPFlag() )
 				CPVPFactionRewardManager::getInstance().giveTotemsEffects( user );
