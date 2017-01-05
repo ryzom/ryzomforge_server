@@ -1833,7 +1833,7 @@ void CCharacter::respawn( uint16 index )
 	{
 		return;
 	}
-
+	
 	PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->playerRespawn(this);
 
 	sint32 x,y,z;
@@ -1888,8 +1888,12 @@ void CCharacter::respawn( uint16 index )
 
 	applyRespawnEffects();
 
+	TDataSetRow dsr = getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+	sint32 cell = srcCell;
+			
 	// tpWanted() sends message CAIPlayerRespawnMsg to AIS
-	tpWanted( x, y, z, true, heading );
+	tpWanted( x, y, z, true, heading, 0xFF, cell);
 
 	// give spire effect if needed
 	CPVPFactionRewardManager::getInstance().giveTotemsEffects( this );
