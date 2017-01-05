@@ -1488,6 +1488,28 @@ NLMISC_COMMAND(setRespawn, "set respawn point for the player", "<uid> x y cell")
 	return true;
 }
 
+//-----------------------------------------------
+// Add re-spawn point
+//-----------------------------------------------
+NLMISC_COMMAND(addRespawnPoint,"Add re-spawn point","<uid> <Re-spawn point name>")
+{
+	if (args.size () < 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+
+
+	CCharacterRespawnPoints::TRespawnPoint respawnPoint = CZoneManager::getInstance().getTpSpawnZoneIdByName(args[1]);
+	if (respawnPoint == InvalidSpawnZoneId)
+		return false;
+	
+	c->getRespawnPoints().addRespawnPoint(respawnPoint);
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientation groupname x y look cell")
