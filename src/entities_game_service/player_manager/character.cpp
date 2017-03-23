@@ -643,6 +643,9 @@ CCharacter::CCharacter():	CEntityBase(false),
 	_ChannelAdded = false;
 
 	_DuelOpponent = NULL;
+	
+	_LastTpTick = 0;
+	_LastOverSpeedTick = 0;
 
 	_LastCivPointWriteDB = ~0;
 	_LastCultPointWriteDB = ~0;
@@ -2071,6 +2074,7 @@ void CCharacter::mount( TDataSetRow PetRowId )
 							{
 								setMode( MBEHAV::MOUNT_NORMAL, true );
 
+								_LastMountTick = CTickEventHandler::getGameCycle();
 								// egs_chinfo("<CEntityBase::setMode> %d Set Mode to %d for entity %s", CTickEventHandler::getGameCycle(), MBEHAV::EMode(_Mode.getValue().Mode), _Id.toString().c_str() );
 								CMessage msgout("ACQUIRE_CONTROL");
 								CEntityId mountedEntityId = TheDataset.getEntityId( getEntityMounted() );
@@ -2159,6 +2163,8 @@ void CCharacter::unmount( bool changeMountedState, uint petIndex )
 {
 	setMode( MBEHAV::NORMAL, true );
 	//	egs_chinfo("<CEntityBase::unseat> %d Set Mode to %d for entity %s", CTickEventHandler::getGameCycle(), MBEHAV::EMode(_Mode.getValue().Mode) , _Id.toString().c_str() );
+
+	_LastUnMountTick = CTickEventHandler::getGameCycle();
 
 	CMessage msgout("LEAVE_CONTROL");
 	msgout.serial( _Id );
@@ -2450,6 +2456,10 @@ void CCharacter::applyRegenAndClipCurrentValue()
 
 //		_PropertyDatabase.setProp( "USER:SPEED_FACTOR", sint64( speedVariationModifier + 100.0f ) );
 		CBankAccessor_PLR::getUSER().setSPEED_FACTOR(_PropertyDatabase, checkedCast<uint8>( speedVariationModifier + 100.0f ) );
+		if (speedVariationModifier > 0) {
+			nlinfo("Current speedVariationModifier = %d", speedVariationModifier);
+			_LastOverSpeedTick = CTickEventHandler::getGameCycle();
+		}
 	}
 	else
 	{
@@ -5204,6 +5214,9 @@ void CCharacter::teleportCharacter( sint32 x, sint32 y, sint32 z, bool teleportW
 			}
 		}
 	}
+
+	_LastTpTick = CTickEventHandler::getGameCycle();
+
 
 	_TpCoordinate.X = x;
 	_TpCoordinate.Y = y;
@@ -10406,6 +10419,8 @@ void CCharacter::setOrganization(uint32 org)
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(1).setVALUE(_PropertyDatabase, _Organization );
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus );
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(3).setVALUE(_PropertyDatabase, _OrganizationPoints );
+	
+	CPVPManager2::getInstance()->updateFactionChannel(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -19427,7 +19442,7 @@ bool CCharacter::setGuildId( uint32 guildId )
 		_GuildId = guildId;
 
 #ifdef HAVE_MONGO
-		CMongo::update("users", toString("{'game.cid':%"NL_I64"u}", _Id.getShortId()), toString("{$set:{'game.guildId':%d}}", guildId));
+		CMongo::update("ryzom_users", toString("{'cid': %"NL_I64"u}", _Id.getShortId()), toString("{ $set: {'guildId': %d} }", guildId));
 #endif
 
 		return true;

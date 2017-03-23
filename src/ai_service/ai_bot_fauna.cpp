@@ -1068,8 +1068,8 @@ void CMovementMagnet::update(uint32 waitTime, uint32 ticksSinceLastUpdate, bool 
 
 			float	distToDest=(float)_PathCont.getDestination().quickDistTo(_BotFauna.pos());
 			distToDest-=((_BotFauna.getPersistent().getChildIndex()&7)+1.5f);
-			_Speed=_BotFauna.walkSpeed();
 			
+			_Speed=_BotFauna.walkSpeed();
 			float		dist=_Speed*ticksSinceLastUpdate;
 			CAIVector	lastPos=_BotFauna.pos();
 			{

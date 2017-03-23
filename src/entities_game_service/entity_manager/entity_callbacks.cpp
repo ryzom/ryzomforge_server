@@ -39,6 +39,7 @@
 #include "game_share/mainland_summary.h"
 #include "game_share/shard_names.h"
 #include "server_share/testing_tool_structures.h"
+#include "server_share/mongo_wrapper.h"
 
 #include "server_share/r2_vision.h"
 #include "game_share/r2_share_itf.h"
@@ -1189,6 +1190,13 @@ void cbDeleteChar( CMessage& msgin, const std::string &serviceName, NLNET::TServ
 	CCharacter *character = player->getCharacter(characterIndex);
 	if (character != NULL)
 		charName = character->getName().toUtf8();
+
+	#ifdef HAVE_MONGO
+		string::size_type pos = charName.find('(');
+		if (pos != string::npos)
+			charName = charName.substr(0, pos);
+		CMongo::remove("ryzom_users", toString("{'name': '%s'}", charName.c_str()));
+	#endif
 
 	PlayerManager.deleteCharacter( userId, index );
 

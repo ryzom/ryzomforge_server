@@ -2000,4 +2000,48 @@ NLMISC_COMMAND(addArkMissionParams,"add Mission Params","<uid> <mission_name> <p
 	c->addCustomMissionParam(args[1], args[2]);
 }
 
+//-----------------------------------------------
+NLMISC_COMMAND(getLastTpTick,"get tick of last teleport","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastTpTick());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastOverSpeedTick,"get tick of last over speed","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastOverSpeedTick());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastMountTick,"get tick of last mount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastMountTick());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastUnMountTick,"get tick of last umount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastUnMountTick());
+}
+
 

@@ -90,48 +90,8 @@ void CChatManager::init( /*const string& staticDBFileName, const string& dynDBFi
 	CMongo::init();
 
 	// reset all muted players
-	CMongo::update("users", "{ 'game.muted': true}", toString("{ $set:{ 'game.muted': false } }"), false, true);
+	CMongo::update("ryzom_users", "{ 'muted': true}", toString("{ $set:{ 'muted': false } }"), false, true);
 #endif
-
-	/* Now make a connection to MongoDB. */
-/*
-	if( mongo_client( &conn, "ryzom.com", 22110 ) != MONGO_OK )
-	{
-		switch( conn.err )
-		{
-			case MONGO_CONN_SUCCESS:
-			break;
-			case MONGO_CONN_NO_SOCKET:
-			nlwarning( "FAIL: Could not create a socket!\n" );
-			break;
-			case MONGO_CONN_FAIL:
-			nlwarning( "FAIL: Could not connect to mongod. Make sure it's listening at 127.0.0.1:27017.\n" );
-			break;
-			default:
-			nlwarning( "MongoDB connection error number %d.\n", conn.err );
-			break;
-		}
-
-		exit( 1 );
-	}
-
-	if (IService::getInstance()->getShardId() == 301)
-	{
-		mongo_db = "megacorp_dev";
-		mongo_col = "megacorp_dev.chats";
-	}
-	else
-	{
-		mongo_db = "megacorp_live";
-		mongo_col = "megacorp_live.chats";
-	}
-
-	if( mongo_cmd_authenticate(&conn, mongo_db.c_str(), "megacorp", "feFrvs3rfdcef4")  != MONGO_OK )
-	{
-		nlwarning( "FAIL: Failed to auth %d\n", conn.err );
-		exit( 1 );
-	}
-*/
 
 	// create a chat group 'universe'
 	addGroup(CEntityId(RYZOMID::chatGroup,0), CChatGroup::universe, "");
@@ -213,7 +173,7 @@ bool CChatManager::checkClient( const TDataSetRow& id )
 void CChatManager::addMutedUser( const NLMISC::CEntityId &eid )
 {
 #ifdef HAVE_MONGO
-	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': true } }"));
+	CMongo::update("ryzom_users", toString("{ 'cid': %d}", eid.getShortId()), toString("{ $set:{ 'muted': true } }"));
 #endif
 
 	_MutedUsers.insert( eid );
@@ -222,7 +182,7 @@ void CChatManager::addMutedUser( const NLMISC::CEntityId &eid )
 void CChatManager::removeMutedUser( const NLMISC::CEntityId &eid )
 {
 #ifdef HAVE_MONGO
-	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': false } }"));
+	CMongo::update("ryzom_users", toString("{ 'cid': %d}", eid.getShortId()), toString("{ $set:{ 'muted': false } }"));
 #endif
 
 	_MutedUsers.erase( eid );
@@ -231,7 +191,7 @@ void CChatManager::removeMutedUser( const NLMISC::CEntityId &eid )
 void CChatManager::addUniverseMutedUser( const NLMISC::CEntityId &eid )
 {
 #ifdef HAVE_MONGO
-	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': true } }"));
+	CMongo::update("ryzom_users", toString("{ 'cid': %d}", eid.getShortId()), toString("{ $set:{ 'muted': true } }"));
 #endif
 
 	_MutedUniverseUsers.insert( eid );
@@ -240,7 +200,7 @@ void CChatManager::addUniverseMutedUser( const NLMISC::CEntityId &eid )
 void CChatManager::removeUniverseMutedUser( const NLMISC::CEntityId &eid )
 {
 #ifdef HAVE_MONGO
-	CMongo::update("users", toString("{ 'game.cid': %d}", eid.getShortId()), toString("{ $set:{ 'game.muted': false } }"));
+	CMongo::update("ryzom_users", toString("{ 'cid': %d}", eid.getShortId()), toString("{ $set:{ 'muted': false } }"));
 #endif
 
 	_MutedUniverseUsers.erase( eid );
@@ -716,12 +676,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				_Log.displayNL("'%s' (%s) : \t\"%s\"", senderName.c_str(), groupNames[itCl->second->getChatMode()], ucstr.toString().c_str() );
 				_DestUsers.push_back(grpId);
 
-
-				/// MONGODB
-				//
-
 				double date = 1000.0*(double)CTime::getSecondsSince1970();
-
 				string name = senderName;
 
 				string::size_type pos = senderName.find('(');
@@ -729,29 +684,8 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					name = senderName.substr(0, pos);
 
 #ifdef HAVE_MONGO
-				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': 'all', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), date));
+				CMongo::insert("ryzom_chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': 'all', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), date));
 #endif
-
-/*b
-				bson base;
-				bson_init( &base );
-					bson_append_string( &base, "username", name.c_str() );
-					bson_append_string( &base, "chat", ucstr.toUtf8().c_str() );
-					bson_append_string( &base, "chatType", "univers" );
-					bson_append_string( &base, "chatId", "all" );
-					bson_append_double( &base, "date", date );
-					bson_append_bool( &base, "ig", true );
-				bson_finish( &base );
-
-				if (mongo_insert( &conn, mongo_col.c_str(), &base, 0 ) != MONGO_OK)
-				{
-					nlwarning("MongoDB : Error inserting data: %d %d", conn.err, conn.errcode);
-				}
-
-				bson_destroy ( &base );
-*/
-				/////
-
 				chatInGroup( grpId, ucstr, sender );
 			}
 			break;
@@ -764,6 +698,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				chatInGroup( grpId, ucstr, sender );
 			}
 			break;
+
 		case CChatGroup::guild:
 			{
 				TGroupId grpId = itCl->second->getGuildChatGroup();
@@ -773,9 +708,6 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					senderName.c_str(),
 					groupNames[itCl->second->getChatMode()],
 					ucstr.toString().c_str() );
-
-				/// MONGODB
-				//
 
 				uint32 guildId = grpId.getShortId() - 0x10000000;
 
@@ -793,30 +725,8 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					name = senderName;
 
 #ifdef HAVE_MONGO
-				CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'guildId', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), sGuildId.str().c_str(), date));
+				CMongo::insert("ryzom_chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'guildId', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), sGuildId.str().c_str(), date));
 #endif
-
-/*b
-				bson base;
-				bson_init( &base );
-					bson_append_string( &base, "username", name.c_str() );
-					bson_append_string( &base, "chat", ucstr.toUtf8().c_str() );
-					bson_append_string( &base, "chatType", "guildId" );
-					bson_append_string( &base, "chatId", sGuildId.str().c_str() );
-					bson_append_double( &base, "date", date );
-					bson_append_bool( &base, "ig", true );
-				bson_finish( &base );
-
-				if (mongo_insert( &conn, mongo_col.c_str(), &base, 0 ) != MONGO_OK)
-				{
-					nlwarning("MongoDB : Error inserting data: %d %d", conn.err, conn.errcode);
-				}
-
-				bson_destroy ( &base );
-*/
-				/////
-
-
 				chatInGroup( grpId, ucstr, sender );
 			}
 			break;
@@ -841,61 +751,22 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 						}
 					}
 
-					///// MongoDB
-
-					///// Uni lang
-					//
-					// En: (0x0000000000:0a:00:00)
-					// Fr: (0x0000000001:0a:00:00)
-					// De: (0x0000000002:0a:00:00)
-					// Ru: (0x0000000003:0a:00:00)
-					// Es: (0x0000000004:0a:00:00)
-					//
-
-
-					if (chanId.getShortId() < 5)
-					{
-						const std::string *tmpChatId = _ChanNames.getB(chanId);
-						string chatId;
-						if (tmpChatId)
-							chatId = *tmpChatId;
-
-						chatId = toLower(chatId.substr(chatId.length()-2));
-
-						double date = 1000.0*(double)CTime::getSecondsSince1970();
-						string name = senderName;
-
-						string::size_type pos = senderName.find('(');
-						if (pos != string::npos)
-							name = senderName.substr(0, pos);
-						else
-							name = senderName;
-
 #ifdef HAVE_MONGO
-						CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
+					const std::string *tmpChatId = _ChanNames.getB(chanId);
+					string chatId;
+					if (tmpChatId)
+						chatId = *tmpChatId;
+
+					nlinfo("CHAT : %s", chatId.c_str());
+					double date = 1000.0*(double)CTime::getSecondsSince1970();
+					
+					string name = senderName;
+					string::size_type pos = senderName.find('(');
+					if (pos != string::npos)
+						name = senderName.substr(0, pos);
+						
+					CMongo::insert("ryzom_chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'dynamic', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
 #endif
-
-/*b
-						bson base;
-						bson_init( &base );
-							bson_append_string( &base, "username", name.c_str() );
-							bson_append_string( &base, "chat", ucstr.toUtf8().c_str() );
-							bson_append_string( &base, "chatType", "univers" );
-							bson_append_string( &base, "chatId", chatId.c_str() );
-							bson_append_double( &base, "date", date );
-							bson_append_bool( &base, "ig", true );
-						bson_finish( &base );
-
-						if (mongo_insert( &conn, mongo_col.c_str(), &base, 0 ) != MONGO_OK)
-						{
-							nlwarning("MongoDB : Error inserting data: %d %d", conn.err, conn.errcode);
-						}
-
-						bson_destroy ( &base );
-*/
-					}
-
-					//////////////
 
 					if (!session->getChan()->getDontBroadcastPlayerInputs())
 					{
@@ -969,6 +840,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 		}
 		break;
 			// static group
+			
 		default :
 			nlwarning("<CChatManager::chat> client %u chat in %s ! don't know how to handle it.",
 				sender.getIndex(),
@@ -2304,7 +2176,7 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 			chatId = chatId.substr(0, pos);
 
 #ifdef HAVE_MONGO
-		CMongo::insert("chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'username', 'chatId': '%s', 'date': %f, 'ig': true }", username.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
+		CMongo::insert("ryzom_chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'username', 'chatId': '%s', 'date': %f, 'ig': true }", username.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
 #endif
 
 /*
@@ -2707,7 +2579,7 @@ void CChatManager::update()
 #ifdef HAVE_MONGO
 	try {
 		TTime before = CTime::getLocalTime();
-		std::auto_ptr<DBClientCursor> cursor = CMongo::query("chats", toString("{'date': { $gt: %f }, 'ig': false }", last_mongo_chat_date));
+		std::auto_ptr<DBClientCursor> cursor = CMongo::query("ryzom_chats", toString("{'date': { $gt: %f }, 'ig': false }", last_mongo_chat_date));
 		TTime after = CTime::getLocalTime();
 
 		if(!cursor.get()) return;
@@ -2750,22 +2622,18 @@ void CChatManager::update()
 				grpId.setDynamicId(0);
 				grpId.setCreatorId(0);
 			}
-			else if (chatType == "univers" and chatId != "all")
+			else if (chatType == "dynamic")
 			{
 				// broadcast to other client in the channel
-				TChanID chanId = NLMISC::CEntityId::Unknown;
-
-				chatId = "FACTION_"+toUpper(chatId);
-
-				const TChanID *tmpChanId = _ChanNames.getA(chatId);
-				if (tmpChanId)
-					chanId = *tmpChanId;
-
-				CDynChatSession *dcc = _DynChat.getChan(chanId)->getFirstSession();
-				while (dcc)
+				const TChanID *chanId = _ChanNames.getA(chatId);
+				if (chanId)
 				{
-					sendFarChat((CChatGroup::TGroupType)12, dcc->getClient()->getID(), text, ucstring("~")+ucstring(name), chanId);
-					dcc = dcc->getNextChannelSession(); // next session in this channel
+					CDynChatSession *dcc = _DynChat.getChan(*chanId)->getFirstSession();
+					while (dcc)
+					{
+						sendFarChat((CChatGroup::TGroupType)12, dcc->getClient()->getID(), text, ucstring("~")+ucstring(name), *chanId);
+						dcc = dcc->getNextChannelSession(); // next session in this channel
+					}
 				}
 				// void CChatManager::sendFarChat( C const ucstring& ucstr, const ucstring &senderName, TChanID chanID)
 				continue;
@@ -2788,140 +2656,4 @@ void CChatManager::update()
 		cout << "caught DBException " << e.toString() << endl;
 	}
 #endif
-
-/*
- 	mongo_cursor cursor;
-	bson query;
-
-	bson_init( &query );
-	bson_append_start_object( &query, "$query" );
-		bson_append_start_object( &query, "date" );
-		bson_append_double( &query, "$gt", last_mongo_chat_date );
-	  bson_append_finish_object( &query );
-	bson_append_finish_object( &query );
-	bson_finish( &query );
-
-
-	if(mongo_check_connection(&conn) == MONGO_ERROR)
-	{
-		nlwarning("boom");
-		mongo_reconnect(&conn);
-		if( mongo_cmd_authenticate(&conn, mongo_db.c_str(), "megacorp", "feFrvs3rfdcef4")  != MONGO_OK )
-		{
-			nlwarning( "FAIL: Failed to auth %d\n", conn.err );
-		}
-	}
-
-
-	mongo_cursor_init( &cursor, &conn, mongo_col.c_str() );
-	mongo_cursor_set_query( &cursor, &query );
-
-	while( mongo_cursor_next( &cursor ) == MONGO_OK )
-	{
-		bson_iterator iterator;
-		string name;
-		string chat;
-		string chatType;
-		string chatId;
-		double date;
-		bool ig;
-
-		if ( !bson_find( &iterator, mongo_cursor_bson( &cursor ), "username" ))
-		{
-			nlwarning("bson_find(username)");
-			continue;
-		}
-		name = string(bson_iterator_string( &iterator ));
-
-		if ( !bson_find( &iterator, mongo_cursor_bson( &cursor ), "chat" ))
-		{
-			nlwarning("bson_find(chat)");
-			continue;
-		}
-		chat = string(bson_iterator_string( &iterator ));
-
-		if ( !bson_find( &iterator, mongo_cursor_bson( &cursor ), "chatType" ))
-		{
-			nlwarning("bson_find(chatType)");
-			continue;
-		}
-		chatType = string(bson_iterator_string( &iterator ));
-
-		if ( !bson_find( &iterator, mongo_cursor_bson( &cursor ), "chatId" ))
-		{
-			nlwarning("bson_find(chatId)");
-			continue;
-		}
-		chatId = string(bson_iterator_string( &iterator ));
-
-		if ( !bson_find( &iterator, mongo_cursor_bson( &cursor ), "date" ))
-		{
-			nlwarning("bson_find(date)");
-			continue;
-		}
-		date = bson_iterator_double( &iterator );
-		last_mongo_chat_date = date;
-
-		if ( !bson_find( &iterator, mongo_cursor_bson( &cursor ), "ig" ))
-		{
-			nlwarning("bson_find(ig)");
-			continue;
-		}
-		ig = bson_iterator_bool( &iterator );
-		if (ig)
-			continue;
-
-		ucstring text;
-		text.fromUtf8(chat);
-
-		TGroupId grpId = CEntityId(RYZOMID::chatGroup, 0);
-
-		if (chatType == "guildId") // Chat avec la guilde
-		{
-			uint32 guildId;
-			NLMISC::fromString(chatId, guildId);
-
-			grpId.setShortId(guildId + 0x10000000);  // 0x10000000 is the GuildBase to chat group id
-			grpId.setDynamicId(0);
-			grpId.setCreatorId(0);
-		}
-		else if (chatType == "univers" and chatId != "all")
-		{
-			// broadcast to other client in the channel
-			TChanID chanId = NLMISC::CEntityId::Unknown;
-
-			chatId = "FACTION_"+toUpper(chatId);
-
-			const TChanID *tmpChanId = _ChanNames.getA(chatId);
-			if (tmpChanId)
-				chanId = *tmpChanId;
-
-			nlinfo("MongoDB: chatId = %s, chanId = %s", chatId.c_str(), chanId.toString().c_str());
-
-			CDynChatSession *dcc = _DynChat.getChan(chanId)->getFirstSession();
-			while (dcc)
-			{
-				sendFarChat((CChatGroup::TGroupType)12, dcc->getClient()->getID(), text, ucstring("~")+ucstring(name), chanId);
-				dcc = dcc->getNextChannelSession(); // next session in this channel
-			}
-			// void CChatManager::sendFarChat( C const ucstring& ucstr, const ucstring &senderName, TChanID chanID)
-			continue;
-		}
-		else if (chatType == "username")
-		{
-			if (IService::getInstance()->getShardId() == 301)
-				chatId = chatId+"(Yubo)";
-			else
-				chatId = chatId+"(Atys)";
-
-			farTell(CEntityId(uint64(0)), ucstring("~")+ucstring(name), false, ucstring(chatId), text);
-			continue;
-		}
-
-		farChatInGroup(grpId, 0, text, ucstring("~")+ucstring(name));
-	}
-
-	bson_destroy( &query );
-	mongo_cursor_destroy( &cursor );
-*/
 }

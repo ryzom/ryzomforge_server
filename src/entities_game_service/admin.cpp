@@ -53,6 +53,7 @@
 #include "game_share/http_client.h"
 #include "server_share/log_command_gen.h"
 #include "server_share/r2_vision.h"
+#include "server_share/mongo_wrapper.h"
 
 #include "egs_sheets/egs_sheets.h"
 #include "egs_sheets/egs_static_rolemaster_phrase.h"
@@ -4561,7 +4562,7 @@ NLMISC_COMMAND (connectUserChannel, "Connect to user channels", "<user id> <chan
 	{
 		string channelPass = inst->getPassUserChannel(channel);
 
-		if ( (channel != DYN_CHAT_INVALID_CHAN) && (pass == string("***")) && (c->havePriv(":DEV:") || c->havePriv(":SGM:") || c->havePriv(":GM:") || c->havePriv(":EM:")))
+		if ( pass == string("***") && (c->havePriv(":DEV:") || c->havePriv(":SGM:") || c->havePriv(":GM:") || c->havePriv(":EM:")))
 		{
 			inst->deleteUserChannel(name);
 		}

@@ -2484,6 +2484,10 @@ public:
 
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
+	uint32 getLastTpTick() const;
+	uint32 getLastOverSpeedTick() const;
+	uint32 getLastUnMountTick() const;
+	uint32 getLastMountTick() const;
 	const std::list<TCharacterLogTime>& getLastLogStats() const;
 	void updateConnexionStat();
 	void setDisconnexionTime();		
@@ -3864,6 +3868,12 @@ private:
 	bool			_PowoCantDead;
 	bool			_PowoCanTeleport;
 	bool			_PowoCanSpeedUp;
+	
+	uint32			_LastTpTick;
+	uint32			_LastOverSpeedTick;
+	uint32			_LastMountTick;
+	uint32			_LastUnMountTick;
+		
 	
 public:
 

@@ -978,6 +978,25 @@ inline uint32 CCharacter::getOrganizationStatus() const
 	return _OrganizationStatus; 
 }
 
+inline uint32 CCharacter::getLastTpTick() const
+{
+	return _LastTpTick; 
+}
+
+inline uint32 CCharacter::getLastOverSpeedTick() const
+{
+	return _LastOverSpeedTick; 
+}
+
+inline uint32 CCharacter::getLastMountTick() const
+{
+	return _LastMountTick; 
+}
+
+inline uint32 CCharacter::getLastUnMountTick() const
+{
+	return _LastUnMountTick; 
+}
 
 //------------------------------------------------------------------------------
 

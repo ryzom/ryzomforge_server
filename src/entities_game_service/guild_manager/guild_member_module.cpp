@@ -36,7 +36,6 @@
 #include "building_manager/building_physical.h"
 #include "guild_manager/fame_manager.h"
 #include "zone_manager.h"
-#include "server_share/mongo_wrapper.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -624,12 +623,6 @@ void CGuildMemberModule::kickMember( uint16 index,uint8 session )const
 	if (member->getReferencingModule(module))
 	{
 		module->clearOnlineGuildProperties();
-	}
-	else
-	{
-#ifdef HAVE_MONGO
-		CMongo::update("users", toString("{'game.cid':%"NL_I64"u}", member->getIngameEId().getShortId()), "{$set:{'game.guildId':0}}");
-#endif
 	}
 
 	// send system message

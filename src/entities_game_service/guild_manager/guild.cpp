@@ -40,6 +40,7 @@
 /// todo guild remove entity id translator
 #include "nel/misc/eid_translator.h"
 #include "chat_groups_ids.h"
+#include "server_share/mongo_wrapper.h"
 
 using namespace std;
 using namespace NLMISC;
@@ -1272,6 +1273,10 @@ void CGuild::deleteMember( CGuildMember* member )
 {
 	nlassert(member);
 	nlassert( uint(member->getGrade()) < _GradeCounts.size() );
+
+#ifdef HAVE_MONGO
+		CMongo::update("ryzom_users", toString("{'cid':%"NL_I64"u}", member->getIngameEId().getShortId()), "{$set:{'guildId':0}}");
+#endif
 
 	if (PlayerManager.getChar(member->getIngameEId()) != NULL)
 		setMemberOffline( member );
