@@ -1166,13 +1166,13 @@ NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>"
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> player_name number")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [can_xp,cant_dead,can_teleport,can_speedup]")
 {
 	GET_ACTIVE_CHARACTER
 
 	IBuildingPhysical * building;	
 	if (args.size () >= 3)
-		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName("building_instance_ZO_player_11"+args[2]);
+		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]);
 	else
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName("building_instance_ZO_player_111");
 
@@ -1188,11 +1188,15 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> player_name number"
 
 			CBuildingPhysicalPlayer * buildingPlayer = dynamic_cast<CBuildingPhysicalPlayer *>( building );
 
-			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[1]));
-			if (buildingPlayer && entityBase)
+			CEntityId playerEid = CEntityIdTranslator::getInstance()->getByEntity( ucstring(args[1]) );
+			nlinfo("playerEid = %s", playerEid.toString().c_str());
+			//CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[1]));
+			if (buildingPlayer && playerEid != CEntityId::Unknown/*entityBase*/)
 			{
 				CBuildingManager::getInstance()->removePlayerFromRoom( c );
-				uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
+				//uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
+				uint16 ownerId = buildingPlayer->getOwnerIdx( playerEid );
+				nlinfo("ownerId = %d", ownerId);
 				sint32 cell;
 				buildingPlayer->addUser(c, 0, ownerId, cell);
 				c->setPowoCell(cell);
@@ -1259,7 +1263,7 @@ NLMISC_COMMAND(slide, "slide to the powo", "<uid> x y cell [z] [h]")
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] teleportMektoub? checks sameCell")
+NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] teleportMektoub? checks sameCell checkPowoFlag")
 {
 	if (args.size () < 2)
 	{
@@ -1442,6 +1446,12 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 		cell = mirrorCell;
 	}
 
+	// Check if PowoFlag canTeleport are true
+	if (args.size () > 5 && args[5] == "1" && !c->getPowoFlag("teleport")) {
+		log.displayNL("ERR: NO_POWO_FLAG");
+		return true;
+	}
+	
 	c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
 
 	if ( cont )
@@ -1450,6 +1460,55 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 	}
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setRespawn, "set respawn point for the player", "<uid> x y cell")
+{
+	if (args.size () < 4)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+	
+	sint32 x;
+	sint32 y;
+	uint32 cell;
+	
+	fromString(args[1], x);
+	x *= 1000;
+	
+	fromString(args[2], y);
+	y *= 1000;
+
+	fromString(args[3], cell);
+	
+	c->getRespawnPoints().setArkRespawnpoint(x, y, cell);
+	
+	return true;
+}
+
+//-----------------------------------------------
+// Add re-spawn point
+//-----------------------------------------------
+NLMISC_COMMAND(addRespawnPoint,"Add re-spawn point","<uid> <Re-spawn point name>")
+{
+	if (args.size () < 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+
+
+	CCharacterRespawnPoints::TRespawnPoint respawnPoint = CZoneManager::getInstance().getTpSpawnZoneIdByName(args[1]);
+	if (respawnPoint == InvalidSpawnZoneId)
+		return false;
+	
+	c->getRespawnPoints().addRespawnPoint(respawnPoint);
+	return true;
+}
 
 
 //----------------------------------------------------------------------------
@@ -1725,7 +1784,7 @@ NLMISC_COMMAND(getArkMissions,"dump character ark missions","<uid>")
 
 
 //-----------------------------------------------
-NLMISC_COMMAND(getPlayerStats,"get_player_stats","<uid> <stat1,stat2,stat3..>")
+NLMISC_COMMAND(getPlayerStats,"get player stats","<uid> <stat1,stat2,stat3..>")
 {
 	
 	if (args.size() <= 1)
@@ -1779,7 +1838,7 @@ NLMISC_COMMAND(getPlayerStats,"get_player_stats","<uid> <stat1,stat2,stat3..>")
 }
 
 //-----------------------------------------------
-NLMISC_COMMAND(getServerStats,"get_server_stats","<stat1,stat2,stat3..>")
+NLMISC_COMMAND(getServerStats,"get server stats","<stat1,stat2,stat3..>")
 {
 	
 	if (args.size() <= 0)
@@ -1809,6 +1868,180 @@ NLMISC_COMMAND(getServerStats,"get_server_stats","<stat1,stat2,stat3..>")
 	}
 
 	return true;
+}
+
+//addCheckPos 530162 26140 -2436 5 test Prout
+
+//-----------------------------------------------
+NLMISC_COMMAND(addCheckPos,"add check pos","<uid> <x> <y> <radius> <mission_name> <use_compass>")
+{
+	if (args.size() != 6)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	sint32 x;
+	sint32 y;
+	uint32 r;
+	fromString(args[1], x);
+	fromString(args[2], y);
+	fromString(args[3], r);
+
+	c->addPositionCheck(x, y, r, args[4], args[5] == "1");
+}
+
+
+//-----------------------------------------------
+NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>")
+{
+	if (args.size() != 3)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	vector<TAIAlias> aliases;
+	CAIAliasTranslator::getInstance()->getNPCAliasesFromName(args[1], aliases);
+	if (aliases.empty())
+	{
+		nldebug ("<spawn_mission> No NPC found matching name '%s'", args[1].c_str());
+		return false;
+	}
+
+	TAIAlias giverAlias = aliases[0];
+	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[2]);
+
+	if (missionAlias == CAIAliasTranslator::Invalid)
+	{
+		nldebug ("<addMissionByName> No Mission found matching name '%s'", args[2].c_str());
+		return false;
+	}
+
+	c->endBotChat();
+
+	std::list< CMissionEvent* > eventList;
+	CMissionManager::getInstance()->instanciateMission(c, missionAlias,	giverAlias, eventList);
+	c->processMissionEventList(eventList,true, CAIAliasTranslator::Invalid);
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(removeArkMission,"remove Mission","<uid> <mission_name>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
+	c->removeMission(missionAlias, 0);
+	c->removeMissionFromHistories(missionAlias);
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(finishArkMission,"finish Mission","<uid> <mission_name>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+		
+	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
+	c->removeMission(missionAlias, 0, true);
+	c->removeMissionFromHistories(missionAlias);
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1> <line2> <line3> ...")
+{
+	if (args.size() < 3)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	uint32 nbString = (uint32)args.size();
+	string text = getStringFromHash(args[2]);
+
+	for (uint32 i=3; i<nbString; ++i)
+		text +=  "\n"+getStringFromHash(args[i]);
+	c->setCustomMissionParams(args[1], text);
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(delArkMissionParams,"del Mission Params","<uid> <mission_name>")
+{
+	if (args.size() != 5)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	c->setCustomMissionParams(args[1], "");
+}
+
+
+//-----------------------------------------------
+NLMISC_COMMAND(setArkMissionParams,"set Mission Params","<uid> <mission_name> <params> <app_callback> <callback_params>")
+{
+	if (args.size() != 5)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	c->setCustomMissionParams(args[1], args[3]+" "+args[4]+","+args[2]);
+}
+
+
+//-----------------------------------------------
+NLMISC_COMMAND(addArkMissionParams,"add Mission Params","<uid> <mission_name> <params>")
+{
+	if (args.size() != 3)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	c->addCustomMissionParam(args[1], args[2]);
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastTpTick,"get tick of last teleport","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastTpTick());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastOverSpeedTick,"get tick of last over speed","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastOverSpeedTick());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastMountTick,"get tick of last mount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastMountTick());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastUnMountTick,"get tick of last umount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastUnMountTick());
 }
 
 

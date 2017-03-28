@@ -223,6 +223,16 @@ bool CCharacterRespawnPoints::setRingAdventureRespawnpoint(const CFarPosition &f
 }
 
 //-----------------------------------------------------------------------------
+void CCharacterRespawnPoints::setArkRespawnpoint(sint32 x, sint32 y, uint32 cell)
+{
+	_RingRespawnPoint.SessionId = TSessionId(cell);
+	_RingRespawnPoint.PosState = _Char.getState();
+	_RingRespawnPoint.PosState.X = x;
+	_RingRespawnPoint.PosState.Y = y;
+	resetUserDb(false);
+}
+
+//-----------------------------------------------------------------------------
 void CCharacterRespawnPoints::clearRingRespawnpoint()
 {
 	_RingRespawnPoint.SessionId = TSessionId(0);
@@ -230,9 +240,25 @@ void CCharacterRespawnPoints::clearRingRespawnpoint()
 }
 
 //-----------------------------------------------------------------------------
+bool CCharacterRespawnPoints::inR2Island() const
+{
+	
+	CContinent * cont = CZoneManager::getInstance().getContinent( _Char.getX(), _Char.getY() );
+	if( cont == 0 )
+		return false;
+	
+	CONTINENT::TContinent continent = (CONTINENT::TContinent)cont->getId();
+	return (continent == CONTINENT::R2_ROOTS ||
+			continent == CONTINENT::R2_FOREST ||
+			continent == CONTINENT::R2_DESERT ||
+			continent == CONTINENT::R2_LAKES ||
+			continent == CONTINENT::R2_JUNGLE );
+}
+
+//-----------------------------------------------------------------------------
 bool CCharacterRespawnPoints::getRingAdventuresRespawnPoint( sint32 &x, sint32 &y ) const
 {
-	if( _RingRespawnPoint.SessionId.asInt() != 0 )
+	if( _RingRespawnPoint.SessionId.asInt() != 0 && inR2Island() )
 	{
 		x = _RingRespawnPoint.PosState.X;
 		y = _RingRespawnPoint.PosState.Y;
@@ -247,7 +273,7 @@ void CCharacterRespawnPoints::getUsableRespawnPoints(CONTINENT::TContinent conti
 	respawnPoints.clear();
 
 	// ring re-spawn point override mission and regular re-spawn point
-	if( _RingRespawnPoint.SessionId.asInt() != 0 )
+	if( _RingRespawnPoint.SessionId.asInt() != 0 && inR2Island() )
 	{
 		respawnPoints.push_back(0); //only one ring re-spawn point
 		return;
@@ -363,10 +389,10 @@ bool CCharacterRespawnPoints::isUsableRegularRespawnPoint(CONTINENT::TContinent 
 		return false;
 
 	// check if the player is kami or karavan 	 
-	static const uint32 kamiFaction = CStaticFames::getInstance().getFactionIndex("kami"); 	 
-	static const uint32 karavanFaction = CStaticFames::getInstance().getFactionIndex("karavan"); 	 
-	sint32 kamiFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), kamiFaction); 	 
-	sint32 karavanFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), karavanFaction); 	 
+	static const uint32 kamiFaction = CStaticFames::getInstance().getFactionIndex("kami");
+	static const uint32 karavanFaction = CStaticFames::getInstance().getFactionIndex("karavan");
+	sint32 kamiFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), kamiFaction);
+	sint32 karavanFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), karavanFaction);
 	bool isKami = (kamiFame >= karavanFame); 	 
   	 
 	if (zone->getType() == RESPAWN_POINT::KAMI && !isKami) 	 
@@ -381,7 +407,7 @@ bool CCharacterRespawnPoints::isUsableRegularRespawnPoint(CONTINENT::TContinent 
 }
 
 //-----------------------------------------------------------------------------
-void CCharacterRespawnPoints::resetUserDb() const
+void CCharacterRespawnPoints::resetUserDb(bool checkInR2Island) const
 {
 	if ( !_Char.getEnterFlag() )
 		return;
@@ -394,7 +420,7 @@ void CCharacterRespawnPoints::resetUserDb() const
 
 	CRespawnPointsMsg respawnPointMsg;
 
-	if( _RingRespawnPoint.SessionId.asInt() != 0 )
+	if( _RingRespawnPoint.SessionId.asInt() != 0 && (!checkInR2Island || inR2Island()) )
 	{
 		CRespawnPointsMsg::SRespawnPoint rs;
 		rs.x = _RingRespawnPoint.PosState.X;

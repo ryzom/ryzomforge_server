@@ -194,6 +194,42 @@ struct SGameCoordinate
 	}
 };
 
+/*
+ *	SCheckPosCoordinate
+ */
+struct SCheckPosCoordinate
+{
+
+	DECLARE_PERSISTENCE_METHODS
+
+	sint32	X;
+	sint32	Y;
+	uint32  Radius;
+	std::string	Name;
+
+	SCheckPosCoordinate()
+	{
+		clear();
+	}
+
+	void clear()
+	{
+		X = 0;
+		Y = 0;
+		Radius = 0;
+		Name = "";
+	}
+
+	void serial(NLMISC::IStream &f)
+	{
+		f.serial(X);
+		f.serial(Y);
+		f.serial(Radius);
+		f.serial(Name);
+	}
+};
+
+
 
 /* Storage class for mission history data.
 */
@@ -1682,19 +1718,25 @@ public:
 	void sendUrl(const std::string &url, const std::string &salt);
 
 	/// set custom mission param
- 	void setCustomMissionParams(const std::string &missionName, const std::string &params);
+	void setCustomMissionParams(const std::string &missionName, const std::string &params);
 
- 	/// add custom mission param
- 	void addCustomMissionParam(const std::string &missionName, const std::string &param);
+	/// add custom mission param
+	void addCustomMissionParam(const std::string &missionName, const std::string &param);
 
- 	/// get custom mission params
- 	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
+	/// get custom mission params
+	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
 
- 	/// get custom mission texts
- 	std::string getCustomMissionText(const std::string &missionName);
+	/// get custom mission texts
+	std::string getCustomMissionText(const std::string &missionName);
 
- 	/// validate dynamic mission step sending url
- 	void validateDynamicMissionStep(const std::string &url);
+	/// add Ark position check
+	void addPositionCheck(sint32 x, sint32 y, uint32 r, const std::string &name, bool use_compass);
+
+	/// get Ark position check
+	void getPositionCheck(const std::string &name, sint32 &x, sint32 &y, std::string &textName);
+
+	/// validate dynamic mission step sending url
+	void validateDynamicMissionStep(const std::string &url);
 
 	/// add web command validation check
 	void addWebCommandCheck(const std::string &url, const std::string &data, const std::string &salt);
@@ -2442,6 +2484,10 @@ public:
 
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
+	uint32 getLastTpTick() const;
+	uint32 getLastOverSpeedTick() const;
+	uint32 getLastUnMountTick() const;
+	uint32 getLastMountTick() const;
 	const std::list<TCharacterLogTime>& getLastLogStats() const;
 	void updateConnexionStat();
 	void setDisconnexionTime();		
@@ -3348,7 +3394,9 @@ private:
 	/// last web url index
 	uint32						_LastUrlIndex;
 
- 	std::map<std::string, std::string>	_CustomMissionsParams;
+	std::map<std::string, std::string>	_CustomMissionsParams;
+
+	std::vector<SCheckPosCoordinate>    _CheckPos;
 
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange {
@@ -3820,6 +3868,12 @@ private:
 	bool			_PowoCantDead;
 	bool			_PowoCanTeleport;
 	bool			_PowoCanSpeedUp;
+	
+	uint32			_LastTpTick;
+	uint32			_LastOverSpeedTick;
+	uint32			_LastMountTick;
+	uint32			_LastUnMountTick;
+		
 	
 public:
 

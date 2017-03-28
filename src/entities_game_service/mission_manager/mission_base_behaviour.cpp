@@ -211,35 +211,39 @@ uint32 CMissionBaseBehaviour::sendDesc( const TDataSetRow & user )
 }
 
 //----------------------------------------------------------------------------
-void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot )
+void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot, bool isPosition )
 {
 	CCreature * c = NULL;
 	CPlace * place = NULL;
-	if (isBot)
+	if (!isPosition)
 	{
-		const CEntityId & id = CAIAliasTranslator::getInstance()->getEntityId( targetId );
-		if (id != CEntityId::Unknown)
+		if (isBot)
 		{
-			c = CreatureManager.getCreature( id );
-			if (c == NULL)
+			
+			const CEntityId & id = CAIAliasTranslator::getInstance()->getEntityId( targetId );
+			if (id != CEntityId::Unknown)
 			{
-				nlwarning("<CMissionInstance addCompassTarget> Invalid entity %s", id.toString().c_str());
+				c = CreatureManager.getCreature( id );
+				if (c == NULL)
+				{
+					nlwarning("<CMissionInstance addCompassTarget> Invalid entity %s", id.toString().c_str());
+					return;
+				}
+			}
+			else
+			{
+				nlwarning("<CMissionInstance addCompassTarget> Invalid entity alias %s", CPrimitivesParser::aliasToString(targetId).c_str());
 				return;
 			}
 		}
 		else
 		{
-			nlwarning("<CMissionInstance addCompassTarget> Invalid entity alias %s", CPrimitivesParser::aliasToString(targetId).c_str());
-			return;
-		}
-	}
-	else
-	{
-		place = CZoneManager::getInstance().getPlaceFromId( (uint16)targetId );
-		if (place == NULL)
-		{
-			nlwarning("<MISSIONS> Invalid place %u", targetId);
-			return;
+			place = CZoneManager::getInstance().getPlaceFromId( (uint16)targetId );
+			if (place == NULL)
+			{
+				nlwarning("<MISSIONS> Invalid place %u", targetId);
+				return;
+			}
 		}
 	}
 
@@ -265,6 +269,8 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot )
 				if (c != NULL && currentCompass.getBotId() == c->getAlias())
 					return;
 				if (place != NULL && currentCompass.getPlace() == place->getAlias())
+					return;
+				if (isPosition && currentCompass.getBotId() == targetId)
 					return;
 			}
 
@@ -300,7 +306,32 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot )
 	}
 	else
 	{
-		nlstop;
+		if (isPosition)
+		{
+			compass->setBotId(targetId);
+			compass->setPlace(CAIAliasTranslator::Invalid);
+	
+			sint32 x;
+			sint32 y;
+			string textName;
+			
+			CCharacter * user = getMainEntity();
+			user->getPositionCheck(toUpper(templ->getMissionName()), x, y, textName);
+			nlinfo("add compass target for %s, %d,%d = %s (%d)", templ->getMissionName().c_str(), x, y, textName.c_str(), targetId);
+
+			if (targetId != 0) {
+				nlinfo("update db");
+				CBankAccessor_PLR::getMISSIONS().getArray(_ClientIndex).getTARGET(freeIdx).setX(user->_PropertyDatabase, x*1000);
+				CBankAccessor_PLR::getMISSIONS().getArray(_ClientIndex).getTARGET(freeIdx).setY(user->_PropertyDatabase, y*1000);
+				CBankAccessor_PLR::getMISSIONS().getArray(_ClientIndex).getTARGET(freeIdx).setTITLE(user->_PropertyDatabase, targetId);
+			}
+			
+			targetId = CAIAliasTranslator::Invalid;
+		}
+		else
+		{
+			nlstop;
+		}
 	}
 
 	std::vector<TDataSetRow> entities;
@@ -310,8 +341,9 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot )
 		TVectorParamCheck params(1);
 		sint32 x = 0;
 		sint32 y = 0;
+		uint32 txt = 0;
 		string msg;
-
+		
 		if ( c )
 		{
 			x = c->getState().X();
@@ -331,9 +363,21 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot )
 			params[0].Type = STRING_MANAGER::place;
 			msg = "COMPASS_PLACE";
 		}
+		else if (isPosition)
+		{
+			nlinfo("isposition");
+			string textName;
+			CCharacter * user = getMainEntity();
+			if (user)
+				user->getPositionCheck(toUpper(templ->getMissionName()), x, y, textName);
+			txt = targetId;
+		}
+		
 		for ( uint i  = 0; i < entities.size(); i++)
 		{
-			uint32 txt = STRING_MANAGER::sendStringToClient( entities[i],msg,params );
+			if (!isPosition)
+				txt = STRING_MANAGER::sendStringToClient( entities[i],msg,params );
+				
 			PlayerManager.sendImpulseToClient( getEntityIdFromRow(entities[i]), "JOURNAL:ADD_COMPASS", x,y,txt );
 		}
 	}
@@ -1442,6 +1486,18 @@ uint CMissionBaseBehaviour::_updateCompass(CCharacter & user, DBType &missionDb)
 			compassIdx++;
 		}
 	}
+	
+	CMissionTemplate * tpl = CMissionManager::getInstance()->getTemplate( _Mission->getTemplateId() );
+	
+	sint32 x;
+	sint32 y;
+	string txtName;
+	
+	user.getPositionCheck(toUpper(tpl->getMissionName()), x, y, txtName);
+	
+	if (!txtName.empty())
+		compassIdx++;
+		
 	return compassIdx;
 }
 

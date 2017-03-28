@@ -1602,10 +1602,12 @@ void cbDynChatAddChan(CMessage& msgin, const string &serviceName, TServiceId ser
 	else
 	{
 		if (_ChanNames.getA(name) == NULL && _ChanNames.getB(chanID) == NULL)
+		{
 			_ChanNames.add(chanID, name);
+			nlinfo("cbDynChatAddChan: add channel %s",chanID.toString().c_str());
+		}
 		else
 			nlwarning("Couldn't add chan %s. already added! %p %p", chanID.toString().c_str(), _ChanNames.getA(name), _ChanNames.getB(chanID));
-		nlinfo("cbDynChatAddChan: add channel %s",chanID.toString().c_str());
 	}
 }
 

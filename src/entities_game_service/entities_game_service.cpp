@@ -2024,8 +2024,11 @@ void cbMirrorUp( const std::string &serviceName, NLNET::TServiceId serviceId, vo
 	{
 		IOSIsUp = true;
 		nlinfo("IOS connection, serviceId %d",serviceId.get());
+		DynChatEGS.iosConnection();
+		
 		CGuildManager::getInstance()->onIOSConnection();
 		CPVPManager2::getInstance()->onIOSMirrorUp();
+
 		// add all teams to chat groups
 		TeamManager.addAllTeamsToChatGroup();
 		PlayerManager.registerCharacterName();
@@ -2033,7 +2036,6 @@ void cbMirrorUp( const std::string &serviceName, NLNET::TServiceId serviceId, vo
 //		PlayerManager.addAllCharForStringIdRequest();
 		CZoneManager::getInstance().iosConnection();
 //		RY_PDS::CPDStringManager::buildStringAssociation();
-		DynChatEGS.iosConnection();
 		CAIAliasTranslator::getInstance()->sendAliasToIOS();
 
 		// update all the 'TEXT' property in the database

@@ -2828,14 +2828,31 @@ class CMissionActionCompassNpc : public IMissionAction
 						vector<string> params = c->getCustomMissionParams(toUpper(templ->getMissionName()));
 						if (params.size() >= 2)
 						{
-							vector<TAIAlias> aliases;
-							CAIAliasTranslator::getInstance()->getNPCAliasesFromName( params[1] , aliases );
-							if (aliases.empty())
+							if (params[1] == "*") // The position is defined by 'addCheckPos' command
 							{
-								MISLOG( "<parseBotName> Invalid bot %s",params[1].c_str() );
+								sint32 x;
+								sint32 y;
+								string textName;
+								c->getPositionCheck(toUpper(templ->getMissionName()), x, y, textName);
+								
+								SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
+								textParams[0].Literal.fromUtf8(textName);
+								uint32 txtId = STRING_MANAGER::sendStringToClient( c->getEntityRowId(), "LITERAL", textParams );
+								nlinfo("add compass target for %s, %d,%d = %s (%d)", templ->getMissionName().c_str(), x, y, textName.c_str(), txtId);
+								instance->addCompassTarget((TAIAlias)txtId,true,true);
 								return;
 							}
-							Alias = aliases[aliases.size() - 1];
+							else
+							{
+								vector<TAIAlias> aliases;
+								CAIAliasTranslator::getInstance()->getNPCAliasesFromName( params[1] , aliases );
+								if (aliases.empty())
+								{
+									MISLOG( "<parseBotName> Invalid bot %s",params[1].c_str() );
+									return;
+								}
+								Alias = aliases[aliases.size() - 1];
+							}
 						}
 					}
 				}

@@ -414,6 +414,10 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	_FactionPoint[i],\
 	PVP_CLAN::TPVPClan k=PVP_CLAN::fromString(key); if ((k>=PVP_CLAN::BeginClans) && (k<=PVP_CLAN::EndClans)) _FactionPoint[k-PVP_CLAN::BeginClans]=val)\
 \
+	PROP(uint32,_LastTpTick)\
+	PROP(uint32,_LastOverSpeedTick)\
+	PROP(uint32,_LastMountTick)\
+	PROP(uint32,_LastUnMountTick)\
 	PROP(uint32,_PvpPoint)\
 	PROP2(_LangChannel,string,_LangChannel,_LangChannel=val)\
 	PROP(uint32,_Organization)\
@@ -487,6 +491,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	)\
 	PROP_VECT(CEntityId,_IsFriendOf)\
 	PROP_VECT(CEntityId,_IsIgnoredBy)\
+	STRUCT_VECT(_CheckPos)\
 \
 	STRUCT(_MemorizedPhrases)\
 	STRUCT2(_ForbidPowerDates, _ForbidPowerDates.store(pdr), _ForbidPowerDates.apply(pdr))\
@@ -717,6 +722,24 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	FLAG0(CLEAR,clear())\
 	PROP(uint8,PactNature)\
 	PROP(uint8,PactType)\
+
+//#pragma message( PERSISTENT_GENERATION_MESSAGE )
+#include "game_share/persistent_data_template.h"
+
+
+
+//-----------------------------------------------------------------------------
+// Persistent data for SCheckPosCoordinate
+//-----------------------------------------------------------------------------
+
+#define PERSISTENT_CLASS SCheckPosCoordinate
+
+#define PERSISTENT_DATA\
+	FLAG0(CLEAR,clear())\
+	PROP(sint32,X)\
+	PROP(sint32,Y)\
+	PROP(uint32,Radius)\
+	PROP(string,Name)\
 
 //#pragma message( PERSISTENT_GENERATION_MESSAGE )
 #include "game_share/persistent_data_template.h"

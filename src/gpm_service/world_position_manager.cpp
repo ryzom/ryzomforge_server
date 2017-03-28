@@ -1475,27 +1475,47 @@ void	CWorldPositionManager::computeVision()
 		cell->setVisionUpdateCycle(CTickEventHandler::getGameCycle());
 		H_TIME(ComputeCellVision, computeCellVision(cell, cellVisionArray, numEntities, player->Entity););
 
-		CPlayerInfos	*plv;
-		for (plv=cell->getPlayersList(); plv!=NULL; plv=plv->Next)
+		if (!cell->isIndoor())
 		{
-			CFrontEndData	&fe = (*(plv->ItFrontEnd)).second;
+			CPlayerInfos	*plv;
+			for (plv=cell->getPlayersList(); plv!=NULL; plv=plv->Next)
+			{
+				CFrontEndData	&fe = (*(plv->ItFrontEnd)).second;
+				// if player's fe reached its maximum for this tick, get to next entity
+				if (fe.CurrentVisionsAtTick >= fe.MaxVisionsPerTick || plv->DelayVision > CTickEventHandler::getGameCycle())
+					continue;
+
+				// else set cell vision to the player
+				H_TIME(SetVisionToPlayer, setCellVisionToEntity(plv->Entity, cellVisionArray, numEntities););
+				++numVision;
+				plv->LastVisionTick = CTickEventHandler::getGameCycle();
+
+				//
+				++(fe.CurrentVisionsAtTick);
+
+				// put player at the end of the update list
+				if (plv == *itpl)
+					itpl = updateVisionState(itpl);
+				else
+					updateVisionState(plv->ItUpdatePlayer);
+			}
+		}
+		else
+		{
+			CFrontEndData	&fe = (*(player->ItFrontEnd)).second;
 			// if player's fe reached its maximum for this tick, get to next entity
-			if (fe.CurrentVisionsAtTick >= fe.MaxVisionsPerTick || plv->DelayVision > CTickEventHandler::getGameCycle())
+			if (fe.CurrentVisionsAtTick >= fe.MaxVisionsPerTick || player->DelayVision > CTickEventHandler::getGameCycle())
 				continue;
 
 			// else set cell vision to the player
-			H_TIME(SetVisionToPlayer, setCellVisionToEntity(plv->Entity, cellVisionArray, numEntities););
+			H_TIME(SetVisionToPlayer, setCellVisionToEntity(player->Entity, cellVisionArray, numEntities););
 			++numVision;
-			plv->LastVisionTick = CTickEventHandler::getGameCycle();
+			player->LastVisionTick = CTickEventHandler::getGameCycle();
 
 			//
 			++(fe.CurrentVisionsAtTick);
 
-			// put player at the end of the update list
-			if (plv == *itpl)
-				itpl = updateVisionState(itpl);
-			else
-				updateVisionState(plv->ItUpdatePlayer);
+			itpl = updateVisionState(itpl);
 		}
 	}
 
@@ -2207,17 +2227,12 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 	// only consider (x,y) motion for speed and position correction
 	if (master->PlayerInfos != NULL /*&& master->PlayerInfos->CheckSpeed && CheckPlayerSpeed && fabs(movVector.x)+fabs(movVector.y) > maxDist*/)
 	{
-		double		movNorm = sqr(movVector.x)+sqr(movVector.y); // already done if (entity != master) but here is a rare overspeed case
+		double movNorm = sqr(movVector.x)+sqr(movVector.y); // already done if (entity != master) but here is a rare overspeed case
 
 		if (movNorm > sqr(maxDist))
 		{
 			if (movNorm > sqr(5 * SecuritySpeedFactor * CTickEventHandler::getGameTimeStep() * ticksSinceLastUpdate)) {
 				movVector *= (maxDist / sqrt(movNorm));
-				nlwarning("Player limitSpeed=%2.f, entitySpeed=%.2f, masterSpeed=%.2f", limitSpeedToUse, maxSpeed(), mountWalkSpeed);
-			}
-			else
-			{
-				nlwarning("Player limitSpeed=%2.f, entitySpeed=%.2f, masterSpeed=%.2f", limitSpeedToUse, maxSpeed(), mountWalkSpeed);
 			}
 		}
 	}
@@ -2269,7 +2284,7 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 		}
 
 		// if the final position is more than one meter away from the param position, correct entity position
-		CVectorD	diff2d = targetPos-finalPos;
+		CVectorD diff2d = targetPos-finalPos;
 		diff2d.z = 0.0;
 		if (diff2d.sqrnorm() > 1.0 )
 		{

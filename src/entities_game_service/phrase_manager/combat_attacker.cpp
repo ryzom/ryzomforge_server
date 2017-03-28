@@ -130,7 +130,7 @@ CCombatWeapon::CCombatWeapon(CGameItemPtr itemPtr)
 	// weapon hit rate is in hit/10s and we use ticks/hits....
 	if (itemPtr->hitRate() != 0)
 	{
-		LatencyInTicks = uint16( (10.0f / itemPtr->hitRate())  / CTickEventHandler::getGameTimeStep());
+		LatencyInTicks =  (10.0 / itemPtr->hitRate() )  / CTickEventHandler::getGameTimeStep();
 	}
 	
 	Quality = (uint16)itemPtr->recommended();
@@ -202,6 +202,7 @@ bool CCombatAttackerPlayer::getItem( TAttackerItem item, CCombatWeapon &weaponIt
 		if (weaponItem.Family == ITEMFAMILY::MELEE_WEAPON || weaponItem.Family == ITEMFAMILY::RANGE_WEAPON)
 		{
 			nlwarning("<CCombatAttackerPlayer::getItem> Error while building item, found an hit rate = 0 for item %s!", itemPtr->getSheetId().toString().c_str());
+			return false;
 		}
 	}
 
@@ -297,7 +298,7 @@ void CCombatAttackerAI::initFromRowId( const TDataSetRow &rowId )
 		_RightHandWeapon.Damage = (float)form->getCreatureDamagePerHit() * BotDamageFactor;
 		
 		_RightHandWeapon.DmgType = DMGTYPE::SLASHING;
-		_RightHandWeapon.LatencyInTicks = (uint16)form->getAttackLatency();
+		_RightHandWeapon.LatencyInTicks = (double)form->getAttackLatency();
 		_RightHandWeapon.Family = ITEMFAMILY::MELEE_WEAPON;
 		_RightHandWeapon.Skill = BarehandCombatSkill;
 		_RightHandWeapon.SabrinaCost = (uint16)_SkillValue;
@@ -416,7 +417,7 @@ void CCombatAttackerNpc::initFromRowId( const TDataSetRow &rowId )
 	{
 		// get speed, dmg type, skill and family
 		_RightHandWeapon = CCombatWeapon(entity->getRightHandItem());
-		_RightHandWeapon.LatencyInTicks = (uint16)form->getAttackLatency();
+		_RightHandWeapon.LatencyInTicks = (double)form->getAttackLatency();
 
 		// check ammo 
 		if (entity->getAmmoItem() != NULL && entity->getAmmoItem()->getStaticForm() != NULL && entity->getAmmoItem()->getStaticForm()->Family == ITEMFAMILY::AMMO)
@@ -426,7 +427,7 @@ void CCombatAttackerNpc::initFromRowId( const TDataSetRow &rowId )
 	}
 	else
 	{
-		_RightHandWeapon.LatencyInTicks = (uint16)form->getAttackLatency();
+		_RightHandWeapon.LatencyInTicks = (double)form->getAttackLatency();
 		_RightHandWeapon.Family = ITEMFAMILY::MELEE_WEAPON;
 		_RightHandWeapon.Skill = BarehandCombatSkill;
 		_RightHandWeapon.DmgType = DMGTYPE::BLUNT;

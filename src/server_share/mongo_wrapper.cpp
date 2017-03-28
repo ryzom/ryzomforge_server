@@ -46,7 +46,7 @@ void CMongo::init()
 		bool res;
 		string errmsg;
 
-		res = conn.connect("ryzom.com:22110", errmsg);
+		res = conn.connect("chat.ryzom.com:22110", errmsg);
 		if(!res) nlerror("mongo: init failed, cannot connect '%s'", errmsg.c_str());
 		else nlinfo("mongo: connection ok");
 
@@ -104,6 +104,21 @@ void CMongo::update(const string &collection, const string &jsonQuery, const str
 		nlwarning("mongo: update failed, caught DBException '%s'", e.toString().c_str());
 	}
 }
+
+void CMongo::remove(const string &collection, const string &jsonQuery, bool justOne)
+{
+	nlinfo("mongo: try to delete in '%s' : '%s'", collection.c_str(), jsonQuery.c_str());
+
+	try
+	{
+		conn.remove(dbname+"."+collection, jsonQuery, justOne);
+	}
+	catch(const DBException& e)
+	{
+		nlwarning("mongo: update failed, caught DBException '%s'", e.toString().c_str());
+	}
+}
+
 
 string CMongo::quote(const string &s)
 {
