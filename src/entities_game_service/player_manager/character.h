@@ -3362,7 +3362,7 @@ private:
 	CSEffectPtr _ProspectionLocateDepositEffect;
 
 	//// Bonus extraction time coming from known passive bricks (not saved but computed by computeForageBonus() at
-	///loading)
+	/// loading)
 	NLMISC::TGameCycle _ForageBonusExtractionTime;
 
 	/// date since when this player can't use auras
@@ -3809,9 +3809,9 @@ private:
 
 	uint32 _FirstConnectedTime; // first connected time in second since midnight (00:00:00), January 1, 1970
 	uint32 _LastConnectedTime; // last connected time in second since midnight (00:00:00), January 1, 1970 (change each
-							   // tick update)
+	// tick update)
 	uint32 _LastConnectedDate; // last connected time in second since midnight (00:00:00), January 1, 1970 (never change
-							   // after login, exactly like in mysql db)
+	// after login, exactly like in mysql db)
 	uint32 _PlayedTime; // cumulated played time in second
 	mutable std::list<TCharacterLogTime> _LastLogStats; // keep n login/duration/logoff time
 

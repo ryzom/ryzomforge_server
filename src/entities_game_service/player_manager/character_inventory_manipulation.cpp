@@ -953,7 +953,7 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 
 	// output stats
 	//	EGSPD::equipItem(_Id, item->getSheetId().toString(), item->quality(), INVENTORIES::toString(dstInvId),
-	//SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)dstSlot));
+	// SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)dstSlot));
 }
 
 // ****************************************************************************
@@ -1046,8 +1046,8 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 
 	// output stats
 	//	EGSPD::unequipItem(_Id, item->getSheetId().toString(), item->quality(),
-	//INVENTORIES::toString((INVENTORIES::TInventory)invId),
-	//SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)slot));
+	// INVENTORIES::toString((INVENTORIES::TInventory)invId),
+	// SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)slot));
 }
 
 //--------------------------------------------------------------------------
@@ -2078,7 +2078,7 @@ void CCharacter::sendItemInfos(uint16 slotId)
 				return;
 			}
 			//			infos.versionInfo = (uint16) _PropertyDatabase.getProp(
-			//NLMISC::toString("EXCHANGE:GIVE:%u:INFO_VERSION",slot) );
+			// NLMISC::toString("EXCHANGE:GIVE:%u:INFO_VERSION",slot) );
 			infos.versionInfo
 				= CBankAccessor_PLR::getEXCHANGE().getGIVE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
 		} else if (inventory == INVENTORIES::exchange_proposition) {
@@ -2101,7 +2101,7 @@ void CCharacter::sendItemInfos(uint16 slotId)
 				return;
 			}
 			//			infos.versionInfo = (uint16) _PropertyDatabase.getProp(
-			//NLMISC::toString("EXCHANGE:RECEIVE:%u:INFO_VERSION",slot) );
+			// NLMISC::toString("EXCHANGE:RECEIVE:%u:INFO_VERSION",slot) );
 			infos.versionInfo
 				= CBankAccessor_PLR::getEXCHANGE().getRECEIVE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
 		} else if (inventory == INVENTORIES::guild) {
@@ -2175,7 +2175,7 @@ void CCharacter::sendItemInfos(uint16 slotId)
 				return;
 			}
 			//			infos.versionInfo = (uint16)_PropertyDatabase.getProp(
-			//NLMISC::toString("INVENTORY:SHARE:%u:INFO_VERSION",slot) );
+			// NLMISC::toString("INVENTORY:SHARE:%u:INFO_VERSION",slot) );
 			infos.versionInfo
 				= CBankAccessor_PLR::getINVENTORY().getSHARE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
 		} else {
