@@ -2271,7 +2271,7 @@ void CCharacter::applyRegenAndClipCurrentValue()
 			_Skills._Skills[i].Current = 0;
 		if (_Skills._Skills[i].OldCurrent != _Skills._Skills[i].Current) {
 			//			_PropertyDatabase.setProp( _DataIndexReminder->CHARACTER_INFO.SKILLS.Skill[i], _Skills._Skills[
-			//i
+			// i
 			//].Current );
 			CBankAccessor_PLR::getCHARACTER_INFO().getSKILLS().getArray(i).setSKILL(
 				_PropertyDatabase, checkedCast<uint16>(_Skills._Skills[i].Current));
@@ -3396,8 +3396,9 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 					.getMISSIONS_OPTIONS()
 					.getArray(i)
 					.setPLAYER_GIFT_NEEDED(_PropertyDatabase, texts[k].first);
-				//				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
-				//3
+				//				_PropertyDatabase.setProp(
+				//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
+				// 3
 				//);
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setPRIORITY(
 					_PropertyDatabase, 3);
@@ -3414,7 +3415,8 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 				for (uint k = 0; k < texts.size(); k++) {
 					if (i >= NB_CONTEXT_DYN_TEXTS)
 						break; // no more room in the context menu, don't fill more or it'll assert
-					//					_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
+					//					_PropertyDatabase.setProp(
+					//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
 					//,
 					// texts[k].second );
 					CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(
@@ -3455,7 +3457,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 				uint32 text
 					= STRING_MANAGER::sendStringToClient(_EntityRowId, c->getContextTexts()[j].first.c_str(), vect);
 				//				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i) ,
-				//text
+				// text
 				//);
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(
 					_PropertyDatabase, text);
@@ -3466,8 +3468,9 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 					.getMISSIONS_OPTIONS()
 					.getArray(i)
 					.setPLAYER_GIFT_NEEDED(_PropertyDatabase, 0);
-				//				_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
-				//0
+				//				_PropertyDatabase.setProp(
+				//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
+				// 0
 				//);
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setPRIORITY(
 					_PropertyDatabase, 2);
@@ -3483,7 +3486,8 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 					if (i >= NB_CONTEXT_DYN_TEXTS)
 						break; // no more room in the context menu, don't fill more or it'll assert
 					uint32 text = templ->sendAutoText(_EntityRowId, _CurrentInterlocutor);
-					//					_PropertyDatabase.setProp( toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
+					//					_PropertyDatabase.setProp(
+					//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
 					//,
 					// text );
 					CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(
@@ -3509,7 +3513,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(
 				_PropertyDatabase, 0);
 			//			_PropertyDatabase.setProp(
-			//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PLAYER_GIFT_NEEDED",i)
+			// toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PLAYER_GIFT_NEEDED",i)
 			//, 0 );
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setPLAYER_GIFT_NEEDED(
 				_PropertyDatabase, 0);
@@ -8347,7 +8351,7 @@ void CCharacter::setDatabase()
 		CBankAccessor_PLR::getCHARACTER_INFO().getSKILLS().getArray(skill).setBaseSKILL(
 			_PropertyDatabase, checkedCast<uint16>(_Skills._Skills[skill].Base));
 		//		_PropertyDatabase.setProp( _DataIndexReminder->CHARACTER_INFO.SKILLS.Skill[skill], _Skills._Skills[
-		//skill
+		// skill
 		//].Current );
 		CBankAccessor_PLR::getCHARACTER_INFO().getSKILLS().getArray(skill).setSKILL(
 			_PropertyDatabase, checkedCast<uint16>(_Skills._Skills[skill].Current));
@@ -8890,7 +8894,8 @@ void CCharacter::fillTradePage(uint16 session, bool enableBuildingLossWarning)
 			itemElem.setRM_CLASS_TYPE(_PropertyDatabase, 0);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:RM_FABER_STAT_TYPE",index) , 0 );
 			itemElem.setRM_FABER_STAT_TYPE(_PropertyDatabase, 0);
-			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:PREREQUISIT_VALID",index) , trade.SheetId
+			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:PREREQUISIT_VALID",index) ,
+			//trade.SheetId
 			//==
 			// CSheetId::Unknown ? 0 : true );
 			itemElem.setPREREQUISIT_VALID(_PropertyDatabase, trade.SheetId != CSheetId::Unknown);
@@ -12460,7 +12465,8 @@ void CCharacter::addLink(CSLinkEffect* effect)
 			= CBankAccessor_PLR::getEXECUTE_PHRASE().getLINK().getArray(size);
 		//		if ( node )
 		//		{
-		//			_PropertyDatabase.setProp( node, "COUNTER", _PropertyDatabase.getProp("EXECUTE_PHRASE:LINK:0:COUNTER")
+		//			_PropertyDatabase.setProp( node, "COUNTER",
+		//_PropertyDatabase.getProp("EXECUTE_PHRASE:LINK:0:COUNTER")
 		//+
 		// 1 );
 		linkElem.setCOUNTER(_PropertyDatabase,
@@ -13498,26 +13504,26 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	if (factionIndex >= firstTribeFameIndex) {
 		if (playerFame != NO_FAME) {
 			//			_PropertyDatabase.setProp( toString("FAME:TRIBE%d:VALUE", fameIndexInDatabase -
-			//firstTribeDbIndex),
+			// firstTribeDbIndex),
 			// sint64(float(playerFame)/FameAbsoluteMax*100) );
 			CBankAccessor_PLR::getFAME()
 				.getTRIBE(fameIndexInDatabase - firstTribeDbIndex)
 				.setVALUE(_PropertyDatabase, checkedCast<sint8>(float(playerFame) / FameAbsoluteMax * 100));
 			//			_PropertyDatabase.setProp( toString("FAME:TRIBE%d:TREND", fameIndexInDatabase -
-			//firstTribeDbIndex),
+			// firstTribeDbIndex),
 			// fameTrend );
 			CBankAccessor_PLR::getFAME()
 				.getTRIBE(fameIndexInDatabase - firstTribeDbIndex)
 				.setTREND(_PropertyDatabase, checkedCast<uint8>(fameTrend));
 		} else {
 			//			_PropertyDatabase.setProp( toString("FAME:TRIBE%d:VALUE", fameIndexInDatabase -
-			//firstTribeDbIndex),
+			// firstTribeDbIndex),
 			// 0);
 			CBankAccessor_PLR::getFAME()
 				.getTRIBE(fameIndexInDatabase - firstTribeDbIndex)
 				.setVALUE(_PropertyDatabase, 0);
 			//			_PropertyDatabase.setProp( toString("FAME:TRIBE%d:TREND", fameIndexInDatabase -
-			//firstTribeDbIndex),
+			// firstTribeDbIndex),
 			// 0);
 			CBankAccessor_PLR::getFAME()
 				.getTRIBE(fameIndexInDatabase - firstTribeDbIndex)
