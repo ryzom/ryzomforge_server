@@ -5063,7 +5063,7 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 {
 	sint32 slot = -1;
 	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i) {
-		if (_PlayerPets[ i ].TicketPetSheetId != CSheetId::Unknown {
+		if (_PlayerPets[i].TicketPetSheetId != CSheetId::Unknown) {
 			if (slot == -1)
 				slot = i;
 			const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
