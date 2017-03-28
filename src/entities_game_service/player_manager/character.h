@@ -14,24 +14,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
 // Game Share
 #include "game_share/bot_chat_types.h"
 #include "game_share/brick_flags.h"
-#include "server_share/pet_interface_msg.h"
-#include "game_share/power_types.h"
-#include "game_share/roles.h"
-#include "game_share/temp_inventory_mode.h"
 #include "game_share/dyn_chat.h"
-#include "game_share/timer.h"
 #include "game_share/mission_desc.h"
 #include "game_share/people.h"
+#include "game_share/power_types.h"
 #include "game_share/pvp_clan.h"
-#include "game_share/string_manager_sender.h"
 #include "game_share/r2_types.h"
+#include "game_share/roles.h"
+#include "game_share/string_manager_sender.h"
+#include "game_share/temp_inventory_mode.h"
+#include "game_share/timer.h"
+#include "server_share/pet_interface_msg.h"
 
 #include "server_share/pet_interface_msg.h"
 #include "server_share/r2_vision.h"
@@ -40,67 +39,64 @@
 #include "nel/misc/string_conversion.h"
 
 // EGS
-#include "entity_manager/entity_base.h"
 #include "character_structure/character_persistant_data.h"
+#include "entity_manager/entity_base.h"
+#include "far_position_stack.h"
 #include "harvest_info.h"
 #include "inventory_updater.h"
 #include "known_and_memorized_phrases.h"
 #include "modifiers_in_db.h"
 #include "powers_and_auras.h"
-#include "static_action_types.h"
-#include "far_position_stack.h"
 #include "pvp_manager/pvp_manager_2.h"
+#include "static_action_types.h"
 
 #include "egs_sheets/egs_static_game_sheet.h"
 
-#include "progression/progression_common.h"
-#include "phrase_manager/s_effect.h"
-#include "mission_manager/ai_alias_translator.h"
-#include "ring_reward_points.h"
-#include "persistent_effect.h"
 #include "character_interface.h"
 #include "database_plr.h"
+#include "mission_manager/ai_alias_translator.h"
+#include "persistent_effect.h"
+#include "phrase_manager/s_effect.h"
+#include "progression/progression_common.h"
+#include "ring_reward_points.h"
 
-namespace NLMISC
-{
-	class CBitMemStream;
+namespace NLMISC {
+class CBitMemStream;
 };
 
-namespace EGSPD
-{
-	class CFameContainerPD;
-	class CMissionContainerPD;
-	class CMissionPD;
+namespace EGSPD {
+class CFameContainerPD;
+class CMissionContainerPD;
+class CMissionPD;
 }
 
-namespace CHARSYNC
-{
-	class TCharInfo;
+namespace CHARSYNC {
+class TCharInfo;
 }
 
-typedef std::vector< std::pair< NLMISC::CSheetId, uint8 > > TMpIdQuality;
+typedef std::vector<std::pair<NLMISC::CSheetId, uint8> > TMpIdQuality;
 typedef EGSPD::CMissionPD CMission;
 
 // number of slot in a bot chat list page
-#define NB_SLOT_PER_PAGE		8
+#define NB_SLOT_PER_PAGE 8
 // number of target coordinates in the journal
-#define NB_JOURNAL_COORDS		8
+#define NB_JOURNAL_COORDS 8
 // max number of context menus dynamic options
-#define NB_CONTEXT_DYN_TEXTS	4
+#define NB_CONTEXT_DYN_TEXTS 4
 
 // number of buff slot (in each category)
-#define NB_BUFF_SLOT			12
+#define NB_BUFF_SLOT 12
 
 // max number of step in a mission
-#define NB_STEP_PER_MISSION		20
+#define NB_STEP_PER_MISSION 20
 
 // max number of historics in a mission
-#define NB_HISTO_PER_MISSION	30
+#define NB_HISTO_PER_MISSION 30
 
-#define INVALID_POSITION_ID		0
+#define INVALID_POSITION_ID 0
 
 // Max number of pact character can be have
-#define NB_MAX_PACT				5
+#define NB_MAX_PACT 5
 
 static const uint8 MaxSoloMissionCount = 15;
 static const uint8 MaxGroupMissionCount = 4;
@@ -138,31 +134,30 @@ class CStaticCharacters;
 
 class CExchangeView;
 
-
 /**
  * struct for trading phrases
  */
-struct CTradePhrase
-{
+struct CTradePhrase {
 	/// phrase sheet id
-	NLMISC::CSheetId	SheetId;
+	NLMISC::CSheetId SheetId;
 
 	CTradePhrase() {}
-	explicit CTradePhrase(NLMISC::CSheetId sheetId) : SheetId(sheetId) {}
+	explicit CTradePhrase(NLMISC::CSheetId sheetId)
+		: SheetId(sheetId)
+	{
+	}
 
 	/// <operator used to sort vectors of CTradePhrase
-	bool operator<(const CTradePhrase &p) const
+	bool operator<(const CTradePhrase& p) const
 	{
 		return (SheetId < p.SheetId);
 	}
 };
 
-
 /*
  *	SGameCoordinate
  */
-struct SGameCoordinate
-{
+struct SGameCoordinate {
 	SGameCoordinate()
 	{
 		reset();
@@ -176,36 +171,35 @@ struct SGameCoordinate
 		Cell = 0;
 		Continent = 0;
 	}
-	sint32	X;
-	sint32	Y;
-	sint32	Z;
-	float	Heading;
-	sint32	Cell;
+	sint32 X;
+	sint32 Y;
+	sint32 Z;
+	float Heading;
+	sint32 Cell;
 	uint8 Continent;
 
-	void serial(NLMISC::IStream &f) throw(NLMISC::EStream)
+	void serial(NLMISC::IStream& f) throw(NLMISC::EStream)
 	{
-		f.serial( X );
-		f.serial( Y );
-		f.serial( Z );
-		f.serial( Heading );
-		f.serial( Cell );
-		f.serial( Continent );
+		f.serial(X);
+		f.serial(Y);
+		f.serial(Z);
+		f.serial(Heading);
+		f.serial(Cell);
+		f.serial(Continent);
 	}
 };
 
 /*
  *	SCheckPosCoordinate
  */
-struct SCheckPosCoordinate
-{
+struct SCheckPosCoordinate {
 
 	DECLARE_PERSISTENCE_METHODS
 
-	sint32	X;
-	sint32	Y;
-	uint32  Radius;
-	std::string	Name;
+	sint32 X;
+	sint32 Y;
+	uint32 Radius;
+	std::string Name;
 
 	SCheckPosCoordinate()
 	{
@@ -220,7 +214,7 @@ struct SCheckPosCoordinate
 		Name = "";
 	}
 
-	void serial(NLMISC::IStream &f)
+	void serial(NLMISC::IStream& f)
 	{
 		f.serial(X);
 		f.serial(Y);
@@ -229,12 +223,9 @@ struct SCheckPosCoordinate
 	}
 };
 
-
-
 /* Storage class for mission history data.
 */
-struct TMissionHistory
-{
+struct TMissionHistory {
 	// Start by declaring methods for persistent load/ save operations
 	// The following macro is defined in persistent_data.h
 	// At time of writing it evaluated to:
@@ -244,9 +235,9 @@ struct TMissionHistory
 	DECLARE_PERSISTENCE_METHODS
 
 	// flag for successfull mission
-	bool				Successfull;
+	bool Successfull;
 	/// Last success date (used for replay player replay timer)
-	NLMISC::TGameCycle	LastSuccessDate;
+	NLMISC::TGameCycle LastSuccessDate;
 
 	TMissionHistory()
 	{
@@ -255,19 +246,18 @@ struct TMissionHistory
 
 	void clear()
 	{
-		Successfull=false;
-		LastSuccessDate=0;
+		Successfull = false;
+		LastSuccessDate = 0;
 	}
 
-	void serial(NLMISC::IStream &s)
+	void serial(NLMISC::IStream& s)
 	{
 		s.serial(Successfull);
 		s.serial(LastSuccessDate);
 	}
 };
 
-struct CWelcomeMissionDesc
-{
+struct CWelcomeMissionDesc {
 	DECLARE_PERSISTENCE_METHODS
 
 	CWelcomeMissionDesc()
@@ -290,10 +280,8 @@ struct CWelcomeMissionDesc
 	TAIAlias BotAlias;
 };
 
-
 typedef float TSatiety;
 const TSatiety SatietyNotInit = -9999.0f;
-
 
 /**
  * CPetAnimal
@@ -301,8 +289,7 @@ const TSatiety SatietyNotInit = -9999.0f;
  * \author Nevrax France
  * \date 2003
  */
-struct CPetAnimal
-{
+struct CPetAnimal {
 	// Start by declaring methods for persistent load/ save operations
 	// The following macro is defined in persistent_data.h
 	// At time of writing it evaluated to:
@@ -311,39 +298,45 @@ struct CPetAnimal
 
 	DECLARE_PERSISTENCE_METHODS
 
-	enum TStatus { db_unknown = -1, not_present = 0, waiting_spawn, landscape, stable, death, tp_continent };
+	enum TStatus { db_unknown = -1,
+		not_present = 0,
+		waiting_spawn,
+		landscape,
+		stable,
+		death,
+		tp_continent };
 
-	TStatus				PetStatus;
-	NLMISC::CSheetId	TicketPetSheetId;
-	NLMISC::CSheetId	PetSheetId;
-	uint32				Price;
-	CGameItemPtr		ItemPtr;
-	NLMISC::CEntityId	OwnerId;
-	TDataSetRow			SpawnedPets;
-	uint32				StableId;
-	sint32				Landscape_X;
-	sint32				Landscape_Y;
-	sint32				Landscape_Z;
-	NLMISC::TGameCycle	DeathTick;
-	uint32				Slot;		// used for found item ticket pointer, slot of ticket in bag
-	TStatus				DbPetStatus; // value of PetStatus in the database, for optimization purpose
-	TSatiety			Satiety;
-	TSatiety			MaxSatiety; // not saved, got from form when TicketPetSheetId loaded 
-	uint32				AnimalStatus;
-	bool				IsFollowing;
-	bool				IsMounted;
-	bool				IsTpAllowed;
-	bool				spawnFlag;
-	ucstring			CustomName;
-	
+	TStatus PetStatus;
+	NLMISC::CSheetId TicketPetSheetId;
+	NLMISC::CSheetId PetSheetId;
+	uint32 Price;
+	CGameItemPtr ItemPtr;
+	NLMISC::CEntityId OwnerId;
+	TDataSetRow SpawnedPets;
+	uint32 StableId;
+	sint32 Landscape_X;
+	sint32 Landscape_Y;
+	sint32 Landscape_Z;
+	NLMISC::TGameCycle DeathTick;
+	uint32 Slot; // used for found item ticket pointer, slot of ticket in bag
+	TStatus DbPetStatus; // value of PetStatus in the database, for optimization purpose
+	TSatiety Satiety;
+	TSatiety MaxSatiety; // not saved, got from form when TicketPetSheetId loaded
+	uint32 AnimalStatus;
+	bool IsFollowing;
+	bool IsMounted;
+	bool IsTpAllowed;
+	bool spawnFlag;
+	ucstring CustomName;
+
 	// ctor
 	CPetAnimal();
 
 	void clear();
-	void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
+	void serial(NLMISC::IStream& f) throw(NLMISC::EStream);
 
 	// init found ticket item pointer with slot
-	uint32 initLinkAnimalToTicket( CCharacter * c, uint8 index);
+	uint32 initLinkAnimalToTicket(CCharacter* c, uint8 index);
 
 	// get the max bulk of the animal inventory
 	uint32 getAnimalMaxBulk();
@@ -359,10 +352,9 @@ struct CPetAnimal
  * 
  * Structure to hold information about bot missions on the character
  */
-struct SBotChatMission
-{
-	TAIAlias					Mission;
-	MISSION_DESC::TPreReqState	PreReqState;
+struct SBotChatMission {
+	TAIAlias Mission;
+	MISSION_DESC::TPreReqState PreReqState;
 
 	// ---------------------------------------
 
@@ -380,20 +372,19 @@ struct SBotChatMission
  * \date 2005
  */
 /// Character time statistics in seconds
-struct TCharacterLogTime
-{
+struct TCharacterLogTime {
 	// Start by declaring methods for persistent load/ save operations
 	// The following macro is defined in persistent_data.h
 	// At time of writing it evaluated to:
 	//	void store(CPersistentDataRecord &pdr) const;
 	//	void apply(CPersistentDataRecord &pdr);
-	
+
 	DECLARE_PERSISTENCE_METHODS
-		
-	uint32	LoginTime;
-	uint32	Duration;
-	uint32	LogoffTime;
-	
+
+	uint32 LoginTime;
+	uint32 Duration;
+	uint32 LogoffTime;
+
 	TCharacterLogTime()
 	{
 		LoginTime = 0;
@@ -402,22 +393,20 @@ struct TCharacterLogTime
 	}
 };
 
-
 /**
  *	CXpProgressInfos
  * \author Stephane Coutelas
  * \author Nevrax France
  * \date 2005
  */
-struct CXpProgressInfos
-{
-	double	TotalXpGain;
-	double	XpBonus;
-	uint32	CatalyserCount;
-	uint32	CatalyserLvl;
-	double	RingXpBonus;
-	uint32	RingCatalyserCount;
-	uint32	RingCatalyserLvl;
+struct CXpProgressInfos {
+	double TotalXpGain;
+	double XpBonus;
+	uint32 CatalyserCount;
+	uint32 CatalyserLvl;
+	double RingXpBonus;
+	uint32 RingCatalyserCount;
+	uint32 RingCatalyserLvl;
 
 	CXpProgressInfos()
 	{
@@ -431,15 +420,13 @@ struct CXpProgressInfos
 	}
 };
 
-enum TFriendVisibility
-{
-	VisibleToAll = 0,			// Visible to all people who have me on their friends list, even if I am ignoring them.
-	VisibleToGuildAndFriends,	// Visible to people in my guild and those that have me on their friends list.
-	VisibleToGuildOnly,			// Only visible to people in my guild.
+enum TFriendVisibility {
+	VisibleToAll = 0, // Visible to all people who have me on their friends list, even if I am ignoring them.
+	VisibleToGuildAndFriends, // Visible to people in my guild and those that have me on their friends list.
+	VisibleToGuildOnly, // Only visible to people in my guild.
 	NB_FRIEND_VISIBILITY
 
 };
-
 
 /**
  * CCharacter
@@ -447,16 +434,14 @@ enum TFriendVisibility
  * \author Nevrax France
  * \date 2001
  */
-class CCharacter 
-	:	public CCharacterPersistantData, 
-		public CEntityBase, 
-		public NLMISC::CEvalNumExpr,
-		public ICharacter
-{
+class CCharacter
+	: public CCharacterPersistantData,
+	  public CEntityBase,
+	  public NLMISC::CEvalNumExpr,
+	  public ICharacter {
 private:
 	/// enum for Contact List action (add, remove ...)
-	enum TConctactListAction
-	{
+	enum TConctactListAction {
 		AddedAsFriend = 0,
 		RemovedFromFriends,
 		AddToIgnored,
@@ -464,18 +449,18 @@ private:
 
 		RemoveFriend,
 		RemoveIgnored,
-		
+
 		AddedAsLeague,
 		RemovedFromLeague,
 		RemoveLeague,
 
 		NB_CONTACT_LIST_ACTIONS,
-		UnknownContactListAction= NB_CONTACT_LIST_ACTIONS,
+		UnknownContactListAction = NB_CONTACT_LIST_ACTIONS,
 	};
-	static const NLMISC::CStringConversion<TConctactListAction>::CPair	ContactListActionConversionTable[];
-	static NLMISC::CStringConversion<TConctactListAction>				ContactListActionConversion;
-	static TConctactListAction	toContactListAction(const std::string &str);
-	static const std::string	&contactListActionToString(TConctactListAction e);
+	static const NLMISC::CStringConversion<TConctactListAction>::CPair ContactListActionConversionTable[];
+	static NLMISC::CStringConversion<TConctactListAction> ContactListActionConversion;
+	static TConctactListAction toContactListAction(const std::string& str);
+	static const std::string& contactListActionToString(TConctactListAction e);
 
 	NL_INSTANCE_COUNTER_DECL(CCharacter);
 
@@ -487,7 +472,6 @@ public:
 	//	void apply(CPersistentDataRecord &pdr);
 
 	DECLARE_PERSISTENCE_METHODS
-
 
 	/////////////////////
 	/// Api of CCharacter
@@ -515,7 +499,7 @@ public:
 	// 38 : (01/03/2004) keep number of points assigned to different type during creation
 	// 39 : (02/03/2004) Changed memories behaviours (now 10 without any differences) -> need to clear memories
 	// 40 : (02/03/2004) NEW SP : Wipe all phrases and bricks
-	// 42 : (30/03/2004) removed _RespawnPoint 
+	// 42 : (30/03/2004) removed _RespawnPoint
 	// 43 : binary serial
 	// 44 : (28/04/2004) Craft change : wipe bricks, give SP back
 	// 45 : (03/05/2004) Patch : add characteristic upgrade bricks and phrases to older saves
@@ -559,7 +543,7 @@ public:
 	 * Default constructor
 	 */
 	CCharacter();
-	
+
 	/**
 	 * Destructor
 	 */
@@ -568,18 +552,18 @@ public:
 	/**
 	 * Init PD Struct
 	 */
-	void	initPDStructs();
+	void initPDStructs();
 
 	/**
 	 * Clear the contents of the CCharacter
 	 */
 	void clear();
-	
+
 	/**
 	 * Set the id
 	 * \param id is the CEntityId OF character
 	 */
-	void setId( const NLMISC::CEntityId& id );
+	void setId(const NLMISC::CEntityId& id);
 
 	/** Character interface forwarder */
 	const NLMISC::CEntityId& getCharId() const;
@@ -587,7 +571,7 @@ public:
 
 	/** Fill the TCharInfo struct used to send info to SU
 	 */
-	void fillCharInfo(CHARSYNC::TCharInfo &charInfo) const;
+	void fillCharInfo(CHARSYNC::TCharInfo& charInfo) const;
 
 	/** Set the startup instance id. 
 	 *	This instance is use to put the player in after receiving READY 
@@ -601,12 +585,12 @@ public:
 	uint32 getStartupInstance();
 
 	/** Set the name of the character */
-	void setName(const ucstring &name);
+	void setName(const ucstring& name);
 
 	/***
 	 * Set character Title
 	 */
-	void setTitle( CHARACTER_TITLE::ECharacterTitle title );
+	void setTitle(CHARACTER_TITLE::ECharacterTitle title);
 
 	/***
 	 * Get character Title
@@ -619,18 +603,18 @@ public:
 	 * \param forceUpdate if true, set mode without check gameplay rules (for EGS use only)
 	 * \param disengage true to call phrase manager disengage, false otherwise
 	 */
-	virtual void setMode( MBEHAV::EMode mode, bool forceUpdate = false, bool disengage = true);
+	virtual void setMode(MBEHAV::EMode mode, bool forceUpdate = false, bool disengage = true);
 
 	/**
 	 * set the mode with position or orientation information
 	 * \param mode the new mode (with position or orientation)
 	 */
-	virtual void setMode( MBEHAV::TMode mode );
+	virtual void setMode(MBEHAV::TMode mode);
 
 	/**
 	 * Add the properties to the emiter
 	 */
-	void addPropertiesToMirror( const TDataSetRow& entityIndex, bool keepSheetId=true );
+	void addPropertiesToMirror(const TDataSetRow& entityIndex, bool keepSheetId = true);
 
 	/**
 	 *	Set the value of a var
@@ -638,7 +622,7 @@ public:
 	 * \param value is the new value for the variable
 	 * \return true if the value has been set, false if an error occured
 	 */
-	bool setValue( std::string var, std::string value );
+	bool setValue(std::string var, std::string value);
 
 	/**
 	 *	Modify the value of a var
@@ -646,22 +630,22 @@ public:
 	 * \param value is the modification value
 	 * \return true if the value has been changed, false if an error occured
 	 */
-	bool modifyValue( std::string var, std::string value );
-	
+	bool modifyValue(std::string var, std::string value);
+
 	/**
 	 *	Get the value of the variable
 	 * \param var is the name of the variable
 	 * \param value receive the current value of the variable
 	 * \return true if the var has been found, false otherwise
 	 */
-	bool getValue( std::string var,	std::string& value );
+	bool getValue(std::string var, std::string& value);
 
 	/// Fill version data for handshake
-	void fillHandshake( NLMISC::CBitMemStream& bms );
+	void fillHandshake(NLMISC::CBitMemStream& bms);
 
 	// update next timer tick event
 	void setUpdateNextTick();
-	
+
 	/**
 	 * Make all necessary update for character at timer ticks
 	 */
@@ -671,7 +655,7 @@ public:
 	 * Set the enter flag 
 	 * \param b true if the player entered the game, false if he left
 	 */
-	void setEnterFlag( bool b );
+	void setEnterFlag(bool b);
 
 	/**
 	 * Get/Set the score permanent modifier
@@ -688,15 +672,15 @@ public:
 	/**
 	 * wrapper to CEntityBase
 	 */
-//	CEntityState& getState();
-//	const CEntityState& getState() const;
-	void setState( const COfflineEntityState& es );
+	//	CEntityState& getState();
+	//	const CEntityState& getState() const;
+	void setState(const COfflineEntityState& es);
 	bool isDead() const;
-	
+
 	/**
 	 * Serial: reading off-mirror, writing from mirror
 	 */
-	void serial(NLMISC::IStream &f) throw(NLMISC::EStream);
+	void serial(NLMISC::IStream& f) throw(NLMISC::EStream);
 
 	// set player position to default respawn point of continent
 	void setPositionToDefaultRespawnPoint();
@@ -706,108 +690,105 @@ public:
 	 * \param sheetId is id of sheet of entity
 	 * \param level if level of creature (if == 0, use level in sheet (Basics.Level))
 	 */
-	void loadSheetCharacter( const NLMISC::CSheetId& sheetId, uint16 level = 0 );
+	void loadSheetCharacter(const NLMISC::CSheetId& sheetId, uint16 level = 0);
 
 	/**
 	 * Load George Sheet directly with filename, without using CSheetId (for testing tool)
 	 * \param SheetName is filename of player sheet
 	 * \param level if level of creature (if == 0, use level in sheet (Basics.Level))
 	 */
-	void loadSheetCharacter( const std::string& SheetName, uint16 level );
+	void loadSheetCharacter(const std::string& SheetName, uint16 level);
 
 	/**
 	 * Load George Sheet with static sheet pointer, common part of other loadSheetCharacter
 	 * \param charactersSheet is static sheet pointer
 	 * \param level if level of creature (if == 0, use level in sheet (Basics.Level))
 	 */
-	void loadSheetCharacter( const CStaticCharacters * charactersSheet, uint16 level, const std::string& sheetName );
+	void loadSheetCharacter(const CStaticCharacters* charactersSheet, uint16 level, const std::string& sheetName);
 
 	/**
 	 * set the current target 
 	 * \param target the new target
 	 */
-	virtual void setTarget( const NLMISC::CEntityId& targetId, bool sendMessage = true );
+	virtual void setTarget(const NLMISC::CEntityId& targetId, bool sendMessage = true);
 
 	/**
 	 * set target bot-chat programm
 	 */
-	void setTargetBotchatProgramm( CEntityBase * target, const NLMISC::CEntityId& targetId );
+	void setTargetBotchatProgramm(CEntityBase* target, const NLMISC::CEntityId& targetId);
 
 	/**
 	 * enable appropriate filter for seller
 	 */
-	void enableAppropriateFiltersForSeller( CCreature * seller );
+	void enableAppropriateFiltersForSeller(CCreature* seller);
 
 	/**
 	 * called when this entity is targeted by a player
 	 * \param entity pointer on the entity targeting the current one
 	 */
-	void addTargetingChar( const TDataSetRow & row );
+	void addTargetingChar(const TDataSetRow& row);
 
 	/**
 	 * called when this entity is not targeted by a specifice player anymore
 	 * \param entity pointer on the entity targeting the current one
 	 */
-	void removeTargetingChar( const TDataSetRow & row );
+	void removeTargetingChar(const TDataSetRow& row);
 
 	/// update target chars target
 	void updateTargetingChars();
 
-	CRingRewardPoints &getRingRewardPoints();
+	CRingRewardPoints& getRingRewardPoints();
 
 	/// update the target properties
 	void updateTarget();
 
 	/// add a known brick
-	void addKnownBrick( const NLMISC::CSheetId& brickId);
+	void addKnownBrick(const NLMISC::CSheetId& brickId);
 
 	/// add a known brick bonus
-	void addKnownBrickBonus( const NLMISC::CSheetId& brickId);
+	void addKnownBrickBonus(const NLMISC::CSheetId& brickId);
 
 	/// check if have brick
-	bool haveBrick( const NLMISC::CSheetId& brickId );
+	bool haveBrick(const NLMISC::CSheetId& brickId);
 
 	/// remove a known brick
-	void removeKnownBrick( const NLMISC::CSheetId& brickId );
+	void removeKnownBrick(const NLMISC::CSheetId& brickId);
 
 	/// remove a known brick
-	void removeKnownBrickBonus( const NLMISC::CSheetId& brickId );
+	void removeKnownBrickBonus(const NLMISC::CSheetId& brickId);
 
 	/// get known bricks
-	const std::set<NLMISC::CSheetId> &getKnownBricks() const;
-		
+	const std::set<NLMISC::CSheetId>& getKnownBricks() const;
 
 	// return reference to visual property A
-	CMirrorPropValueAlice< SPropVisualA, CPropLocationPacked<2> >& getVisualPropertyA();
+	CMirrorPropValueAlice<SPropVisualA, CPropLocationPacked<2> >& getVisualPropertyA();
 
 	// return reference to visual property B
-	CMirrorPropValueAlice< SPropVisualB, CPropLocationPacked<2> >& getVisualPropertyB();
+	CMirrorPropValueAlice<SPropVisualB, CPropLocationPacked<2> >& getVisualPropertyB();
 
 	// return reference to visual property C
-	CMirrorPropValueAlice< SPropVisualC, CPropLocationPacked<2> >& getVisualPropertyC();
+	CMirrorPropValueAlice<SPropVisualC, CPropLocationPacked<2> >& getVisualPropertyC();
 
 	// update visual information after inventory manipulation
-	void updateVisualInformation( uint16 InventoryEmpty, uint16 SlotEmpty, uint16 InventoryFull, uint16 SlotFull, const NLMISC::CSheetId& IdSheetItem, CGameItemPtr Item );
+	void updateVisualInformation(uint16 InventoryEmpty, uint16 SlotEmpty, uint16 InventoryFull, uint16 SlotFull, const NLMISC::CSheetId& IdSheetItem, CGameItemPtr Item);
 
 	// update visual properties after equipment inventory manipulation
-	void setVisualPropertyForEquipment( uint16 slot, const CStaticItem* srcForm, uint16 quality, uint8 color );
+	void setVisualPropertyForEquipment(uint16 slot, const CStaticItem* srcForm, uint16 quality, uint8 color);
 
 	// tp wanted, check if tp is regular and send a server tp command
-	void tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading = false, float heading = 0.0f , uint8 continent = 0xFF, sint32 cell = 0);
+	void tpWanted(sint32 x, sint32 y, sint32 z, bool useHeading = false, float heading = 0.0f, uint8 continent = 0xFF, sint32 cell = 0);
 
-	void teleportCharacter( sint32 x, sint32 y);
+	void teleportCharacter(sint32 x, sint32 y);
 
 	// teleport character with or without his mount, check if tp is regular and send a server tp command
-	void teleportCharacter( sint32 x, sint32 y, sint32 z, bool teleportWithMount, bool useHeading = false, float heading = 0.0f, uint8 continent = 0xFF, sint32 cell = 0, uint8 season = 0xff, const  R2::TR2TpInfos& tpInfos= R2::TR2TpInfos());
+	void teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWithMount, bool useHeading = false, float heading = 0.0f, uint8 continent = 0xFF, sint32 cell = 0, uint8 season = 0xff, const R2::TR2TpInfos& tpInfos = R2::TR2TpInfos());
 
 	// return the season in which is the current character
-	uint8 getRingSeason() const { return _RingSeason;}
+	uint8 getRingSeason() const { return _RingSeason; }
 
 	/// get the League id
-	TChanID getLeagueId() const { return _LeagueId;}
-	
-	
-		
+	TChanID getLeagueId() const { return _LeagueId; }
+
 	// \name Team related methods
 	//@{
 	/// get the team Id of this player
@@ -815,34 +796,34 @@ public:
 	/// set the team Id of this player
 	void setTeamId(uint16 id);
 	/// set the League id
-	void setLeagueId(TChanID id, bool removeIfEmpty=false);
+	void setLeagueId(TChanID id, bool removeIfEmpty = false);
 	/// get team invitor
-	const NLMISC::CEntityId & getTeamInvitor() const;
+	const NLMISC::CEntityId& getTeamInvitor() const;
 	/// set team invitor
-	void setTeamInvitor(const NLMISC::CEntityId & invitorId);
+	void setTeamInvitor(const NLMISC::CEntityId& invitorId);
 	/// get League invitor
-	const NLMISC::CEntityId & getLeagueInvitor() const;
+	const NLMISC::CEntityId& getLeagueInvitor() const;
 	/// set League invitor
-	void setLeagueInvitor(const NLMISC::CEntityId & invitorId);
+	void setLeagueInvitor(const NLMISC::CEntityId& invitorId);
 	//@}
 
 	/// Set fighting target
-	void setFightingTarget( const NLMISC::CEntityId& targetId );
+	void setFightingTarget(const NLMISC::CEntityId& targetId);
 
 	// \name Harvest related methods
 	//@{
 	// harvest action
-	void harvestAsked( uint16 mpIndex, uint16 quantity = 0xffff);
-	void harvest( uint8 mpIndex, uint16 quantity );
-	const NLMISC::CEntityId &harvestedEntity() const;
-	void harvestedEntity( const NLMISC::CEntityId &id);
-	const NLMISC::CSheetId &harvestedEntitySheetId() const;
-	void harvestedEntitySheetId( const NLMISC::CSheetId &sheet);
+	void harvestAsked(uint16 mpIndex, uint16 quantity = 0xffff);
+	void harvest(uint8 mpIndex, uint16 quantity);
+	const NLMISC::CEntityId& harvestedEntity() const;
+	void harvestedEntity(const NLMISC::CEntityId& id);
+	const NLMISC::CSheetId& harvestedEntitySheetId() const;
+	void harvestedEntitySheetId(const NLMISC::CSheetId& sheet);
 	uint8 harvestedMpIndex() const;
 	uint16 harvestedMpQuantity() const;
 	void harvestedMpQuantity(uint16 qty);
 	void resetHarvestInfos();
-	void endHarvest( bool sendCloseTempImpulsion = true );
+	void endHarvest(bool sendCloseTempImpulsion = true);
 	void clearHarvestDB();
 	void openHarvest();
 
@@ -855,13 +836,13 @@ public:
 	///harvest deposit Result
 	//void harvestDepositResult( uint16 quality );
 	/// harvest corpse result
-	void harvestCorpseResult( const std::vector<uint16> &qualities );
+	void harvestCorpseResult(const std::vector<uint16>& qualities);
 
 	/**
 	 * Get the indices in the 'materials' vector and the quantities of the items that are currently required by a mission.
 	 * If all items that match have a level tool low compared to the provided itemLevel, a message is sent to the player.
 	 */
-	void getMatchingMissionLootRequirements( uint16 itemLevel, const std::vector<NLMISC::CSheetId>& materials, std::vector<CAutoQuarterItemDescription>& matchingItems );
+	void getMatchingMissionLootRequirements(uint16 itemLevel, const std::vector<NLMISC::CSheetId>& materials, std::vector<CAutoQuarterItemDescription>& matchingItems);
 
 	/**
 	 * Pick up a raw material in the temp inventory.
@@ -869,7 +850,7 @@ public:
 	 * \param lastMaterial if not NULL, return true if we pick up the last material
 	 * \return false if we are too encumbered to pick up
 	 */
-	bool pickUpRawMaterial( uint32 indexInTempInv, bool * lastMaterial = NULL );
+	bool pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial = NULL);
 	//@}
 
 	/**
@@ -878,16 +859,16 @@ public:
 	 * - If the player was foraging the same source, the forage progress is resumed.
 	 * - If the player was foraging another source, the forage progress is reset (and the previous contents lost).
 	 */
-	void beginOrResumeForageSession( const NLMISC::CSheetId& materialSheetId, 
-									const TDataSetRow& sourceRowId, 
-									SKILLS::ESkills usedSkill, 
-									bool isTheExtractor);
+	void beginOrResumeForageSession(const NLMISC::CSheetId& materialSheetId,
+		const TDataSetRow& sourceRowId,
+		SKILLS::ESkills usedSkill,
+		bool isTheExtractor);
 
 	/// Access the forage extraction session structure
-	CForageProgress	*forageProgress();
+	CForageProgress* forageProgress();
 
 	/// Set the current distance to prospected deposit (NULL for "not in deposit prospection mode")
-	void setProspectionLocateDepositEffect( CSEffectPtr effect );
+	void setProspectionLocateDepositEffect(CSEffectPtr effect);
 
 	/// Get the current distance to prospected deposit (NULL for "not in deposit prospection mode")
 	CSEffectPtr getProspectionLocateDepositEffect() const;
@@ -902,7 +883,7 @@ public:
 	 * At the end of life of a forage source, let the player take the result in the temp inventory
 	 * if something can be taken. Otherwise, end the forage session.
 	 */
-	void giveForageSessionResult( const CHarvestSource *source );
+	void giveForageSessionResult(const CHarvestSource* source);
 
 	/**
 	 * If a forage session is active, reset the temp inventory
@@ -917,7 +898,7 @@ public:
 	 * \param XpGain is the amount of xp added to a skill / speciality
 	 * \param Skill is the name of used skill for action (or associated skill ofr specialized action used)
 	 */
-	void addXpToSkill( double XpGain, const std::string& Skill);
+	void addXpToSkill(double XpGain, const std::string& Skill);
 
 	/**
 	 * addXpToSkillAndBuffer add xpGain to a skill. Do not send messages to clients, but buffer the messages
@@ -925,7 +906,7 @@ public:
 	 * \param XpGain is the amount of xp added to a skill / speciality
 	 * \param Skill is the name of used skill for action (or associated skill ofr specialized action used)
 	 */
-	void addXpToSkillAndBuffer( double XpGain, const std::string& Skill, std::map<SKILLS::ESkills,CXpProgressInfos> &gainBySkill);
+	void addXpToSkillAndBuffer(double XpGain, const std::string& Skill, std::map<SKILLS::ESkills, CXpProgressInfos>& gainBySkill);
 
 	/**
 	 * addXpToSkillBranch add xpGain to a skill branch. If XPgain is bigger than the current skill MaxValue, then recurs.
@@ -933,7 +914,7 @@ public:
 	 * \param XpGain is the amount of xp added to a skill / speciality
 	 * \param Skill is the name of used skill for action (or associated skill ofr specialized action used)
 	 */
-	void addXpToSkillBranch( double XpGain, const std::string& Skill);
+	void addXpToSkillBranch(double XpGain, const std::string& Skill);
 
 	// Set skill tree of character to max value of each skill
 	void setSkillsToMaxValue();
@@ -943,37 +924,37 @@ public:
 
 	// for respawn management, need to modify _TimeDeath in cbTpAcknownledge callback
 	NLMISC::TGameTime& getTimeOfDeath();
-	void setTimeOfDeath( NLMISC::TGameTime t);
+	void setTimeOfDeath(NLMISC::TGameTime t);
 
 	// character buy a creature
-	bool addCharacterAnimal( const NLMISC::CSheetId& PetTicket, uint32 Price, CGameItemPtr ptr );
+	bool addCharacterAnimal(const NLMISC::CSheetId& PetTicket, uint32 Price, CGameItemPtr ptr);
 
 	// return free slot for pet spawn or -1 if there are no free slot
 	sint32 getFreePetSlot();
 
 	// return true if can add 'delta' pets to current player pets
-	bool checkAnimalCount( const NLMISC::CSheetId& PetTicket, bool sendMessage, sint32 delta );
+	bool checkAnimalCount(const NLMISC::CSheetId& PetTicket, bool sendMessage, sint32 delta);
 
 	// CCharacter::character want spawn one of own creature
-	bool spawnCharacterAnimal( uint index );
+	bool spawnCharacterAnimal(uint index);
 
 	// Specialized version of spawnCharacterAnimal() for respawnPetAfterTp()
-	bool spawnWaitingCharacterAnimalNear( uint index, const SGameCoordinate& destination, uint32 destAIInstance );
-		
+	bool spawnWaitingCharacterAnimalNear(uint index, const SGameCoordinate& destination, uint32 destAIInstance);
+
 	// Re-spawn pet of character
 	void respawnPet();
 
 	// Re-spawn pet for AI instance
-	void respawnPetForInstance( uint32 InstanceNumber, const std::string& InstanceContinent );
+	void respawnPetForInstance(uint32 InstanceNumber, const std::string& InstanceContinent);
 
 	// Re-spawn pet after a teleport
-	void respawnPetAfterTp( const SGameCoordinate& destination, uint32 destAIInstance );
+	void respawnPetAfterTp(const SGameCoordinate& destination, uint32 destAIInstance);
 
 	// CCharacter::character buy a creature
-	void onAnimalSpawned( CPetSpawnConfirmationMsg::TSpawnError SpawnStatus, uint32 PetIdx, const TDataSetRow&	PetMirrorRow );
+	void onAnimalSpawned(CPetSpawnConfirmationMsg::TSpawnError SpawnStatus, uint32 PetIdx, const TDataSetRow& PetMirrorRow);
 
 	/// Return the index of the animal, or ~0 if it's not an animal belonging to this character
-	uint getAnimalIndex( const TDataSetRow& animalRow );
+	uint getAnimalIndex(const TDataSetRow& animalRow);
 
 	/**
 	 * Update database value (precondition: petIndex<_PlayerPets.size())
@@ -981,79 +962,79 @@ public:
 	 * - petIndex<_PlayerPets.size())
 	 * - The current pet type has already been set in the database
 	 */
-	void updateAnimalHungerDb( uint petIndex );
+	void updateAnimalHungerDb(uint petIndex);
 
 	/// Init hunger database for all animals: needed for animals that are not spawned
 	void initAnimalHungerDb();
 
 	/// React to the hunger of the specified animal (precondition: petIndex<_PlayerPets.size()). Return true if the hunger db must be updated.
-	bool onAnimalHungry( uint petIndex, bool justBecameHungry );
+	bool onAnimalHungry(uint petIndex, bool justBecameHungry);
 
 	/// Set satiety directly (if corresponding petCreature is NULL, will do a lookup)
-	void setAnimalSatiety( uint petIndex, float value, CCreature *petCreature=NULL );
+	void setAnimalSatiety(uint petIndex, float value, CCreature* petCreature = NULL);
 
 	/// Set satiety to the max (animal won't be hungry anymore)
 	void setAnimalSatietyToMax(uint petIndex);
 
 	/// Get the current and max satiety of the specified pet, or return false if the pet is not found
-	bool getAnimalSatiety( uint petIndex, float& currentSatiety, float& maxSatiety );
+	bool getAnimalSatiety(uint petIndex, float& currentSatiety, float& maxSatiety);
 
 	/// Set the race of the owner of this animal
-	void setAnimalPeople( uint petIndex );
+	void setAnimalPeople(uint petIndex);
 
 	/// Stop the specified animal if following the character and too far from him
-	void checkAnimalInRange( uint petIndex );
+	void checkAnimalInRange(uint petIndex);
 
 	/// Returns true if animal is in the given stable
 	bool isAnimalInStable(uint petIndex, uint16 stableId) const;
 
 	// Player want send a command to his pet
-	void sendPetCommand( CPetCommandMsg::TCommand command, uint index, bool bypassDistanceCheck=false );
+	void sendPetCommand(CPetCommandMsg::TCommand command, uint index, bool bypassDistanceCheck = false);
 
 	// send pack animal command
-	void sendAnimalCommand( uint8 beastIndex, uint8 command );
+	void sendAnimalCommand(uint8 beastIndex, uint8 command);
 
 	// Remove all spawnedpet (AIS shut down)
 	void removeSpawnedPet(NLNET::TServiceId aiServiceId);
 
 	/// Return the index of the animal corresponding to the specified ticket item, or ~0 if not found
-	uint getAnimalByTicket( CGameItemPtr item );
+	uint getAnimalByTicket(CGameItemPtr item);
 
 	// \return true if corresponding pack animal is empty (return false for invalid index)
-	bool checkPackAnimalEmptyInventory( uint32 petIndex );
-	
+	bool checkPackAnimalEmptyInventory(uint32 petIndex);
+
 	// \return true if pet animal can received a command
-	bool petCommandDistance( uint32 beastIndex );
-	
+	bool petCommandDistance(uint32 beastIndex);
+
 	// \return true if pet animal inventory is accessible
-	bool petInventoryDistance( uint32 beastIndex );
+	bool petInventoryDistance(uint32 beastIndex);
 
 	// remove pet from player corresponding to item and despawn it
-	void removeAnimal( CGameItemPtr item, CPetCommandMsg::TCommand command );
+	void removeAnimal(CGameItemPtr item, CPetCommandMsg::TCommand command);
 
 	// remove pet from player corresponding to index and despawn it
-	void removeAnimalIndex( uint32 beastIndex, CPetCommandMsg::TCommand command );
-		
+	void removeAnimalIndex(uint32 beastIndex, CPetCommandMsg::TCommand command);
+
 	// update coordinate for spawned pets
 	void updatePetCoordinateAndDatabase();
 
 	// update the despawn bar for dead pet animal
-	void updateAnimalDespawnDb( uint petIndex );
+	void updateAnimalDespawnDb(uint petIndex);
 
 	// remove Pet Character after his death
-	void removePetCharacterAfterDeath( uint32 index );
-		
+	void removePetCharacterAfterDeath(uint32 index);
+
 	// Update database for spawned pets
 	void updatePetDatabase();
 
 	/// Update database for a spawned pet (precondition: petIndex<_PlayerPets.size())
-	void updateOnePetDatabase( uint petIndex, bool mustUpdateHungerDb );
-	
+	void updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb);
+
 	// return the index of a player pet, or -1 if not found
-	sint32 getPlayerPet( const TDataSetRow& petRowId ) const;
+	sint32 getPlayerPet(const TDataSetRow& petRowId) const;
 
 	// Set the name of the animal
-	void setAnimalName( uint8 petIndex, ucstring customName );
+	void setAnimalName(uint8 petIndex, ucstring customName);
 
 	void sendPetCustomNameToClient(uint8 petIndex);
 
@@ -1063,20 +1044,20 @@ public:
 	void forbidNearPetTp();
 
 	// Check create parameters return false if error and set createCharErrorMsg
-	static bool checkCreateParams( const CCreateCharMsg& createCharMsg, CCreateCharErrorMsg& createCharErrorMsg, uint32 userId );
+	static bool checkCreateParams(const CCreateCharMsg& createCharMsg, CCreateCharErrorMsg& createCharErrorMsg, uint32 userId);
 
 	// Set start statistics and other params on character
-	void setStartStatistics( const CCreateCharMsg& createCharMsg );
+	void setStartStatistics(const CCreateCharMsg& createCharMsg);
 
 	// search role sheet and call start equipment and memorize actions at create character
-	void searchCreateRoleSheet( EGSPD::CPeople::TPeople people, ROLES::ERole role, uint8 nbPoints, bool onlyMemorizeActions = false );
+	void searchCreateRoleSheet(EGSPD::CPeople::TPeople people, ROLES::ERole role, uint8 nbPoints, bool onlyMemorizeActions = false);
 
 	// setStartEquipment : Set start equipment at create character
-	void setStartEquipment( const SMirrorEquipment* Items );
+	void setStartEquipment(const SMirrorEquipment* Items);
 
 	// memorizeStartAction : memorize start action at create character
-	void memorizeStartAction( const std::vector< CStaticRole::TMemorizedSentence >& MemorizedSentences );
-		
+	void memorizeStartAction(const std::vector<CStaticRole::TMemorizedSentence>& MemorizedSentences);
+
 	// update regen value
 	void updateRegen();
 
@@ -1091,10 +1072,10 @@ public:
 	 * \return UnknownValue if the value is not known, ValueError is the value evaluation failed or NoError 
 	 * if it has been parsed.
 	 */
-	virtual TReturnState evalValue (const char *value, double &result, uint32 userData);
+	virtual TReturnState evalValue(const char* value, double& result, uint32 userData);
 
 	/// Add a pact
-	void addPact( uint8 PactNature, uint8 PactType );
+	void addPact(uint8 PactNature, uint8 PactType);
 
 	uint8 getNbPact();
 
@@ -1121,17 +1102,17 @@ public:
 	 * \return a pointer on the current interlocutor
 	 * \param chatType: type of the selected chat
 	 */
-	CCreature* startBotChat( BOTCHATTYPE::TBotChatFlags chatType );
+	CCreature* startBotChat(BOTCHATTYPE::TBotChatFlags chatType);
 
 	/// end the bot chat. newBotChat must be set to true if the chat is canceled because of another bot chat. closeDynChat must be true to close the current dynChat
 	void endBotChat(bool newBotChat = false, bool closeDynChat = false);
 
 	/// return the current bot chat type
-	uint8 getBotChatType()const;
+	uint8 getBotChatType() const;
 
 	///\return the current bot chat page
 	uint8 getCurrentBotChatListPage();
-	
+
 	/// increment the current bot chat page
 	void incCurrentBotChatListPage();
 
@@ -1145,11 +1126,11 @@ public:
 	void acceptExchange(uint8 exchangeId);
 
 	///exchange money
-	void exchangeMoney( const uint64& quantity);
+	void exchangeMoney(const uint64& quantity);
 
 	/// check if each character have enough room in bag for exchange
 	bool validateExchange();
-		
+
 	///invalidate an exchange
 	void invalidateExchange();
 
@@ -1163,20 +1144,20 @@ public:
 	bool teleportInProgress() const;
 
 	// send message using string manager
-	static void sendDynamicSystemMessage(const TDataSetRow &playerRowId, const std::string &msgName, const TVectorParamCheck & params = TVectorParamCheck() );
+	static void sendDynamicSystemMessage(const TDataSetRow& playerRowId, const std::string& msgName, const TVectorParamCheck& params = TVectorParamCheck());
 	// send message using string manager
-	static void sendDynamicSystemMessage(const NLMISC::CEntityId &eid, const std::string &msgName, const TVectorParamCheck & params = TVectorParamCheck() );
+	static void sendDynamicSystemMessage(const NLMISC::CEntityId& eid, const std::string& msgName, const TVectorParamCheck& params = TVectorParamCheck());
 
 	// send message using string manager
-	static void sendDynamicMessageToChatGroup(const TDataSetRow &playerRowId, const std::string &msgName, CChatGroup::TGroupType type, const TVectorParamCheck & params = TVectorParamCheck() );
+	static void sendDynamicMessageToChatGroup(const TDataSetRow& playerRowId, const std::string& msgName, CChatGroup::TGroupType type, const TVectorParamCheck& params = TVectorParamCheck());
 	// send message using string manager
-	static void sendDynamicMessageToChatGroup(const NLMISC::CEntityId &eid, const std::string &msgName, CChatGroup::TGroupType type, const TVectorParamCheck & params = TVectorParamCheck() );
+	static void sendDynamicMessageToChatGroup(const NLMISC::CEntityId& eid, const std::string& msgName, CChatGroup::TGroupType type, const TVectorParamCheck& params = TVectorParamCheck());
 
 	// send a bit field message to client
-	void sendMessageToClient( uint32 userId, NLNET::CMessage& msgout );
-	
+	void sendMessageToClient(uint32 userId, NLNET::CMessage& msgout);
+
 	// send the USER_CHAR message to the client (after a character is selected)
-	void sendUserChar( uint32 userId, uint8 scenarioSeason, const R2::TUserRole& userRole );
+	void sendUserChar(uint32 userId, uint8 scenarioSeason, const R2::TUserRole& userRole);
 
 	// Return the home mainland session id for a character
 	TSessionId getHomeMainlandSessionId() const;
@@ -1196,10 +1177,10 @@ public:
 	void applyTopOfPositionStack();
 
 	// See in character_interface.h
-	void applyAndPushNewPosition( const CFarPosition& farPos );
+	void applyAndPushNewPosition(const CFarPosition& farPos);
 
 	// See in character_interface.h
-	void applyEditorPosition( const CFarPosition& farPos );
+	void applyEditorPosition(const CFarPosition& farPos);
 
 	// See in character_interface.h
 	void pushCurrentPosition();
@@ -1210,46 +1191,46 @@ public:
 	void leavePreviousSession(TSessionId previousSesionId);
 
 	/// See in character_interface.h
-	void requestFarTP( TSessionId destSessionId, bool allowRetToMainlandIfFails=true, bool sendViaUid=false );
+	void requestFarTP(TSessionId destSessionId, bool allowRetToMainlandIfFails = true, bool sendViaUid = false);
 
 	// See in character_interface.h
-	void returnToPreviousSession( uint32 userId, sint32 charIndex, TSessionId rejectedSessionId );
+	void returnToPreviousSession(uint32 userId, sint32 charIndex, TSessionId rejectedSessionId);
 
 	/// spend money
-	void spendMoney( const uint64 & price );
+	void spendMoney(const uint64& price);
 
 	/// get money
-	const uint64 & getMoney();
+	const uint64& getMoney();
 
 	/// give money
-	void giveMoney( const uint64 & money );
+	void giveMoney(const uint64& money);
 
 	/// set money
-	void setMoney( const uint64 & money );
-	
+	void setMoney(const uint64& money);
+
 	/// set the number of faction point dependent of the faction
-	void	setFactionPoint(PVP_CLAN::TPVPClan clan, uint32 nbPt, bool factionPVP = false);
+	void setFactionPoint(PVP_CLAN::TPVPClan clan, uint32 nbPt, bool factionPVP = false);
 
 	/// get the number of faction point given a faction
-	uint32	getFactionPoint(PVP_CLAN::TPVPClan clan);
+	uint32 getFactionPoint(PVP_CLAN::TPVPClan clan);
 
 	/// set the number of pvp point
-	void	setPvpPoint(uint32 nbPt);
+	void setPvpPoint(uint32 nbPt);
 
 	/// get the number of pvp point given a faction
-	uint32	getPvpPoint();
+	uint32 getPvpPoint();
 
 	/// set the SDB path where player wins HoF points in PvP (if not empty)
-	void	setSDBPvPPath(const std::string & sdbPvPPath);
+	void setSDBPvPPath(const std::string& sdbPvPPath);
 
 	/// get the SDB path where player wins HoF points in PvP (if not empty)
-	bool	getSDBPvPPath(std::string & sdbPvPPath);
+	bool getSDBPvPPath(std::string& sdbPvPPath);
 
 	/// init faction point in client database
-	void	initFactionPointDb();
+	void initFactionPointDb();
 
 	/// init pvp point in client database
-	void	initPvpPointDb();
+	void initPvpPointDb();
 
 	void initOrganizationInfos();
 	void setOrganization(uint32 org);
@@ -1258,18 +1239,18 @@ public:
 	void changeOrganizationPoints(sint32 points);
 
 	/// send faction point gain phrase to the client
-	void	sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain);
+	void sendFactionPointGainMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain);
 	/// send faction point gain kill phrase to the client
-	void	sendFactionPointGainKillMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain, const NLMISC::CEntityId & victimId);
+	void sendFactionPointGainKillMessage(PVP_CLAN::TPVPClan clan, uint32 fpGain, const NLMISC::CEntityId& victimId);
 	/// send faction point lose phrase to the client
-	void	sendFactionPointLoseMessage(PVP_CLAN::TPVPClan clan, uint32 fpLose);
+	void sendFactionPointLoseMessage(PVP_CLAN::TPVPClan clan, uint32 fpLose);
 	/// send faction point 'cannot gain yet' phrase to the client
-	void	sendFactionPointCannotGainYetMessage(const NLMISC::CEntityId & victimId, uint32 remainingSeconds);
+	void sendFactionPointCannotGainYetMessage(const NLMISC::CEntityId& victimId, uint32 remainingSeconds);
 
 	///get the current interlocutor of the character
-	const NLMISC::CEntityId & getCurrentInterlocutor();
+	const NLMISC::CEntityId& getCurrentInterlocutor();
 	// set the current interlocutor
-	void setCurrentInterlocutor(const NLMISC::CEntityId & interlocutor);
+	void setCurrentInterlocutor(const NLMISC::CEntityId& interlocutor);
 
 	///remove the entity from exchange
 	void removeFromExchange();
@@ -1278,26 +1259,26 @@ public:
 	 * process (Memorize) pre memorized sentences
 	 * \param sheetId the sheet id used by this character
 	 */
-	void processPreMemorizedSentences( const std::vector< CSentenceStatic > & MemorizedSentences, const std::string& SheetName );
+	void processPreMemorizedSentences(const std::vector<CSentenceStatic>& MemorizedSentences, const std::string& SheetName);
 
 	/**
 	 * set the player in berserk state and update database
 	 * \param isBerserk : the new berserk state
 	 */
 	void setBerserkFlag(bool isBerserk);
-	
+
 	/// return the berserk state
 	bool getBerserkFlag();
 
 	/// get the exchange view
-	CExchangeView * getExchangeView();
+	CExchangeView* getExchangeView();
 
 	/// return the money in exchange
-	const uint64 & getExchangeMoney() const;
+	const uint64& getExchangeMoney() const;
 
 	/// set exchange money amount
-	void setExchangeMoney( uint64 amount );
-	
+	void setExchangeMoney(uint64 amount);
+
 	///\return the loot container
 	CInventoryPtr getLootContainer();
 
@@ -1312,10 +1293,10 @@ public:
 
 	/// cancel any static action in progress (ie actions canceled if the player moves like casting, harvest, faber...)
 	/// type is the type of the action ( magic,...)
-	void cancelStaticActionInProgress( STATIC_ACT_TYPES::TStaticActTypes type = STATIC_ACT_TYPES::Neutral, bool cancelChat = true, bool cancelLoot = true);
+	void cancelStaticActionInProgress(STATIC_ACT_TYPES::TStaticActTypes type = STATIC_ACT_TYPES::Neutral, bool cancelChat = true, bool cancelLoot = true);
 
 	/// cancel any static effect in progress (ie effects canceled if the player moves like casting, harvest, faber...)
-	virtual void cancelStaticEffects();	
+	virtual void cancelStaticEffects();
 
 	/// return true if a static action is in progress
 	bool staticActionInProgress() const;
@@ -1324,21 +1305,21 @@ public:
 	void staticActionInProgress(bool flag, STATIC_ACT_TYPES::TStaticActTypes type = STATIC_ACT_TYPES::Neutral);
 
 	/// receibed emote from client
-	void setEmote( MBEHAV::EBehaviour emote );
+	void setEmote(MBEHAV::EBehaviour emote);
 
-	void sendEmote( const NLMISC::CEntityId& id, MBEHAV::EBehaviour behaviour, uint16 emoteTextId, bool checkPrivilege = true );
-	void sendCustomEmote( const NLMISC::CEntityId& id, MBEHAV::EBehaviour behaviour, ucstring& emoteCustomText );
+	void sendEmote(const NLMISC::CEntityId& id, MBEHAV::EBehaviour behaviour, uint16 emoteTextId, bool checkPrivilege = true);
+	void sendCustomEmote(const NLMISC::CEntityId& id, MBEHAV::EBehaviour behaviour, ucstring& emoteCustomText);
 
 	uint32 getActionsSPValue() const;
 	uint32 getStartActionsSPValue() const;
-	void getRoleStartActions(EGSPD::CPeople::TPeople people, ROLES::ERole role, uint8 nbPoints, std::vector<NLMISC::CSheetId> &phrases) const;
+	void getRoleStartActions(EGSPD::CPeople::TPeople people, ROLES::ERole role, uint8 nbPoints, std::vector<NLMISC::CSheetId>& phrases) const;
 	uint32 getTotalEarnedSP() const;
 
 	/// set the current action (fills the appropriate portion of the database)
-	virtual void setCurrentAction(CLIENT_ACTION_TYPE::TClientActionType actionType,NLMISC::TGameCycle actionEndCycle );
+	virtual void setCurrentAction(CLIENT_ACTION_TYPE::TClientActionType actionType, NLMISC::TGameCycle actionEndCycle);
 
 	/// clear current action: action barre on client is no more displayed
-	virtual void clearCurrentAction( );
+	virtual void clearCurrentAction();
 
 	void setSaveDate(uint32 nTimeStamp);
 	uint32 getSaveDate();
@@ -1355,31 +1336,31 @@ public:
 	std::map<TAIAlias, CMission*>::iterator getMissionsEnd();
 
 	///\return a mission by alias
-	const CMission* getMission( TAIAlias missionId ) const;
+	const CMission* getMission(TAIAlias missionId) const;
 	///\return a mission by alias
-	CMission* getMission( TAIAlias missionId );
+	CMission* getMission(TAIAlias missionId);
 
 	///\return the successful missions
-	const std::map< TAIAlias, TMissionHistory >& getMissionHistories();
+	const std::map<TAIAlias, TMissionHistory>& getMissionHistories();
 	///add a succesful mission. DEBUG ONLY
-	void addSuccessfulMissions( const CMissionTemplate & templ);
+	void addSuccessfulMissions(const CMissionTemplate& templ);
 
 	/// check weither or not a mission has been successfully played
-	bool isMissionSuccessfull(const CMissionTemplate & templ);
+	bool isMissionSuccessfull(const CMissionTemplate& templ);
 
 	/// check the last date of trying for a mission (0 if never tryied)
-	NLMISC::TGameCycle getMissionLastSuccess(const CMissionTemplate & templ);
+	NLMISC::TGameCycle getMissionLastSuccess(const CMissionTemplate& templ);
 
 	/// build the current mission list proposed to the player
-	void buildMissionList(CCreature * creature, uint16 sessionId);
+	void buildMissionList(CCreature* creature, uint16 sessionId);
 	/// send mission prerequisit infos
-	void sendMissionPrerequisitInfos( uint16 missionIndex );
+	void sendMissionPrerequisitInfos(uint16 missionIndex);
 	/// fill DB with the current mission page
 	void fillMissionPage(uint16 sessionId);
 	///\return the current mission list
-	const std::vector<SBotChatMission> & getCurrentMissionList();
+	const std::vector<SBotChatMission>& getCurrentMissionList();
 	/// add a mission to this player
-	void addMission(CMissionSolo * mission);
+	void addMission(CMissionSolo* mission);
 	/// remove a mission from this player
 	void removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result, bool doNotClearJournal = false);
 	/// player abandon a mission
@@ -1391,25 +1372,24 @@ public:
 
 	void removeMissionFromHistories(TAIAlias missionAlias) { _MissionHistories.erase(missionAlias); }
 
-	///process a mission event ( this function should be called each time a mission event is triggered ). 
+	///process a mission event ( this function should be called each time a mission event is triggered ).
 	/// The alias parameter is useful when we want to test only a mission with a specific alias
 	/// if deleteEvent is true, the first event is deleted
-	bool processMissionEventList( std::list< CMissionEvent* > & eventList, bool deleteEvent ,TAIAlias alias );
-	bool processMissionEvent( CMissionEvent & event, TAIAlias alias = CAIAliasTranslator::Invalid);
+	bool processMissionEventList(std::list<CMissionEvent*>& eventList, bool deleteEvent, TAIAlias alias);
+	bool processMissionEvent(CMissionEvent& event, TAIAlias alias = CAIAliasTranslator::Invalid);
 	// process a mission event and if not processed check if it can unblock steps for other teammate
-	bool processMissionEventWithTeamMate( CMissionEvent & event, TAIAlias alias = CAIAliasTranslator::Invalid);
+	bool processMissionEventWithTeamMate(CMissionEvent& event, TAIAlias alias = CAIAliasTranslator::Invalid);
 	// process a mission event multiple times, until all matching steps are done. Return the number of matching steps for which processMissionEvent() returned true.
-	sint processMissionMultipleEvent( CMissionEvent & event, TAIAlias alias = CAIAliasTranslator::Invalid);
+	sint processMissionMultipleEvent(CMissionEvent& event, TAIAlias alias = CAIAliasTranslator::Invalid);
 	/// process a mission event for the missions took by this player
-	bool processMissionUserEvent(std::list< CMissionEvent* > & eventList,TAIAlias alias);
+	bool processMissionUserEvent(std::list<CMissionEvent*>& eventList, TAIAlias alias);
 	/// process a mission event for a specific mission and optionally for a specific step
-	bool processMissionStepUserEvent(std::list< CMissionEvent* > & eventList, uint missionAlias, uint32 stepIndex );
+	bool processMissionStepUserEvent(std::list<CMissionEvent*>& eventList, uint missionAlias, uint32 stepIndex);
 	/// make a mission advance through bot chat
-	void botChatMissionAdvance( uint8 index );
+	void botChatMissionAdvance(uint8 index);
 	/// creat a filled exchange window BRIANCODE
 	bool autoFillExchangeView();
-	CMission * getMissionFromBotGift();
-
+	CMission* getMissionFromBotGift();
 
 	/// update all previously saved missions (init of dynamic parameters)
 	void updateSavedMissions();
@@ -1417,24 +1397,24 @@ public:
 	//void updateJournalEntry(uint8 idx,MISSION_DESC::TMissionType type);
 
 	/// add a group with a handle (indicates when it can be despawn)
-	void addHandledAIGroup(CMission *m, TAIAlias nGroupAlias, uint32 nDespawnTime);
+	void addHandledAIGroup(CMission* m, TAIAlias nGroupAlias, uint32 nDespawnTime);
 	/// remove a group with handle (data are kept by mission for multiple handles)
-	void delHandledAIGroup(CMission *m, TAIAlias nGroupAlias);
+	void delHandledAIGroup(CMission* m, TAIAlias nGroupAlias);
 	/// remove all handled group for a specified mission
-	void delAllHandledAIGroup(CMission *m);
+	void delAllHandledAIGroup(CMission* m);
 	/// for all handles in all missions send spawn-msg to ais
 	void spawnAllHandledAIGroup();
 	/// for all handles in all missions send despawn-msg to ais
 	void despawnAllHandledAIGroup();
-	
-	/// build the item trade list
-	void startTradeItemSession( uint16 session );
 
-	std::vector<CTradePhrase> & currentPhrasesTradeList();
+	/// build the item trade list
+	void startTradeItemSession(uint16 session);
+
+	std::vector<CTradePhrase>& currentPhrasesTradeList();
 
 	void addTradePageToUpdate(uint16 idx);
 
-	/// start a trade phrase session 
+	/// start a trade phrase session
 	void startTradePhrases(uint16 session);
 
 	/** 
@@ -1442,17 +1422,17 @@ public:
 	 * \param bot the rolemaster bot
 	 * \param phrases the vector that will be filled with phrases sheetIds
 	 */
-	void getPhrasesOfferedByBot(const CCreature &bot, std::vector<CTradePhrase> &phrases);
+	void getPhrasesOfferedByBot(const CCreature& bot, std::vector<CTradePhrase>& phrases);
 
 	// return a const reference on character's item in store shop
-	const CItemsForSale	&getItemInShop();
+	const CItemsForSale& getItemInShop();
 
 	// remove an item from shop store, character destroy it's own item
-	void removeItemFromShop( uint32 identifier, uint32 quantity );
+	void removeItemFromShop(uint32 identifier, uint32 quantity);
 
 	// set filter and refresh trade list if trade occurs
-	void setFilters( uint32 minQuality, uint32 maxQuality, uint32 minPrice, uint32 maxPrice, RM_CLASS_TYPE::TRMClassType minClass, RM_CLASS_TYPE::TRMClassType maxClass, RM_FABER_TYPE::TRMFType itemPartFilter, ITEM_TYPE::TItemType itemTypeFilter );
-	
+	void setFilters(uint32 minQuality, uint32 maxQuality, uint32 minPrice, uint32 maxPrice, RM_CLASS_TYPE::TRMClassType minClass, RM_CLASS_TYPE::TRMClassType maxClass, RM_FABER_TYPE::TRMFType itemPartFilter, ITEM_TYPE::TItemType itemTypeFilter);
+
 	// Filters for shop list
 	RM_FABER_TYPE::TRMFType getRawMaterialItemPartFilter() const;
 	ITEM_TYPE::TItemType getItemTypeFilter() const;
@@ -1464,7 +1444,7 @@ public:
 	uint32 getMaxQualityFilter() const;
 	uint32 getMinPriceFilter() const;
 	uint32 getMaxPriceFilter() const;
-	
+
 	/// fill a trade page
 	void fillTradePage(uint16 session, bool enableBuildingLossWarning = false);
 
@@ -1472,26 +1452,26 @@ public:
 	void refreshTradeList();
 
 	/// access to _CurrentTradeSession
-	void	setCurrentTradeSession(uint16 session);
-	uint16	getCurrentTradeSession() const;
-	
+	void setCurrentTradeSession(uint16 session);
+	uint16 getCurrentTradeSession() const;
+
 	/// buy an item
-	void buyItem( uint16 itemNumber, uint16 quantity );
+	void buyItem(uint16 itemNumber, uint16 quantity);
 
 	// destroy an item in current selected page
-	void destroySaleItem( uint16 itemNumber, uint16 quantity );
-		
+	void destroySaleItem(uint16 itemNumber, uint16 quantity);
+
 	/// query an item price
-	bool queryItemPrice( const CGameItemPtr item, uint32& price );
-		
+	bool queryItemPrice(const CGameItemPtr item, uint32& price);
+
 	// sell an item
-	void sellItem( INVENTORIES::TInventory inv, uint32 slot, uint32 quantity, uint32 price );
+	void sellItem(INVENTORIES::TInventory inv, uint32 slot, uint32 quantity, uint32 price);
 
 	// item are sold
-	void itemSolded( uint32 identifier, uint32 quantity, uint32 price, uint32 basePrice, const NLMISC::CEntityId& buyer, bool sellOffline );
+	void itemSolded(uint32 identifier, uint32 quantity, uint32 price, uint32 basePrice, const NLMISC::CEntityId& buyer, bool sellOffline);
 
 	// item reach maximum time in sell store
-	void itemReachMaximumSellStoreTime( uint32 identifier, uint32 quantity, bool sellOffline );
+	void itemReachMaximumSellStoreTime(uint32 identifier, uint32 quantity, bool sellOffline);
 
 	// check sell store coherency with character, assume character is a reference
 	void checkSellStore();
@@ -1504,23 +1484,23 @@ public:
 	 * \param n the number of free slots needed
 	 * \param testMpConsumption tell if we should check the number of slots freed by mps consumption (default = false)
 	 */
-	bool testEmptySlots( uint8 n, bool testMpConsumption = false);
+	bool testEmptySlots(uint8 n, bool testMpConsumption = false);
 
 	/**
 	 * create a beast train
 	 * \param beastLeaderRow datasetRow of the train leader beast
 	 * \param nbBeasts the max number of beasts in the train
 	 */
-	void createTrain( const TDataSetRow& beastLeaderRow, uint8 nbBeasts );
+	void createTrain(const TDataSetRow& beastLeaderRow, uint8 nbBeasts);
 
 	/// get train max size
 	uint8 trainMaxSize() const;
 
 	/// add a beast in the train
-	void addBeast( uint16 petIndex );
+	void addBeast(uint16 petIndex);
 
 	/// get the beast train
-	const std::vector<TDataSetRow> &beastTrain() const;
+	const std::vector<TDataSetRow>& beastTrain() const;
 
 	/// clear the beast train
 	void clearBeastTrain();
@@ -1536,41 +1516,41 @@ public:
 	uint8 interfaceCounter() const;
 
 	/// Register character name in IOS
-	void registerName(const ucstring &newName = std::string(""));
+	void registerName(const ucstring& newName = std::string(""));
 
 	/// Mount a mount
-	void mount( TDataSetRow PetRowId );
+	void mount(TDataSetRow PetRowId);
 
 	/**
 	 * Unmount a mount.
 	 * If changeMountedState is false, IsMounted is not changed (useful to remember the state when teleporting).
 	 * If petIndex is ~0, auto-finds the index of the first mount for which IsMounted is true.
 	 */
-	void unmount( bool changeMountedState=true, uint petIndex=~0 );
+	void unmount(bool changeMountedState = true, uint petIndex = ~0);
 
 	// return true if the user have the privilege
-	bool havePriv (const std::string &priv) const;
+	bool havePriv(const std::string& priv) const;
 
 	//	return true if user have any privilege
 	bool haveAnyPrivilege() const;
-		
+
 	///\return the continent where the player is
 	CONTINENT::TContinent getCurrentContinent();
 
 	///\return the region where the player is
 	uint16 getCurrentRegion();
 
-	bool isInPlace( uint16 place );
+	bool isInPlace(uint16 place);
 
 	///\return all the places where the player is
-	const std::vector<uint16> & getPlaces();
+	const std::vector<uint16>& getPlaces();
 
 	///\set all the places where the player is
-	void setPlaces(const std::vector<const CPlace*> & places);
+	void setPlaces(const std::vector<const CPlace*>& places);
 
 	///\return the stable where the player is
 	uint16 getCurrentStable();
-	
+
 	///\set the continent where the player is
 	void setCurrentContinent(CONTINENT::TContinent continent);
 
@@ -1579,10 +1559,10 @@ public:
 
 	// \set the stable where the player is
 	/// todo place
-	void setCurrentStable (uint16 stable, uint16 placeId);
+	void setCurrentStable(uint16 stable, uint16 placeId);
 
 	// apply goo damage if character is too close than a goo path
-	void applyGooDamage( float gooDistance );
+	void applyGooDamage(float gooDistance);
 
 	/// get the valid state of melee combat
 	bool meleeCombatIsValid() const;
@@ -1593,30 +1573,30 @@ public:
 	/// check is player can spawn npc group in here position
 	bool isSpawnValid(bool inVillage, bool inOutpost, bool inStable, bool inAtys);
 
-	/// memorize a phrase 
-	void memorize(uint8 memorizationSet, uint8 index, uint16 phraseId, const std::vector<NLMISC::CSheetId> &bricks);
+	/// memorize a phrase
+	void memorize(uint8 memorizationSet, uint8 index, uint16 phraseId, const std::vector<NLMISC::CSheetId>& bricks);
 
 	//clear building phrase
 	void clearCurrentPhrase();
 
-	// get const reference on container of raw materials selected for faber 
-	const std::vector<CFaberMsgItem> &getFaberRms();
-	// get const reference on container of raw materials formula selected for faber 
-	const std::vector<CFaberMsgItem> &getFaberRmsFormula();
+	// get const reference on container of raw materials selected for faber
+	const std::vector<CFaberMsgItem>& getFaberRms();
+	// get const reference on container of raw materials formula selected for faber
+	const std::vector<CFaberMsgItem>& getFaberRmsFormula();
 
 	// set craft plan sheet-id
-	void setCraftPlan( NLMISC::CSheetId sheet );
+	void setCraftPlan(NLMISC::CSheetId sheet);
 
 	// return craft plan sheet-id
 	NLMISC::CSheetId getCraftPlan() const;
 
-	// get reference on container of raw materials selected for faber 
-	std::vector<CFaberMsgItem> &getFaberRmsNoConst();
-	// get reference on container of raw materials formula selected for faber 
-	std::vector<CFaberMsgItem> &getFaberRmsFormulaNoConst();
-	
+	// get reference on container of raw materials selected for faber
+	std::vector<CFaberMsgItem>& getFaberRmsNoConst();
+	// get reference on container of raw materials formula selected for faber
+	std::vector<CFaberMsgItem>& getFaberRmsFormulaNoConst();
+
 	// fill vector of const GameItem pointer with Raw material used for faber
-	bool getFillFaberRms( std::vector< const CStaticItem * >& rms, std::vector< const CStaticItem * >& rmsFormula, uint16& lowerQuality ); 
+	bool getFillFaberRms(std::vector<const CStaticItem*>& rms, std::vector<const CStaticItem*>& rmsFormula, uint16& lowerQuality);
 
 	// clear Faber raw material selection
 	void clearFaberRms();
@@ -1631,22 +1611,22 @@ public:
 	void consumeFaberRms(bool failed = false);
 
 	// consume an item and trigger its built-in effect
-	void consumeItem( INVENTORIES::TInventory inventory, uint32 slot );
+	void consumeItem(INVENTORIES::TInventory inventory, uint32 slot);
 
 	// destroy Item currently consumed
 	void destroyConsumedItem();
 
 	// launch an admin command specified in command ticket
-	void launchCommandTicket(const CStaticItem * form);
+	void launchCommandTicket(const CStaticItem* form);
 
 	// Exec a memorized phrase
-	void executeMemorizedPhrase(uint8 memSet, uint8 index, bool cyclic, bool enchant );
+	void executeMemorizedPhrase(uint8 memSet, uint8 index, bool cyclic, bool enchant);
 
 	/// forget a memorizedPhrase
 	void forgetPhrase(uint8 memSet, uint8 i);
 
 	/// learn a new phrase
-	void learnPhrase(const std::vector<NLMISC::CSheetId> &bricks, uint16 phraseId, const ucstring &name);
+	void learnPhrase(const std::vector<NLMISC::CSheetId>& bricks, uint16 phraseId, const ucstring& name);
 
 	/// delete a known phrase
 	void deleteKnownPhrase(uint16 phraseId);
@@ -1656,19 +1636,19 @@ public:
 
 	/// return const reference on known phrases
 	const std::vector<CKnownPhrase>& getKnownPhrases();
-	
+
 	/// buy a phrase and add it to known phrases
-	void buyPhraseByIndex( uint8 botChatIndex, uint16 knownPhraseIndex );
+	void buyPhraseByIndex(uint8 botChatIndex, uint16 knownPhraseIndex);
 
 	/** 
 	 * buy a phrase and add it to known phrases use a sheet Id to get the phrase
 	 * \param phraseId the phrase sheet id
 	 * \param knownPhraseIndex index of the phrase in known phrase book
 	 */
-	void buyPhraseBySheet( const NLMISC::CSheetId &phraseId, uint16 knownPhraseIndex );
-	
+	void buyPhraseBySheet(const NLMISC::CSheetId& phraseId, uint16 knownPhraseIndex);
+
 	/// learn a phrase and add it's brick to known bricks
-	bool learnPrebuiltPhrase( const NLMISC::CSheetId &phraseId, uint16 knownPhraseIndex , bool replace = false, bool onlyLearnBricks = false);
+	bool learnPrebuiltPhrase(const NLMISC::CSheetId& phraseId, uint16 knownPhraseIndex, bool replace = false, bool onlyLearnBricks = false);
 
 	/// get first empty slot in known phrase vector, increase vector size if no free slot found !
 	uint16 getFirstFreeSlotInKnownPhrase();
@@ -1683,13 +1663,13 @@ public:
 	void compassDatabaseUpdate();
 
 	/// set the compass target
-	void setCompassTarget( TDataSetRow rowId);
+	void setCompassTarget(TDataSetRow rowId);
 
 	/// get cycle counter
 	uint8 cycleCounter() const;
 	/// get next counter
 	uint8 nextCounter() const;
-	
+
 	/// write cycle counter in DB
 	void writeCycleCounterInDB();
 
@@ -1712,43 +1692,43 @@ public:
 	virtual CGameItemPtr getAmmoItem() const;
 
 	/// send dynamic message
-	void sendDynamicMessage(const std::string &phrase, const std::string &message);
+	void sendDynamicMessage(const std::string& phrase, const std::string& message);
 
 	/// send custom url
-	void sendUrl(const std::string &url, const std::string &salt);
+	void sendUrl(const std::string& url, const std::string& salt);
 
 	/// set custom mission param
-	void setCustomMissionParams(const std::string &missionName, const std::string &params);
+	void setCustomMissionParams(const std::string& missionName, const std::string& params);
 
 	/// add custom mission param
-	void addCustomMissionParam(const std::string &missionName, const std::string &param);
+	void addCustomMissionParam(const std::string& missionName, const std::string& param);
 
 	/// get custom mission params
-	std::vector<std::string> getCustomMissionParams(const std::string &missionName);
+	std::vector<std::string> getCustomMissionParams(const std::string& missionName);
 
 	/// get custom mission texts
-	std::string getCustomMissionText(const std::string &missionName);
+	std::string getCustomMissionText(const std::string& missionName);
 
 	/// add Ark position check
-	void addPositionCheck(sint32 x, sint32 y, uint32 r, const std::string &name, bool use_compass);
+	void addPositionCheck(sint32 x, sint32 y, uint32 r, const std::string& name, bool use_compass);
 
 	/// get Ark position check
-	void getPositionCheck(const std::string &name, sint32 &x, sint32 &y, std::string &textName);
+	void getPositionCheck(const std::string& name, sint32& x, sint32& y, std::string& textName);
 
 	/// validate dynamic mission step sending url
-	void validateDynamicMissionStep(const std::string &url);
+	void validateDynamicMissionStep(const std::string& url);
 
 	/// add web command validation check
-	void addWebCommandCheck(const std::string &url, const std::string &data, const std::string &salt);
+	void addWebCommandCheck(const std::string& url, const std::string& data, const std::string& salt);
 
 	/// get web command validation check
-	uint getWebCommandCheck(const std::string &url);
+	uint getWebCommandCheck(const std::string& url);
 
 	/// validate web command. Return web command item index in bag if command is valid or INVENTORIES::NbBagSlots if not
-	uint checkWebCommand(const std::string &url, const std::string &data, const std::string &hmac, const std::string &salt);
+	uint checkWebCommand(const std::string& url, const std::string& data, const std::string& hmac, const std::string& salt);
 
 	/// get the available phrases
-	void getAvailablePhrasesList(const std::string &brickFilter, std::vector<NLMISC::CSheetId> &selectedPhrases, EGSPD::CPeople::TPeople people = EGSPD::CPeople::Common, bool bypassBrickRequirements = false, bool includeNonRolemasterBricks = true );
+	void getAvailablePhrasesList(const std::string& brickFilter, std::vector<NLMISC::CSheetId>& selectedPhrases, EGSPD::CPeople::TPeople people = EGSPD::CPeople::Common, bool bypassBrickRequirements = false, bool includeNonRolemasterBricks = true);
 
 	/// spend Skill points
 	void spendSP(double sp, EGSPD::CSPType::TSPType type = EGSPD::CSPType::EndSPType);
@@ -1760,36 +1740,36 @@ public:
 	double getSP(EGSPD::CSPType::TSPType type);
 
 	/// set skill points
-	void setSP(double d, EGSPD::CSPType::TSPType type );
+	void setSP(double d, EGSPD::CSPType::TSPType type);
 
 	// dodge or parry as defense
-	virtual void dodgeAsDefense( bool b);
+	virtual void dodgeAsDefense(bool b);
 	bool dodgeAsDefense() const;
 
 	// used to modify defense success chance
-	void parrySuccessModifier( sint32 mod );
+	void parrySuccessModifier(sint32 mod);
 	sint32 parrySuccessModifier() const;
-	void dodgeSuccessModifier( sint32 mod );
+	void dodgeSuccessModifier(sint32 mod);
 	sint32 dodgeSuccessModifier() const;
 
 	// used to modify craft success chance
-	void craftSuccessModifier( sint32 mod );
+	void craftSuccessModifier(sint32 mod);
 	sint32 craftSuccessModifier() const;
 
 	// used to modify combat action success chance
-	void meleeSuccessModifier( sint32 mod );
+	void meleeSuccessModifier(sint32 mod);
 	sint32 meleeSuccessModifier() const;
-	void rangeSuccessModifier( sint32 mod );
+	void rangeSuccessModifier(sint32 mod);
 	sint32 rangeSuccessModifier() const;
-	void magicSuccessModifier( sint32 mod );
+	void magicSuccessModifier(sint32 mod);
 	sint32 magicSuccessModifier() const;
 
 	// used to modify forage success chance
-	void forageSuccessModifier( ECOSYSTEM::EECosystem eco, sint32 mod );
-	sint32 forageSuccessModifier( ECOSYSTEM::EECosystem eco) const;
+	void forageSuccessModifier(ECOSYSTEM::EECosystem eco, sint32 mod);
+	sint32 forageSuccessModifier(ECOSYSTEM::EECosystem eco) const;
 
 	/// set the protected slot
-	virtual void protectedSlot( SLOT_EQUIPMENT::TSlotEquipment slot);
+	virtual void protectedSlot(SLOT_EQUIPMENT::TSlotEquipment slot);
 	SLOT_EQUIPMENT::TSlotEquipment protectedSlot() const;
 
 	// set the next allowed action date
@@ -1798,7 +1778,7 @@ public:
 	NLMISC::TGameCycle dateOfNextAllowedAction();
 
 	/// player choose a re-spawn for his death character
-	void respawn( uint16 index );
+	void respawn(uint16 index);
 
 	/// apply respawn malus
 	void applyRespawnEffects();
@@ -1808,9 +1788,9 @@ public:
 
 	// player revives at full health at his location without death penalty
 	void revive();
-	
+
 	// Buy kami or karavan pact for a respawn point
-	void buyPact( const std::string& PactName ); 
+	void buyPact(const std::string& PactName);
 
 	/// set forbid aura use start and end dates
 	void setForbidAuraUseDates(NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate);
@@ -1819,16 +1799,16 @@ public:
 	NLMISC::TGameCycle getForbidAuraUseEndDate() const;
 
 	/// add an aura to ineffective auras
-	void useAura(POWERS::TPowerType auraType, NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate, const NLMISC::CEntityId &userId);
+	void useAura(POWERS::TPowerType auraType, NLMISC::TGameCycle startDate, NLMISC::TGameCycle endDate, const NLMISC::CEntityId& userId);
 
 	/// check if aura is effective, return true if effective
-	bool isAuraEffective(POWERS::TPowerType auraType, NLMISC::TGameCycle &endDate, const NLMISC::CEntityId &userId);
+	bool isAuraEffective(POWERS::TPowerType auraType, NLMISC::TGameCycle& endDate, const NLMISC::CEntityId& userId);
 
 	/// add an aura to ineffective auras
 	void forbidPower(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle date);
-	
+
 	/// check if aura is effective, return true if effective
-	bool canUsePower(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle &endDate);
+	bool canUsePower(POWERS::TPowerType type, uint16 consumableFamilyId, NLMISC::TGameCycle& endDate);
 
 	/// get nb of auras on this player
 	uint8 nbAuras() const;
@@ -1843,8 +1823,8 @@ public:
 	void resetPowerFlags();
 
 	void displayPowerFlags();
-	
-	/// reset a combat event flag 
+
+	/// reset a combat event flag
 	void resetCombatEventFlag(BRICK_FLAGS::TBrickFlag flag);
 
 	/// set a combat event flag and it's reset date
@@ -1863,10 +1843,10 @@ public:
 	void updateBrickFlagsDBEntry();
 
 	// add a link cast by this player
-	virtual void addLink( CSLinkEffect * effect);
+	virtual void addLink(CSLinkEffect* effect);
 
 	// remove a link cast by this player
-	virtual void removeLink( CSLinkEffect * effect, float factorOnSurvivalTime);
+	virtual void removeLink(CSLinkEffect* effect, float factorOnSurvivalTime);
 
 	// stop all links (a broken link last a few more seconds before being deleted)
 	virtual void stopAllLinks(float factorOnSurvivalTime = 1.0f);
@@ -1875,7 +1855,7 @@ public:
 	 * apply the effect of the armor/shield on damage. Update the armor items if necessary
 	 * \return the remaining damages
 	 */
-	virtual sint32 applyDamageOnArmor( DMGTYPE::EDamageType dmgType, sint32 damage, SLOT_EQUIPMENT::TSlotEquipment forcedSlot);
+	virtual sint32 applyDamageOnArmor(DMGTYPE::EDamageType dmgType, sint32 damage, SLOT_EQUIPMENT::TSlotEquipment forcedSlot);
 
 	/**
 	 * return the malus on spell casting due to armor
@@ -1883,7 +1863,7 @@ public:
 	float getArmorCastingMalus();
 
 	/// Return the damage using current armor, done by an explosion (e.g. forage source explosion)
-	virtual float getActualDamageFromExplosionWithArmor( float dmg ) const;
+	virtual float getActualDamageFromExplosionWithArmor(float dmg) const;
 
 	/// send temp inventory close impulsion to client
 	void sendCloseTempInventoryImpulsion();
@@ -1897,7 +1877,7 @@ public:
 	void resetFameDatabase();
 
 	/// equipment wear malus accessor
-	void addWearMalus( float m );
+	void addWearMalus(float m);
 
 	float wearMalus();
 
@@ -1912,13 +1892,13 @@ public:
 	sint32 adversaryParryModifier();
 
 	// add an effect to this entity
-	virtual bool addSabrinaEffect( CSEffect *effect );
-	
+	virtual bool addSabrinaEffect(CSEffect* effect);
+
 	/**
 	 * remove an effect on this entity. The effect is not deleted nor stopped, if you
 	 * want to force the effect to stop, use CSEffect::stopEffect() method
 	 */
-	virtual bool removeSabrinaEffect( CSEffect *effect, bool activateSleepingEffect = true );
+	virtual bool removeSabrinaEffect(CSEffect* effect, bool activateSleepingEffect = true);
 
 	/** 
 	 * add a bonus effect and write it in DB
@@ -1926,7 +1906,7 @@ public:
 	 * \param bonus true of the effectis a bonus
 	 * \return index in Db, or  -1 if DB full
 	 */
-	sint8 addEffectInDB(const NLMISC::CSheetId &sheetId, bool bonus = true);
+	sint8 addEffectInDB(const NLMISC::CSheetId& sheetId, bool bonus = true);
 
 	/// remove bonus effect
 	void removeEffectInDB(uint8 index, bool bonus = true);
@@ -1940,16 +1920,16 @@ public:
 	sint32 getWeightMalus();
 
 	// return Pet Animal container const reference
-	const std::vector< CPetAnimal >& getPlayerPets();
+	const std::vector<CPetAnimal>& getPlayerPets();
 
 	/// Return the mount if the player is mounted, otherwise NULL
-	CEntityBase *getMountEntity();
+	CEntityBase* getMountEntity();
 
 	// flag indicate if tp of pet near character are allowed
-	bool	NearPetTpAllowed;
-	
+	bool NearPetTpAllowed;
+
 	/// return the gear latency structure
-	const CGearLatency & getGearLatency();
+	const CGearLatency& getGearLatency();
 
 	/// return true if the player can use an action
 	virtual bool canEntityUseAction(CBypassCheckFlags bypassCheckFlags = CBypassCheckFlags::NoFlags, bool sendMessage = true) const;
@@ -1959,7 +1939,7 @@ public:
 
 	/// get the resist value associated to effect type
 	uint32 getMagicResistance(EFFECT_FAMILIES::TEffectFamily effectFamily);
-	
+
 	/// get the resist value associated to damage type
 	uint32 getMagicResistance(DMGTYPE::EDamageType dmgType);
 
@@ -1972,95 +1952,95 @@ public:
 	void setLastPosXInDB(sint32 x);
 	/// set last Y pos in DB (for teammates)
 	void setLastPosYInDB(sint32 y);
-	
+
 	/// \name Friend/Ignore lists management.
 
 	// @{
 
-		/// add a player to friend list by name
-		void addPlayerToFriendList(const ucstring &name);
+	/// add a player to friend list by name
+	void addPlayerToFriendList(const ucstring& name);
 
-		/// add a player to ignore list by name
-		void addPlayerToIgnoreList(const ucstring &name);
+	/// add a player to ignore list by name
+	void addPlayerToIgnoreList(const ucstring& name);
 
-		/// add a player to ignore list by Id
-		void addPlayerToIgnoreList(const NLMISC::CEntityId &id);
-		
-		/// add a player to league list by id
-		void addPlayerToLeagueList(const NLMISC::CEntityId &id);
+	/// add a player to ignore list by Id
+	void addPlayerToIgnoreList(const NLMISC::CEntityId& id);
 
-		/// add a player to friend list by id
-		void addPlayerToFriendList(const NLMISC::CEntityId &id);
+	/// add a player to league list by id
+	void addPlayerToLeagueList(const NLMISC::CEntityId& id);
 
-		/// get a player from friend or ignore list, by contact id
-		const NLMISC::CEntityId	&getFriendByContactId(uint32 contactId);
-		const NLMISC::CEntityId	&getIgnoreByContactId(uint32 contactId);
-		
-		/// remove player from friend list
-		void removePlayerFromFriendListByContactId(uint32 contactId);
-		void removePlayerFromFriendListByEntityId(const NLMISC::CEntityId &id);
+	/// add a player to friend list by id
+	void addPlayerToFriendList(const NLMISC::CEntityId& id);
 
-		void setInRoomOfPlayer(const NLMISC::CEntityId &id);
-		const NLMISC::CEntityId& getInRoomOfPlayer();
+	/// get a player from friend or ignore list, by contact id
+	const NLMISC::CEntityId& getFriendByContactId(uint32 contactId);
+	const NLMISC::CEntityId& getIgnoreByContactId(uint32 contactId);
 
-		void setPowoCell(sint32 cell);
-		sint32 getPowoCell();
+	/// remove player from friend list
+	void removePlayerFromFriendListByContactId(uint32 contactId);
+	void removePlayerFromFriendListByEntityId(const NLMISC::CEntityId& id);
 
-		/// get if player have acces to room
-		bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
+	void setInRoomOfPlayer(const NLMISC::CEntityId& id);
+	const NLMISC::CEntityId& getInRoomOfPlayer();
 
-		/// add room acces to player
-		void addRoomAccessToPlayer(const NLMISC::CEntityId &id);
-		
-		/// remove room acces to player
-		void removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick);
+	void setPowoCell(sint32 cell);
+	sint32 getPowoCell();
 
-		/// remove player from league list
-		void removePlayerFromLeagueListByContactId(uint32 contactId);
-		void removePlayerFromLeagueListByEntityId(const NLMISC::CEntityId &id);
+	/// get if player have acces to room
+	bool playerHaveRoomAccess(const NLMISC::CEntityId& id);
 
-		/// remove player from ignore list
-		void removePlayerFromIgnoreListByContactId(uint32 contactId);
-		void removePlayerFromIgnoreListByEntityId(const NLMISC::CEntityId &id);
-		
-		/// clear friend list
-		void clearFriendList();
-		
-		/// clear Ignore list
-		void clearIgnoreList();
-		
-		/// clear friendOf list
-		void clearFriendOfList();
+	/// add room acces to player
+	void addRoomAccessToPlayer(const NLMISC::CEntityId& id);
 
-		/// set player status in contact list
-		void setContactOnlineStatus( const NLMISC::CEntityId &id, bool online );
+	/// remove room acces to player
+	void removeRoomAccesToPlayer(const NLMISC::CEntityId& id, bool kick);
 
-		/// get num friend
-		uint	getNumFriends() const;
+	/// remove player from league list
+	void removePlayerFromLeagueListByContactId(uint32 contactId);
+	void removePlayerFromLeagueListByEntityId(const NLMISC::CEntityId& id);
 
-		/// get friend by index
-		const NLMISC::CEntityId &getFriend(uint16 index) const;
-		
-		/// get num ignored
-		uint	getNumIgnored() const;
-		
-		/// get ignored player by index
-		const NLMISC::CEntityId &getIgnoredPlayer(uint16 index) const;
+	/// remove player from ignore list
+	void removePlayerFromIgnoreListByContactId(uint32 contactId);
+	void removePlayerFromIgnoreListByEntityId(const NLMISC::CEntityId& id);
 
-		/// does the entity friend(ify) this player?
-		bool hasInFriendList(const NLMISC::CEntityId &player) const;
+	/// clear friend list
+	void clearFriendList();
 
-		/// does the entity ignore this player?
-		bool hasInIgnoreList(const NLMISC::CEntityId &player) const;
-		
-		/// player is going online or offline
-		void online(bool onlineStatus);
+	/// clear Ignore list
+	void clearIgnoreList();
 
-		/// player last connection date (from SU, exactly like on mysql db)
-		void setLastConnectionDate(uint32 date);
+	/// clear friendOf list
+	void clearFriendOfList();
 
-		/// player is permanently erased, unreferenced it from all contact lists
-		void destroyCharacter();
+	/// set player status in contact list
+	void setContactOnlineStatus(const NLMISC::CEntityId& id, bool online);
+
+	/// get num friend
+	uint getNumFriends() const;
+
+	/// get friend by index
+	const NLMISC::CEntityId& getFriend(uint16 index) const;
+
+	/// get num ignored
+	uint getNumIgnored() const;
+
+	/// get ignored player by index
+	const NLMISC::CEntityId& getIgnoredPlayer(uint16 index) const;
+
+	/// does the entity friend(ify) this player?
+	bool hasInFriendList(const NLMISC::CEntityId& player) const;
+
+	/// does the entity ignore this player?
+	bool hasInIgnoreList(const NLMISC::CEntityId& player) const;
+
+	/// player is going online or offline
+	void online(bool onlineStatus);
+
+	/// player last connection date (from SU, exactly like on mysql db)
+	void setLastConnectionDate(uint32 date);
+
+	/// player is permanently erased, unreferenced it from all contact lists
+	void destroyCharacter();
 
 	// @}
 
@@ -2072,12 +2052,12 @@ public:
 
 	/// called internally when the user crash or disconnect from the server
 	void onDisconnection(bool bCrashed);
-	
+
 	/// change rolemaster type
 	void setRolemasterType(EGSPD::CSPType::TSPType type);
 
 	/// set the afk state of the user
-	void setAfkState( bool isAfk );
+	void setAfkState(bool isAfk);
 
 	/**
 	 * Return the skills of this entity
@@ -2152,28 +2132,28 @@ public:
 	sint8 getAggroableOverride() const;
 	void sendAggroable();
 	bool isAggroableOverridden();
-	
+
 	/// set player intangible end date
 	void setIntangibleEndDate(NLMISC::TGameCycle date);
 	/// get player intangible end date
 	NLMISC::TGameCycle getIntangibleEndDate() const;
 
 	// get the backup of the who sees me property
-	void setWhoSeesMeBeforeTP(const uint64 &whoSeesMe);
+	void setWhoSeesMeBeforeTP(const uint64& whoSeesMe);
 	// get the backup of the who sees me property
-	const uint64 &whoSeesMeBeforeTP() const;
+	const uint64& whoSeesMeBeforeTP() const;
 	// reset the backup of the who sees me property
 	void resetWhoSeesMeBeforeTP();
 
 	/// return the user admin properties
-	CAdminProperties & getAdminProperties();
+	CAdminProperties& getAdminProperties();
 
 	/// accessors to the monitoring CSR
-	const TDataSetRow&  getMonitoringCSR();
+	const TDataSetRow& getMonitoringCSR();
 	void setMonitoringCSR(const TDataSetRow& csr);
 
 	/// get death penalties
-	const CDeathPenalties & getDeathPenalties() const;
+	const CDeathPenalties& getDeathPenalties() const;
 
 	float nextDeathPenaltyFactor() const;
 	void resetNextDeathPenaltyFactor();
@@ -2190,14 +2170,14 @@ public:
 	 * Get persistent item services (ie services that need to be provided each time player reconnects)
 	 * It is a handle used by CItemServiceManager. It should not be used by another class.
 	 **/
-	std::vector<NLMISC::CSheetId> & getPersistentItemServices();
+	std::vector<NLMISC::CSheetId>& getPersistentItemServices();
 
 	/// return the player room of this user
-	CPlayerRoomInterface	&getRoomInterface();
+	CPlayerRoomInterface& getRoomInterface();
 
-	EGSPD::CFameContainerPD &getPlayerFamesContainer();
+	EGSPD::CFameContainerPD& getPlayerFamesContainer();
 
-	bool checkCharacterStillValide( const char * msgError);
+	bool checkCharacterStillValide(const char* msgError);
 
 	/// get display stat flag on Xp gain for player
 	bool logXpGain() const;
@@ -2219,22 +2199,22 @@ public:
 
 	/// returns true if player is sitting
 	bool isSitting() const;
-	
+
 	/// check to see if guild can belong to the guild ID provided.
 	/// setToNone- if true will change any mismatched allegiances to "None", otherwise no change is made (default: false).
 	/// returns true if allegiances are allowed, false otherwise.
-	bool canBelongToGuild( uint32 guildId, bool setToNone = false );
+	bool canBelongToGuild(uint32 guildId, bool setToNone = false);
 
 	/// set the guild id of the player
 	/// returns true if the change was allowed, returns false if the change was not allowed.
-	bool setGuildId( uint32 guildId );
+	bool setGuildId(uint32 guildId);
 
 	/// get the guild id of the player
 	uint32 getGuildId() const;
 
 	/// updates the guild flag field in the mirror, according to character clan and preferences
 	void updateGuildFlag() const;
-	
+
 	/// send FBT status to the client
 	void sendBetaTesterStatus();
 
@@ -2249,7 +2229,7 @@ public:
 	void sendReservedTitleStatus(CHARACTER_TITLE::ECharacterTitle title, bool available) const;
 
 	/// get used TP ticket slot in bag, INVALID_INVENTORY_SLOT = unused
-	uint32	getTpTicketSlot() const;
+	uint32 getTpTicketSlot() const;
 
 	/// reset used TP ticket slot, necessary to allow user to use another ticket
 	void resetTpTicketSlot();
@@ -2263,7 +2243,6 @@ public:
 	// unlock new skill added by patch, if parent skill reach max value, children skill must be unlocked
 	void checkSkillTreeForLockedSkill();
 
-
 	// set the character hair. return true on success
 	bool setHair(uint32 hairValue);
 	// set the character tatoo return true on success
@@ -2271,25 +2250,23 @@ public:
 	// set the hair color of the user return true on success
 	bool setHairColor(uint32 colorValue);
 
-
-	typedef std::vector< TBrickParam::IIdPtr > CBrickPropertyValues;
-	typedef std::map< TBrickParam::TValueType, CBrickPropertyValues > CBrickProperties;
+	typedef std::vector<TBrickParam::IIdPtr> CBrickPropertyValues;
+	typedef std::map<TBrickParam::TValueType, CBrickPropertyValues> CBrickProperties;
 
 	/// Return the values of properties of the known bricks of the specified family (useful for bonus values)
-	void getPropertiesFromKnownBricks( BRICK_FAMILIES::TBrickFamily brickFamily,
-									   CBrickProperties& results );
-
+	void getPropertiesFromKnownBricks(BRICK_FAMILIES::TBrickFamily brickFamily,
+		CBrickProperties& results);
 
 	// set pet status for debug feature
-	void setPetStatus( uint32 index, CPetAnimal::TStatus status );
+	void setPetStatus(uint32 index, CPetAnimal::TStatus status);
 
-	void petTpAllowed( uint32 index, bool allowed );
+	void petTpAllowed(uint32 index, bool allowed);
 
-	void setSpawnPetFlag( uint32 index );
+	void setSpawnPetFlag(uint32 index);
 
 	// return if hair cute price discount apply
 	bool getHairCutDiscount() const;
-	
+
 	// reset hair cut discount price
 	void resetHairCutDiscount();
 
@@ -2298,14 +2275,14 @@ public:
 
 	/// HP/STA/SAP/FOCUS bar update, called every 2 tick, send fast-accurate bar info to the client
 	void barUpdate();
-		
-	CCharacterEncyclopedia	&getEncyclopedia();
-	
-	CCharacterGameEvent		&getGameEvent()	;
 
-	CCharacterRespawnPoints	&getRespawnPoints();
+	CCharacterEncyclopedia& getEncyclopedia();
 
-	const CCharacterRespawnPoints	&getRespawnPoints()	const;
+	CCharacterGameEvent& getGameEvent();
+
+	CCharacterRespawnPoints& getRespawnPoints();
+
+	const CCharacterRespawnPoints& getRespawnPoints() const;
 
 	/// add player in queue id
 	void addInQueue(uint32 id);
@@ -2314,7 +2291,7 @@ public:
 	void removeFromQueue(uint32 id);
 
 	/// get mission Queues
-	const std::vector<uint32> &getMissionQueues() const;
+	const std::vector<uint32>& getMissionQueues() const;
 
 	uint32 getEnterCriticalZoneProposalQueueId() const;
 	void setEnterCriticalZoneProposalQueueId(uint32 queueId);
@@ -2326,34 +2303,34 @@ public:
 	void updateMagicProtectionAndResistance();
 
 	// return magic protection of character (clamped to max value)
-	uint32 getMagicProtection( PROTECTION_TYPE::TProtectionType magicProtectionType ) const;
+	uint32 getMagicProtection(PROTECTION_TYPE::TProtectionType magicProtectionType) const;
 
 	// set magic protection of character (unclamped)
-	void setUnclampedMagicProtection( PROTECTION_TYPE::TProtectionType magicProtectionType, sint32 value );
+	void setUnclampedMagicProtection(PROTECTION_TYPE::TProtectionType magicProtectionType, sint32 value);
 
 	// return unclamped magic protection of a character
-	uint32 getUnclampedMagicProtection( PROTECTION_TYPE::TProtectionType magicProtectionType ) const;
+	uint32 getUnclampedMagicProtection(PROTECTION_TYPE::TProtectionType magicProtectionType) const;
 
 	// return unclamped magic resistance of a character
-	uint32 getUnclampedMagicResistance( RESISTANCE_TYPE::TResistanceType magicResistanceType ) const;
+	uint32 getUnclampedMagicResistance(RESISTANCE_TYPE::TResistanceType magicResistanceType) const;
 
 	// return clamped magic resistance of a character
 	uint32 getMagicResistance(RESISTANCE_TYPE::TResistanceType magicResistanceType) const;
 
 	/// return NbNonNullClassificationTypesSkillMod
 	uint8 getNbNonNullClassificationTypesSkillMod() const;
-	
+
 	/// get specific skill modifier for given race
 	virtual sint32 getSkillModifierForRace(EGSPD::CPeople::TPeople people) const;
 
 	/// get currently consumed item if any
 	CGameItemPtr getConsumedItem() const;
-	
+
 	/// reset currently consumed item if any
 	void resetConsumedItem(bool unlock = false);
 
 	/// can player use consumable family ? returns true if allowed false otherwise
-	bool canUseConsumableFamily(uint16 family, NLMISC::TGameCycle &endDate);
+	bool canUseConsumableFamily(uint16 family, NLMISC::TGameCycle& endDate);
 
 	/// disable a consumable family until 'date'
 	void disableConsumableFamily(uint16 family, NLMISC::TGameCycle date);
@@ -2364,13 +2341,13 @@ public:
 	///\name PVP methode related
 	//@{
 	/// return the user PVP interface
-	CPVPInterface &getPVPInterface();
-	const CPVPInterface & getPVPInterface() const;
+	CPVPInterface& getPVPInterface();
+	const CPVPInterface& getPVPInterface() const;
 	// priviledge PVP mode
-	void setPriviledgePVP( bool b );
+	void setPriviledgePVP(bool b);
 	bool priviledgePVP();
 	// full PVP mode
-	void setFullPVP( bool b );
+	void setFullPVP(bool b);
 	/// set the current PVP zone where the player is
 	void setCurrentPVPZone(TAIAlias alias);
 	/// get the current PVP zone where the player is
@@ -2386,13 +2363,13 @@ public:
 	/// character enter in versus pvp zone, player must choose a clan
 	void openPVPVersusDialog() const;
 	/// get priviledgePvp
-	bool getPriviledgePVP() const {return _PriviledgePvp;};
+	bool getPriviledgePVP() const { return _PriviledgePvp; };
 	/// get fullPvp
-	bool getFullPVP() const {return _FullPvp;};
+	bool getFullPVP() const { return _FullPvp; };
 	/// get character pvp flag
-	bool getPVPFlag( bool updatePVPModeInMirror = true ) const;
+	bool getPVPFlag(bool updatePVPModeInMirror = true) const;
 	/// change pvp flag
-	void setPVPFlag( bool pvpFlag );
+	void setPVPFlag(bool pvpFlag);
 	/// reset all pvp timers and mode
 	void resetPVPTimers();
 	/// pvp action are made before the end of timer for remove PvP flag
@@ -2400,7 +2377,7 @@ public:
 	/// set database pvp flag
 	void setPVPFlagDatabase();
 	/// set PVP recent action flag
-	void setPVPRecentActionFlag(CCharacter *target = NULL);
+	void setPVPRecentActionFlag(CCharacter* target = NULL);
 	/// get PvP recent action flag (true if player involved in PVP action recently)
 	bool getPvPRecentActionFlag() const;
 	/// character are killed in PvP situation
@@ -2414,7 +2391,7 @@ public:
 	bool setDeclaredCult(PVP_CLAN::TPVPClan newClan);
 	/// Sets new declared civ, returns if parameter was within bounds, and thus if new clan as set.
 	bool setDeclaredCiv(PVP_CLAN::TPVPClan newClan);
-	/// Set an allegiance to neutral from indetermined status, used for process message from client want set it's allegiance to neutral when it's idetermined, over case are managed by missions. 
+	/// Set an allegiance to neutral from indetermined status, used for process message from client want set it's allegiance to neutral when it's idetermined, over case are managed by missions.
 	void setAllegianceFromIndeterminedStatus(PVP_CLAN::TPVPClan allegiance);
 	/// true if pvp safe zone active for character
 	bool getSafeInPvPSafeZone() const;
@@ -2435,7 +2412,7 @@ public:
 	bool verifyClanAllegiance(PVP_CLAN::TPVPClan theClan, sint32 newFameValue);
 
 	/// set outpost alias
-	void setOutpostAlias( uint32 id );
+	void setOutpostAlias(uint32 id);
 	/// stores the time when player leaves outpost zone
 	void startOutpostLeavingTimer();
 	/// refresh the leaving timer if active
@@ -2443,19 +2420,19 @@ public:
 	/// stop the timer (happens when user re-enter the zone for instance)
 	void stopOutpostLeavingTimer();
 	/// set the temporary outpost alias
-	void setOutpostAliasBeforeUserValidation( TAIAlias outpostId );
+	void setOutpostAliasBeforeUserValidation(TAIAlias outpostId);
 	/// true when timer is over
 	bool outpostLeavingDurationElapsed();
 	/// return true if player's guild is in conflict with outpost. attacker will get true if the guild is in conflict and the guild is attacking the outpost
-	bool isGuildInConflictWithOutpost( TAIAlias outpostId, bool &guildIsAttacker );
+	bool isGuildInConflictWithOutpost(TAIAlias outpostId, bool& guildIsAttacker);
 	/// open a dialog box on the client when user enter in a different outpost zone to ask him to choose his side
-	void outpostOpenChooseSideDialog( TAIAlias outpostId );
+	void outpostOpenChooseSideDialog(TAIAlias outpostId);
 	/// user who entered into an outpost zone has choosen his side
-	void outpostSideChosen( bool neutral, OUTPOSTENUMS::TPVPSide side );
-	
-	void setDuelOpponent( CCharacter * user );
-	CCharacter * getDuelOpponent() const;
-	
+	void outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side);
+
+	void setDuelOpponent(CCharacter* user);
+	CCharacter* getDuelOpponent() const;
+
 	/// character log stats accessors
 	uint32 getFirstConnectedTime() const;
 	uint32 getLastConnectedTime() const;
@@ -2463,24 +2440,24 @@ public:
 	uint32 getPlayedTime() const;
 
 	const std::string& getLangChannel() const;
-	void setLangChannel(const std::string &lang);
+	void setLangChannel(const std::string& lang);
 
 	const std::string& getNewTitle() const;
-	void setNewTitle(const std::string &title);
+	void setNewTitle(const std::string& title);
 
 	std::string getFullTitle() const;
 
 	std::string getTagA() const;
-	void setTagA(const std::string &tag);
+	void setTagA(const std::string& tag);
 
 	std::string getTagB() const;
-	void setTagB(const std::string &tag);
+	void setTagB(const std::string& tag);
 
 	std::string getTagPvPA() const;
-	void setTagPvPA(const std::string &tag);
+	void setTagPvPA(const std::string& tag);
 
 	std::string getTagPvPB() const;
-	void setTagPvPB(const std::string &tag);
+	void setTagPvPB(const std::string& tag);
 
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
@@ -2490,14 +2467,14 @@ public:
 	uint32 getLastMountTick() const;
 	const std::list<TCharacterLogTime>& getLastLogStats() const;
 	void updateConnexionStat();
-	void setDisconnexionTime();		
+	void setDisconnexionTime();
 
 	/// update outpost admin flag in client database
 	void updateOutpostAdminFlagInDB();
 
-	void haveToUpdateItemsPrerequisit( bool b );
+	void haveToUpdateItemsPrerequisit(bool b);
 
-	void channelAdded( bool b );
+	void channelAdded(bool b);
 	bool isChannelAdded() const;
 
 	uint8 getNbUserChannels() const { return _NbUserChannels; };
@@ -2507,23 +2484,25 @@ public:
 	std::vector<SItemSpecialEffect> lookForSpecialItemEffects(ITEM_SPECIAL_EFFECT::TItemSpecialEffect effectType) const;
 
 	/// return true if the given item is an xp catalyser which has been activated
-	bool isAnActiveXpCatalyser( CGameItemPtr item );
-	
+	bool isAnActiveXpCatalyser(CGameItemPtr item);
+
 	void setShowFactionChannelsMode(TChanID channel, bool s);
 	bool showFactionChannelsMode(TChanID channel) const;
 
 	// from offline command
-	void contactListRefChangeFromCommand(const NLMISC::CEntityId &id, const std::string &operation);
-
+	void contactListRefChangeFromCommand(const NLMISC::CEntityId& id, const std::string& operation);
 
 	////////////////////////////////////////////////////////////////
 	// Methods from "character_inventory_manipulation.h"
 
-	class CItemPtr : public NLMISC::CRefCount
-	{
+	class CItemPtr : public NLMISC::CRefCount {
 	public:
 		CItemPtr() {}
-		~CItemPtr() { if(_Item != NULL) _Item.deleteItem(); }
+		~CItemPtr()
+		{
+			if (_Item != NULL)
+				_Item.deleteItem();
+		}
 
 		void setItem(CGameItemPtr item) { _Item = item; }
 
@@ -2544,28 +2523,27 @@ public:
 	CInventoryPtr getInventory(INVENTORIES::TInventory invId) const;
 
 	// pick-up item from ground, the item taking is the targeted item
-	bool pickUpItem( const NLMISC::CEntityId& entity );
+	bool pickUpItem(const NLMISC::CEntityId& entity);
 
 	/// pick-up close
 	/// close the temp inv and restore all items to the looted container
 	void pickUpItemClose();
 
 	/// pickup on entity, for loot or harvest
-	void itemPickup( const NLMISC::CEntityId& entity, bool harvest = false );
+	void itemPickup(const NLMISC::CEntityId& entity, bool harvest = false);
 
 	/// destroy an item (or several items in a stack)
 	void destroyItem(INVENTORIES::TInventory invId, uint32 slot, uint32 quantity, bool sendChatMessage = false);
 
 	/// used for selectItems / destroyItems
-	class CItemSlotId
-	{
+	class CItemSlotId {
 	public:
-		INVENTORIES::TInventory		InvId;
-		uint32						Slot;
-		uint32						Quality;
-		bool	operator<(const CItemSlotId &o) const
+		INVENTORIES::TInventory InvId;
+		uint32 Slot;
+		uint32 Quality;
+		bool operator<(const CItemSlotId& o) const
 		{
-			return Quality<o.Quality;
+			return Quality < o.Quality;
 		}
 	};
 
@@ -2575,14 +2553,14 @@ public:
 	 *	\param itemList if not NULL, the array is filled with the items found (nb: not cleared => allow append of different invs)
 	 *	\return the number of items / stack elements that matchs
 	 */
-	uint selectItems(INVENTORIES::TInventory invId, NLMISC::CSheetId itemSheetId, uint32 quality, std::vector<CItemSlotId> *itemList= NULL);
-	
+	uint selectItems(INVENTORIES::TInventory invId, NLMISC::CSheetId itemSheetId, uint32 quality, std::vector<CItemSlotId>* itemList = NULL);
+
 	/** destroy a list of items (up to maxQuantity to destroy)
 	 *	- if maxQuantity is not -1 (infinity code), sort itemList by quality to destroy first the lowest ones
 	 *	- don't send any chat message
 	 *	\return the number of items / stack element really destroyed (0 if none found)
 	 */
-	uint destroyItems(const std::vector<CItemSlotId> &itemSlots, uint32 maxQuantity=-1);
+	uint destroyItems(const std::vector<CItemSlotId>& itemSlots, uint32 maxQuantity = -1);
 
 	/**
 	 * Move an item from an inventory to another (with autostack support).
@@ -2604,31 +2582,31 @@ public:
 	void unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bool sendChatMessage = false);
 
 	/// apply item modifiers(bonus etc..)
-	void applyItemModifiers(const CGameItemPtr & item);
-	
+	void applyItemModifiers(const CGameItemPtr& item);
+
 	/// remove item modifiers
-	void removeItemModifiers(const CGameItemPtr & item);
+	void removeItemModifiers(const CGameItemPtr& item);
 
 	// return weight of equipped weapons
-	uint32	getWeightOfEquippedWeapon();
+	uint32 getWeightOfEquippedWeapon();
 
 	// check compatibility with slot for equip an item
-	bool checkItemValidityWithSlot( const NLMISC::CSheetId& sheet, INVENTORIES::TInventory inv, uint16 slot );
+	bool checkItemValidityWithSlot(const NLMISC::CSheetId& sheet, INVENTORIES::TInventory inv, uint16 slot);
 	// check compatibility with equipment slot for equip an item
-	bool checkItemValidityWithEquipmentSlot( const NLMISC::CSheetId& sheet, uint16 Slot );
+	bool checkItemValidityWithEquipmentSlot(const NLMISC::CSheetId& sheet, uint16 Slot);
 	// check compatibility between item in left and right hand for equip an item
-	bool checkRightLeftHandCompatibility( const std::vector<std::string> itemRight, const std::vector<std::string> itemLeft );
+	bool checkRightLeftHandCompatibility(const std::vector<std::string> itemRight, const std::vector<std::string> itemLeft);
 	// low level methode for check compatibility between item and slot
-	bool checkIfItemCompatibleWithSlots( const std::vector<std::string> itemSlot, std::vector< uint16 > slots );
+	bool checkIfItemCompatibleWithSlots(const std::vector<std::string> itemSlot, std::vector<uint16> slots);
 	// check ammo compatibility with weapon
-	bool checkIfAmmoCompatibleWithWeapon( SKILLS::ESkills ammoType, SKILLS::ESkills weaponType );
-		
+	bool checkIfAmmoCompatibleWithWeapon(SKILLS::ESkills ammoType, SKILLS::ESkills weaponType);
+
 	// check pre-required for equip an item
-	bool checkPreRequired(const CGameItemPtr & item, bool equipCheck = false );
+	bool checkPreRequired(const CGameItemPtr& item, bool equipCheck = false);
 
 	/// check integrity of exchanging actors
 	/// \param exchangeWithBot : if not NULL return true if player is exchanging with a bot
-	bool checkExchangeActors(bool * exchangeWithBot = NULL) const;
+	bool checkExchangeActors(bool* exchangeWithBot = NULL) const;
 
 	/// add an item from bag to exchange
 	void itemBagToExchange(uint32 bagSlot, uint32 exchangeSlot, uint32 quantity);
@@ -2658,7 +2636,7 @@ public:
 	 * - If single item: item family is requested, and getStaticForm() returns non-null.
 	 * - If stack: there is at least one child, and the first child is non-null and has the request item family, and getStaticForm() returns non-null on it.
 	 */
-	CGameItemPtr getItemByFamily(INVENTORIES::TInventory invId, ITEMFAMILY::EItemFamily family, uint32 & returnedSlot);
+	CGameItemPtr getItemByFamily(INVENTORIES::TInventory invId, ITEMFAMILY::EItemFamily family, uint32& returnedSlot);
 
 	/// consume the given quantity of ammo in sheath
 	void consumeAmmo(uint32 quantity = 1);
@@ -2671,12 +2649,12 @@ public:
 
 	/// create an item
 	/// WARNING: if quantity is greater than item max stack size, max stack size will be used instead
-	CGameItemPtr createItem(uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId & obtainedItem, const NLMISC::CEntityId & creatorId = NLMISC::CEntityId::Unknown, const std::string * phraseId = NULL);
+	CGameItemPtr createItem(uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId& obtainedItem, const NLMISC::CEntityId& creatorId = NLMISC::CEntityId::Unknown, const std::string* phraseId = NULL);
 
 	/// add item to an inventory
 	/// \return true if item was successfully added
 	/// WARNING: item can be nullified in case of autostacking
-	bool addItemToInventory(INVENTORIES::TInventory invId, CGameItemPtr & item, bool autoStack = true);
+	bool addItemToInventory(INVENTORIES::TInventory invId, CGameItemPtr& item, bool autoStack = true);
 
 	/// remove an item from an inventory
 	//// \return a pointer on the removed item
@@ -2685,12 +2663,12 @@ public:
 	/// create item in the given inventory (autostack)
 	/// \return true if item was successfully created
 	/// WARNING: if quantity is greater than item max stack size, max stack size will be used instead
-	bool createItemInInventory(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId & obtainedItem, const NLMISC::CEntityId & creatorId = NLMISC::CEntityId::Unknown, const std::string * phraseId = NULL);
+	bool createItemInInventory(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId& obtainedItem, const NLMISC::CEntityId& creatorId = NLMISC::CEntityId::Unknown, const std::string* phraseId = NULL);
 
 	/// create item in the given inventory and return it (no autostack)
 	/// \return the item or NULL if creation failed
 	/// WARNING: if quantity is greater than item max stack size, max stack size will be used instead
-	CGameItemPtr createItemInInventoryFreeSlot(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId & obtainedItem, const NLMISC::CEntityId & creatorId = NLMISC::CEntityId::Unknown, const std::string * phraseId = NULL);
+	CGameItemPtr createItemInInventoryFreeSlot(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId& obtainedItem, const NLMISC::CEntityId& creatorId = NLMISC::CEntityId::Unknown, const std::string* phraseId = NULL);
 
 	/// action on an item in the temp inventory (move it to bag)
 	void itemTempInventoryToBag(uint32 scrSlot, bool sendCloseTempImpulsion = true);
@@ -2708,18 +2686,18 @@ public:
 	void incSlotVersion(INVENTORIES::TInventory invId, uint32 slot);
 
 	/// send item infos. For slotId (combination of inventory and slot), see explanation in CItemInfos
-	void sendItemInfos( uint16 slotId );
+	void sendItemInfos(uint16 slotId);
 
 	/// return true if the player wears an item with the specified sheetId
-	bool doesWear(const NLMISC::CSheetId & sheetId) const;
+	bool doesWear(const NLMISC::CSheetId& sheetId) const;
 
 	/// create a crystallized action item in temp inventory
-	void createCrystallizedActionItem(const std::vector<NLMISC::CSheetId> & action);
-				
+	void createCrystallizedActionItem(const std::vector<NLMISC::CSheetId>& action);
+
 	///create a sap reload item in temp inventory
 	void createRechargeItem(uint32 sapRecharge);
 
-	/// check if enchant or recharge an item 
+	/// check if enchant or recharge an item
 	void enchantOrRechargeItem(INVENTORIES::TInventory invId, uint32 slot);
 
 	/// helper for enchant and recharge item do not call directly!
@@ -2738,13 +2716,13 @@ public:
 	void useItem(uint32 slot);
 
 	/// stop use of an item
-	void stopUseItem( bool isRingCatalyser );
+	void stopUseItem(bool isRingCatalyser);
 
 	/// use a teleport
-	void useTeleport(const CStaticItem & form);
+	void useTeleport(const CStaticItem& form);
 
 	/// use an xp catalyser
-	void useXpCatalyser( uint32 slot );
+	void useXpCatalyser(uint32 slot);
 
 	/// get temp inventory mode
 	TEMP_INV_MODE::TInventoryMode tempInventoryMode() const;
@@ -2762,7 +2740,7 @@ public:
 
 	// End of methods from "character_inventory_manipulation.h"
 	////////////////////////////////////////////////////////////////
-	
+
 	/// Ring stuff <=> useful to update the player DB to indicate the current speed of the incarnated creature
 	void setNpcControl(const NLMISC::CEntityId& eid);
 	void setStopNpcControl();
@@ -2770,9 +2748,9 @@ public:
 	/// return true if character has moved during a static action
 	bool hasMovedDuringStaticAction()
 	{
-		return ( _EntityState.X() != _OldPosX || _EntityState.Y() != _OldPosY );
+		return (_EntityState.X() != _OldPosX || _EntityState.Y() != _OldPosY);
 	}
-	
+
 	///////////////////
 	// Protected methods
 	///////////////////
@@ -2781,11 +2759,10 @@ protected:
 	friend class CCharacterGameEvent;
 	friend class CCharacterVersionAdapter;
 	friend class CRingRewardPointsImpl;
-	
-	virtual void kill(TDataSetRow killerRowId = TDataSetRow());
-	void setEntityRowId( const TDataSetRow& r );
-	void resetPvPFlag();
 
+	virtual void kill(TDataSetRow killerRowId = TDataSetRow());
+	void setEntityRowId(const TDataSetRow& r);
+	void resetPvPFlag();
 
 	///////////////////
 	// Private methods
@@ -2795,18 +2772,18 @@ private:
 	void wearItem(INVENTORIES::TInventory invId, uint32 slot, float wearFactor);
 
 	// check return true if params match with pre requisit for wearing an equipment
-	bool checkRequiredForSkill( uint32 skillRequired, SKILLS::ESkills requiredSkill );
-		
-	void contactListRefChange(const NLMISC::CEntityId &id, TConctactListAction actionType);
-	
+	bool checkRequiredForSkill(uint32 skillRequired, SKILLS::ESkills requiredSkill);
+
+	void contactListRefChange(const NLMISC::CEntityId& id, TConctactListAction actionType);
+
 	/// return true if player is ignored by the given entity
-	bool isIgnoredBy(const NLMISC::CEntityId &id);
+	bool isIgnoredBy(const NLMISC::CEntityId& id);
 	/// return true if given entity has player on friend list
-	bool isFriendOf(const NLMISC::CEntityId &id);
+	bool isFriendOf(const NLMISC::CEntityId& id);
 	/// player is referenced as friend by the given entity
-	void referencedAsFriendBy( const NLMISC::CEntityId &id);
+	void referencedAsFriendBy(const NLMISC::CEntityId& id);
 	/// player is no longer referenced as friend by the given entity
-	void unreferencedAsFriendBy( const NLMISC::CEntityId &id);
+	void unreferencedAsFriendBy(const NLMISC::CEntityId& id);
 
 	/// remove player from friend list
 	void removePlayerFromFriendListByIndex(uint16 index);
@@ -2814,12 +2791,11 @@ private:
 	void removePlayerFromLeagueListByIndex(uint16 index);
 	/// remove player from ignore list
 	void removePlayerFromIgnoreListByIndex(uint16 index);
-	
-	
+
 	/// player is ignored by given player
-	void addedInIgnoreListBy( const NLMISC::CEntityId &id);
+	void addedInIgnoreListBy(const NLMISC::CEntityId& id);
 	/// player no longer ignored by given player
-	void removedFromIgnoreListBy( const NLMISC::CEntityId &id);	
+	void removedFromIgnoreListBy(const NLMISC::CEntityId& id);
 
 	/// Set all character stats modifiers to initale states
 	void resetCharacterModifier();
@@ -2831,7 +2807,7 @@ private:
 	void applyRegenAndClipCurrentValue();
 
 	/// character is dead
-	void deathOccurs( void );
+	void deathOccurs(void);
 
 	/// process items decay
 	void processItemsDecay();
@@ -2861,37 +2837,37 @@ private:
 	/**
 	 * check the player has the mps used in faber and lock them in inventory
 	 */
-//	bool checkAndLockMps();
+	//	bool checkAndLockMps();
 
 	/**
 	 * unlock mps
 	 */
-//	void unlockMps();
+	//	void unlockMps();
 
 	// Apply Xp gain to skill
-	void applyXpGainToSkill( SSkill *skill, float coeff, uint16 stageIdx, double XpGain, const std::string& Skill );
-		
+	void applyXpGainToSkill(SSkill* skill, float coeff, uint16 stageIdx, double XpGain, const std::string& Skill);
+
 	// Apply Xp gain to skill and speciality used
-	void applyXpGainToSkillAndSpeciality( SSkill *skill, SSkill *speciality, uint16 stageIdx, uint16 stageIdxSpe, double XpGain, const std::string& Skill, const std::string& Speciality );
+	void applyXpGainToSkillAndSpeciality(SSkill* skill, SSkill* speciality, uint16 stageIdx, uint16 stageIdxSpe, double XpGain, const std::string& Skill, const std::string& Speciality);
 
 	// remove the items given during an exchange
-	void removeExchangeItems(std::vector<CGameItemPtr>& itemRemoved, std::vector< CPetAnimal >& PlayerPetsRemoved);
+	void removeExchangeItems(std::vector<CGameItemPtr>& itemRemoved, std::vector<CPetAnimal>& PlayerPetsRemoved);
 
 	// add the items gained during an exchange
-	void addExchangeItems(CCharacter* trader,std::vector<CGameItemPtr>& itemToAdd, std::vector< CPetAnimal >& PlayerPetsAdded);
+	void addExchangeItems(CCharacter* trader, std::vector<CGameItemPtr>& itemToAdd, std::vector<CPetAnimal>& PlayerPetsAdded);
 
 	/// get creator name dynamic string Id
-	uint32 getCreatorNameId( const NLMISC::CEntityId &creatorId);
+	uint32 getCreatorNameId(const NLMISC::CEntityId& creatorId);
 
 	/// send init impulsion for friend and ignore lists
 	void sendContactListInit();
 
 	/// Compute the 'visual' online state of a friend character
-	TCharConnectionState isFriendCharVisualyOnline(const NLMISC::CEntityId &friendId);
+	TCharConnectionState isFriendCharVisualyOnline(const NLMISC::CEntityId& friendId);
 
 	// From SU on char name change. sendContactListInit(), if must update
-	void syncContactListWithCharNameChanges(const std::vector<NLMISC::CEntityId> &charNameChanges);
-	
+	void syncContactListWithCharNameChanges(const std::vector<NLMISC::CEntityId>& charNameChanges);
+
 	/// send a message to client to remove an entry in a contact list
 	void sendRemoveContactMessage(uint32 contactId, uint8 listNumber);
 
@@ -2919,7 +2895,7 @@ private:
 	void checkCharacAndScoresValues();
 
 	/// check scores match possessed bricks
-	void checkScoresValues( SCORES::TScores score, CHARACTERISTICS::TCharacteristics charac );
+	void checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TCharacteristics charac);
 
 	/// compute the best skill
 	void computeBestSkill();
@@ -2934,25 +2910,25 @@ private:
 	void computeMiscBonus();
 
 	/// increment characteristic
-	void changeCharacteristic( CHARACTERISTICS::TCharacteristics charac, sint16 mod );
+	void changeCharacteristic(CHARACTERISTICS::TCharacteristics charac, sint16 mod);
 
 	/// process a training brick (increase scores, charac...)
-	void processTrainingBrick( const CStaticBrick *brick, bool sendChatMessage = true );
+	void processTrainingBrick(const CStaticBrick* brick, bool sendChatMessage = true);
 
 	/// process a new received bonus brick
-	void processForageBonusBrick( const CStaticBrick *brick );
+	void processForageBonusBrick(const CStaticBrick* brick);
 
 	/// process a new received bonus brick
-	void processMiscBonusBrick( const CStaticBrick *brick );
+	void processMiscBonusBrick(const CStaticBrick* brick);
 
 	/// unprocess a training brick (increase scores, charac...)
-	void unprocessTrainingBrick( const CStaticBrick *brick, bool sendChatMessage = true );
+	void unprocessTrainingBrick(const CStaticBrick* brick, bool sendChatMessage = true);
 
 	/// unprocess a new received bonus brick
-	void unprocessForageBonusBrick( const CStaticBrick *brick );
+	void unprocessForageBonusBrick(const CStaticBrick* brick);
 
 	/// unprocess a new received bonus brick
-	void unprocessMiscBonusBrick( const CStaticBrick *brick );
+	void unprocessMiscBonusBrick(const CStaticBrick* brick);
 
 	/// process items in temp inventory
 	void logAndClearTempInventory();
@@ -2964,35 +2940,34 @@ private:
 	 * \param testRestrictions if true then test if player match phrase requirements
 	 * \return true if the phrase has been bought, false if an error occured
 	 */
-	bool buyRolemasterPhrase( const NLMISC::CSheetId &phraseId, uint16 knownPhraseIndex, bool testRestrictions );
+	bool buyRolemasterPhrase(const NLMISC::CSheetId& phraseId, uint16 knownPhraseIndex, bool testRestrictions);
 
 	/// reset exchange: clear and reset exchange views, clear exchange related members and client database
 	void resetExchange();
 
 	/// add an entity that must be saved with me when i am saved
-	void	addEntityToSaveWithMe(const NLMISC::CEntityId &entityId);
-	void	clearEntitiesToSaveWithMe();
-	const std::set<NLMISC::CEntityId>	&getEntitiesToSaveWithMe() const;
+	void addEntityToSaveWithMe(const NLMISC::CEntityId& entityId);
+	void clearEntitiesToSaveWithMe();
+	const std::set<NLMISC::CEntityId>& getEntitiesToSaveWithMe() const;
 
 	// fill vector of const GameItem pointer with material used for faber
-	bool fillFaberMaterialArray( std::vector<CFaberMsgItem>& materialsSelectedForFaber, std::vector< const CStaticItem * >& materials, uint16& lowerMaterialQuality );
+	bool fillFaberMaterialArray(std::vector<CFaberMsgItem>& materialsSelectedForFaber, std::vector<const CStaticItem*>& materials, uint16& lowerMaterialQuality);
 
 	// get region resistance modifier
-	sint32 getRegionResistanceModifier( RESISTANCE_TYPE::TResistanceType resistanceType );
-		
+	sint32 getRegionResistanceModifier(RESISTANCE_TYPE::TResistanceType resistanceType);
+
 	CFarPositionStack& getPositionStack();
 
 	/// see addXpToSkillInternal
-	enum TAddXpToSkillMode
-	{
-		AddXpToSkillSingle= 0,		// Allow usage of XPCatalyzer and send message immediatly
-		AddXpToSkillBuffer,			// Allow usage of XPCatalyzer and backup XP report in gainBySkill map
-		AddXpToSkillBranch			// Do not allow usage of XPCatalyzer, send message immediatly with truncated XP gain values
+	enum TAddXpToSkillMode {
+		AddXpToSkillSingle = 0, // Allow usage of XPCatalyzer and send message immediatly
+		AddXpToSkillBuffer, // Allow usage of XPCatalyzer and backup XP report in gainBySkill map
+		AddXpToSkillBranch // Do not allow usage of XPCatalyzer, send message immediatly with truncated XP gain values
 	};
 
 	// add xp bonus from catalyser ( see addXpToSkillInternal )
-	bool addCatalyserXpBonus( uint32& slot, SSkill * skill, double xpGain, double& xpBonus, uint32& stackSizeToRemove, 
-									 uint32& catalyserLvl, uint32& catalyserCount );
+	bool addCatalyserXpBonus(uint32& slot, SSkill* skill, double xpGain, double& xpBonus, uint32& stackSizeToRemove,
+		uint32& catalyserLvl, uint32& catalyserCount);
 
 	/**
 	 * addXpToSkillInternal add xpGain to a skill
@@ -3004,7 +2979,7 @@ private:
 	 * \return the remaining XP --that can be distribued-- to same or upper skills. Warning! if allowXPCat, the returned value 
 	 *	may even be bigger than the original XpGain!
 	 */
-	double addXpToSkillInternal( double XpGain, const std::string& ContSkill, TAddXpToSkillMode addXpMode, std::map<SKILLS::ESkills,CXpProgressInfos> &gainBySkill );
+	double addXpToSkillInternal(double XpGain, const std::string& ContSkill, TAddXpToSkillMode addXpMode, std::map<SKILLS::ESkills, CXpProgressInfos>& gainBySkill);
 
 	/// Initialize the specified pet inventory, if it is valid
 	bool initPetInventory(uint8 index);
@@ -3014,12 +2989,11 @@ private:
 	///////////////////
 	/// Property database, it's a mirror of client database
 public:
-
 	/// Player-bank database
-//	CCDBSynchronised				_PropertyDatabase;
-	CBankAccessor_PLR				_PropertyDatabase;
+	//	CCDBSynchronised				_PropertyDatabase;
+	CBankAccessor_PLR _PropertyDatabase;
 
-	CInventoryUpdaterForCharacter	_InventoryUpdater;
+	CInventoryUpdaterForCharacter _InventoryUpdater;
 
 	////////////////////////////
 	// For debug
@@ -3028,29 +3002,28 @@ public:
 	std::string TestProgressSpeciality;
 
 	// Only for testing tool
-	std::string					TestSheetName;
-	CStaticCharacters			TestcharactersSheet;
+	std::string TestSheetName;
+	CStaticCharacters TestcharactersSheet;
 
 	/// Stack of normal positions (mainland, outlands) (mutable because of store() that pushes/pops _EntityState)
-	mutable CFarPositionStack		PositionStack;
-
+	mutable CFarPositionStack PositionStack;
 
 	// Obsolete:
 	// Editor position (mutable because of store() that pushes/pops _EntityState)
 	//mutable CFarPosition			EditorPosition;
 
-	void			setSessionUserRole( R2::TUserRole mode );
-	R2::TUserRole	sessionUserRole() const;
+	void setSessionUserRole(R2::TUserRole mode);
+	R2::TUserRole sessionUserRole() const;
 
 	/** If the session id is SessionLockPositionStack, the current position won't be saved.
 	 * It should be the case in ur_editor mode (see setSessionUserRole()).
 	 */
-	void			setSessionId( TSessionId sessionId );
-	TSessionId		sessionId() const;
+	void setSessionId(TSessionId sessionId);
+	TSessionId sessionId() const;
 
 	// Same as set SessionId but works event if current sessin is a edition session
-	void			setCurrentSessionId( TSessionId sessionId );
-	TSessionId		currentSessionId() const;
+	void setCurrentSessionId(TSessionId sessionId);
+	TSessionId currentSessionId() const;
 
 	// get the position stack
 	const CFarPositionStack& getPositionStack() const;
@@ -3065,338 +3038,338 @@ public:
 	void setFriendVisibility(TFriendVisibility val) { _FriendVisibility = val; }
 	const TFriendVisibility& getFriendVisibility() const { return _FriendVisibility; }
 
-	void setFriendVisibilitySave(uint8 val) { if (val < NB_FRIEND_VISIBILITY) _FriendVisibility = (TFriendVisibility)val; }
+	void setFriendVisibilitySave(uint8 val)
+	{
+		if (val < NB_FRIEND_VISIBILITY)
+			_FriendVisibility = (TFriendVisibility)val;
+	}
 	uint8 getFriendVisibilitySave() const { return (uint8)_FriendVisibility; }
 
 	//////////////////
 	// Private members
 	//////////////////
 private:
+	R2::TUserRole _SessionUserRole;
+	sint32 _HPB; //backup hp of player for mainland, for be independant of what happend in ring session
 
-	R2::TUserRole						_SessionUserRole;
-	sint32								_HPB; //backup hp of player for mainland, for be independant of what happend in ring session
-	
 	// If SessionLockPositionStack, the current position won't be saved (ex: _SessionUserRole == ur_editor)
-	TSessionId							_SessionId;
+	TSessionId _SessionId;
 	// the value of the current session (valid even when _SessionUserRole == ur_editor)
-	TSessionId							_CurrentSessionId;
+	TSessionId _CurrentSessionId;
 
 	/// The active anim session returned by SU after syncUserChars
-	TSessionId							_ActiveAnimSessionId;
+	TSessionId _ActiveAnimSessionId;
 
-	CTimer								_TickUpdateTimer;
-	CTimer								_DbUpdateTimer;
-	CTimer								_DeathPenaltyTimer;
-	CTimer								_BarUpdateTimer;
-	
-	struct CBotGift
-	{
+	CTimer _TickUpdateTimer;
+	CTimer _DbUpdateTimer;
+	CTimer _DeathPenaltyTimer;
+	CTimer _BarUpdateTimer;
+
+	struct CBotGift {
 		NL_INSTANCE_COUNTER_DECL(CBotGift);
-	public:
 
-		MISSION_DESC::TMissionType	Type;
-		TAIAlias					MissionAlias;
-		std::set<uint32>			StepsIndex; // when step "any" we must consider several steps
+	public:
+		MISSION_DESC::TMissionType Type;
+		TAIAlias MissionAlias;
+		std::set<uint32> StepsIndex; // when step "any" we must consider several steps
 	};
-	
+
 	/// true if the player entered the game
-	bool								_Enter;
+	bool _Enter;
 
 	/// initial ai instance for ring
-	uint32								_StartupInstance;
+	uint32 _StartupInstance;
 
 	/// The temporary fame container
-	EGSPD::CFameContainerPD				*_Fames;
+	EGSPD::CFameContainerPD* _Fames;
 
 	// The declared Cult and Civilization information for the character for fame purposes.
-	PVP_CLAN::TPVPClan					_DeclaredCult;
-	PVP_CLAN::TPVPClan					_DeclaredCiv;
+	PVP_CLAN::TPVPClan _DeclaredCult;
+	PVP_CLAN::TPVPClan _DeclaredCiv;
 
 	/// Time in gametime until the behaviour not change, using has temporizing deaths sequence management
-	NLMISC::TGameTime					_TimeDeath;
+	NLMISC::TGameTime _TimeDeath;
 
 	// money
-	uint64								_Money;
+	uint64 _Money;
 
-	uint32								_FactionPoint[PVP_CLAN::EndClans-PVP_CLAN::BeginClans+1];
+	uint32 _FactionPoint[PVP_CLAN::EndClans - PVP_CLAN::BeginClans + 1];
 
-	uint32								_PvpPoint;
+	uint32 _PvpPoint;
 
-	uint32								_Organization;
-	uint32								_OrganizationStatus;
-	uint32								_OrganizationPoints;
+	uint32 _Organization;
+	uint32 _OrganizationStatus;
+	uint32 _OrganizationPoints;
 
-	std::string							_LangChannel;
+	std::string _LangChannel;
 
-	std::string							_NewTitle;
-	std::string							_TagPvPA;
-	std::string							_TagPvPB;
-	std::string							_TagA;
-	std::string							_TagB;
+	std::string _NewTitle;
+	std::string _TagPvPA;
+	std::string _TagPvPB;
+	std::string _TagA;
+	std::string _TagB;
 
 	/// SDB path where player wins HoF points in PvP (if not empty)
-	std::string							_SDBPvPPath;
-	
+	std::string _SDBPvPPath;
+
 	// Keep pointer on the container being looted
-	CInventoryPtr						_LootContainer;
-	NLMISC::CEntityId					_EntityLoot;
+	CInventoryPtr _LootContainer;
+	NLMISC::CEntityId _EntityLoot;
 
 	/// if this player has an invitation for another team, keep the team here
-	NLMISC::CEntityId 					_TeamInvitor;
+	NLMISC::CEntityId _TeamInvitor;
 
 	/// if this player has an invitation for League, keep the invitor here
-	NLMISC::CEntityId 					_LeagueInvitor;
+	NLMISC::CEntityId _LeagueInvitor;
 
 	// id of the current team
-	CMirrorPropValueAlice< uint16, CPropLocationPacked<2> >	_TeamId;
-	
-	TChanID								_LeagueId;
+	CMirrorPropValueAlice<uint16, CPropLocationPacked<2> > _TeamId;
+
+	TChanID _LeagueId;
 
 	/// temp values used to test if team bars need an update or not
-	mutable uint8						_OldHpBarSentToTeam;
-	mutable uint8						_OldSapBarSentToTeam;
-	mutable uint8						_OldStaBarSentToTeam;
+	mutable uint8 _OldHpBarSentToTeam;
+	mutable uint8 _OldSapBarSentToTeam;
+	mutable uint8 _OldStaBarSentToTeam;
 
 	/// temp values used to test if Players bars need an update or not
-	uint8								_BarSentToPlayerMsgNumber;
+	uint8 _BarSentToPlayerMsgNumber;
 
-	sint32								_OldHpBarSentToPlayer;
-	sint32								_OldSapBarSentToPlayer;
-	sint32								_OldStaBarSentToPlayer;
-	sint32								_OldFocusBarSentToPlayer;
-	
-	NLMISC::TGameCycle					_LastTickSaved;
-	NLMISC::TGameCycle					_LastTickCompassUpdated;
+	sint32 _OldHpBarSentToPlayer;
+	sint32 _OldSapBarSentToPlayer;
+	sint32 _OldStaBarSentToPlayer;
+	sint32 _OldFocusBarSentToPlayer;
+
+	NLMISC::TGameCycle _LastTickSaved;
+	NLMISC::TGameCycle _LastTickCompassUpdated;
 
 	/// permanent score modifiers (given by bricks)
-	sint32								_ScorePermanentModifiers[SCORES::NUM_SCORES];
+	sint32 _ScorePermanentModifiers[SCORES::NUM_SCORES];
 
-
-///\todo (nico): bot chat list should be regrouped in a structure deleted when bot chat ends
+	///\todo (nico): bot chat list should be regrouped in a structure deleted when bot chat ends
 	// Trading structures
-	CCharacterShoppingList				*_ShoppingList;
+	CCharacterShoppingList* _ShoppingList;
 	// special trading struct for phrases
-	std::vector<CTradePhrase>			_CurrentPhrasesTradeList;
+	std::vector<CTradePhrase> _CurrentPhrasesTradeList;
 	// current trade session
-	uint16								_CurrentTradeSession;
+	uint16 _CurrentTradeSession;
 	// list of trade pages waiting update
-	std::list<uint16>					_TradePagesToUpdate;
+	std::list<uint16> _TradePagesToUpdate;
 	// if trader is a rolemaster, keep rolemaster main type for SP spending
-	EGSPD::CSPType::TSPType				_RolemasterType;
-	
-	// current page in the displayed list
-	uint8								_CurrentBotChatListPage;
-	// type of the current bot chat
-	uint8								_CurrentBotChatType;
-	// current mission list
-	std::vector<SBotChatMission>		_CurrentMissionList;
-	
-	// the missions took by the player
-	EGSPD::CMissionContainerPD			*_Missions;
+	EGSPD::CSPType::TSPType _RolemasterType;
 
-	std::map<TAIAlias, TMissionHistory>	_MissionHistories;
+	// current page in the displayed list
+	uint8 _CurrentBotChatListPage;
+	// type of the current bot chat
+	uint8 _CurrentBotChatType;
+	// current mission list
+	std::vector<SBotChatMission> _CurrentMissionList;
+
+	// the missions took by the player
+	EGSPD::CMissionContainerPD* _Missions;
+
+	std::map<TAIAlias, TMissionHistory> _MissionHistories;
 
 	// temporary data to keep the welcome mission description between the character creation and the first connection
-	CWelcomeMissionDesc					_WelcomeMissionDesc;
+	CWelcomeMissionDesc _WelcomeMissionDesc;
 
 	// Save date is used to know if we have to launch crash or player_reconnect handler
-	uint32								_SaveDate;
+	uint32 _SaveDate;
 
 	//the entity the character is talking to
-	NLMISC::CEntityId					_CurrentInterlocutor;
+	NLMISC::CEntityId _CurrentInterlocutor;
 
 	//entity who proposed an exchange
-	NLMISC::CEntityId					_ExchangeAsker;
+	NLMISC::CEntityId _ExchangeAsker;
 
 	// exchange view
-	NLMISC::CSmartPtr<CExchangeView>	_ExchangeView;
+	NLMISC::CSmartPtr<CExchangeView> _ExchangeView;
 
 	//id of the last exchange action
-	uint8								_ExchangeId;
-	
+	uint8 _ExchangeId;
+
 	//has the character accepted the exchange
-	bool								_ExchangeAccepted;
-	
+	bool _ExchangeAccepted;
+
 	// money in exchange
-	uint64								_ExchangeMoney;
-	
+	uint64 _ExchangeMoney;
+
 	/// current bot gift of the player
-	CBotGift							*_BotGift;
-	
-	
+	CBotGift* _BotGift;
+
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
-	SGameCoordinate				_TpCoordinate;
+	SGameCoordinate _TpCoordinate;
 
 	// currently used TP ticket bag slot, INVALID_SLOT_INDEX = unused
-//	sint16						_TpTicketSlot;
-	uint32						_TpTicketSlot;
+	//	sint16						_TpTicketSlot;
+	uint32 _TpTicketSlot;
 
 	// is the player berserk
-	bool						_IsBerserk;
+	bool _IsBerserk;
 
 	/// Number of bits currently available for sending database impulsions to the client
-	CMirrorPropValueBase< uint16 > _AvailImpulseBitsize;
+	CMirrorPropValueBase<uint16> _AvailImpulseBitsize;
 
 	/// old pos X
-	mutable sint32				_OldPosX;
+	mutable sint32 _OldPosX;
 	/// old pos Y
-	mutable sint32				_OldPosY;
+	mutable sint32 _OldPosY;
 
 	/// old pos X
-	mutable sint32				_SavedPosX;
+	mutable sint32 _SavedPosX;
 	/// old pos Y
-	mutable sint32				_SavedPosY;
+	mutable sint32 _SavedPosY;
 
 	/// last X position written in DB
-	sint32						_LastPosXInDB;
+	sint32 _LastPosXInDB;
 	/// last Y position written in DB
-	sint32						_LastPosYInDB;
+	sint32 _LastPosYInDB;
 
 	/// set to true if the character is doing an action canceled by any movement (X or Y)
-	mutable bool				_StaticActionInProgress;
+	mutable bool _StaticActionInProgress;
 	/// the current type of static action if any
-	mutable STATIC_ACT_TYPES::TStaticActTypes	_StaticActionType;
+	mutable STATIC_ACT_TYPES::TStaticActTypes _StaticActionType;
 
 	// \name Harvest related attributes
 	//@{
 	/// bool indicating if the harvest interface is opened
-	bool						_HarvestOpened;
+	bool _HarvestOpened;
 	/// the mp source id
-	NLMISC::CEntityId			_MpSourceId;
+	NLMISC::CEntityId _MpSourceId;
 	/// the mp source sheetId
-	NLMISC::CSheetId			_MpSourceSheetId;
+	NLMISC::CSheetId _MpSourceSheetId;
 	/// index of the harvested Mp
-	uint8						_MpIndex;
+	uint8 _MpIndex;
 	/// quantity of mp harvested
-	uint16						_HarvestedQuantity;
+	uint16 _HarvestedQuantity;
 	/// flag indicating if the player is harvesting a deposit
-	bool						_HarvestDeposit;
+	bool _HarvestDeposit;
 	/// if harvesting a deposit, the skill used
-	SKILLS::ESkills				_DepositSearchSkill;
+	SKILLS::ESkills _DepositSearchSkill;
 	/// Harvest deposit information
 	HARVEST_INFOS::CHarvestInfos _DepositHarvestInformation;
 	//@}
 
 	/// the tick value of the nex decay of player items
-//	NLMISC::TGameCycle			_NextDecayTickTime;
+	//	NLMISC::TGameCycle			_NextDecayTickTime;
 
 	// character fames
-//	CCharacterFames				_Fames;
+	//	CCharacterFames				_Fames;
 
-	// nb of activestatic effects 
-	uint8						_NbStaticActiveEffects;
+	// nb of activestatic effects
+	uint8 _NbStaticActiveEffects;
 
 	// the stable where the player is and Place/Region where stable is
-	uint16						_CurrentStable;
-	uint16						_PlaceOfCurrentStable; 
-	uint16						_RegionOfCurrentStable;
+	uint16 _CurrentStable;
+	uint16 _PlaceOfCurrentStable;
+	uint16 _RegionOfCurrentStable;
 
 	// Pet Animal of player (Mektoub mount and packer, other pets
-	std::vector< CPetAnimal >	_PlayerPets;
+	std::vector<CPetAnimal> _PlayerPets;
 
 	/// vector of the creatures in the current player train
-	std::vector<TDataSetRow>	_BeastTrain;
+	std::vector<TDataSetRow> _BeastTrain;
 	/// max number of beasts in the train
-	uint8						_TrainMaxSize;
+	uint8 _TrainMaxSize;
 
 	/// counter for the current action of the player (used for macros)
-	uint8						_ActionCounter;
+	uint8 _ActionCounter;
 
 	/// counter for interface actions (used for inventory and building_sentence)
-	uint8						_InterfaceCounter;
+	uint8 _InterfaceCounter;
 
 	/// the continent where the player is
-	CONTINENT::TContinent		_CurrentContinent;
+	CONTINENT::TContinent _CurrentContinent;
 	/// the region where the player is
-	uint16						_CurrentRegion;
+	uint16 _CurrentRegion;
 	/// the places where the player is
-	std::vector< uint16 >		_Places;
+	std::vector<uint16> _Places;
 
 	// Last tick send message for inform player is suffer goo damage
-	NLMISC::TGameCycle			_LastTickSufferGooDamage;
-	
+	NLMISC::TGameCycle _LastTickSufferGooDamage;
+
 	/// is melee combat valid or not
-	bool						_MeleeCombatIsValid;
-	
+	bool _MeleeCombatIsValid;
+
 	/// memorized phrases
-	CPlayerPhraseMemory			_MemorizedPhrases;
+	CPlayerPhraseMemory _MemorizedPhrases;
 
 	/// known bricks
-	std::set<NLMISC::CSheetId>	_KnownBricks;
+	std::set<NLMISC::CSheetId> _KnownBricks;
 
 	/// known Phrases
-	std::vector<CKnownPhrase>	_KnownPhrases;
+	std::vector<CKnownPhrase> _KnownPhrases;
 
 	/// known Phrases
-	std::set<NLMISC::CSheetId>	_BoughtPhrases;
+	std::set<NLMISC::CSheetId> _BoughtPhrases;
 
 	/// cycle counter
-	uint8						_CycleCounter;
+	uint8 _CycleCounter;
 	/// next phrase counter
-	uint8						_NextCounter;
+	uint8 _NextCounter;
 
 	// sheet id of craft plan
-	NLMISC::CSheetId			_CraftPlan;
+	NLMISC::CSheetId _CraftPlan;
 
 	// vector of inventory and index and quantity of raw material selected for faber
-	std::vector<CFaberMsgItem>	_RmSelectedForFaber;
+	std::vector<CFaberMsgItem> _RmSelectedForFaber;
 	// vector of inventory and index and quantity of raw material formula selected for faber
-	std::vector<CFaberMsgItem>	_RmFormulaSelectedForFaber;
+	std::vector<CFaberMsgItem> _RmFormulaSelectedForFaber;
 
-	uint16						_SavedVersion;
+	uint16 _SavedVersion;
 
 	// keep starting charac values, use them as an offset of current charac values when listing charac bricks player can buy
-	std::vector<uint8>			_StartingCharacteristicValues;
+	std::vector<uint8> _StartingCharacteristicValues;
 
 	/** 
 	 * date when the player will be able to start a new action, before this date new actions will be refused
 	 * this is set when a player disengage from a combat before the combat action latency has ended (anti exploit)
 	 */
-	NLMISC::TGameCycle			_DateOfNextAllowedAction;
+	NLMISC::TGameCycle _DateOfNextAllowedAction;
 
 	/// Structure for forage sessions (NULL if there is no forage in progress)
-	CForageProgress				*_ForageProgress;
-	
+	CForageProgress* _ForageProgress;
+
 	/// Distance to current prospected deposit
-	CSEffectPtr					_ProspectionLocateDepositEffect;
+	CSEffectPtr _ProspectionLocateDepositEffect;
 
 	//// Bonus extraction time coming from known passive bricks (not saved but computed by computeForageBonus() at loading)
-	NLMISC::TGameCycle			_ForageBonusExtractionTime;
+	NLMISC::TGameCycle _ForageBonusExtractionTime;
 
 	/// date since when this player can't use auras
-	NLMISC::TGameCycle			_ForbidAuraUseStartDate;
+	NLMISC::TGameCycle _ForbidAuraUseStartDate;
 	/// date when this player will be able to use auras again
-	NLMISC::TGameCycle			_ForbidAuraUseEndDate;
+	NLMISC::TGameCycle _ForbidAuraUseEndDate;
 
 	/// vector of power types and the date when player will be able to use them again
-	CPowerActivationDateVector	_ForbidPowerDates;
+	CPowerActivationDateVector _ForbidPowerDates;
 
 	/// vector of auras ineffective on this player
-	CAuraActivationDateVector	_IneffectiveAuras;
+	CAuraActivationDateVector _IneffectiveAuras;
 
 	/// ctecor of disabled consumables families
-	CConsumableOverdoseTimerVector	_ConsumableOverdoseEndDates;
+	CConsumableOverdoseTimerVector _ConsumableOverdoseEndDates;
 
 	/// disabled modifiers (such as ineffective auras)
-	CModifiersInDB				_ModifiersInDB;
+	CModifiersInDB _ModifiersInDB;
 
 	/// nb of auras affecting this player
-	uint8						_NbAuras;
+	uint8 _NbAuras;
 
 	/// nb of users channels
-	uint8						_NbUserChannels;
+	uint8 _NbUserChannels;
 
 	/// last webcommand index
-	uint32						_LastWebCommandIndex;
+	uint32 _LastWebCommandIndex;
 
 	/// last web url index
-	uint32						_LastUrlIndex;
+	uint32 _LastUrlIndex;
 
-	std::map<std::string, std::string>	_CustomMissionsParams;
+	std::map<std::string, std::string> _CustomMissionsParams;
 
-	std::vector<SCheckPosCoordinate>    _CheckPos;
+	std::vector<SCheckPosCoordinate> _CheckPos;
 
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange {
@@ -3415,410 +3388,408 @@ private:
 			OldEndTick = 0;
 		}
 	};
-	std::vector<CFlagTickRange>	_CombatEventFlagTicks;
-	std::vector<CFlagTickRange>	_PowerFlagTicks;
-	
+	std::vector<CFlagTickRange> _CombatEventFlagTicks;
+	std::vector<CFlagTickRange> _PowerFlagTicks;
+
 	// class used for apply/store for persistent effects
-	CPersistentEffect			_PersistentEffects;
+	CPersistentEffect _PersistentEffects;
 
 	/// timer for each flag, when date is reached, reset flag
-//	NLMISC::TGameCycle			_CombatEventResetDate[BRICK_FLAGS::NbCombatFlags];
+	//	NLMISC::TGameCycle			_CombatEventResetDate[BRICK_FLAGS::NbCombatFlags];
 
 	/// total malus due to wearing equipment
-	float						_WearEquipmentMalus;
+	float _WearEquipmentMalus;
 
 	/// compass current target (none, target, teammates...)
-	TDataSetRow					_CompassTarget;
+	TDataSetRow _CompassTarget;
 
 	/// bulk of the character
-//	sint32						_Bulk;
+	//	sint32						_Bulk;
 	/// total carried weight
-//	sint32						_CarriedWeight;
+	//	sint32						_CarriedWeight;
 
-	CGearLatency				*_GearLatency;
+	CGearLatency* _GearLatency;
 
 	// modifiers due to equipment
-	sint32						_DodgeModifier;
-	sint32						_ParryModifier;
-	sint32						_AdversaryDodgeModifier;
-	sint32						_AdversaryParryModifier;
+	sint32 _DodgeModifier;
+	sint32 _ParryModifier;
+	sint32 _AdversaryDodgeModifier;
+	sint32 _AdversaryParryModifier;
 
 	// is character in a coma ("dead" but can still be healed and resurrected)
-	bool						_IsInAComa;
+	bool _IsInAComa;
 
 	// Aggroable override (-1=computed, 0=not aggroable, 1=aggroable)
-	sint8							_AggroableOverride;
-	bool							_Aggroable;
-	
+	sint8 _AggroableOverride;
+	bool _Aggroable;
+
 	// Contact Structure
-	struct CContactId
-	{
-		NLMISC::CEntityId			EntityId;		// Id used for server/storage
-		uint32						ContactId;		// Id used for client/server communication
+	struct CContactId {
+		NLMISC::CEntityId EntityId; // Id used for server/storage
+		uint32 ContactId; // Id used for client/server communication
 	};
-	uint32							_ContactIdPool;
+	uint32 _ContactIdPool;
 
-	std::vector<NLMISC::CEntityId>	_RoomersList; // Players who have acces to player's room
-	NLMISC::CEntityId				_inRoomOfPlayer;
-	sint32							_PowoCell;
-
+	std::vector<NLMISC::CEntityId> _RoomersList; // Players who have acces to player's room
+	NLMISC::CEntityId _inRoomOfPlayer;
+	sint32 _PowoCell;
 
 	// friends list
-	std::vector<CContactId>	_FriendsList;
+	std::vector<CContactId> _FriendsList;
 	// league list
-	std::vector<CContactId>	_LeagueList;
+	std::vector<CContactId> _LeagueList;
 	// ignore list
-	std::vector<CContactId>	_IgnoreList;
+	std::vector<CContactId> _IgnoreList;
 	// list of players for whom this player is in the friendlist (to update online status and to remove from players list if this char is permanently deleted)
 	// Yoyo: WARNING!! this list may be false (may contain too much entities), see contactListRefRefChange()
-	std::vector<NLMISC::CEntityId>	_IsFriendOf;
+	std::vector<NLMISC::CEntityId> _IsFriendOf;
 	// list of players for whom this player is in the friendlist (to remove from players list if this char is permanently deleted)
 	// Yoyo: WARNING!! this list may be false (may contain too much entities), see contactListRefRefChange()
-	std::vector<NLMISC::CEntityId>	_IsIgnoredBy;
+	std::vector<NLMISC::CEntityId> _IsIgnoredBy;
 
 	// specialized skill points (not in CSkills for version management !)
-	double							_SpType[EGSPD::CSPType::EndSPType];
-	uint32							_SpentSpType[EGSPD::CSPType::EndSPType];
+	double _SpType[EGSPD::CSPType::EndSPType];
+	uint32 _SpentSpType[EGSPD::CSPType::EndSPType];
 
 	// keep points repartition among different types (fight, magic, craft, harvest) during creation (2bits per type)
-	uint8							_CreationPointsRepartition;
+	uint8 _CreationPointsRepartition;
 
 	/// Intangible state end date
-	NLMISC::TGameCycle				_IntangibleEndDate;
-	
+	NLMISC::TGameCycle _IntangibleEndDate;
+
 	/// who sees me property, before TP
-	uint64							_WhoSeesMeBeforeTP;
+	uint64 _WhoSeesMeBeforeTP;
 
 	/// special properties for GM ( 4 bytes )
-	CAdminProperties				*_AdminProperties;
+	CAdminProperties* _AdminProperties;
 
 	/// CSR monitoring this player mission
-	TDataSetRow						_MonitoringCSR;
+	TDataSetRow _MonitoringCSR;
 
 	/// death penalties
-	CDeathPenalties					*_DeathPenalties;
+	CDeathPenalties* _DeathPenalties;
 
 	/// part of xp gain used to update death penalty
-	float							_DeathPenaltyXpGainFactor;
+	float _DeathPenaltyXpGainFactor;
 
 	/// if true, next death penalty will not be applied
-	float							_NextDeathPenaltyFactor;
+	float _NextDeathPenaltyFactor;
 
 	/// duration (in days) needed to lose all death penalty
-	float							_DPLossDuration;
+	float _DPLossDuration;
 
 	/// player room
-	CPlayerRoomInterface			*_PlayerRoom;
+	CPlayerRoomInterface* _PlayerRoom;
 
 	/// display stats on Xp gain for player
-	bool							_LogXpGain;
+	bool _LogXpGain;
 
 	/// number of creatures attacking the player
-	uint8							_AggroCount;
+	uint8 _AggroCount;
 
 	/// guild id of the player
-	uint32							_GuildId;
+	uint32 _GuildId;
 	/// guild id of the player
-	bool							_UseFactionSymbol;
-	
+	bool _UseFactionSymbol;
+
 	/// bool, set to true if player is in water
-	mutable bool					_PlayerIsInWater;
+	mutable bool _PlayerIsInWater;
 
 	/// best skill
-	SKILLS::ESkills					_BestSkill;
+	SKILLS::ESkills _BestSkill;
 	/// best skill used for dodge
-	SKILLS::ESkills					_SkillUsedForDodge;
+	SKILLS::ESkills _SkillUsedForDodge;
 
 	/// current dodge level
-	sint32							_CurrentDodgeLevel;
+	sint32 _CurrentDodgeLevel;
 	/// base dodge level
-	sint32							_BaseDodgeLevel;
+	sint32 _BaseDodgeLevel;
 	/// current parry level
-	sint32							_CurrentParryLevel;
+	sint32 _CurrentParryLevel;
 	/// base parry level
-	sint32							_BaseParryLevel;
+	sint32 _BaseParryLevel;
 	/// current parry skill
-	SKILLS::ESkills					_CurrentParrySkill;
+	SKILLS::ESkills _CurrentParrySkill;
 
 	/// current protection for each type of magic damage and max magic damage absorption gived by jewels
-	uint32							_MagicProtection[PROTECTION_TYPE::NB_PROTECTION_TYPE];
-	uint32							_MaxAbsorption;
+	uint32 _MagicProtection[PROTECTION_TYPE::NB_PROTECTION_TYPE];
+	uint32 _MaxAbsorption;
 
 	// current resistance for each type of magic resistance
-	uint32							_MagicResistance[RESISTANCE_TYPE::NB_RESISTANCE_TYPE];
+	uint32 _MagicResistance[RESISTANCE_TYPE::NB_RESISTANCE_TYPE];
 
-	sint32							_BaseResistance;
+	sint32 _BaseResistance;
 
 	/// currently consumed item slot
-	sint32							_ConsumedItemSlot;
+	sint32 _ConsumedItemSlot;
 	/// currently consumed item inventory
-	INVENTORIES::TInventory			_ConsumedItemInventory;
+	INVENTORIES::TInventory _ConsumedItemInventory;
 
 	/// slot of xp catalyser used
-	uint32							_XpCatalyserSlot;
+	uint32 _XpCatalyserSlot;
 	/// slot of ring xp catalyser used
-	uint32							_RingXpCatalyserSlot;
+	uint32 _RingXpCatalyserSlot;
 
 	/// backup last used weight malus
-	sint32							_LastAppliedWeightMalus;
+	sint32 _LastAppliedWeightMalus;
 
-	std::vector<TDataSetRow>		_TargetingChars;
+	std::vector<TDataSetRow> _TargetingChars;
 
 	// items placed in shop store by character
-	CItemsForSale					*_ItemsInShopStore;
+	CItemsForSale* _ItemsInShopStore;
 
 	// shop list filters
-	RM_FABER_TYPE::TRMFType			_RawMaterialItemPartFilter;
-	ITEM_TYPE::TItemType			_ItemTypeFilter;
-	RM_CLASS_TYPE::TRMClassType		_MinClass;
-	RM_CLASS_TYPE::TRMClassType		_MaxClass;
-	uint32							_MinQualityFilter;
-	uint32							_MaxQualityFilter;
-	uint32							_MinPriceFilter;
-	uint32							_MaxPriceFilter;
+	RM_FABER_TYPE::TRMFType _RawMaterialItemPartFilter;
+	ITEM_TYPE::TItemType _ItemTypeFilter;
+	RM_CLASS_TYPE::TRMClassType _MinClass;
+	RM_CLASS_TYPE::TRMClassType _MaxClass;
+	uint32 _MinQualityFilter;
+	uint32 _MaxQualityFilter;
+	uint32 _MinPriceFilter;
+	uint32 _MaxPriceFilter;
 
-	uint16							_BuildingExitZone;
+	uint16 _BuildingExitZone;
 
 	// used for force respawn player who are in a mainland in town of this mainland
-	bool							_RespawnMainLandInTown;
+	bool _RespawnMainLandInTown;
 
-	CCharacterEncyclopedia			*_EncycloChar;
+	CCharacterEncyclopedia* _EncycloChar;
 
-	CCharacterGameEvent				*_GameEvent;
+	CCharacterGameEvent* _GameEvent;
 
-	CCharacterRespawnPoints			*_RespawnPoints;
+	CCharacterRespawnPoints* _RespawnPoints;
 
 	/// persistent item services, ie services that need to be provided each time player reconnects
-	std::vector<NLMISC::CSheetId>	_PersistentItemServices;
+	std::vector<NLMISC::CSheetId> _PersistentItemServices;
 
 	/// number of specific type modifiers on skill
-	uint8							_NbNonNullClassificationTypesSkillMod;
+	uint8 _NbNonNullClassificationTypesSkillMod;
 
 	/// specific types skill modifiers
-	sint32							_ClassificationTypesSkillModifiers[EGSPD::CClassificationType::EndClassificationType];
+	sint32 _ClassificationTypesSkillModifiers[EGSPD::CClassificationType::EndClassificationType];
 
 	/// to know if item pre-requisits have to be recomputed (as after a skill/charac update)
-	bool							_HaveToUpdateItemsPrerequisit;
+	bool _HaveToUpdateItemsPrerequisit;
 
 	///\name PVP related members
 	//@{
 	/// interface between player and PVP system
-	CPVPInterface					*_PVPInterface;
+	CPVPInterface* _PVPInterface;
 	// set pvp mode for priviledge player
-	bool							_PriviledgePvp;
+	bool _PriviledgePvp;
 	// set full pvp mode for player
-	bool							_FullPvp;
+	bool _FullPvp;
 	// flag PVP, true for player involved in Faction PVP and other PVP
-	bool							_PVPFlag;
+	bool _PVPFlag;
 	// time of last change in pvp safe
-	NLMISC::TGameCycle				_PVPSafeLastTimeChange;
-	bool							_PVPSafeLastTime;
-	bool							_PVPInSafeZoneLastTime;
+	NLMISC::TGameCycle _PVPSafeLastTimeChange;
+	bool _PVPSafeLastTime;
+	bool _PVPInSafeZoneLastTime;
 	// time of last change in pvp flag (for prevent change PVP flag exploits)
-	NLMISC::TGameCycle				_PVPFlagLastTimeChange;
+	NLMISC::TGameCycle _PVPFlagLastTimeChange;
 	// time of pvp flag are setted to on (for prevent change PVP flag exploits)
-	NLMISC::TGameCycle				_PVPFlagTimeSettedOn;
+	NLMISC::TGameCycle _PVPFlagTimeSettedOn;
 	// time of the last PVP action made (for prevent PVE / PVP exploits)
-	NLMISC::TGameCycle				_PVPRecentActionTime;
+	NLMISC::TGameCycle _PVPRecentActionTime;
 	// all pvp flags (ally and enemy) when players do a pvp curative action
-	uint32							_PVPFlagAlly;
-	uint32							_PVPFlagEnemy;
+	uint32 _PVPFlagAlly;
+	uint32 _PVPFlagEnemy;
 	// character safe if is in pvp safe zone
-	bool							_PvPSafeZoneActive;
+	bool _PvPSafeZoneActive;
 	// player changed his faction tag, we have to update pvp mode
-	bool							_HaveToUpdatePVPMode;
+	bool _HaveToUpdatePVPMode;
 	// counter for database management
-	uint32							_PvPDatabaseCounter;
+	uint32 _PvPDatabaseCounter;
 	// last civ points written in database
-	sint32							_LastCivPointWriteDB;
+	sint32 _LastCivPointWriteDB;
 	// last cult points written in database
-	sint32							_LastCultPointWriteDB;
+	sint32 _LastCultPointWriteDB;
 	/// the PVP zone where the player is
-	TAIAlias						_CurrentPVPZone;
+	TAIAlias _CurrentPVPZone;
 	/// the outpost zone where the player is
-	TAIAlias						_CurrentOutpostZone;
+	TAIAlias _CurrentOutpostZone;
 	/// region where player character are killed in PvP situation
-	uint16							_RegionKilledInPvp;
+	uint16 _RegionKilledInPvp;
 	//@}
 
-	bool							_ChannelAdded;
+	bool _ChannelAdded;
 
-	bool							_LoadingFinish;
+	bool _LoadingFinish;
 
 	/// if true, enable display of channel faction for users with priviledge
-	std::map<TChanID, bool>	_FactionChannelsMode;
+	std::map<TChanID, bool> _FactionChannelsMode;
 
 	/// time when user left outpost zone (0 means not valid)
-	NLMISC::TGameCycle				_OutpostLeavingTime;
+	NLMISC::TGameCycle _OutpostLeavingTime;
 	/// temporary outpost id(user doesn't have chosen his side yet)
-	TAIAlias						_OutpostIdBeforeUserValidation;
+	TAIAlias _OutpostIdBeforeUserValidation;
 
 	// duel opponent
-	CCharacter						* _DuelOpponent;
+	CCharacter* _DuelOpponent;
 
-	TAIAlias						_LastCreatedNpcGroup;
+	TAIAlias _LastCreatedNpcGroup;
 
-	TFriendVisibility               _FriendVisibility;
+	TFriendVisibility _FriendVisibility;
 
 	// :KLUDGE: ICDBStructNode non-const 'coz getName and getParent are not
 	// const methods. See CCDBSynchronised::getICDBStructNodeFromName for more
 	// info.
-//	typedef ICDBStructNode* TDbReminderData;
-//	struct CCharacterDbReminder
-//	{
-//		NL_INSTANCE_COUNTER_DECL(CCharacterDbReminder);
-//	public:
-//
-//		/*
-//		 * PackAnimal
-//		 */
-//		struct CBeast
-//		{
-//			TDbReminderData TYPE;
-//			TDbReminderData UID;
-//			TDbReminderData STATUS;
-//			TDbReminderData HP;
-//			TDbReminderData BULK_MAX;
-//			TDbReminderData POS;
-//			TDbReminderData HUNGER;
-//			TDbReminderData DESPAWN;
-//		};
-//
-//		struct CPackAnimal
-//		{
-//			CBeast			BEAST[4];
-//		};
-//
-//		CPackAnimal		PACK_ANIMAL;
-//
-//
-//
-//		/*
-//		 * CharacterInfo
-//		 */
-//		struct CScores
-//		{
-//			TDbReminderData BaseRegen[SCORES::NUM_SCORES];
-//			TDbReminderData Regen[SCORES::NUM_SCORES];
-//			TDbReminderData BaseScore[SCORES::NUM_SCORES];
-//			TDbReminderData MaxScore[SCORES::NUM_SCORES];
-//		};
-//
-//		struct CSkills
-//		{
-//			TDbReminderData	BaseSkill[SKILLS::NUM_SKILLS];
-//			TDbReminderData	Skill[SKILLS::NUM_SKILLS];
-//			TDbReminderData	ProgressBar[SKILLS::NUM_SKILLS];
-//		};
-//
-//		struct CCharacterInfo
-//		{
-//			CScores		SCORES;
-//			CSkills		SKILLS;
-//			
-//			TDbReminderData	DodgeBase;
-//			TDbReminderData	DodgeCurrent;
-//			TDbReminderData	ParryBase;
-//			TDbReminderData	ParryCurrent;
-//		};
-//
-//		CCharacterInfo	CHARACTER_INFO;
-//
-//
-//		/*
-//		 * Target
-//		 */
-//		struct CTarget
-//		{
-//			TDbReminderData UID;
-//			TDbReminderData HP;
-//			TDbReminderData SAP;
-//			TDbReminderData STA;
-//			TDbReminderData FOCUS;
-//			TDbReminderData CONTEXT_VAL;
-//			TDbReminderData PLAYER_LEVEL;
-//		};
-//
-//		CTarget			TARGET;
-//
-//		struct CDebugPing
-//		{
-//			TDbReminderData PING;
-//		};
-//
-//		CDebugPing		DATABASE_PING;
-//
-//		TDbReminderData KnownBricksFamilies[BRICK_FAMILIES::NbFamilies];
-//
-//		/*
-//		 * Modifier
-//		 */
-//		struct CBonus
-//		{
-//			TDbReminderData Sheet[12];
-//			TDbReminderData Disable[12];
-//			TDbReminderData DisableTime[12];
-//		};
-//
-//		struct CMalus
-//		{
-//			TDbReminderData Sheet[12];
-//			TDbReminderData Disable[12];
-//			TDbReminderData DisableTime[12];
-//		};
-//
-//		struct CModifier
-//		{
-//			TDbReminderData TotalMalusEquip;
-//			CBonus	Bonus;
-//			CMalus	Malus;
-//		};
-//
-//		CModifier	Modifiers;
-//
-//		struct CDisableConsumable
-//		{
-//			TDbReminderData Family[12];
-//			TDbReminderData DisableTime[12];
-//		};
-//
-//		CDisableConsumable DisableConsumable;
-//
-//		/// Constructor
-//		CCharacterDbReminder();		
-//	};
+	//	typedef ICDBStructNode* TDbReminderData;
+	//	struct CCharacterDbReminder
+	//	{
+	//		NL_INSTANCE_COUNTER_DECL(CCharacterDbReminder);
+	//	public:
+	//
+	//		/*
+	//		 * PackAnimal
+	//		 */
+	//		struct CBeast
+	//		{
+	//			TDbReminderData TYPE;
+	//			TDbReminderData UID;
+	//			TDbReminderData STATUS;
+	//			TDbReminderData HP;
+	//			TDbReminderData BULK_MAX;
+	//			TDbReminderData POS;
+	//			TDbReminderData HUNGER;
+	//			TDbReminderData DESPAWN;
+	//		};
+	//
+	//		struct CPackAnimal
+	//		{
+	//			CBeast			BEAST[4];
+	//		};
+	//
+	//		CPackAnimal		PACK_ANIMAL;
+	//
+	//
+	//
+	//		/*
+	//		 * CharacterInfo
+	//		 */
+	//		struct CScores
+	//		{
+	//			TDbReminderData BaseRegen[SCORES::NUM_SCORES];
+	//			TDbReminderData Regen[SCORES::NUM_SCORES];
+	//			TDbReminderData BaseScore[SCORES::NUM_SCORES];
+	//			TDbReminderData MaxScore[SCORES::NUM_SCORES];
+	//		};
+	//
+	//		struct CSkills
+	//		{
+	//			TDbReminderData	BaseSkill[SKILLS::NUM_SKILLS];
+	//			TDbReminderData	Skill[SKILLS::NUM_SKILLS];
+	//			TDbReminderData	ProgressBar[SKILLS::NUM_SKILLS];
+	//		};
+	//
+	//		struct CCharacterInfo
+	//		{
+	//			CScores		SCORES;
+	//			CSkills		SKILLS;
+	//
+	//			TDbReminderData	DodgeBase;
+	//			TDbReminderData	DodgeCurrent;
+	//			TDbReminderData	ParryBase;
+	//			TDbReminderData	ParryCurrent;
+	//		};
+	//
+	//		CCharacterInfo	CHARACTER_INFO;
+	//
+	//
+	//		/*
+	//		 * Target
+	//		 */
+	//		struct CTarget
+	//		{
+	//			TDbReminderData UID;
+	//			TDbReminderData HP;
+	//			TDbReminderData SAP;
+	//			TDbReminderData STA;
+	//			TDbReminderData FOCUS;
+	//			TDbReminderData CONTEXT_VAL;
+	//			TDbReminderData PLAYER_LEVEL;
+	//		};
+	//
+	//		CTarget			TARGET;
+	//
+	//		struct CDebugPing
+	//		{
+	//			TDbReminderData PING;
+	//		};
+	//
+	//		CDebugPing		DATABASE_PING;
+	//
+	//		TDbReminderData KnownBricksFamilies[BRICK_FAMILIES::NbFamilies];
+	//
+	//		/*
+	//		 * Modifier
+	//		 */
+	//		struct CBonus
+	//		{
+	//			TDbReminderData Sheet[12];
+	//			TDbReminderData Disable[12];
+	//			TDbReminderData DisableTime[12];
+	//		};
+	//
+	//		struct CMalus
+	//		{
+	//			TDbReminderData Sheet[12];
+	//			TDbReminderData Disable[12];
+	//			TDbReminderData DisableTime[12];
+	//		};
+	//
+	//		struct CModifier
+	//		{
+	//			TDbReminderData TotalMalusEquip;
+	//			CBonus	Bonus;
+	//			CMalus	Malus;
+	//		};
+	//
+	//		CModifier	Modifiers;
+	//
+	//		struct CDisableConsumable
+	//		{
+	//			TDbReminderData Family[12];
+	//			TDbReminderData DisableTime[12];
+	//		};
+	//
+	//		CDisableConsumable DisableConsumable;
+	//
+	//		/// Constructor
+	//		CCharacterDbReminder();
+	//	};
 
-//	static void ensureDbReminderReady();
+	//	static void ensureDbReminderReady();
 
-//	static CCharacterDbReminder* _DataIndexReminder;
+	//	static CCharacterDbReminder* _DataIndexReminder;
 
 	// temporary boolean for allow buy one hair cute for one dapper for correct bug of haircut of patch 1_2_1
-	bool				_HairCuteDiscount;
+	bool _HairCuteDiscount;
 
 	/// keep the Ids of the mission queues in which is this player
-	std::vector<uint32>	_MissionsQueues;
+	std::vector<uint32> _MissionsQueues;
 
 	/// keep the validated web commandes
-	std::set<uint32>	_ValideWebCommandIndex;
+	std::set<uint32> _ValideWebCommandIndex;
 
 	/// keep here the queue for which this player currently has an enter critical zone proposal
-	uint32				_EnterCriticalZoneProposalQueueId;
+	uint32 _EnterCriticalZoneProposalQueueId;
 
 	/// List of entities that must be saved at same time than me
-	std::set<NLMISC::CEntityId>		_EntitiesToSaveWithMe;
+	std::set<NLMISC::CEntityId> _EntitiesToSaveWithMe;
 
-	uint32 _FirstConnectedTime;						//first connected time in second since midnight (00:00:00), January 1, 1970
-	uint32 _LastConnectedTime;						//last connected time in second since midnight (00:00:00), January 1, 1970 (change each tick update)
-	uint32 _LastConnectedDate;						//last connected time in second since midnight (00:00:00), January 1, 1970 (never change after login, exactly like in mysql db)
-	uint32 _PlayedTime;								//cumulated played time in second
-	mutable std::list<TCharacterLogTime> _LastLogStats;		//keep n login/duration/logoff time
+	uint32 _FirstConnectedTime; //first connected time in second since midnight (00:00:00), January 1, 1970
+	uint32 _LastConnectedTime; //last connected time in second since midnight (00:00:00), January 1, 1970 (change each tick update)
+	uint32 _LastConnectedDate; //last connected time in second since midnight (00:00:00), January 1, 1970 (never change after login, exactly like in mysql db)
+	uint32 _PlayedTime; //cumulated played time in second
+	mutable std::list<TCharacterLogTime> _LastLogStats; //keep n login/duration/logoff time
 
 	sint64 _BrickFamilyBitField[BRICK_FAMILIES::NbFamilies]; // bit fields for known bricks
 	sint64 _InterfacesFlagsBitField;
 
 	uint8 _RingSeason;
 	// Ring info used for updating client DB on the speed of the curently controlled creature
-	NLMISC::CEntityId _NpcControlEid;	
+	NLMISC::CEntityId _NpcControlEid;
 	uint32 _LastTickNpcControlUpdated;
 
 	/// success modifiers from consumables
@@ -3830,19 +3801,19 @@ private:
 	sint32 _MagicSuccessModifier;
 	std::vector<sint32> _ForageSuccessModifiers;
 
-	
 public:
 	uint32 getLastDisconnectionDate();
 	bool hasMoved();
 
 private:
 	TAIAlias _SelectedOutpost;
+
 public:
 	TAIAlias getSelectedOutpost() const;
 	void setSelectedOutpost(TAIAlias alias);
-	
+
 public:
-//	static CCharacterDbReminder* getDataIndexReminder();
+	//	static CCharacterDbReminder* getDataIndexReminder();
 	// Add/Update  a channel in the user DB. For private usage by dynchat
 	void setDynChatChan(TChanID id, uint32 name, bool readOnly);
 	// Remove a channel in the user DB. For private usage by dynchat
@@ -3857,82 +3828,90 @@ public:
 
 private:
 	/// general invisibility flag for super users (GMs...)
-	bool			_Invisibility;
+	bool _Invisibility;
 	/// General aggroable flag for persistence
-	sint8			_AggroableSave;
+	sint8 _AggroableSave;
 	/// General god flag for persistence
-	bool			_GodModeSave;
-	
+	bool _GodModeSave;
+
 	/// General flags for powos
-	bool			_PowoCanXP;
-	bool			_PowoCantDead;
-	bool			_PowoCanTeleport;
-	bool			_PowoCanSpeedUp;
-	
-	uint32			_LastTpTick;
-	uint32			_LastOverSpeedTick;
-	uint32			_LastMountTick;
-	uint32			_LastUnMountTick;
-		
-	
+	bool _PowoCanXP;
+	bool _PowoCantDead;
+	bool _PowoCanTeleport;
+	bool _PowoCanSpeedUp;
+
+	uint32 _LastTpTick;
+	uint32 _LastOverSpeedTick;
+	uint32 _LastMountTick;
+	uint32 _LastUnMountTick;
+
 public:
+	void setWebCommandIndex(uint32 index) { _LastWebCommandIndex = index; }
+	uint32 getWebCommandIndex() const { return _LastWebCommandIndex; }
 
-	void			setWebCommandIndex(uint32 index) { _LastWebCommandIndex = index;}
-	uint32			getWebCommandIndex() const { return _LastWebCommandIndex;}
+	void validateWebCommandIndex(uint32 index) { _ValideWebCommandIndex.insert(index); }
+	uint32 isValidWebCommandIndex(uint32 index) { return _ValideWebCommandIndex.find(index) != _ValideWebCommandIndex.end(); }
 
-	void			validateWebCommandIndex(uint32 index) { _ValideWebCommandIndex.insert(index);}
-	uint32			isValidWebCommandIndex(uint32 index) { return _ValideWebCommandIndex.find(index) != _ValideWebCommandIndex.end();}
+	void setUrlIndex(uint32 index) { _LastUrlIndex = index; }
+	uint32 getUrlIndex() const { return _LastUrlIndex; }
 
-	void			setUrlIndex(uint32 index) { _LastUrlIndex = index;}
-	uint32			getUrlIndex() const { return _LastUrlIndex;}
-
-	bool			getInvisibility() const	{ return _Invisibility;}
+	bool getInvisibility() const { return _Invisibility; }
 	/// Set the invisibility flag, NB : just for persistence, do not change nothing.
-	void			setInvisibility(bool invisible)
-	{ 
+	void setInvisibility(bool invisible)
+	{
 		_Invisibility = invisible;
 		CBankAccessor_PLR::getUSER().setIS_INVISIBLE(_PropertyDatabase, _Invisibility);
 	}
 
-	sint8			getAggroableSave() const	{ return _AggroableSave;}
+	sint8 getAggroableSave() const { return _AggroableSave; }
 	/// Set the aggroable save flag, NB : just for persistence, do not change nothing.
-	void			setAggroableSave(sint8 aggroable)		{ _AggroableSave = aggroable;}
+	void setAggroableSave(sint8 aggroable) { _AggroableSave = aggroable; }
 
-	bool			getPowoFlag(const std::string &flag) const	{
-		if (flag == "xp") return _PowoCanXP;
-		if (flag == "dead") return _PowoCantDead;
-		if (flag == "teleport") return _PowoCanTeleport;
-		if (flag == "speed") return _PowoCanSpeedUp;
+	bool getPowoFlag(const std::string& flag) const
+	{
+		if (flag == "xp")
+			return _PowoCanXP;
+		if (flag == "dead")
+			return _PowoCantDead;
+		if (flag == "teleport")
+			return _PowoCanTeleport;
+		if (flag == "speed")
+			return _PowoCanSpeedUp;
 	}
 
-	bool			setPowoFlag(const std::string &flag, bool value) {
-		if (flag == "xp") _PowoCanXP = value;
-		if (flag == "dead") _PowoCantDead = value;
-		if (flag == "teleport") _PowoCanTeleport = value;
-		if (flag == "speed") _PowoCanSpeedUp = value;
+	bool setPowoFlag(const std::string& flag, bool value)
+	{
+		if (flag == "xp")
+			_PowoCanXP = value;
+		if (flag == "dead")
+			_PowoCantDead = value;
+		if (flag == "teleport")
+			_PowoCanTeleport = value;
+		if (flag == "speed")
+			_PowoCanSpeedUp = value;
 	}
-	
-	void			resetPowoFlags() {
+
+	void resetPowoFlags()
+	{
 		_PowoCanXP = false;
 		_PowoCantDead = false;
 		_PowoCanTeleport = false;
-		_PowoCanSpeedUp  = false;
+		_PowoCanSpeedUp = false;
 	}
-	
-	bool			getGodModeSave() const	{ return _GodModeSave;}
+
+	bool getGodModeSave() const { return _GodModeSave; }
 	/// Set the gobmode save flag, NB : just for persistence, do not change nothing.
-	void			setGodModeSave(bool godMode)	{ _GodModeSave = godMode;}
+	void setGodModeSave(bool godMode) { _GodModeSave = godMode; }
 
 	/// Test the character against mission prerequisits for the specified list of mission giver NPCs
-	void			sendNpcMissionGiverIconDesc( const std::vector<uint32>& npcKeys );
+	void sendNpcMissionGiverIconDesc(const std::vector<uint32>& npcKeys);
 
 	/// Inform the client that an event that might change mission availability just occured
-	void			sendEventForMissionAvailabilityCheck();
+	void sendEventForMissionAvailabilityCheck();
 
 	/// Send the current timer period if is different from the default or force is true
-	void			sendNpcMissionGiverTimer(bool force);
+	void sendNpcMissionGiverTimer(bool force);
 };
-
 
 typedef NLMISC::CSmartPtr<CCharacter> CCharacterPtr;
 typedef NLMISC::CRefPtr<CCharacter> CCharacterRefPtr;
