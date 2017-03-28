@@ -758,6 +758,10 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 	if (srcInvId == INVENTORIES::player_room || dstInvId == INVENTORIES::player_room) {
 		if (!getRoomInterface().canUseInventory(this, this))
 			return;
+		
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer() && dstInvId == INVENTORIES::player_room)
+			return;
 	}
 
 	// if one of inventories is a pet animal check that it is accessible
