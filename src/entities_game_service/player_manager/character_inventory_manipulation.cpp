@@ -1212,6 +1212,12 @@ bool CCharacter::checkPreRequired(const CGameItemPtr& item, bool equipCheck)
 		}
 	}
 
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && (form->Family != ITEMFAMILY::RAW_MATERIAL)) {
+		if (item->recommended() > 150)
+			requiredRespected = false;
+	}
+
 	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();
 	bool neutralcult = (allegeance.first == PVP_CLAN::Neutral || allegeance.first == PVP_CLAN::None);
 	bool neutralciv = (allegeance.second == PVP_CLAN::Neutral || allegeance.second == PVP_CLAN::None);
