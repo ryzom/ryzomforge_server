@@ -768,6 +768,13 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 	if (dstInvId >= INVENTORIES::pet_animal && dstInvId < INVENTORIES::max_pet_animal) {
 		if (!petInventoryDistance(dstInvId - INVENTORIES::pet_animal))
 			return;
+			
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer()) {
+			sint32 petSlot = getMountOrFirstPetSlot();
+			if (petSlot != dstInvId - INVENTORIES::pet_animal)
+				return;
+		}
 	}
 
 	/***  END OF GAME PLAY RULES  ***/

@@ -4784,6 +4784,23 @@ sint32 CCharacter::getFreePetSlot()
 	return -1;
 }
 
+// CCharacter::getMountOrFirstPetSlot return the slot of the mount pet or the first packer pet
+//-----------------------------------------------
+sint32 CCharacter::getMountOrFirstPetSlot()
++{
+	sint32 slot = -1;
+	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i) {
+		if (_PlayerPets[ i ].TicketPetSheetId != CSheetId::Unknown {
+			if (slot == -1)
+				slot = i;
+			const CStaticItem* form = CSheets::getForm(_PlayerPets[ i ].TicketPetSheetId);
+			if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
+				return i;
+		}
+	}
+	return slot;
+}
+
 //-----------------------------------------------
 // CCharacter::checkAnimalCount return true if can add 'delta' pets to current player pets
 //-----------------------------------------------
