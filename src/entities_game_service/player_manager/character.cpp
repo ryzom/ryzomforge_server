@@ -3397,7 +3397,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 					.getArray(i)
 					.setPLAYER_GIFT_NEEDED(_PropertyDatabase, texts[k].first);
 				//				_PropertyDatabase.setProp(
-				//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
+				// toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
 				// 3
 				//);
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setPRIORITY(
@@ -3416,7 +3416,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 					if (i >= NB_CONTEXT_DYN_TEXTS)
 						break; // no more room in the context menu, don't fill more or it'll assert
 					//					_PropertyDatabase.setProp(
-					//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
+					// toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
 					//,
 					// texts[k].second );
 					CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(
@@ -3469,7 +3469,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 					.getArray(i)
 					.setPLAYER_GIFT_NEEDED(_PropertyDatabase, 0);
 				//				_PropertyDatabase.setProp(
-				//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
+				// toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:PRIORITY",i),
 				// 0
 				//);
 				CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setPRIORITY(
@@ -3487,7 +3487,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 						break; // no more room in the context menu, don't fill more or it'll assert
 					uint32 text = templ->sendAutoText(_EntityRowId, _CurrentInterlocutor);
 					//					_PropertyDatabase.setProp(
-					//toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
+					// toString("TARGET:CONTEXT_MENU:MISSIONS_OPTIONS:%u:TITLE",i)
 					//,
 					// text );
 					CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().getMISSIONS_OPTIONS().getArray(i).setTITLE(
@@ -8895,7 +8895,7 @@ void CCharacter::fillTradePage(uint16 session, bool enableBuildingLossWarning)
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:RM_FABER_STAT_TYPE",index) , 0 );
 			itemElem.setRM_FABER_STAT_TYPE(_PropertyDatabase, 0);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:PREREQUISIT_VALID",index) ,
-			//trade.SheetId
+			// trade.SheetId
 			//==
 			// CSheetId::Unknown ? 0 : true );
 			itemElem.setPREREQUISIT_VALID(_PropertyDatabase, trade.SheetId != CSheetId::Unknown);
