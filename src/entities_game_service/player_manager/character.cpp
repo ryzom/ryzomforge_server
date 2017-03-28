@@ -5059,7 +5059,7 @@ sint32 CCharacter::getFreePetSlot()
 
 // CCharacter::getMountOrFirstPetSlot return the slot of the mount pet or the first packer pet
 //-----------------------------------------------
-sint32 CCharacter::getMountOrFirstPetSlot() +
+sint32 CCharacter::getMountOrFirstPetSlot()
 {
 	sint32 slot = -1;
 	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i) {
