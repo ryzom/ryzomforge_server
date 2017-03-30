@@ -1195,14 +1195,19 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 				uint16 ownerId = buildingPlayer->getOwnerIdx(playerEid);
 				nlinfo("ownerId = %d", ownerId);
 				sint32 cell;
-				buildingPlayer->addUser(c, 0, ownerId, cell);
-				c->setPowoCell(cell);
-				if (powoFlags[0] == '1') c->setPowoFlag("xp", true);
-				if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
-				if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
-				if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
+				if (buildingPlayer->addUser(c, 0, ownerId, cell))
+				{
+					c->setPowoCell(cell);
+					if (powoFlags[0] == '1') c->setPowoFlag("xp", true);
+					if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
+					if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
+					if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
 					
-				log.displayNL("%d", cell);
+					log.displayNL("%d", cell);
+				} else {
+					log.displayNL("ERR: invalid number");
+					return false;
+				}
 			}
 		} else {
 			log.displayNL("ERR: invalid number");
