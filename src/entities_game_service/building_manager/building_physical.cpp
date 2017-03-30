@@ -83,12 +83,12 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 		nlwarning("<BUILDING>Invalid room %u count is %u",roomIdx,_Rooms.size() );
 		return false;
 	}
+	
 	if ( ownerIdx >= _Rooms[roomIdx].Cells.size() )
 	{
 		nlwarning("<BUILDING>Invalid owner idx %u count is %u",ownerIdx,_Rooms[roomIdx].Cells.size());
 		return false;
 	}
-
 
 	if (user->currentHp() <= 0 )
 	{
@@ -96,23 +96,18 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 		return false;
 	}
 
-	CCharacter *owner;
+	CEntityId owner;
 
 	if (ownerIdx < _Players.size())
-	{
-		owner = PlayerManager.getChar(_Players[ownerIdx] );
-	}
+		owner = _Players[ownerIdx];
 	else
-	{
-		owner = user;
-	}
+		owner = user->getId();
+
 
 	IRoomInstance * roomInstance;
 	
 	if (_Rooms[roomIdx].Cells[ownerIdx] != 0)
-	{
 		roomInstance = CBuildingManager::getInstance()->getRoomInstanceFromCell(_Rooms[roomIdx].Cells[ownerIdx]);
-	}
 
 	// if the room is not already instanciated, we have to do it
 	if ( _Rooms[roomIdx].Cells[ownerIdx] == 0 || roomInstance == NULL)
@@ -133,7 +128,7 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 
 	user->setBuildingExitZone( _DefaultExitSpawn );
 	_UsersInside.push_back( user->getEntityRowId() );
-	cellId =  _Rooms[roomIdx].Cells[ownerIdx];
+	cellId = _Rooms[roomIdx].Cells[ownerIdx];
 
 	return true;
 }

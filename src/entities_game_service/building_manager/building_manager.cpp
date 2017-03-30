@@ -854,7 +854,7 @@ IBuildingPhysical * CBuildingManager::getBuildingPhysicalsByAlias( TAIAlias alia
 //----------------------------------------------------------------------------
 IBuildingPhysical* CBuildingManager::getBuildingPhysicalsByName( const std::string & name )
 {
-	std::map<std::string,IBuildingPhysical*>::iterator it =  _BuildingPhysicalsName.find( name );
+	std::map<std::string,IBuildingPhysical*>::iterator it = _BuildingPhysicalsName.find( name );
 	if ( it != _BuildingPhysicalsName.end() )
 	{
 		if( (*it).second == NULL )
