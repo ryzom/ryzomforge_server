@@ -1481,6 +1481,9 @@ public:
 	// check sell store coherency with character, assume character is a reference
 	void checkSellStore();
 
+	// checks for free trial players
+	void checksForFreeTrial();
+
 	/// Clear the list mission histories(for debug purpose only)
 	void clearMissionHistories();
 

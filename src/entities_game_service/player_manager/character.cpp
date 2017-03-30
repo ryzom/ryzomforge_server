@@ -9570,6 +9570,32 @@ void CCharacter::itemReachMaximumSellStoreTime(uint32 identifier, uint32 quantit
 void CCharacter::checkSellStore() { _ItemsInShopStore->checkSellStore(getId()); }
 
 //-----------------------------------------------------------------------------
+void CCharacter::checksForFreeTrial()
+{
+	// Check items
+	CGameItemPtr item;
+
+	CInventoryPtr equipInv = getInventory(INVENTORIES::equipment);
+	if (equipInv != NULL) {
+		for (uint i = 0; i < equipInv->getSlotCount(); i++) {
+			item = equipInv->getItem(i);
+			if (item != NULL && i != SLOT_EQUIPMENT::CHEST && i != SLOT_EQUIPMENT::LEGS && item->recommended() > 150) {
+				unequipCharacter(INVENTORIES::equipment, i);
+			}
+		}
+	}
+
+	CInventoryPtr handlingInv = getInventory(INVENTORIES::handling);
+	if (handlingInv != NULL) {
+		for (uint i = 0; i < handlingInv->getSlotCount(); i++) {
+			item = handlingInv->getItem(i);
+			if (item != NULL && item->recommended() > 150) {
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void CCharacter::clearMissionHistories() { _MissionHistories.clear(); }
 
 //-----------------------------------------------
