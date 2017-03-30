@@ -51,6 +51,7 @@ void CForageProgress::reset( const NLMISC::CSheetId& material,  const TDataSetRo
 	_SourceRowId = sourceRowId;
 	_Amount = 0;
 	_Quality = 1.0f;
+	_MaxQuality = 300.0f;
 	_InitialFocus = initialFocus;
 	_ResultCanBeTaken = false;
 	_HasCastedUsefulCare = false;
@@ -60,16 +61,38 @@ void CForageProgress::reset( const NLMISC::CSheetId& material,  const TDataSetRo
 /*
  * Add the result of an action
  */
-void CForageProgress::fillFromExtraction( float quantity, float quality, CCharacter *player )
+void CForageProgress::fillFromExtraction(const CHarvestSource *source, float quantity, float quality, CCharacter *player)
 {
 	_Amount += quantity;
 	_Quality = quality;
 
 	//if ( (_Amount*10.0f >= 65536.0) || (_Quality>=251.0f) )
 	//	nlwarning( "Forage ext. progress out of bounds: %g %g", _Amount, _Quality );
+	
+	CGameItemPtr item = player->getItem(INVENTORIES::handling, INVENTORIES::right);
 
-	player->setExtractionProgressCounters( (uint16)(uint)(_Amount*10.0f), (uint16)(uint)(_Quality*10.0f) );
+	// Harvester use a low quality pike
+	if (item != 0 && item->recommended() < _MaxQuality-49)
+		_MaxQuality = item->recommended()+49;
 
+	vector<CCharacter*> usefulCareCasters;
+	const CHarvestSource::CForagers& foragers = source->foragers();
+	CHarvestSource::CForagers::const_iterator itf = foragers.begin();
+	for (++itf; itf!=foragers.end(); ++itf)
+	{
+		const TDataSetRow& ccRowId = (*itf);
+		CCharacter *careCaster = PlayerManager.getChar(ccRowId);
+		if (careCaster && careCaster->forageProgress())
+		{
+			item = careCaster->getItem(INVENTORIES::handling, INVENTORIES::right);
+			if (item != 0 && item->recommended() < _MaxQuality-49)
+				_MaxQuality = item->recommended()+49;
+		}
+	}
+	if (_Quality > _MaxQuality)
+		_Quality = _MaxQuality;
+	
+	player->setExtractionProgressCounters((uint16)(uint)(_Amount*10.0f), (uint16)(uint)(_Quality*10.0f));
 	//nldebug( "Progress #%u: (A %.2f Q %.2f)", (uint)_NbExtActions, _Amount, _Quality );
 }
 
