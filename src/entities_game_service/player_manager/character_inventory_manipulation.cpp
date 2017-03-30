@@ -773,8 +773,6 @@ void CCharacter::moveItem(
 
 	// You cannot exchange genesis named items
 	if (srcItem->getPhraseId().find("genesis_") == 0 && !canPutNonDropableItemInInventory(dstInvId)) {
-		nlwarning("Character %s tries to move '%s' to inv %u", _Id.toString().c_str(), srcItem->getPhraseId().c_str(),
-			dstInvId);
 		return;
 	}
 
@@ -796,8 +794,10 @@ void CCharacter::moveItem(
 			return;
 
 		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
-		if (p->isTrialPlayer() && dstInvId == INVENTORIES::player_room)
+		if (p->isTrialPlayer() && dstInvId == INVENTORIES::player_room) {
+			sendDynamicSystemMessage(_Id, "EGS_CANT_USE_ROOM_INV_IS_TRIAL_PLAYER");
 			return;
+		}
 	}
 
 	// if one of inventories is a pet animal check that it is accessible
@@ -812,8 +812,10 @@ void CCharacter::moveItem(
 		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 		if (p->isTrialPlayer()) {
 			sint32 petSlot = getMountOrFirstPetSlot();
-			if (petSlot != dstInvId - INVENTORIES::pet_animal)
+			if (petSlot != dstInvId - INVENTORIES::pet_animal) {
+				sendDynamicSystemMessage(_Id, "EGS_CANT_USE_ROOM_INV_IS_TRIAL_PLAYER");
 				return;
+			}
 		}
 	}
 
