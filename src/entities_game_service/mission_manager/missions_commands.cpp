@@ -1170,7 +1170,7 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 {
 	GET_ACTIVE_CHARACTER
 
-	IBuildingPhysical * building;	
+	IBuildingPhysical *building;
 	if (args.size () >= 3)
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]);
 	else
@@ -1180,22 +1180,19 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 	if (args.size () >= 4)
 		powoFlags = args[3];
 
-	if ( building )
+	if (building)
 	{
-
+		nlinfo("Bulding: %s", building->getName().c_str());
 		if (building->getTemplate()->Type == BUILDING_TYPES::Player)
 		{
+			CBuildingPhysicalPlayer *buildingPlayer = dynamic_cast<CBuildingPhysicalPlayer *>(building);
 
-			CBuildingPhysicalPlayer * buildingPlayer = dynamic_cast<CBuildingPhysicalPlayer *>( building );
-
-			CEntityId playerEid = CEntityIdTranslator::getInstance()->getByEntity( ucstring(args[1]) );
+			CEntityId playerEid = CEntityIdTranslator::getInstance()->getByEntity(ucstring(args[1]));
 			nlinfo("playerEid = %s", playerEid.toString().c_str());
-			//CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[1]));
-			if (buildingPlayer && playerEid != CEntityId::Unknown/*entityBase*/)
+			if (buildingPlayer && playerEid != CEntityId::Unknown)
 			{
-				CBuildingManager::getInstance()->removePlayerFromRoom( c );
-				//uint16 ownerId = buildingPlayer->getOwnerIdx( entityBase->getId() );
-				uint16 ownerId = buildingPlayer->getOwnerIdx( playerEid );
+				CBuildingManager::getInstance()->removePlayerFromRoom(c);
+				uint16 ownerId = buildingPlayer->getOwnerIdx(playerEid);
 				nlinfo("ownerId = %d", ownerId);
 				sint32 cell;
 				buildingPlayer->addUser(c, 0, ownerId, cell);

@@ -59,7 +59,7 @@ void CRoomInstanceCommon::removeUser( CCharacter* user )
 }
 
 //----------------------------------------------------------------------------
-void CRoomInstanceCommon::addUser( CCharacter* user, CCharacter* owner )
+void CRoomInstanceCommon::addUser( CCharacter* user, const NLMISC::CEntityId & owner )
 {
 	BOMB_IF( !user, "<BUILDING> null character!", return );
 
@@ -102,7 +102,7 @@ void CRoomInstanceGuild::removeUser( CCharacter* user )
 }
 
 //----------------------------------------------------------------------------
-void CRoomInstanceGuild::addUser( CCharacter* user, CCharacter* owner )
+void CRoomInstanceGuild::addUser( CCharacter* user, const NLMISC::CEntityId & owner )
 {
 	BOMB_IF( !user, "<BUILDING> null character!", return );
 
@@ -111,8 +111,8 @@ void CRoomInstanceGuild::addUser( CCharacter* user, CCharacter* owner )
 
 	// open guild inventory window
 	PlayerManager.sendImpulseToClient(user->getId(), "GUILD:OPEN_INVENTORY");
-
-	user->sendUrl("app_ryzhome action=open_guild_room&owner="+ owner->getName().toString()+"&room_name="+guildBuilding->getName(), "");
+	
+	user->sendUrl("app_ryzhome action=open_guild_room&owner="+ owner.toString()+"&room_name="+guildBuilding->getName(), "");
 
 	++_RefCount;
 }
@@ -160,7 +160,7 @@ void CRoomInstancePlayer::removeUser( CCharacter* user )
 }
 
 //----------------------------------------------------------------------------
-void CRoomInstancePlayer::addUser( CCharacter* user, CCharacter* owner )
+void CRoomInstancePlayer::addUser( CCharacter* user, const NLMISC::CEntityId & owner )
 {
 	BOMB_IF( !user, "<BUILDING> null character!", return );
 
@@ -169,17 +169,15 @@ void CRoomInstancePlayer::addUser( CCharacter* user, CCharacter* owner )
 
 	// open room inventory window
 	PlayerManager.sendImpulseToClient(user->getId(), "ITEM:OPEN_ROOM_INVENTORY");
-	if (owner)
+	if (owner != CEntityId::Unknown)
 	{
-		owner->removeRoomAccesToPlayer(user->getId(),false);
-		user->setInRoomOfPlayer(owner->getId());
+		CCharacter * o = PlayerManager.getChar(owner);
+		if (o)
+			o->removeRoomAccesToPlayer(user->getId(), false);
+		user->setInRoomOfPlayer(owner);
 	}
-	else
-	{
-		// Very rare case
-		owner = user;
-	}
-	user->sendUrl("app_ryzhome action=open_player_room&owner="+ owner->getName().toString()+"&room_name="+playerBuilding->getName(), "");
+	
+	user->sendUrl("app_ryzhome action=open_player_room&owner="+ owner.toString()+"&room_name="+playerBuilding->getName(), "");
 
 	++_RefCount;
 }
