@@ -19,7 +19,7 @@
 /////////////
 // INCLUDE //
 /////////////
-//Misc
+// Misc
 #include "nel/misc/sheet_id.h"
 
 #include "game_share/bot_chat_types.h"
@@ -87,7 +87,8 @@ extern CGenericXmlMsgHeaderManager GenericMsgManager;
 extern float MaxHarvestDistance;
 extern SKILLS::ESkills BarehandCombatSkill;
 
-CVariable<uint32> DefaultWeightHands("egs", "DefaultWeightHands", "Weight of hands for calculate STA consumed by action for handed fight", 500, 0, true);
+CVariable<uint32> DefaultWeightHands(
+	"egs", "DefaultWeightHands", "Weight of hands for calculate STA consumed by action for handed fight", 500, 0, true);
 
 // ****************************************************************************
 void CCharacter::initInventories()
@@ -181,7 +182,8 @@ void CCharacter::initInventoriesDb()
 	CEquipInventory* pEquip = (CEquipInventory*)(CInventoryBase*)_Inventory[INVENTORIES::equipment];
 	_WearEquipmentMalus += pEquip->getWearMalus();
 	//	_PropertyDatabase.setProp( _DataIndexReminder->Modifiers.TotalMalusEquip, (uint32)(_WearEquipmentMalus * 50) );
-	CBankAccessor_PLR::getMODIFIERS().setTOTAL_MALUS_EQUIP(_PropertyDatabase, checkedCast<uint8>(_WearEquipmentMalus * 50));
+	CBankAccessor_PLR::getMODIFIERS().setTOTAL_MALUS_EQUIP(
+		_PropertyDatabase, checkedCast<uint8>(_WearEquipmentMalus * 50));
 
 	// update parry skill if no item in right hand
 	if (getRightHandItem() == NULL) {
@@ -190,9 +192,11 @@ void CCharacter::initInventoriesDb()
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
-		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));
+		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
+			_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryCurrent, _CurrentParryLevel );
-		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
+		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(
+			_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
 	}
 }
 
@@ -248,14 +252,17 @@ void CCharacter::itemPickup(const NLMISC::CEntityId& entity, bool harvest)
 
 	CEntityBase* e = CCreatureManager::getEntityBasePtr(entity);
 	if (e == 0) {
-		nlwarning("<CCharacter::itemPickup> character %s perform itemPickup on entity %s, but entity not exist", _Id.toString().c_str(), entity.toString().c_str());
+		nlwarning("<CCharacter::itemPickup> character %s perform itemPickup on entity %s, but entity not exist",
+			_Id.toString().c_str(), entity.toString().c_str());
 		sendCloseTempInventoryImpulsion();
 		return;
 	}
 
 	// check if creature is dead for preventsome exploit
 	if (e->isDead() == false) {
-		nlwarning("<CCharacter::itemPickup> character %s perform itemPickup on entity %s, but entity is not dead, It's an EXPLOIT with /ah context_loot macro. Ban the player...", _Id.toString().c_str(), entity.toString().c_str());
+		nlwarning("<CCharacter::itemPickup> character %s perform itemPickup on entity %s, but entity is not dead, It's "
+				  "an EXPLOIT with /ah context_loot macro. Ban the player...",
+			_Id.toString().c_str(), entity.toString().c_str());
 		sendCloseTempInventoryImpulsion();
 		return;
 	}
@@ -274,7 +281,7 @@ void CCharacter::itemPickup(const NLMISC::CEntityId& entity, bool harvest)
 		// if character have skill for harvest entity
 		const CStaticCreatures* form = e->getForm();
 		if (form /*&& form->getHarvestSkill() < SKILLS::NUM_SKILLS*/) {
-			//if( _Skills._Skills[ form->getHarvestSkill() ].Base > 0 ) // MUST
+			// if( _Skills._Skills[ form->getHarvestSkill() ].Base > 0 ) // MUST
 			{
 				switch (entity.getType()) {
 				case RYZOMID::creature:
@@ -312,15 +319,22 @@ void CCharacter::itemPickup(const NLMISC::CEntityId& entity, bool harvest)
 								// TEMP ANTI BUG !!!!
 								if (harvester->harvestedEntity() != entity) {
 									nlwarning("<CCharacter::itemPickup> BUG MUST BE CORRECTED LATER");
-									nlwarning("<CCharacter::itemPickup> Creature (%s) supposed Harvester, id %s, is harvesting entity %s, which is not the same !!!!! Error in harvest, reset harvester on creature and continue harvest action", entity.toString().c_str(), harvesterId.toString().c_str(), harvester->harvestedEntity().toString().c_str());
+									nlwarning("<CCharacter::itemPickup> Creature (%s) supposed Harvester, id %s, is "
+											  "harvesting entity %s, which is not the same !!!!! Error in harvest, "
+											  "reset harvester on creature and continue harvest action",
+										entity.toString().c_str(), harvesterId.toString().c_str(),
+										harvester->harvestedEntity().toString().c_str());
 									creature->resetHarvesterRowId();
 								}
 								// END TEMP ANTI BUG
 								else {
 									SM_STATIC_PARAMS_2(params, STRING_MANAGER::entity, STRING_MANAGER::entity);
-									params[0].setEIdAIAlias(entity, CAIAliasTranslator::getInstance()->getAIAlias(entity));
-									params[1].setEIdAIAlias(harvesterId, CAIAliasTranslator::getInstance()->getAIAlias(harvesterId));
-									sendDynamicSystemMessage(_EntityRowId, "HARVEST_QUARTER_ALREADY_IN_PROGRESS_OTHER", params);
+									params[0].setEIdAIAlias(
+										entity, CAIAliasTranslator::getInstance()->getAIAlias(entity));
+									params[1].setEIdAIAlias(
+										harvesterId, CAIAliasTranslator::getInstance()->getAIAlias(harvesterId));
+									sendDynamicSystemMessage(
+										_EntityRowId, "HARVEST_QUARTER_ALREADY_IN_PROGRESS_OTHER", params);
 
 									sendCloseTempInventoryImpulsion();
 									return;
@@ -329,18 +343,25 @@ void CCharacter::itemPickup(const NLMISC::CEntityId& entity, bool harvest)
 								// check this player was really harvesting this entity
 								if (_MpSourceId != entity) {
 									nlwarning("<CCharacter::itemPickup> BUG MUST BE CORRECTED LATER");
-									nlwarning("<CCharacter::itemPickup> Creature %s supposed to be harvested by current player (id %s) but he is harvestng entity %s, which is not the same !!!!! Error in harvest, reset harvester on creature and conitnue harvest action", entity.toString().c_str(), harvesterId.toString().c_str(), _MpSourceId.toString().c_str());
+									nlwarning("<CCharacter::itemPickup> Creature %s supposed to be harvested by "
+											  "current player (id %s) but he is harvestng entity %s, which is not the "
+											  "same !!!!! Error in harvest, reset harvester on creature and conitnue "
+											  "harvest action",
+										entity.toString().c_str(), harvesterId.toString().c_str(),
+										_MpSourceId.toString().c_str());
 									creature->resetHarvesterRowId();
 								} else {
 									// do nothing as player already harvesting this entity
-									//return;
+									// return;
 									// reset harvest infos and restart harvest as the client window has been cleared
-									//endHarvest(false);
+									// endHarvest(false);
 								}
 							}
 						} else {
 							nlwarning("<CCharacter::itemPickup> BUG MUST BE CORRECTED LATER");
-							nlwarning("<CCharacter::itemPickup> For creature %s , Harvester row id cannot be found !!!! Error in harvest, reset harvester on creature and conitnue harvest action", entity.toString().c_str());
+							nlwarning("<CCharacter::itemPickup> For creature %s , Harvester row id cannot be found "
+									  "!!!! Error in harvest, reset harvester on creature and conitnue harvest action",
+								entity.toString().c_str());
 							creature->resetHarvesterRowId();
 						}
 					}
@@ -354,7 +375,8 @@ void CCharacter::itemPickup(const NLMISC::CEntityId& entity, bool harvest)
 					if (qty == 0) {
 						if (!e->getContextualProperty().directAccessForStructMembers().lootable()) {
 							SM_STATIC_PARAMS_1(params, STRING_MANAGER::entity);
-							params[0].setEIdAIAlias(creature->getId(), CAIAliasTranslator::getInstance()->getAIAlias(creature->getId()));
+							params[0].setEIdAIAlias(
+								creature->getId(), CAIAliasTranslator::getInstance()->getAIAlias(creature->getId()));
 							sendDynamicSystemMessage(_EntityRowId, "HARVEST_NOTHING_TO_QUARTER", params);
 
 							sendCloseTempInventoryImpulsion();
@@ -478,8 +500,10 @@ bool CCharacter::pickUpItem(const CEntityId& entity)
 			// And not already looted by someone
 			if (pCreature->getLooter() != CEntityId::Unknown) {
 				SM_STATIC_PARAMS_2(params, STRING_MANAGER::entity, STRING_MANAGER::entity);
-				params[0].setEIdAIAlias(pCreature->getId(), CAIAliasTranslator::getInstance()->getAIAlias(pCreature->getId()));
-				params[1].setEIdAIAlias(pCreature->getLooter(), CAIAliasTranslator::getInstance()->getAIAlias(pCreature->getLooter()));
+				params[0].setEIdAIAlias(
+					pCreature->getId(), CAIAliasTranslator::getInstance()->getAIAlias(pCreature->getId()));
+				params[1].setEIdAIAlias(
+					pCreature->getLooter(), CAIAliasTranslator::getInstance()->getAIAlias(pCreature->getLooter()));
 				sendDynamicSystemMessage(_EntityRowId, "HARVEST_LOOT_ALREADY_IN_PROGRESS_OTHER", params);
 
 				return false;
@@ -511,14 +535,17 @@ bool CCharacter::pickUpItem(const CEntityId& entity)
 				if ((pCreature->getForm() != NULL) && !pCreature->moneyHasBeenLooted() && !IsRingShard) {
 					const CStaticLootTable* lootTable;
 					if (!pCreature->getCustomLootTableId().empty()) {
-						//if custom, retrieve the CStaticLootTable stored in the DynamicSheetManager
-						lootTable = CDynamicSheetManager::getInstance()->getLootTable(pCreature->getPrimAlias(), pCreature->getCustomLootTableId());
+						// if custom, retrieve the CStaticLootTable stored in the DynamicSheetManager
+						lootTable = CDynamicSheetManager::getInstance()->getLootTable(
+							pCreature->getPrimAlias(), pCreature->getCustomLootTableId());
 					} else
 						lootTable = CSheets::getLootTableForm(pCreature->getLootTable(0));
 					if (lootTable != NULL) {
 						uint8 roll = (uint8)RandomGenerator.rand(99);
 						if (roll < (uint8)(lootTable->MoneyDropProbability * 100)) {
-							uint64 nAmount = (uint64)(((float)pCreature->getForm()->getXPLevel()) * lootTable->MoneyLvlFactor + lootTable->MoneyBase);
+							uint64 nAmount
+								= (uint64)(((float)pCreature->getForm()->getXPLevel()) * lootTable->MoneyLvlFactor
+									+ lootTable->MoneyBase);
 							if (nAmount > 0) {
 								SM_STATIC_PARAMS_1(params, STRING_MANAGER::money);
 								params[0].Money = nAmount;
@@ -635,7 +662,8 @@ void CCharacter::destroyItem(INVENTORIES::TInventory invId, uint32 slot, uint32 
 
 	// if the item is equipped, unequip first
 	CInventoryPtr refInv = item->getRefInventory();
-	if (refInv != NULL && (refInv->getInventoryId() == INVENTORIES::handling || refInv->getInventoryId() == INVENTORIES::equipment)) {
+	if (refInv != NULL
+		&& (refInv->getInventoryId() == INVENTORIES::handling || refInv->getInventoryId() == INVENTORIES::equipment)) {
 		unequipCharacter(refInv->getInventoryId(), item->getRefInventorySlot());
 	}
 
@@ -673,21 +701,25 @@ void CCharacter::destroyItem(INVENTORIES::TInventory invId, uint32 slot, uint32 
 		if (_XpCatalyserSlot != INVENTORIES::INVALID_INVENTORY_SLOT) {
 			if (slot == _XpCatalyserSlot) {
 				//				_PropertyDatabase.setProp( "CHARACTER_INFO:XP_CATALYSER:Count", remainingQuantity );
-				CBankAccessor_PLR::getCHARACTER_INFO().getXP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(remainingQuantity));
+				CBankAccessor_PLR::getCHARACTER_INFO().getXP_CATALYSER().setCount(
+					_PropertyDatabase, checkedCast<uint16>(remainingQuantity));
 			}
 		}
 
 		if (_RingXpCatalyserSlot != INVENTORIES::INVALID_INVENTORY_SLOT) {
 			if (slot == _RingXpCatalyserSlot) {
-				//				_PropertyDatabase.setProp( "CHARACTER_INFO:RING_XP_CATALYSER:Count", remainingQuantity );
-				CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(remainingQuantity));
+				//				_PropertyDatabase.setProp( "CHARACTER_INFO:RING_XP_CATALYSER:Count", remainingQuantity
+				//);
+				CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(
+					_PropertyDatabase, checkedCast<uint16>(remainingQuantity));
 			}
 		}
 	}
 }
 
 // ****************************************************************************
-void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVENTORIES::TInventory dstInvId, uint32 dstSlot, uint32 quantity)
+void CCharacter::moveItem(
+	INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVENTORIES::TInventory dstInvId, uint32 dstSlot, uint32 quantity)
 {
 	// cannot move an item in the same inventory
 	if (srcInvId == dstInvId)
@@ -734,12 +766,13 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 		return;
 
 	// cannot move a non dropable item or an active xp catalyser
-	if (!srcItem->getMovable() && (srcItem->getUnMovable() || (!srcForm->DropOrSell && !canPutNonDropableItemInInventory(dstInvId)) || isAnActiveXpCatalyser(srcItem)))
+	if (!srcItem->getMovable()
+		&& (srcItem->getUnMovable() || (!srcForm->DropOrSell && !canPutNonDropableItemInInventory(dstInvId))
+			   || isAnActiveXpCatalyser(srcItem)))
 		return;
 
 	// You cannot exchange genesis named items
 	if (srcItem->getPhraseId().find("genesis_") == 0 && !canPutNonDropableItemInInventory(dstInvId)) {
-		nlwarning("Character %s tries to move '%s' to inv %u", _Id.toString().c_str(), srcItem->getPhraseId().c_str(), dstInvId);
 		return;
 	}
 
@@ -748,7 +781,8 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 		return;
 
 	// worned items (except tools) are no longer 'movable'
-	if (srcItem->getItemWornState() == ITEM_WORN_STATE::Worned && (srcForm->Family != ITEMFAMILY::CRAFTING_TOOL && srcForm->Family != ITEMFAMILY::HARVEST_TOOL)) {
+	if (srcItem->getItemWornState() == ITEM_WORN_STATE::Worned
+		&& (srcForm->Family != ITEMFAMILY::CRAFTING_TOOL && srcForm->Family != ITEMFAMILY::HARVEST_TOOL)) {
 		/// TODO : send more explicit message
 		sendDynamicSystemMessage(_Id, "NON_DROPABLE_ITEM");
 		return;
@@ -758,6 +792,12 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 	if (srcInvId == INVENTORIES::player_room || dstInvId == INVENTORIES::player_room) {
 		if (!getRoomInterface().canUseInventory(this, this))
 			return;
+
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer() && dstInvId == INVENTORIES::player_room) {
+			sendDynamicSystemMessage(_Id, "EGS_CANT_USE_ROOM_INV_IS_TRIAL_PLAYER");
+			return;
+		}
 	}
 
 	// if one of inventories is a pet animal check that it is accessible
@@ -768,6 +808,15 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 	if (dstInvId >= INVENTORIES::pet_animal && dstInvId < INVENTORIES::max_pet_animal) {
 		if (!petInventoryDistance(dstInvId - INVENTORIES::pet_animal))
 			return;
+
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer()) {
+			sint32 petSlot = getMountOrFirstPetSlot();
+			if (petSlot != dstInvId - INVENTORIES::pet_animal) {
+				sendDynamicSystemMessage(_Id, "EGS_CANT_USE_ROOM_INV_IS_TRIAL_PLAYER");
+				return;
+			}
+		}
 	}
 
 	/***  END OF GAME PLAY RULES  ***/
@@ -800,8 +849,7 @@ void CCharacter::moveItem(INVENTORIES::TInventory srcInvId, uint32 srcSlot, INVE
 // ****************************************************************************
 bool CCharacter::canPutNonDropableItemInInventory(INVENTORIES::TInventory invId) const
 {
-	if (invId == INVENTORIES::bag
-		|| invId == INVENTORIES::player_room
+	if (invId == INVENTORIES::bag || invId == INVENTORIES::player_room
 		|| (invId >= INVENTORIES::pet_animal && invId < INVENTORIES::max_pet_animal))
 		return true;
 
@@ -860,7 +908,8 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 		return;
 
 	// cannot equip a worned item(except tools)
-	if (item->getItemWornState() == ITEM_WORN_STATE::Worned && (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL))
+	if (item->getItemWornState() == ITEM_WORN_STATE::Worned
+		&& (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL))
 		return;
 
 	// if an item is equipped in destination slot unequip it
@@ -900,12 +949,13 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 
 	// if equip right hand item, compute parry level and disengage if player is engaged in combat
 	if (dstInvId == INVENTORIES::handling && dstSlot == INVENTORIES::right) {
-		//updateParry(form->Family, form->Skill);
+		// updateParry(form->Family, form->Skill);
 		CPhraseManager::getInstance().disengage(_EntityRowId, true);
 	}
 
 	// output stats
-	//	EGSPD::equipItem(_Id, item->getSheetId().toString(), item->quality(), INVENTORIES::toString(dstInvId), SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)dstSlot));
+	//	EGSPD::equipItem(_Id, item->getSheetId().toString(), item->quality(), INVENTORIES::toString(dstInvId),
+	// SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)dstSlot));
 }
 
 // ****************************************************************************
@@ -946,11 +996,13 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 
 	const CStaticItem* form = item->getStaticForm();
 	if (form) {
-		//if( form->Family == ITEMFAMILY::ARMOR || form->Family == ITEMFAMILY::MELEE_WEAPON || form->Family == ITEMFAMILY::RANGE_WEAPON )
+		// if( form->Family == ITEMFAMILY::ARMOR || form->Family == ITEMFAMILY::MELEE_WEAPON || form->Family ==
+		// ITEMFAMILY::RANGE_WEAPON )
 		_WearEquipmentMalus -= form->WearEquipmentMalus;
 	}
 	//	_PropertyDatabase.setProp(_DataIndexReminder->Modifiers.TotalMalusEquip, uint32(_WearEquipmentMalus * 50));
-	CBankAccessor_PLR::getMODIFIERS().setTOTAL_MALUS_EQUIP(_PropertyDatabase, checkedCast<uint8>(_WearEquipmentMalus * 50));
+	CBankAccessor_PLR::getMODIFIERS().setTOTAL_MALUS_EQUIP(
+		_PropertyDatabase, checkedCast<uint8>(_WearEquipmentMalus * 50));
 
 	// remove item modifiers
 	removeItemModifiers(item);
@@ -978,9 +1030,11 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
-		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));
+		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
+			_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryCurrent, _CurrentParryLevel);
-		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
+		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(
+			_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
 
 		CPhraseManager::getInstance().disengage(_EntityRowId, true);
 	}
@@ -993,7 +1047,9 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 	}
 
 	// output stats
-	//	EGSPD::unequipItem(_Id, item->getSheetId().toString(), item->quality(), INVENTORIES::toString((INVENTORIES::TInventory)invId), SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)slot));
+	//	EGSPD::unequipItem(_Id, item->getSheetId().toString(), item->quality(),
+	// INVENTORIES::toString((INVENTORIES::TInventory)invId),
+	// SLOT_EQUIPMENT::toString((SLOT_EQUIPMENT::TSlotEquipment)slot));
 }
 
 //--------------------------------------------------------------------------
@@ -1007,7 +1063,9 @@ bool CCharacter::checkItemValidityWithSlot(const CSheetId& sheet, INVENTORIES::T
 	}
 
 	const CStaticItem* form = CSheets::getForm(sheet);
-	BOMB_IF(form == 0, NLMISC::toString("Item %s have no static form, recompute packed sheet.", sheet.toString().c_str()), return false);
+	BOMB_IF(form == 0,
+		NLMISC::toString("Item %s have no static form, recompute packed sheet.", sheet.toString().c_str()),
+		return false);
 
 	// if hands inventory, check if item match with slot (right hand and left hand)
 	if (inv == INVENTORIES::handling) {
@@ -1023,7 +1081,9 @@ bool CCharacter::checkItemValidityWithSlot(const CSheetId& sheet, INVENTORIES::T
 				CGameItemPtr item = inventory->getItem(INVENTORIES::left);
 				if (item != 0) {
 					const CStaticItem* form2 = CSheets::getForm(item->getSheetId());
-					BOMB_IF(form2 == 0, NLMISC::toString("Item %s have no static form, recompute packed sheet.", item->getSheetId().toString().c_str()), return false);
+					BOMB_IF(form2 == 0, NLMISC::toString("Item %s have no static form, recompute packed sheet.",
+											item->getSheetId().toString().c_str()),
+						return false);
 					result = checkRightLeftHandCompatibility(form->Slots, form2->Slots);
 					if (result) {
 						if (form2->Family == ITEMFAMILY::AMMO) {
@@ -1044,7 +1104,9 @@ bool CCharacter::checkItemValidityWithSlot(const CSheetId& sheet, INVENTORIES::T
 				CGameItemPtr item = inventory->getItem(INVENTORIES::right);
 				if (item != 0) {
 					const CStaticItem* form2 = CSheets::getForm(item->getSheetId());
-					BOMB_IF(form2 == 0, NLMISC::toString("Item %s have no static form, recompute packed sheet.", item->getSheetId().toString().c_str()), return false);
+					BOMB_IF(form2 == 0, NLMISC::toString("Item %s have no static form, recompute packed sheet.",
+											item->getSheetId().toString().c_str()),
+						return false);
 
 					if (form->Family == ITEMFAMILY::AMMO && form2->Family == ITEMFAMILY::RANGE_WEAPON) {
 						result = checkIfAmmoCompatibleWithWeapon(form->Skill, form2->Skill);
@@ -1135,7 +1197,8 @@ bool CCharacter::checkItemValidityWithEquipmentSlot(const CSheetId& sheet, uint1
 }
 
 //----------------------------------------------------------------------------
-bool CCharacter::checkRightLeftHandCompatibility(const std::vector<std::string> itemRight, const std::vector<std::string> itemLeft)
+bool CCharacter::checkRightLeftHandCompatibility(
+	const std::vector<std::string> itemRight, const std::vector<std::string> itemLeft)
 {
 	const sint itemRightSlotSize = (sint)itemRight.size();
 	const sint itemLeftSlotSize = (sint)itemLeft.size();
@@ -1195,16 +1258,38 @@ bool CCharacter::checkPreRequired(const CGameItemPtr& item, bool equipCheck)
 
 	if (requiredRespected) {
 		if (item->getRequiredCharac() >= 0 && item->getRequiredCharac() < CHARACTERISTICS::NUM_CHARACTERISTICS) {
-			if (item->getRequiredCharacLevel() > _PhysCharacs._PhysicalCharacteristics[item->getRequiredCharac()].Base) {
+			if (item->getRequiredCharacLevel()
+				> _PhysCharacs._PhysicalCharacteristics[item->getRequiredCharac()].Base) {
 				requiredRespected = false;
 			}
 		}
 	}
 
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && (form->Family != ITEMFAMILY::RAW_MATERIAL)) {
+		if (item->recommended() > 150)
+			requiredRespected = false;
+	}
+
 	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();
 	bool neutralcult = (allegeance.first == PVP_CLAN::Neutral || allegeance.first == PVP_CLAN::None);
 	bool neutralciv = (allegeance.second == PVP_CLAN::Neutral || allegeance.second == PVP_CLAN::None);
-	if (item->getPhraseId().find("foragetool_") != 0 && ((item->getRequiredFaction() == "kami" && (allegeance.first != PVP_CLAN::Kami || getOrganization() != 0)) || (item->getRequiredFaction() == "karavan" && (allegeance.first != PVP_CLAN::Karavan || getOrganization() != 0)) || (item->getRequiredFaction() == "marauder" && (!neutralcult || !neutralciv || getOrganization() != 5)) || (item->getRequiredFaction() == "neutralcult" && (!neutralcult || getOrganization() != 0)) || (item->getRequiredFaction() == "neutralciv" && (!neutralciv || getOrganization() != 0)) || (item->getRequiredFaction() == "neutral" && (!neutralcult || !neutralciv || getOrganization() != 0)) || (item->getRequiredFaction() == "fyros" && (allegeance.second != PVP_CLAN::Fyros || getOrganization() != 0)) || (item->getRequiredFaction() == "matis" && (allegeance.second != PVP_CLAN::Matis || getOrganization() != 0)) || (item->getRequiredFaction() == "tryker" && (allegeance.second != PVP_CLAN::Tryker || getOrganization() != 0)) || (item->getRequiredFaction() == "zorai" && (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0))))
+	if (item->getPhraseId().find("foragetool_") != 0
+		&& ((item->getRequiredFaction() == "kami" && (allegeance.first != PVP_CLAN::Kami || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "karavan"
+					  && (allegeance.first != PVP_CLAN::Karavan || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "marauder" && (!neutralcult || !neutralciv || getOrganization() != 5))
+			   || (item->getRequiredFaction() == "neutralcult" && (!neutralcult || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "neutralciv" && (!neutralciv || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "neutral" && (!neutralcult || !neutralciv || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "fyros"
+					  && (allegeance.second != PVP_CLAN::Fyros || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "matis"
+					  && (allegeance.second != PVP_CLAN::Matis || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "tryker"
+					  && (allegeance.second != PVP_CLAN::Tryker || getOrganization() != 0))
+			   || (item->getRequiredFaction() == "zorai"
+					  && (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0))))
 		requiredRespected = false;
 
 	if (requiredRespected == false && equipCheck) {
@@ -1222,7 +1307,10 @@ bool CCharacter::checkRequiredForSkill(uint32 skillRequired, SKILLS::ESkills req
 			return false;
 		}
 	} else {
-		if (skillRequired > (uint32)getBestSkillValue(SKILLS::SF) && skillRequired > (uint32)getBestSkillValue(SKILLS::SM) && skillRequired > (uint32)getBestSkillValue(SKILLS::SC) && skillRequired > (uint32)getBestSkillValue(SKILLS::SH)) {
+		if (skillRequired > (uint32)getBestSkillValue(SKILLS::SF)
+			&& skillRequired > (uint32)getBestSkillValue(SKILLS::SM)
+			&& skillRequired > (uint32)getBestSkillValue(SKILLS::SC)
+			&& skillRequired > (uint32)getBestSkillValue(SKILLS::SH)) {
 			return false;
 		}
 	}
@@ -1236,13 +1324,15 @@ uint32 CCharacter::getWeightOfEquippedWeapon()
 	itemPtr = getRightHandItem();
 	uint32 weight = DefaultWeightHands;
 	if (itemPtr != NULL && itemPtr->getStaticForm() != NULL
-		&& (itemPtr->getStaticForm()->Family == ITEMFAMILY::MELEE_WEAPON || itemPtr->getStaticForm()->Family == ITEMFAMILY::RANGE_WEAPON)) {
+		&& (itemPtr->getStaticForm()->Family == ITEMFAMILY::MELEE_WEAPON
+			   || itemPtr->getStaticForm()->Family == ITEMFAMILY::RANGE_WEAPON)) {
 		weight = itemPtr->weight();
 	}
 
 	itemPtr = getLeftHandItem();
 	if (itemPtr != NULL && itemPtr->getStaticForm() != NULL
-		&& (itemPtr->getStaticForm()->Family == ITEMFAMILY::MELEE_WEAPON /*|| itemPtr->getStaticForm()->Family == ITEMFAMILY::AMMO*/)) {
+		&& (itemPtr->getStaticForm()->Family
+			   == ITEMFAMILY::MELEE_WEAPON /*|| itemPtr->getStaticForm()->Family == ITEMFAMILY::AMMO*/)) {
 		weight += itemPtr->weight();
 		weight /= 2;
 	}
@@ -1254,7 +1344,8 @@ bool CCharacter::checkExchangeActors(bool* exchangeWithBot) const
 {
 	CEntityBase* interlocutor = CEntityBaseManager::getEntityBasePtr(_CurrentInterlocutor);
 	if (interlocutor == NULL) {
-		nlwarning("Player %s, invalid exchange partner %s", _Id.toString().c_str(), _CurrentInterlocutor.toString().c_str());
+		nlwarning(
+			"Player %s, invalid exchange partner %s", _Id.toString().c_str(), _CurrentInterlocutor.toString().c_str());
 		return false;
 	}
 
@@ -1267,7 +1358,8 @@ bool CCharacter::checkExchangeActors(bool* exchangeWithBot) const
 	if (_CurrentInterlocutor.getType() == RYZOMID::player) {
 		trader = dynamic_cast<CCharacter*>(interlocutor);
 		if (trader == NULL) {
-			nlwarning("Entity %s type is player but dynamic_cast in CCharacter * returns NULL ?!", interlocutor->getId().toString().c_str());
+			nlwarning("Entity %s type is player but dynamic_cast in CCharacter * returns NULL ?!",
+				interlocutor->getId().toString().c_str());
 			return false;
 		}
 
@@ -1276,7 +1368,8 @@ bool CCharacter::checkExchangeActors(bool* exchangeWithBot) const
 
 		allExchanging &= trader->isExchanging();
 	} else if (_CurrentInterlocutor.getType() != RYZOMID::npc) {
-		nlwarning("Player %s, bad exchange partner type %s", _Id.toString().c_str(), _CurrentInterlocutor.toString().c_str());
+		nlwarning(
+			"Player %s, bad exchange partner type %s", _Id.toString().c_str(), _CurrentInterlocutor.toString().c_str());
 		return false;
 	}
 
@@ -1284,10 +1377,8 @@ bool CCharacter::checkExchangeActors(bool* exchangeWithBot) const
 		if (trader == NULL)
 			nlwarning("Player %s is not exchanging!", _Id.toString().c_str());
 		else
-			nlwarning("Player %s is %s Interlocutor is %s",
-				_Id.toString().c_str(),
-				(isExchanging() ? "exchanging." : "not exchanging!"),
-				_CurrentInterlocutor.toString().c_str(),
+			nlwarning("Player %s is %s Interlocutor is %s", _Id.toString().c_str(),
+				(isExchanging() ? "exchanging." : "not exchanging!"), _CurrentInterlocutor.toString().c_str(),
 				(trader->isExchanging() ? "exchanging." : "not exchanging!"));
 		return false;
 	}
@@ -1425,7 +1516,8 @@ void CCharacter::consumeAmmo(uint32 quantity)
 }
 
 // ****************************************************************************
-CGameItemPtr CCharacter::createItem(uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId& obtainedItem, const CEntityId& creatorId, const std::string* phraseId)
+CGameItemPtr CCharacter::createItem(uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId& obtainedItem,
+	const CEntityId& creatorId, const std::string* phraseId)
 {
 	static const CSheetId preorderSheetId("pre_order.sitem");
 
@@ -1440,12 +1532,9 @@ CGameItemPtr CCharacter::createItem(uint16 obtainedQuality, uint32 quantity, con
 
 	// if item can be sold, get it in the sold items list (TODO: remove this horrible hardcoding!)
 	CGameItemPtr sellingItem;
-	if (form->Family != ITEMFAMILY::RAW_MATERIAL
-		&& form->Family != ITEMFAMILY::HARVEST_TOOL
-		&& form->Family != ITEMFAMILY::CRAFTING_TOOL
-		&& form->Family != ITEMFAMILY::CRYSTALLIZED_SPELL
-		&& form->Family != ITEMFAMILY::ITEM_SAP_RECHARGE
-		&& form->Family != ITEMFAMILY::FOOD) {
+	if (form->Family != ITEMFAMILY::RAW_MATERIAL && form->Family != ITEMFAMILY::HARVEST_TOOL
+		&& form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::CRYSTALLIZED_SPELL
+		&& form->Family != ITEMFAMILY::ITEM_SAP_RECHARGE && form->Family != ITEMFAMILY::FOOD) {
 		vector<CGameItemPtr>::const_iterator it;
 		const vector<CGameItemPtr>::const_iterator itEnd = CStaticItems::getStaticItems().end();
 		for (it = CStaticItems::getStaticItems().begin(); it != itEnd; ++it) {
@@ -1487,13 +1576,17 @@ CGameItemPtr CCharacter::createItem(uint16 obtainedQuality, uint32 quantity, con
 		} else if (obtainedItem == preorderSheetId) {
 			item = GameItemManager.createItem(obtainedItem, obtainedQuality, true, form->DropOrSell, creatorId);
 		} else {
-			nlwarning("<CCharacter::createItem> item %s could be sold, but can't get copy of it from static item list (note : sheet name must start with 'ic', and not with '_', if name starts with 'ic' then craft plan is surely missing", obtainedItem.toString().c_str());
+			nlwarning("<CCharacter::createItem> item %s could be sold, but can't get copy of it from static item list "
+					  "(note : sheet name must start with 'ic', and not with '_', if name starts with 'ic' then craft "
+					  "plan is surely missing",
+				obtainedItem.toString().c_str());
 		}
 	}
 	}
 
 	if (item == NULL) {
-		nlwarning("<CCharacter::createItem> error while creating item %s -> returned a NULL pointer", form->SheetId.toString().c_str());
+		nlwarning("<CCharacter::createItem> error while creating item %s -> returned a NULL pointer",
+			form->SheetId.toString().c_str());
 		return NULL;
 	}
 
@@ -1600,7 +1693,8 @@ CGameItemPtr CCharacter::removeItemFromInventory(INVENTORIES::TInventory invId, 
 	}
 
 	// worned items (except tools) are no longer 'movable'
-	if (item->getItemWornState() == ITEM_WORN_STATE::Worned && (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL)) {
+	if (item->getItemWornState() == ITEM_WORN_STATE::Worned
+		&& (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL)) {
 		/// TODO : send more explicit message
 		sendDynamicSystemMessage(_Id, "NON_DROPABLE_ITEM");
 		return NULL;
@@ -1619,7 +1713,8 @@ CGameItemPtr CCharacter::removeItemFromInventory(INVENTORIES::TInventory invId, 
 }
 
 // ****************************************************************************
-bool CCharacter::createItemInInventory(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId& obtainedItem, const CEntityId& creatorId, const std::string* phraseId)
+bool CCharacter::createItemInInventory(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity,
+	const NLMISC::CSheetId& obtainedItem, const CEntityId& creatorId, const std::string* phraseId)
 {
 	H_AUTO(CCharacter_createItemInInventory);
 
@@ -1640,7 +1735,9 @@ bool CCharacter::createItemInInventory(INVENTORIES::TInventory invId, uint16 obt
 }
 
 // ****************************************************************************
-CGameItemPtr CCharacter::createItemInInventoryFreeSlot(INVENTORIES::TInventory invId, uint16 obtainedQuality, uint32 quantity, const NLMISC::CSheetId& obtainedItem, const NLMISC::CEntityId& creatorId, const std::string* phraseId)
+CGameItemPtr CCharacter::createItemInInventoryFreeSlot(INVENTORIES::TInventory invId, uint16 obtainedQuality,
+	uint32 quantity, const NLMISC::CSheetId& obtainedItem, const NLMISC::CEntityId& creatorId,
+	const std::string* phraseId)
 {
 	H_AUTO(CCharacter_createItemInInventoryFreeSlot);
 
@@ -1703,7 +1800,7 @@ void CCharacter::itemTempInventoryToBag(uint32 srcSlot, bool sendCloseTempImpuls
 	// trap change the code where there is some quartering by entering the mode quarter
 	// it seems obvious, but apparently it is not for the person who has coded that
 
-	case TEMP_INV_MODE::Harvest: //quarter
+	case TEMP_INV_MODE::Harvest: // quarter
 	{
 		TLogContext_Item_QuarterOrLoot logContext(_Id);
 		// try to quarter, else try to loot
@@ -1745,7 +1842,8 @@ void CCharacter::itemTempInventoryToBag(uint32 srcSlot, bool sendCloseTempImpuls
 				// send loot txt to every team members (except looter ..)
 				CTeam* team = TeamManager.getTeam(_TeamId);
 				if (team) {
-					SM_STATIC_PARAMS_4(paramsOther, STRING_MANAGER::player, STRING_MANAGER::integer, STRING_MANAGER::item, STRING_MANAGER::integer);
+					SM_STATIC_PARAMS_4(paramsOther, STRING_MANAGER::player, STRING_MANAGER::integer,
+						STRING_MANAGER::item, STRING_MANAGER::integer);
 					paramsOther[0].setEIdAIAlias(getId(), CAIAliasTranslator::getInstance()->getAIAlias(getId()));
 					paramsOther[1].Int = (sint32)itemStackSize;
 					if (paramsOther[1].Int == 0)
@@ -1854,7 +1952,8 @@ void CCharacter::itemTempInventoryToBag(uint32 srcSlot, bool sendCloseTempImpuls
 			// send loot txt to every team members (except looter ..)
 			CTeam* team = TeamManager.getTeam(_TeamId);
 			if (team) {
-				SM_STATIC_PARAMS_4(paramsOther, STRING_MANAGER::player, STRING_MANAGER::integer, STRING_MANAGER::item, STRING_MANAGER::integer);
+				SM_STATIC_PARAMS_4(paramsOther, STRING_MANAGER::player, STRING_MANAGER::integer, STRING_MANAGER::item,
+					STRING_MANAGER::integer);
 				paramsOther[0].setEIdAIAlias(getId(), CAIAliasTranslator::getInstance()->getAIAlias(getId()));
 				paramsOther[1].Int = (sint32)itemStackSize;
 				if (paramsOther[1].Int == 0)
@@ -1935,10 +2034,7 @@ void CCharacter::clearTempInventory()
 }
 
 // ****************************************************************************
-bool CCharacter::tempInventoryEmpty()
-{
-	return (_Inventory[INVENTORIES::temporary]->getUsedSlotCount() == 0);
-}
+bool CCharacter::tempInventoryEmpty() { return (_Inventory[INVENTORIES::temporary]->getUsedSlotCount() == 0); }
 
 // ****************************************************************************
 void CCharacter::incSlotVersion(INVENTORIES::TInventory invId, uint32 slot)
@@ -1967,7 +2063,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 		CGameItemPtr item = NULL;
 		if (inventory == INVENTORIES::exchange) {
 			if (slot >= CExchangeView::NbExchangeSlots) {
-				nlwarning("<sendItemInfos>for exchange %s tries slot %u count is %u", _Id.toString().c_str(), slot, CExchangeView::NbExchangeSlots);
+				nlwarning("<sendItemInfos>for exchange %s tries slot %u count is %u", _Id.toString().c_str(), slot,
+					CExchangeView::NbExchangeSlots);
 				return;
 			}
 
@@ -1982,8 +2079,10 @@ void CCharacter::sendItemInfos(uint16 slotId)
 				nlwarning("<sendItemInfos>for exchange %s tries slot %u. Slot is empty", _Id.toString().c_str(), slot);
 				return;
 			}
-			//			infos.versionInfo = (uint16) _PropertyDatabase.getProp( NLMISC::toString("EXCHANGE:GIVE:%u:INFO_VERSION",slot) );
-			infos.versionInfo = CBankAccessor_PLR::getEXCHANGE().getGIVE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
+			//			infos.versionInfo = (uint16) _PropertyDatabase.getProp(
+			// NLMISC::toString("EXCHANGE:GIVE:%u:INFO_VERSION",slot) );
+			infos.versionInfo
+				= CBankAccessor_PLR::getEXCHANGE().getGIVE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
 		} else if (inventory == INVENTORIES::exchange_proposition) {
 			CCharacter* trader = PlayerManager.getChar(_CurrentInterlocutor);
 			if (!trader) {
@@ -1992,17 +2091,21 @@ void CCharacter::sendItemInfos(uint16 slotId)
 			}
 
 			if (slot >= CExchangeView::NbExchangeSlots) {
-				nlwarning("<sendItemInfos>for exchange %s tries slot %u count is %u", _Id.toString().c_str(), slot, CExchangeView::NbExchangeSlots);
+				nlwarning("<sendItemInfos>for exchange %s tries slot %u count is %u", _Id.toString().c_str(), slot,
+					CExchangeView::NbExchangeSlots);
 				return;
 			}
 
 			item = trader->_ExchangeView->getExchangeItem(slot);
 			if (item == NULL) {
-				nlwarning("<sendItemInfos>for exchange_proposition %s tries slot %u. Slot is empty", _Id.toString().c_str(), slot);
+				nlwarning("<sendItemInfos>for exchange_proposition %s tries slot %u. Slot is empty",
+					_Id.toString().c_str(), slot);
 				return;
 			}
-			//			infos.versionInfo = (uint16) _PropertyDatabase.getProp( NLMISC::toString("EXCHANGE:RECEIVE:%u:INFO_VERSION",slot) );
-			infos.versionInfo = CBankAccessor_PLR::getEXCHANGE().getRECEIVE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
+			//			infos.versionInfo = (uint16) _PropertyDatabase.getProp(
+			// NLMISC::toString("EXCHANGE:RECEIVE:%u:INFO_VERSION",slot) );
+			infos.versionInfo
+				= CBankAccessor_PLR::getEXCHANGE().getRECEIVE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
 		} else if (inventory == INVENTORIES::guild) {
 			CMirrorPropValueRO<TYPE_CELL> mirrorValue(TheDataset, getEntityRowId(), DSPropertyCELL);
 			const sint32 cell = mirrorValue;
@@ -2011,7 +2114,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 				return;
 			}
 
-			const CRoomInstanceGuild* room = dynamic_cast<CRoomInstanceGuild*>(CBuildingManager::getInstance()->getRoomInstanceFromCell(cell));
+			const CRoomInstanceGuild* room
+				= dynamic_cast<CRoomInstanceGuild*>(CBuildingManager::getInstance()->getRoomInstanceFromCell(cell));
 			if (!room) {
 				nlwarning("<sendItemInfos> user %s cell %d is invalid", _Id.toString().c_str(), cell);
 				return;
@@ -2039,7 +2143,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 						if (item != NULL) {
 							itemPtrSmart->setItem(item);
 						} else {
-							nlwarning("<CCharacter sendItemInfos> invalid trading slot %u for user %s", slot, _Id.toString().c_str());
+							nlwarning("<CCharacter sendItemInfos> invalid trading slot %u for user %s", slot,
+								_Id.toString().c_str());
 							return;
 						}
 					}
@@ -2071,11 +2176,14 @@ void CCharacter::sendItemInfos(uint16 slotId)
 				nlwarning("<CCharacter sendItemInfos> invalid item for user '%s'", _Id.toString().c_str());
 				return;
 			}
-			//			infos.versionInfo = (uint16)_PropertyDatabase.getProp( NLMISC::toString("INVENTORY:SHARE:%u:INFO_VERSION",slot) );
-			infos.versionInfo = CBankAccessor_PLR::getINVENTORY().getSHARE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
+			//			infos.versionInfo = (uint16)_PropertyDatabase.getProp(
+			// NLMISC::toString("INVENTORY:SHARE:%u:INFO_VERSION",slot) );
+			infos.versionInfo
+				= CBankAccessor_PLR::getINVENTORY().getSHARE().getArray(slot).getINFO_VERSION(_PropertyDatabase);
 		} else {
 			if (inventory >= INVENTORIES::NUM_INVENTORY) {
-				nlwarning("<CCharacter sendItemInfos> invalid inventory %u : there are %u inventory, for user %s", inventory, INVENTORIES::NUM_INVENTORY, _Id.toString().c_str());
+				nlwarning("<CCharacter sendItemInfos> invalid inventory %u : there are %u inventory, for user %s",
+					inventory, INVENTORIES::NUM_INVENTORY, _Id.toString().c_str());
 				return;
 			}
 			if (_Inventory[inventory] == NULL) {
@@ -2083,7 +2191,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 				return;
 			}
 			if (slot >= _Inventory[inventory]->getSlotCount()) {
-				nlwarning("<CCharacter sendItemInfos> invalid slot %u for inventory %u: only %u slots for user %s", slot, inventory, _Inventory[inventory]->getSlotCount(), _Id.toString().c_str());
+				nlwarning("<CCharacter sendItemInfos> invalid slot %u for inventory %u: only %u slots for user %s",
+					slot, inventory, _Inventory[inventory]->getSlotCount(), _Id.toString().c_str());
 				return;
 			}
 			item = _Inventory[inventory]->getItem(slot);
@@ -2092,7 +2201,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 			infos.versionInfo = (uint16)_InventoryUpdater.getInfoVersion((INVENTORIES::TInventory)inventory, slot);
 		}
 		if (item == NULL) {
-			nlwarning("<CCharacter sendItemInfos> invalid slot %u for inventory %u: NULL, for user %s", slot, inventory, _Id.toString().c_str());
+			nlwarning("<CCharacter sendItemInfos> invalid slot %u for inventory %u: NULL, for user %s", slot, inventory,
+				_Id.toString().c_str());
 			return;
 		}
 
@@ -2120,7 +2230,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 			if (form->Skill != SKILLS::unknown) {
 				SKILLS::ESkills skill = form->Skill;
 				// Found compatible unlocked skill
-				while (_Skills.getSkillStruct(skill)->Base == 0 && SkillsTree->SkillsTree[skill].ParentSkill != SKILLS::unknown) {
+				while (_Skills.getSkillStruct(skill)->Base == 0
+					&& SkillsTree->SkillsTree[skill].ParentSkill != SKILLS::unknown) {
 					skill = SkillsTree->SkillsTree[skill].ParentSkill;
 				}
 				skillVal = _Skills.getSkillStruct(skill)->Current;
@@ -2129,7 +2240,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 
 			if (item->getStaticForm()->Family == ITEMFAMILY::SCROLL_R2) {
 				// sessionId() don't works with edition session
-				const R2::TMissionItem* itemDesc = CR2MissionItem::getInstance().getR2ItemDefinition(currentSessionId(), item->getSheetId());
+				const R2::TMissionItem* itemDesc
+					= CR2MissionItem::getInstance().getR2ItemDefinition(currentSessionId(), item->getSheetId());
 				if (itemDesc != 0) {
 					infos.R2ItemDescription = itemDesc->Description;
 					infos.R2ItemComment = itemDesc->Comment;
@@ -2138,7 +2250,7 @@ void CCharacter::sendItemInfos(uint16 slotId)
 		}
 		item->damage(skillVal, infos.CurrentDamage, infos.MaxDamage);
 
-		infos.HitRate = (uint16)(item->hitRate() * 6); //nb hit per minute
+		infos.HitRate = (uint16)(item->hitRate() * 6); // nb hit per minute
 
 		infos.SapLoadCurrent = item->sapLoad();
 		infos.SapLoadMax = item->maxSapLoad();
@@ -2193,7 +2305,8 @@ void CCharacter::sendItemInfos(uint16 slotId)
 			string cText = item->getCustomText().toString();
 			string::size_type sPos = cText.find(" ");
 			string::size_type ePos = cText.find("\n---\n");
-			if (sPos != string::npos && sPos != (cText.length() - 1) && ePos != string::npos && ePos != (cText.length() - 1)) {
+			if (sPos != string::npos && sPos != (cText.length() - 1) && ePos != string::npos
+				&& ePos != (cText.length() - 1)) {
 				string cUrl = cText.substr(sPos, ePos - sPos);
 				infos.CustomText = ucstring("@WEBIG " + cUrl);
 			}
@@ -2217,7 +2330,9 @@ void CCharacter::sendItemInfos(uint16 slotId)
 		sendMessageViaMirror(NLNET::TServiceId(_Id.getDynamicId()), msgout);
 
 		// Call the onItemChanged only on character's inventories (trading is not an inventory)
-		if ((inventory != INVENTORIES::guild) && (inventory != INVENTORIES::player_room) && (inventory != INVENTORIES::exchange_proposition) && (inventory != INVENTORIES::exchange) && (inventory != INVENTORIES::trading) && (inventory != INVENTORIES::reward_sharing)) {
+		if ((inventory != INVENTORIES::guild) && (inventory != INVENTORIES::player_room)
+			&& (inventory != INVENTORIES::exchange_proposition) && (inventory != INVENTORIES::exchange)
+			&& (inventory != INVENTORIES::trading) && (inventory != INVENTORIES::reward_sharing)) {
 			CInventoryPtr pInv = _Inventory[inventory];
 			nlassert(pInv != NULL);
 			pInv->onItemChanged(slot, INVENTORIES::itc_info_version);
@@ -2369,7 +2484,8 @@ bool CCharacter::checkSlotsForEnchantOrRecharge(INVENTORIES::TInventory invId, u
 
 	// check if slot is valid
 	if (slot >= inv->getSlotCount()) {
-		nlwarning("slot %u is higher than size of inventory %s (size %u)", slot, INVENTORIES::toString(invId).c_str(), inv->getSlotCount());
+		nlwarning("slot %u is higher than size of inventory %s (size %u)", slot, INVENTORIES::toString(invId).c_str(),
+			inv->getSlotCount());
 		return false;
 	}
 
@@ -2557,19 +2673,22 @@ void CCharacter::procEnchantment()
 void CCharacter::useItem(uint32 slot)
 {
 	if (slot >= _Inventory[INVENTORIES::bag]->getSlotCount()) {
-		nlwarning("<useItem>%s invalid slot %u count = %u", _Id.toString().c_str(), slot, _Inventory[INVENTORIES::bag]->getSlotCount());
+		nlwarning("<useItem>%s invalid slot %u count = %u", _Id.toString().c_str(), slot,
+			_Inventory[INVENTORIES::bag]->getSlotCount());
 		return;
 	}
 
 	CGameItemPtr item = _Inventory[INVENTORIES::bag]->getItem(slot);
 	if (item == NULL) {
-		nlwarning("<useItem>%s NULL item in slot %u count = %u", _Id.toString().c_str(), slot, _Inventory[INVENTORIES::bag]->getSlotCount());
+		nlwarning("<useItem>%s NULL item in slot %u count = %u", _Id.toString().c_str(), slot,
+			_Inventory[INVENTORIES::bag]->getSlotCount());
 		return;
 	}
 
 	const CStaticItem* form = item->getStaticForm();
 	if (!form) {
-		nlwarning("<useItem>%s item in slot %u has a NULL form count = %u", _Id.toString().c_str(), slot, _Inventory[INVENTORIES::bag]->getSlotCount());
+		nlwarning("<useItem>%s item in slot %u has a NULL form count = %u", _Id.toString().c_str(), slot,
+			_Inventory[INVENTORIES::bag]->getSlotCount());
 		return;
 	}
 
@@ -2589,12 +2708,14 @@ void CCharacter::useItem(uint32 slot)
 			//			_PropertyDatabase.setProp( "CHARACTER_INFO:RING_XP_CATALYSER:Level", item->quality() );
 			CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setLevel(_PropertyDatabase, item->quality());
 			//			_PropertyDatabase.setProp( "CHARACTER_INFO:RING_XP_CATALYSER:Count", item->getStackSize() );
-			CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(item->getStackSize()));
+			CBankAccessor_PLR::getCHARACTER_INFO().getRING_XP_CATALYSER().setCount(
+				_PropertyDatabase, checkedCast<uint16>(item->getStackSize()));
 		} else {
 			//			_PropertyDatabase.setProp( "CHARACTER_INFO:XP_CATALYSER:Level", item->quality() );
 			CBankAccessor_PLR::getCHARACTER_INFO().getXP_CATALYSER().setLevel(_PropertyDatabase, item->quality());
 			//			_PropertyDatabase.setProp( "CHARACTER_INFO:XP_CATALYSER:Count", item->getStackSize() );
-			CBankAccessor_PLR::getCHARACTER_INFO().getXP_CATALYSER().setCount(_PropertyDatabase, checkedCast<uint16>(item->getStackSize()));
+			CBankAccessor_PLR::getCHARACTER_INFO().getXP_CATALYSER().setCount(
+				_PropertyDatabase, checkedCast<uint16>(item->getStackSize()));
 		}
 
 		SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
@@ -2607,7 +2728,7 @@ void CCharacter::useItem(uint32 slot)
 		pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();
 		if ((form->TpType == TELEPORT_TYPES::KAMI) && (allegeance.first == PVP_CLAN::Karavan)
 			|| (form->TpType == TELEPORT_TYPES::KARAVAN) && (allegeance.first == PVP_CLAN::Kami)
-			|| getOrganization() == 5) //marauder
+			|| getOrganization() == 5) // marauder
 		{
 			CCharacter::sendDynamicSystemMessage(_Id, "ALTAR_RESTRICTION");
 			return;
@@ -2637,8 +2758,9 @@ void CCharacter::useItem(uint32 slot)
 				params[0].Int = DelayBeforeItemTP / 10;
 				CCharacter::sendDynamicSystemMessage(_Id, "TELEPORT_USED", params);
 
-				//CTeleportEffect *effect = new CTeleportEffect( _EntityRowId, _EntityRowId, EFFECT_FAMILIES::Teleport, 0, DelayBeforeItemTP + CTickEventHandler::getGameCycle(), *form );
-				//addSabrinaEffect( effect );
+				// CTeleportEffect *effect = new CTeleportEffect( _EntityRowId, _EntityRowId, EFFECT_FAMILIES::Teleport,
+				// 0, DelayBeforeItemTP + CTickEventHandler::getGameCycle(), *form );
+				// addSabrinaEffect( effect );
 				_TpTicketSlot = slot;
 				lockItem(INVENTORIES::bag, slot, 1);
 
@@ -2646,9 +2768,9 @@ void CCharacter::useItem(uint32 slot)
 				CMirrorPropValue<TYPE_VISUAL_FX> visualFx(TheDataset, _EntityRowId, DSPropertyVISUAL_FX);
 				CVisualFX fx;
 				fx.unpack(visualFx.getValue());
-				if (allegeance.first != PVP_CLAN::None
-					&& allegeance.first != PVP_CLAN::Neutral
-					&& CFameInterface::getInstance().getFameIndexed(_Id, PVP_CLAN::getFactionIndex(allegeance.first)) >= 600000) {
+				if (allegeance.first != PVP_CLAN::None && allegeance.first != PVP_CLAN::Neutral
+					&& CFameInterface::getInstance().getFameIndexed(_Id, PVP_CLAN::getFactionIndex(allegeance.first))
+						>= 600000) {
 					if (allegeance.first == PVP_CLAN::Kami) {
 						fx.Aura = MAGICFX::TeleportKami;
 					} else if (allegeance.first == PVP_CLAN::Karavan) {
@@ -2681,7 +2803,8 @@ void CCharacter::useItem(uint32 slot)
 			}
 		}
 	} else {
-		nlwarning("<TELEPORT>%s item in slot %u has invalid family %d ('%s')", _Id.toString().c_str(), slot, item->getStaticForm()->Family, ITEMFAMILY::toString(item->getStaticForm()->Family).c_str());
+		nlwarning("<TELEPORT>%s item in slot %u has invalid family %d ('%s')", _Id.toString().c_str(), slot,
+			item->getStaticForm()->Family, ITEMFAMILY::toString(item->getStaticForm()->Family).c_str());
 		return;
 	}
 }
@@ -2719,7 +2842,8 @@ void CCharacter::useTeleport(const CStaticItem& form)
 	uint16 idx = CZoneManager::getInstance().getTpSpawnZoneIdByName(form.Destination);
 	const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(idx);
 	if (!zone) {
-		nlwarning("<TELEPORT>%s item '%s'has a bad Dest zone %s", _Id.toString().c_str(), form.SheetId.toString().c_str(), form.Destination.c_str());
+		nlwarning("<TELEPORT>%s item '%s'has a bad Dest zone %s", _Id.toString().c_str(),
+			form.SheetId.toString().c_str(), form.Destination.c_str());
 		respawn(0); // force respawn to avoid exploits....
 	} else {
 		CMirrorPropValue<TYPE_VISUAL_FX> visualFx(TheDataset, _EntityRowId, DSPropertyVISUAL_FX);
@@ -2793,9 +2917,11 @@ void CCharacter::applyItemModifiers(const CGameItemPtr& item)
 	_CurrentDodgeLevel = max(sint32(0), _BaseDodgeLevel + _DodgeModifier);
 	_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.DodgeCurrent, _CurrentDodgeLevel );
-	CBankAccessor_PLR::getCHARACTER_INFO().getDODGE().setCurrent(_PropertyDatabase, checkedCast<uint16>(_CurrentDodgeLevel));
+	CBankAccessor_PLR::getCHARACTER_INFO().getDODGE().setCurrent(
+		_PropertyDatabase, checkedCast<uint16>(_CurrentDodgeLevel));
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryCurrent, _CurrentParryLevel );
-	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
+	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(
+		_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
 
 	// modifiers on scores
 	_PhysScores._PhysicalScores[SCORES::hit_points].Modifier += (item->hpBuff() + item->armorHpBuff());
@@ -2834,9 +2960,11 @@ void CCharacter::removeItemModifiers(const CGameItemPtr& item)
 	_CurrentDodgeLevel = max(sint32(0), _BaseDodgeLevel + _DodgeModifier);
 	_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.DodgeCurrent, _CurrentDodgeLevel );
-	CBankAccessor_PLR::getCHARACTER_INFO().getDODGE().setCurrent(_PropertyDatabase, checkedCast<uint16>(_CurrentDodgeLevel));
+	CBankAccessor_PLR::getCHARACTER_INFO().getDODGE().setCurrent(
+		_PropertyDatabase, checkedCast<uint16>(_CurrentDodgeLevel));
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryCurrent, _CurrentParryLevel );
-	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
+	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setCurrent(
+		_PropertyDatabase, checkedCast<uint16>(_CurrentParryLevel));
 
 	// modifiers on scores
 	_PhysScores._PhysicalScores[SCORES::hit_points].Modifier -= (item->hpBuff() + item->armorHpBuff());
@@ -2897,7 +3025,7 @@ bool CCharacter::wearRightHandItem(float wearFactor)
 			/*SM_STATIC_PARAMS_1(params, STRING_MANAGER::item);
 			params[0].SheetId = item->getSheetId();
 			sendDynamicSystemMessage( _EntityRowId, "ITEM_WORNED_DESTROYED", params);
-			
+
 			destroyItem(item->getInventory()->getInventoryId(), item->getInventorySlot(), item->getStackSize(), false);
 			*/
 			unequipCharacter(INVENTORIES::handling, INVENTORIES::right);
@@ -2926,7 +3054,7 @@ bool CCharacter::wearLeftHandItem(float wearFactor)
 			/*SM_STATIC_PARAMS_1(params, STRING_MANAGER::item);
 			params[0].SheetId = item->getSheetId();
 			sendDynamicSystemMessage( _EntityRowId, "ITEM_WORNED_DESTROYED", params);
-			
+
 			destroyItem(item->getInventory()->getInventoryId(), item->getInventorySlot(), item->getStackSize(), false);
 			*/
 			unequipCharacter(INVENTORIES::handling, INVENTORIES::left);
@@ -2942,14 +3070,9 @@ bool CCharacter::wearLeftHandItem(float wearFactor)
 void CCharacter::wearArmor(float wearFactor)
 {
 	static const uint8 NbArmorSlots = 6;
-	static const SLOT_EQUIPMENT::TSlotEquipment armorSlots[NbArmorSlots] = {
-		SLOT_EQUIPMENT::HEAD,
-		SLOT_EQUIPMENT::CHEST,
-		SLOT_EQUIPMENT::ARMS,
-		SLOT_EQUIPMENT::HANDS,
-		SLOT_EQUIPMENT::LEGS,
-		SLOT_EQUIPMENT::FEET
-	};
+	static const SLOT_EQUIPMENT::TSlotEquipment armorSlots[NbArmorSlots]
+		= { SLOT_EQUIPMENT::HEAD, SLOT_EQUIPMENT::CHEST, SLOT_EQUIPMENT::ARMS, SLOT_EQUIPMENT::HANDS,
+			SLOT_EQUIPMENT::LEGS, SLOT_EQUIPMENT::FEET };
 
 	for (uint i = 0; i < NbArmorSlots; ++i) {
 		wearItem(INVENTORIES::equipment, armorSlots[i], wearFactor);
@@ -2980,8 +3103,9 @@ void CCharacter::wearShield(float wearFactor)
 		/*SM_STATIC_PARAMS_1(params, STRING_MANAGER::item);
 		params[0].SheetId = shield->getSheetId();
 		sendDynamicSystemMessage( _EntityRowId, "ITEM_WORNED_DESTROYED", params);
-		
-		destroyItem(shield->getInventory()->getInventoryId(), shield->getInventorySlot(), shield->getStackSize(), false);
+
+		destroyItem(shield->getInventory()->getInventoryId(), shield->getInventorySlot(), shield->getStackSize(),
+		false);
 		*/
 		unequipCharacter(INVENTORIES::handling, INVENTORIES::left);
 	}
@@ -2994,16 +3118,9 @@ void CCharacter::wearJewels(float wearFactor)
 	/*  static values
 	/************************************************************************/
 	static const SLOT_EQUIPMENT::TSlotEquipment JewelSlots[] = {
-		SLOT_EQUIPMENT::ANKLEL,
-		SLOT_EQUIPMENT::ANKLER,
-		SLOT_EQUIPMENT::EARL,
-		SLOT_EQUIPMENT::EARR,
-		SLOT_EQUIPMENT::FINGERL,
-		SLOT_EQUIPMENT::FINGERR,
-		SLOT_EQUIPMENT::HEADDRESS,
-		SLOT_EQUIPMENT::NECKLACE,
-		SLOT_EQUIPMENT::WRISTL,
-		SLOT_EQUIPMENT::WRISTR,
+		SLOT_EQUIPMENT::ANKLEL, SLOT_EQUIPMENT::ANKLER, SLOT_EQUIPMENT::EARL, SLOT_EQUIPMENT::EARR,
+		SLOT_EQUIPMENT::FINGERL, SLOT_EQUIPMENT::FINGERR, SLOT_EQUIPMENT::HEADDRESS, SLOT_EQUIPMENT::NECKLACE,
+		SLOT_EQUIPMENT::WRISTL, SLOT_EQUIPMENT::WRISTR,
 	};
 	static const uint NbJewelSlots = sizeof(JewelSlots) / sizeof(SLOT_EQUIPMENT::TSlotEquipment);
 	/************************************************************************/
@@ -3016,7 +3133,8 @@ void CCharacter::wearJewels(float wearFactor)
 // ****************************************************************************
 void CCharacter::wearItem(INVENTORIES::TInventory invId, uint32 slot, float wearFactor)
 {
-	BOMB_IF((invId != INVENTORIES::equipment && invId != INVENTORIES::handling), "call wearItem for an unequipped item", return );
+	BOMB_IF((invId != INVENTORIES::equipment && invId != INVENTORIES::handling), "call wearItem for an unequipped item",
+		return );
 
 	// get equipped item
 	CGameItemPtr item = getItem(invId, slot);
@@ -3051,10 +3169,12 @@ void CCharacter::wearItem(INVENTORIES::TInventory invId, uint32 slot, float wear
  * Garanties:
  * - If not NULL, the returned item is either a stack or a food item.
  * - If single item: item family is requested, and getStaticForm() returns non-null.
- * - If stack: there is at least one child, and the first child is non-null and has the request item family, and getStaticForm() returns non-null on it.
+ * - If stack: there is at least one child, and the first child is non-null and has the request item family, and
+ * getStaticForm() returns non-null on it.
  */
 // ****************************************************************************
-CGameItemPtr CCharacter::getItemByFamily(INVENTORIES::TInventory invId, ITEMFAMILY::EItemFamily family, uint32& returnedSlot)
+CGameItemPtr CCharacter::getItemByFamily(
+	INVENTORIES::TInventory invId, ITEMFAMILY::EItemFamily family, uint32& returnedSlot)
 {
 	CInventoryPtr inv = getInventory(invId);
 	if (inv == NULL)
@@ -3075,7 +3195,8 @@ CGameItemPtr CCharacter::getItemByFamily(INVENTORIES::TInventory invId, ITEMFAMI
 }
 
 // ***************************************************************************
-uint CCharacter::selectItems(INVENTORIES::TInventory invId, CSheetId itemSheetId, uint32 quality, std::vector<CItemSlotId>* itemList)
+uint CCharacter::selectItems(
+	INVENTORIES::TInventory invId, CSheetId itemSheetId, uint32 quality, std::vector<CItemSlotId>* itemList)
 {
 	CInventoryPtr inv = getInventory(invId);
 	if (inv == NULL)

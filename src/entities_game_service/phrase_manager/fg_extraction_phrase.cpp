@@ -545,13 +545,13 @@ bool CFgExtractionPhrase::validate()
 	}
 
 	// test if tool have enough quality
-	sint depositQ = (sint)harvestSource->forageSite()->deposit()->maxQuality();
+	/* OLD CHECK sint depositQ = (sint)harvestSource->forageSite()->deposit()->maxQuality();
 
-	if ((depositQ > 0) && (item->recommended()+49  < depositQ))
+	 if ((depositQ > 0) && (item->recommended()+49  < depositQ))
 	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage(_ActorRowId, "FORAGE_TOOL_QUALITY_TOO_LOW");
 		return false;
-	}
+	} */
 
 	// Check the distance from the player to the source (ignoring Z because for tunnel case, player couldn't target the source)
 	const CEntityState& state = player->getState();
@@ -807,7 +807,7 @@ void CFgExtractionPhrase::applyExtraction( CCharacter *player, float successFact
 		nldebug( "FG: Player requests (dA %.2f Q %.1f), gets (dA %.2f Q %.1f) of %s", _RequestedProps[CHarvestSource::A], _RequestedProps[CHarvestSource::Q], _Props.Extraction.ObtainedProps[CHarvestSource::A], _Props.Extraction.ObtainedProps[CHarvestSource::Q], _Source->materialSheet().toString().c_str() );
 #endif
 		if ( player->forageProgress() ) // can have been reset if extractMaterial() killed the player
-			player->forageProgress()->fillFromExtraction( _Props.Extraction.ObtainedProps[CHarvestSource::A], _Props.Extraction.ObtainedProps[CHarvestSource::Q], player );
+			player->forageProgress()->fillFromExtraction(_Source, _Props.Extraction.ObtainedProps[CHarvestSource::A], _Props.Extraction.ObtainedProps[CHarvestSource::Q], player );
 		else
 			return;
 
