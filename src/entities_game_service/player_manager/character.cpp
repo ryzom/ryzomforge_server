@@ -9589,8 +9589,8 @@ void CCharacter::checksForFreeTrial()
 	if (handlingInv != NULL) {
 		for (uint i = 0; i < handlingInv->getSlotCount(); i++) {
 			item = handlingInv->getItem(i);
-			if (item != NULL && item->recommended() > 150) {
-			}
+			if (item != NULL && item->recommended() > 150)
+				unequipCharacter(INVENTORIES::handling, i);
 		}
 	}
 }
