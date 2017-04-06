@@ -1153,6 +1153,43 @@ NLMISC_COMMAND(getPvpPoints, "get pvp points of player", "<uid>")
 }
 
 //----------------------------------------------------------------------------
+NLMISC_COMMAND(getGender, "get gender of player", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	if (c->getGender() == GSGENDER::female)
+		log.displayNL("f");
+	else
+		log.displayNL("m");
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getRace, "get race of player", "<uid>")
+{
+
+	GET_ACTIVE_CHARACTER
+
+	switch (c->getRace()) {
+		case EGSPD::CPeople::Fyros:
+			log.displayNL("f");
+			break;
+		case EGSPD::CPeople::Matis:
+			log.displayNL("m");
+			break;
+		case EGSPD::CPeople::Tryker:
+			log.displayNL("t");
+			break;
+		case EGSPD::CPeople::Zorai:
+			log.displayNL("z");
+			break;
+		default:
+			log.displayNL("0");
+	}
+}
+
+
+//----------------------------------------------------------------------------
 NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>")
 {
 
@@ -2046,4 +2083,75 @@ NLMISC_COMMAND(getLastUnMountTick,"get tick of last umount","<uid>")
 	log.displayNL("%d", c->getLastUnMountTick());
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var>")
+{
+	if (args.size() != 2)
+		return false;
+	
+	GET_ACTIVE_CHARACTER;
+	
+	string value = "";
 
+	if (c->getValue(args[2], value))
+		log.displayNL("%s", value.c_str());
+	else
+		log.displayNL("ERR: Variable not found");
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerVar, "set the value of a variable of player","<uid> <var> <value>")
+{
+	if (args.size() != 3)
+		return false;
+	
+	GET_ACTIVE_CHARACTER;
+	
+	string value = "";
+
+	if (c->setValue(args[2], value))
+		log.displayNL("OK", value.c_str());
+	else
+		log.displayNL("ERR: Variable not found");
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <var> <value>")
+{
+	if (args.size() != 3)
+		return false;
+	
+	GET_ACTIVE_CHARACTER;
+	
+	string value = "";
+
+	if (c->modifyValue(args[2], value))
+		log.displayNL("OK", value.c_str());
+	else
+		log.displayNL("ERR: Variable not found");
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+	
+	GET_ACTIVE_CHARACTER;
+
+	string msg = "";
+	
+	CTeam* pTeam = TeamManager.getRealTeam(c->getTeamId());
+	if (pTeam != NULL)
+	{
+		log.displayNL("%d", c->getTeamId());
+		vector<CEntityId> vMembers;
+		for (list<CEntityId>::const_iterator it = pTeam->getTeamMembers().begin(); it != pTeam->getTeamMembers().end(); ++it)
+		{
+			ucstring name = CEntityIdTranslator::getInstance()->getByEntity((*it));
+			CEntityIdTranslator::removeShardFromName(name);
+			log.displayNL("%"NL_I64"u|%s", (*it).asUint64(), name.toUtf8().c_str());
+		}
+	} else 
+		log.displayNL("0");
+}
