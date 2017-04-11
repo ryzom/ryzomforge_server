@@ -178,13 +178,15 @@ inline void CAIAliasTranslator::getNPCAliasesFromName(const std::string & botNam
 
 inline void CAIAliasTranslator::removeNPCAlias(TAIAlias alias)
 {
+	// 1: Find name linked to alias
+	// 2: Find all aliases linked to name
+	// 3: Erase all names if alias is the right one
 	CHashMap< uint,std::string >::const_iterator it = _BotIdsToNames.find(alias);
 	if ( it == _BotIdsToNames.end() )
 		return;
-	std::string lwr = NLMISC::strlwr((*it).second);
-	
-	std::pair< CHashMultiMap< std::string, TAIAlias>::const_iterator, CHashMultiMap< std::string, TAIAlias>::const_iterator > result = _BotNamesToIds.equal_range(lwr);
 
+	std::string lwr = NLMISC::strlwr((*it).second);
+	std::pair< CHashMultiMap< std::string, TAIAlias>::const_iterator, CHashMultiMap< std::string, TAIAlias>::const_iterator > result = _BotNamesToIds.equal_range(lwr);
 	CHashMultiMap< std::string, TAIAlias>::const_iterator it2 = result.first;
 	
 	while ( it2 != result.second )
@@ -216,22 +218,18 @@ inline void CAIAliasTranslator::removeName(const std::string &name)
 		else
 			++it2;
 	}
-
 }
 
 
 inline void CAIAliasTranslator::setNameForNPCAliases(const std::string &name, TAIAlias id)
 {
 	std::string lwr = NLMISC::strlwr(name);
-	removeName(name);
-	_BotNamesToIds.insert( make_pair(lwr, id) );
+	_BotNamesToIds.insert(make_pair(lwr, id));
 	
-	CHashMap< uint,std::string >::iterator it = _BotIdsToNames.find(id);
-	if ( it != _BotIdsToNames.end() )
+	CHashMap<uint,std::string>::iterator it = _BotIdsToNames.find(id);
+	if (it != _BotIdsToNames.end())
 		_BotIdsToNames.erase(it);
-	_BotIdsToNames.insert( make_pair((uint)id,name) );
-		
-
+	_BotIdsToNames.insert(make_pair((uint)id,name));
 }
 
 //-----------------------------------------------
