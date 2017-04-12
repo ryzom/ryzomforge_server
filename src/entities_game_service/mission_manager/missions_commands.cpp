@@ -850,7 +850,6 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 				itNeedItems = need_items.find(sheet+":"+NLMISC::toString("%d", item_quality));
 				if (itNeedItems != need_items.end() && (*itNeedItems).second > 0)
 				{
-					nlinfo("Found : %s %d", sheet.c_str(), item_quality);
 					uint32 quantity = std::min((*itNeedItems).second, itemPtr->getStackSize());
 					slots.insert(make_pair(j, quantity));
 					(*itNeedItems).second -= quantity;
@@ -862,7 +861,6 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 		for ( itNeedItems = need_items.begin(); itNeedItems != need_items.end(); ++itNeedItems )
 		{
 			if ((*itNeedItems).second != 0) {
-				nlinfo("Missing : %s", (*itNeedItems).first.c_str());
 				log.displayNL("ERR: Not enough items.");
 				return false;
 			}
@@ -871,7 +869,6 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 		//Delete them
 		for ( std::map<uint32, uint32>::iterator it = slots.begin(); it != slots.end(); ++it )
 		{
-			nlinfo("Deleting... %d, %d", (*it).first, (*it).second);
 			inventory->deleteStackItem((*it).first, (*it).second);
 		}
 	}
