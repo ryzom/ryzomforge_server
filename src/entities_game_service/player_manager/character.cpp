@@ -2340,7 +2340,6 @@ void CCharacter::applyRegenAndClipCurrentValue()
 		CBankAccessor_PLR::getUSER().setSPEED_FACTOR(
 			_PropertyDatabase, checkedCast<uint8>(speedVariationModifier + 100.0f));
 		if (speedVariationModifier > 0) {
-			nlinfo("Current speedVariationModifier = %d", speedVariationModifier);
 			_LastOverSpeedTick = CTickEventHandler::getGameCycle();
 		}
 	} else {
@@ -3554,8 +3553,6 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId& 
 			url += "&teid=" + c->getId().toString();
 
 			string defaultSalt = toString(getLastConnectedDate());
-			nlinfo(defaultSalt.c_str());
-			nlinfo(url.c_str());
 			string control = "&hmac="
 				+ getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
 					  .toString();
@@ -12408,7 +12405,6 @@ bool CCharacter::isSpawnValid(bool inVillage, bool inOutpost, bool inStable, boo
 		CPlace* p = CZoneManager::getInstance().getPlaceFromId(_Places[i]);
 		if (p) {
 			PLACE_TYPE::TPlaceType place_type = p->getPlaceType();
-			nlinfo("Place type = %s", PLACE_TYPE::toString(p->getPlaceType()).c_str());
 			if (!inVillage && (place_type == PLACE_TYPE::Village || place_type == PLACE_TYPE::Capital)) {
 				CCharacter::sendDynamicSystemMessage(_EntityRowId, "NO_ACTION_IN_VILLAGE");
 				return false;
@@ -12962,8 +12958,6 @@ void CCharacter::sendUrl(const string& url, const string& salt)
 				  .toString();
 	}
 
-	nlinfo(url.c_str());
-
 	uint32 userId = PlayerManager.getPlayerId(getId());
 
 	SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
@@ -13044,7 +13038,6 @@ void CCharacter::addPositionCheck(sint32 x, sint32 y, uint32 r, const std::strin
 	poscheck.Radius = r;
 	poscheck.Name = name;
 	_CheckPos.push_back(poscheck);
-	nlinfo("Checking : %d, %d, %d, %s", x, y, r, name.c_str());
 }
 
 /// get Ark position check

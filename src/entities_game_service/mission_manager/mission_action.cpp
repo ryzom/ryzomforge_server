@@ -2838,7 +2838,6 @@ class CMissionActionCompassNpc : public IMissionAction
 								SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
 								textParams[0].Literal.fromUtf8(textName);
 								uint32 txtId = STRING_MANAGER::sendStringToClient( c->getEntityRowId(), "LITERAL", textParams );
-								nlinfo("add compass target for %s, %d,%d = %s (%d)", templ->getMissionName().c_str(), x, y, textName.c_str(), txtId);
 								instance->addCompassTarget((TAIAlias)txtId,true,true);
 								return;
 							}
