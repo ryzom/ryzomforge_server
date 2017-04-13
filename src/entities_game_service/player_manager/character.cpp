@@ -1473,6 +1473,38 @@ uint32 CCharacter::tickUpdate()
 	_SavedPosX = _EntityState.X();
 	_SavedPosY = _EntityState.Y();
 
+	// ARK Check Position
+	vector<string> missionToRemove;
+	for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end(); ++it)
+	{
+		sint32 A = (_SavedPosX / 1000) - (*it).X;
+		sint32 B = (_SavedPosY / 1000) - (*it).Y;
+		uint32 R = (*it).Radius;
+		if ((double)(A * A) + (double)(B * B) <= (double)(R * R))
+		{
+			TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName((*it).Name);
+			CMission * mission = _Missions->getMissions(missionAlias);
+			if (mission != NULL)
+			{
+				vector<string> params = getCustomMissionParams((*it).Name);
+				if (params.size() >= 2)
+				{
+					validateDynamicMissionStep(params[0]);
+					missionToRemove.push_back((*it).Name);
+				}
+			}
+		}
+	}
+	for (uint32 i = 0; i < missionToRemove.size(); i++)
+	{
+		TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(missionToRemove[i]);
+		if (missionAlias)
+		{
+			removeMission(missionAlias, mr_success);
+			removeMissionFromHistories(missionAlias);
+		}
+	}
+
 	return nextUpdate;
 } // tickUpdate //
 
@@ -11205,6 +11237,15 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 
 		//		EGSPD::missionLog(MissionResultStatLogTag[result], _Id, tpl->getMissionName());
 
+		// Erase CheckPos with name of mission
+		for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end();)
+		{
+			if ((*it).Name == toUpper(tpl->getMissionName()))
+				it = _CheckPos.erase(it);
+			else
+				++it;
+		}
+
 		if (!doNotClearJournal)
 			mission->clearUsersJournalEntry();
 	}
@@ -13309,20 +13350,21 @@ bool CCharacter::pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial)
 
 	CTempInventory* invTemp = (CTempInventory*)(CInventoryBase*)getInventory(INVENTORIES::temporary);
 	nlassert(invTemp != NULL);
-
+nlinfo("ici");
 	if (lastMaterial)
 		*lastMaterial = false;
-
+nlinfo("ici");
 	if (_ForageProgress) {
 		if (lastMaterial)
 			*lastMaterial = true;
-
+nlinfo("ici");
 		if (_ForageProgress->resultCanBeTaken()) {
 			// Forage
 			uint16 quality = 0;
 			quality = invTemp->getDispQuality(indexInTempInv);
-
+nlinfo("ici");
 			if (quality != 0) {
+nlinfo("ici");
 				// Create and stack the item in the bag
 				CGameItemPtr item
 					= createItem(_ForageProgress->quality(), _ForageProgress->amount(), _ForageProgress->material());
@@ -13330,10 +13372,11 @@ bool CCharacter::pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial)
 					return false;
 				if (!addItemToInventory(INVENTORIES::bag, item)) // Autostack the item in the bag
 					return false;
-
+nlinfo("ici");
 				// Send event to the mission : we have harvested some item !
 				const CStaticItem* itemForm = CSheets::getForm(_ForageProgress->material());
 				if (itemForm != NULL) {
+nlinfo("ici");
 					CMissionEventForage event(
 						_ForageProgress->material(), _ForageProgress->amount(), _ForageProgress->quality());
 					processMissionEventWithTeamMate(event);
@@ -13352,6 +13395,7 @@ bool CCharacter::pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial)
 			}
 		}
 	} else {
+nlinfo("ici");
 		// Quartering
 		CCreature* creature = CreatureManager.getCreature(_MpSourceId);
 		if (creature == NULL || creature->harvesterRowId() != _EntityRowId) {
@@ -13363,7 +13407,7 @@ bool CCharacter::pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial)
 			return false; // don't try to quarter an item for looting
 		}
 
-		// Send url for Arcc triggers
+		// Send url for ARK triggers
 
 		vector<string> params = getCustomMissionParams("__LOOT_SHEET__");
 		if (params.size() >= 2) {
