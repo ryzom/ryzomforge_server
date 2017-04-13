@@ -70,7 +70,6 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			for ( uint i = 0; i < subs.size(); i++ )
 			{
 				CSubStep subStep;
-
 				std::vector< std::string > args;
 				CMissionParser::tokenizeString( subs[i]," \t", args );
 
@@ -120,7 +119,6 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
 		string webAppUrl;
-		bool ret = true;
 		_User = PlayerManager.getChar(getEntityIdFromRow(userRow));
 
 		if ( event.Type == CMissionEvent::Kill )
@@ -151,8 +149,8 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 						CPlace * place = CZoneManager::getInstance().getPlaceFromName( placeStr );
 						if ( !place )
 						{
-							ret = false;
 							LOGMISSIONSTEPERROR("kill_fauna : invalid place "+params[2]);
+							return 0;
 						}
 						else
 							_Place = place->getId();
@@ -164,6 +162,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			if ( !c )
 			{
 				LOGMISSIONSTEPERROR("kill_fauna : invalid creature " + toString(event.TargetEntity.getIndex()));
+				return 0;
 			}
 			else if ( faunaSheet == c->getType() )
 			{
@@ -260,9 +259,9 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 					////
 				}
 				
-				nbSubSteps++;
 				if (faunaSheet != CSheetId::Unknown)
 				{
+					nbSubSteps++;
 					retParams.push_back(STRING_MANAGER::TParam());
 					retParams.back().Type = STRING_MANAGER::creature_model;
 					retParams.back().SheetId = faunaSheet;
