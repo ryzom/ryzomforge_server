@@ -142,7 +142,6 @@ void CCharacter::initInventories()
 		piv->bindToInventory(pi);
 	}
 
-
 	// TEMP : should be replace by some specific code for inventory bulk-driven
 	// Initialize all inventories with their max slot number 
 	for (uint ni=0; ni < INVENTORIES::NUM_INVENTORY; ++ni)
