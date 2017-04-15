@@ -13350,21 +13350,20 @@ bool CCharacter::pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial)
 
 	CTempInventory* invTemp = (CTempInventory*)(CInventoryBase*)getInventory(INVENTORIES::temporary);
 	nlassert(invTemp != NULL);
-nlinfo("ici");
+
 	if (lastMaterial)
 		*lastMaterial = false;
-nlinfo("ici");
+
 	if (_ForageProgress) {
 		if (lastMaterial)
 			*lastMaterial = true;
-nlinfo("ici");
+
 		if (_ForageProgress->resultCanBeTaken()) {
 			// Forage
 			uint16 quality = 0;
 			quality = invTemp->getDispQuality(indexInTempInv);
-nlinfo("ici");
+
 			if (quality != 0) {
-nlinfo("ici");
 				// Create and stack the item in the bag
 				CGameItemPtr item
 					= createItem(_ForageProgress->quality(), _ForageProgress->amount(), _ForageProgress->material());
@@ -13372,11 +13371,11 @@ nlinfo("ici");
 					return false;
 				if (!addItemToInventory(INVENTORIES::bag, item)) // Autostack the item in the bag
 					return false;
-nlinfo("ici");
+
 				// Send event to the mission : we have harvested some item !
 				const CStaticItem* itemForm = CSheets::getForm(_ForageProgress->material());
 				if (itemForm != NULL) {
-nlinfo("ici");
+
 					CMissionEventForage event(
 						_ForageProgress->material(), _ForageProgress->amount(), _ForageProgress->quality());
 					processMissionEventWithTeamMate(event);
@@ -13395,7 +13394,7 @@ nlinfo("ici");
 			}
 		}
 	} else {
-nlinfo("ici");
+
 		// Quartering
 		CCreature* creature = CreatureManager.getCreature(_MpSourceId);
 		if (creature == NULL || creature->harvesterRowId() != _EntityRowId) {
