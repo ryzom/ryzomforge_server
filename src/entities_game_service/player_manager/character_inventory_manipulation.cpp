@@ -928,6 +928,17 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 		return;
 	}
 
+	// if an item is equipped in destination slot unequip it
+	if (dstInv->getItem(dstSlot) != NULL)
+	{
+		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
+		{
+			// if item is locked just return
+			return;
+		}
+		unequipCharacter(dstInvId, dstSlot);
+	}
+	
 	// check if bag slot is not empty
 	CGameItemPtr item = bagInv->getItem(bagSlot);
 	if (item == NULL)
@@ -959,16 +970,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 	if (item->getItemWornState() == ITEM_WORN_STATE::Worned && (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL) )
 		return;
 
-	// if an item is equipped in destination slot unequip it
-	if (dstInv->getItem(dstSlot) != NULL)
-	{
-		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
-		{
-			// if item is locked just return
-			return;
-		}
-		unequipCharacter(dstInvId, dstSlot);
-	}
 
 	// set the item in ref inventory
 	dstInv->insertItem(item, dstSlot);
