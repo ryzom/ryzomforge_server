@@ -234,8 +234,10 @@ class CMissionStepForage : public IMissionStepItem
 			{
 				LOGMISSIONSTEPSUCCESS("forage");
 				_SubSteps[subStepIndex].Quantity += eventSpe.Quantity;
-				if (!webAppUrl.empty() && _SubSteps[subStepIndex].Quantity > quantity)
+				if (!webAppUrl.empty() && _SubSteps[subStepIndex].Quantity > quantity) {
+					_SubSteps[subStepIndex].Quantity = 0;
 					_User->validateDynamicMissionStep(webAppUrl);
+				}
 				return eventSpe.Quantity;
 			}
 		}
