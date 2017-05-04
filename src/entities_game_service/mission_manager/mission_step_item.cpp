@@ -166,6 +166,7 @@ inline void IMissionStepItem::getTextParams(uint & nbSubSteps, TVectorParamCheck
 
 			if (itemSheet != CSheetId::Unknown)
 			{
+				nlinfo("sheet known");
 				nbSubSteps++;
 				retParams.push_back(STRING_MANAGER::TParam());
 				retParams.back().Type = STRING_MANAGER::item;
@@ -230,10 +231,12 @@ class CMissionStepForage : public IMissionStepItem
 					NLMISC::fromString(params[3], quality);
 			}
 
+			nlinfo("Get Sheet: %s, Quality: %d, Want Sheet: %s, Quality: %d", eventSpe.Sheet.toString().c_str(), eventSpe.Quality, itemSheet.toString().c_str(), quality);
 			if ( eventSpe.Sheet == itemSheet && eventSpe.Quality >= quality )
 			{
 				LOGMISSIONSTEPSUCCESS("forage");
 				_SubSteps[subStepIndex].Quantity += eventSpe.Quantity;
+				nlinfo("Quantity : +%d = %d / %d", eventSpe.Quantity, _SubSteps[subStepIndex].Quantity, quantity);
 				if (!webAppUrl.empty() && _SubSteps[subStepIndex].Quantity > quantity) {
 					_SubSteps[subStepIndex].Quantity = 0;
 					_User->validateDynamicMissionStep(webAppUrl);
