@@ -40,7 +40,6 @@ using namespace NLMISC;
 
 extern CPlayerManager		PlayerManager;
 extern NLMISC::CRandom		RandomGenerator;
-extern CVariable<uint32>	FreeTrialSkillLimit;
 
 //-----------------------------------------------
 // ctor
@@ -253,8 +252,8 @@ bool CFaberPhrase::validate()
 
 	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( c->getId() ));
 
-	if (p->isTrialPlayer() && _Recommended > (uint32)FreeTrialSkillLimit)
-		_Recommended = (uint32)FreeTrialSkillLimit;
+	if (p->isTrialPlayer() && _Recommended > 150)
+		_Recommended = 150;
 
 	// check quality of right hand item (need be >= Recommended (level of item))
 	if (rightHandItem->recommended()+49 < _Recommended)
