@@ -79,7 +79,7 @@ bool	IMissionStepItem::buildStep( uint32 line, const std::vector< std::string > 
 				}
 				missionData.ChatParams.push_back( make_pair( args[0], STRING_MANAGER::item ) );
 				subStep.Dynamic = "";
-				subStep.Sheet = CSheetId(args[0]);
+				subStep.Sheet = CSheetId(args[0] + ".sitem");
 				if ( args.size() > 1 )
 					NLMISC::fromString(args[1], subStep.Quantity);
 				else
