@@ -4003,7 +4003,6 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 			string control = "&hmac="
 							 + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
 							 .toString();
-							 .toString();
 			params[0].Literal = url + control;
 			text = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", params);
 			//			_PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_URL" , text );
