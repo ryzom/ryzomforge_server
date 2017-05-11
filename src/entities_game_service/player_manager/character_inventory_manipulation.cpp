@@ -863,7 +863,6 @@ void CCharacter::moveItem(
 	// You cannot exchange genesis named items
 	if (srcItem->getPhraseId().find("genesis_") == 0 && !canPutNonDropableItemInInventory(dstInvId))
 	{
-				  dstInvId);
 		return;
 	}
 
