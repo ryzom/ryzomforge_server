@@ -2095,6 +2095,58 @@ uint32 CCreature::tickUpdate()
 		}
 	}
 
+	if (!isDead() && (_NbOfPlayersInAggroList || _LockedLoot != CTEAM::InvalidTeamId))
+	{
+		if (_LockedLoot != CTEAM::InvalidTeamId)
+		{
+			bool keepLock = false;
+			for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
+			{
+				CCharacter * pChar = PlayerManager.getChar( *it );
+				if (pChar && pChar->getTeamId() == _LockedLoot)
+				{
+					keepLock = true;
+					break;
+				}
+			}
+
+			if (!keepLock)
+			{
+				_LockedLoot = CTEAM::InvalidTeamId;
+				nlinfo("unlock me");
+			}
+		}
+		else
+		{
+			vector< uint16 > teams;
+
+			for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
+			{
+
+				CCharacter * pChar = PlayerManager.getChar( *it );
+				if (pChar && pChar->getTeamId() != CTEAM::InvalidTeamId)
+				{
+					uint16 pTeam = pChar->getTeamId();
+					for( vector< uint16 >::const_iterator itTeam = teams.begin(); itTeam != teams.end(); ++itTeam )
+					{
+						if (pTeam == *itTeam)
+						{
+							_LockedLoot = *itTeam;
+							break;
+						}
+					}
+					teams.push_back(pTeam);
+				}
+
+				if (_LockedLoot != CTEAM::InvalidTeamId) {
+					nlinfo("lock me");
+					break;
+				}
+			}
+		}
+	}
+
+
 	if (currentHp()!=maxHp() && !isDead()) return 12;
 	return 24;		
 } // tickUpdate //

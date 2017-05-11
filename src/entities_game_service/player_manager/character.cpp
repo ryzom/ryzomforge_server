@@ -454,12 +454,12 @@ CCharacter::CCharacter()
 	_MeleeCombatIsValid = false;
 	_CurrentBotChatType = BOTCHATTYPE::UnknownFlag;
 	/*
-	_HaveMweaTool = false;
-	_HaveRweaTool = false;
-	_HaveAmmoTool = false;
-	_HaveArmorTool = false;
-	_HaveJewelTool = false;
-	_HaveForageTool = false;
+		_HaveMweaTool = false;
+		_HaveRweaTool = false;
+		_HaveAmmoTool = false;
+		_HaveArmorTool = false;
+		_HaveJewelTool = false;
+		_HaveForageTool = false;
 	*/
 	_DateOfNextAllowedAction = 0;
 	_OldHpBarSentToTeam = 0;
@@ -936,41 +936,39 @@ uint32 CCharacter::tickUpdate()
 			return (uint32) - 1;
 	}
 	/*
-	{
-		H_AUTO(CharacterAntiBugCheckContinent);
-		//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
-		//Note: Characters teleporting on a mount may provoke this warning!
-		uint32 in = getInstanceNumber();
-		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of
-	teleports
-		if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
 		{
+			H_AUTO(CharacterAntiBugCheckContinent);
+			//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
+			//Note: Characters teleporting on a mount may provoke this warning!
+			uint32 in = getInstanceNumber();
+		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of teleports
+			if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
+			{
 			nlwarning("<ANTIBUG>%s IS ON AN INVALID CONTINENT. x= %d, y = %d ",_Id.toString().c_str(),_EntityState.X(),
 	_EntityState.Y() );
-			CContinent * cont = CZoneManager::getInstance().getContinent(_EntityState.X,_EntityState.Y);
-			if ( cont )
-			{
-				in = CUsedContinent::instance().getInstanceForContinent( CONTINENT::TContinent(cont->getId()) );
-				if ( in == INVALID_AI_INSTANCE )
+				CContinent * cont = CZoneManager::getInstance().getContinent(_EntityState.X,_EntityState.Y);
+				if ( cont )
 				{
+					in = CUsedContinent::instance().getInstanceForContinent( CONTINENT::TContinent(cont->getId()) );
+					if ( in == INVALID_AI_INSTANCE )
+					{
 					nlwarning("%s will arrive in an invalid continent (WE NAME : '%s') (REAL NAME : '%s')
 	",_Id.toString().c_str(), NLMISC::strlwr( cont->getName() ).c_str(),
 	CONTINENT::toString(CONTINENT::TContinent(cont->getId())).c_str() );
+					}
 				}
-			}
-			else
-			{
+				else
+				{
 				nlwarning("<ANTIBUG>%s AT x= %d, y = %d NO VALID CONTINENT
 	FOUND",_Id.toString().c_str(),_EntityState.X() , _EntityState.Y() );
-			}
-			setInstanceNumber( in );
+				}
+				setInstanceNumber( in );
 
-			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent
-	!!!") )
-				return (uint32)-1;
+			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent !!!") )
+					return (uint32)-1;
+			}
+			// end of ANTIBUG
 		}
-		// end of ANTIBUG
-	}
 	*/
 	{
 		H_AUTO(CharacterCheckEnterLeaveZone);
@@ -1225,9 +1223,23 @@ uint32 CCharacter::tickUpdate()
 				CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(
 					_PropertyDatabase, checkedCast<uint8>(skillBaseValue));
 			}
-
-			if (!checkCharacterStillValide(
-						"<CCharacter::tickUpdate> Character corrupted : after update target HP/STA/SAP !!!"))
+			else
+			{
+				CCreature * creature = dynamic_cast< CCreature *>(target);
+				if (creature)
+				{
+					if (creature->getLockLoot() != CTEAM::InvalidTeamId)
+					{
+						if (creature->getLockLoot() == _TeamId)
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
+						else
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
+					}
+					else
+						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
+				}
+			}
+			if (!checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after update target HP/STA/SAP !!!"))
 				return (uint32) - 1;
 		}
 	}
@@ -1573,7 +1585,6 @@ uint32 CCharacter::tickUpdate()
 			removeMissionFromHistories(missionAlias);
 		}
 	}
-
 	return nextUpdate;
 } // tickUpdate //
 
@@ -3542,6 +3553,15 @@ void CCharacter::setTarget(const CEntityId &targetId, bool sendMessage)
 				else
 				{
 					rangeLevel = (((form->getLevel() - 1) / 5) << 1) + (((form->getLevel() - 1) % 5) >= 2 ? 2 : 1);
+					if (creature->getLockLoot() != CTEAM::InvalidTeamId)
+					{
+						if (creature->getLockLoot() == _TeamId)
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
+						else
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
+					}
+					else
+						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
 
 					if (rangeLevel > 11)
 						rangeLevel = 11;
@@ -3789,7 +3809,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 
 		for (map<TAIAlias, CMission*>::iterator it = getMissionsBegin(); it != getMissionsEnd(); ++it)
 		{
-			vector<pair<bool, uint32>> texts;
+			vector<pair<bool, uint32> > texts;
 			(*it).second->sendContextTexts(_EntityRowId, c->getEntityRowId(), texts);
 
 			for (uint k = 0; k < texts.size(); k++)
@@ -3825,7 +3845,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 		{
 			for (uint j = 0; j < team->getMissions().size(); j++)
 			{
-				vector<pair<bool, uint32>> texts;
+				vector<pair<bool, uint32> > texts;
 				team->getMissions()[j]->sendContextTexts(_EntityRowId, c->getEntityRowId(), texts);
 
 				for (uint k = 0; k < texts.size(); k++)
@@ -3982,6 +4002,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 			string defaultSalt = toString(getLastConnectedDate());
 			string control = "&hmac="
 							 + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
+							 .toString();
 							 .toString();
 			params[0].Literal = url + control;
 			text = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", params);
@@ -5771,7 +5792,6 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 
 	return slot;
 }
-
 //-----------------------------------------------
 // CCharacter::checkAnimalCount return true if can add 'delta' pets to current player pets
 //-----------------------------------------------
@@ -12918,7 +12938,6 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		//			tpl->getMissionName().c_str());
 
 		//		EGSPD::missionLog(MissionResultStatLogTag[result], _Id, tpl->getMissionName());
-
 		// Erase CheckPos with name of mission
 		for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end();)
 		{
@@ -14368,6 +14387,7 @@ bool CCharacter::isSpawnValid(bool inVillage, bool inOutpost, bool inStable, boo
 		if (p)
 		{
 			PLACE_TYPE::TPlaceType place_type = p->getPlaceType();
+
 
 			if (!inVillage && (place_type == PLACE_TYPE::Village || place_type == PLACE_TYPE::Capital))
 			{
@@ -19149,16 +19169,16 @@ void CCharacter::setPVPFlag(bool pvpFlag)
 
 		// OLD PVP
 		/*		if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false &&
-			CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
-		{
-			// character can set it's tag pvp on if none of his clan is in war
-			SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
-			sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
+					CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
+				{
+					// character can set it's tag pvp on if none of his clan is in war
+					SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
+					sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
 		//			_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:COUNTER", ++_PvPDatabaseCounter );
 			CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase,
 		uint8(++_PvPDatabaseCounter));
-			return;
-		}
+					return;
+				}
 		*/
 	}
 

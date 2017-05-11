@@ -452,13 +452,13 @@ void CCharacter::itemPickup(const NLMISC::CEntityId &entity, bool harvest)
 
 				/*
 				case RYZOMID::deposit:
-					{
-						staticActionInProgress( true );
-						nlwarning("<cbItemPickup> Invalid entity type deposit");
-						// TO DO
-					}
-					break;
-					*/
+				{
+					staticActionInProgress( true );
+					nlwarning("<cbItemPickup> Invalid entity type deposit");
+					// TO DO
+				}
+				break;
+				*/
 				default:
 					nlwarning("<cbItemPickup> Invalid entity type %u", entity.getType());
 					break;
@@ -863,6 +863,7 @@ void CCharacter::moveItem(
 	// You cannot exchange genesis named items
 	if (srcItem->getPhraseId().find("genesis_") == 0 && !canPutNonDropableItemInInventory(dstInvId))
 	{
+				  dstInvId);
 		return;
 	}
 
@@ -988,6 +989,18 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 		return;
 	}
 
+	// if an item is equipped in destination slot unequip it
+	if (dstInv->getItem(dstSlot) != NULL)
+	{
+		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
+		{
+			// if item is locked just return
+			return;
+		}
+
+		unequipCharacter(dstInvId, dstSlot);
+	}
+
 	// check if bag slot is not empty
 	CGameItemPtr item = bagInv->getItem(bagSlot);
 
@@ -1022,17 +1035,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 			&& (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL))
 		return;
 
-	// if an item is equipped in destination slot unequip it
-	if (dstInv->getItem(dstSlot) != NULL)
-	{
-		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
-		{
-			// if item is locked just return
-			return;
-		}
-
-		unequipCharacter(dstInvId, dstSlot);
-	}
 
 	// set the item in ref inventory
 	dstInv->insertItem(item, dstSlot);
@@ -2591,13 +2593,13 @@ void CCharacter::sendItemInfos(uint16 slotId)
 
 		infos.CreatorName = CEntityIdTranslator::getInstance()->getEntityNameStringId(item->getCreator());
 		/*
-		CEntityBase* creator = CEntityBaseManager::getEntityBasePtr(item->getCreator());
-		infos.CreatorName = 0;
-		if( creator && TheDataset.isAccessible( creator->getEntityRowId() ) )
-		{
-			CMirrorPropValueRO<uint32> nameIndex( TheDataset, creator->getId(), "NameIndex" );
-			 = nameIndex();
-		}
+				CEntityBase* creator = CEntityBaseManager::getEntityBasePtr(item->getCreator());
+				infos.CreatorName = 0;
+				if( creator && TheDataset.isAccessible( creator->getEntityRowId() ) )
+				{
+					CMirrorPropValueRO<uint32> nameIndex( TheDataset, creator->getId(), "NameIndex" );
+					 = nameIndex();
+				}
 		*/
 		infos.slotId = slotId;
 		sint32 skillVal = 0;
@@ -3092,7 +3094,7 @@ void CCharacter::procEnchantment()
 				}
 
 				/*	else
-					nlwarning("user %s : no valid image for right weapon", _Id.toString().c_str());*/
+						nlwarning("user %s : no valid image for right weapon", _Id.toString().c_str());*/
 			}
 			else
 			{
