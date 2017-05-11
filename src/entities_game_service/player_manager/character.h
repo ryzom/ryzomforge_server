@@ -956,6 +956,9 @@ public:
 	// return free slot for pet spawn or -1 if there are no free slot
 	sint32 getFreePetSlot();
 
+	// return the slot of the mount pet or the first packer pet or -1 if there are no pet slot
+	sint32 getMountOrFirstPetSlot();
+
 	// return true if can add 'delta' pets to current player pets
 	bool checkAnimalCount(const NLMISC::CSheetId &PetTicket, bool sendMessage, sint32 delta);
 
@@ -1519,6 +1522,9 @@ public:
 
 	// check sell store coherency with character, assume character is a reference
 	void checkSellStore();
+
+	// checks for free trial players
+	void checksForFreeTrial();
 
 	/// Clear the list mission histories(for debug purpose only)
 	void clearMissionHistories();
