@@ -1222,15 +1222,29 @@ uint32 CCharacter::tickUpdate()
 				CCharacter* targetChar = safe_cast<CCharacter*>(target);
 				sint32 skillBaseValue = targetChar->getSkillBaseValue(targetChar->getBestSkill());
 				//				_PropertyDatabase.setProp( _DataIndexReminder->TARGET.PLAYER_LEVEL, skillBaseValue );
-				CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(
-					_PropertyDatabase, checkedCast<uint8>(skillBaseValue));
+				CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, checkedCast<uint8>(skillBaseValue));
 			}
-
-			if (!checkCharacterStillValide(
-						"<CCharacter::tickUpdate> Character corrupted : after update target HP/STA/SAP !!!"))
+			else
+			{
+				CCreature * creature = dynamic_cast< CCreature *>(target);
+				if (creature)
+				{
+					if (creature->getLockLoot() != CTEAM::InvalidTeamId)
+					{
+						if (creature->getLockLoot() == _TeamId)
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
+						else
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
+					}
+					else
+						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
+				}
+			}
+			if (!checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after update target HP/STA/SAP !!!"))
 				return (uint32) - 1;
 		}
 	}
+	
 	// set life bar
 	{
 		H_AUTO(CharacterSetBars);
@@ -3505,6 +3519,15 @@ void CCharacter::setTarget(const CEntityId &targetId, bool sendMessage)
 				else
 				{
 					rangeLevel = (((form->getLevel() - 1) / 5) << 1) + (((form->getLevel() - 1) % 5) >= 2 ? 2 : 1);
+					if (creature->getLockLoot() != CTEAM::InvalidTeamId)
+					{
+						if (creature->getLockLoot() == _TeamId)
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
+						else
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
+					}
+					else
+						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
 
 					if (rangeLevel > 11)
 						rangeLevel = 11;
