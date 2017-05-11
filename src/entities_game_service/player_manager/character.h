@@ -77,7 +77,7 @@ namespace CHARSYNC
 class TCharInfo;
 }
 
-typedef std::vector<std::pair<NLMISC::CSheetId, uint8>> TMpIdQuality;
+typedef std::vector< std::pair<NLMISC::CSheetId, uint8> > TMpIdQuality;
 typedef EGSPD::CMissionPD CMission;
 
 // number of slot in a bot chat list page
@@ -772,13 +772,13 @@ public:
 	const std::set<NLMISC::CSheetId> &getKnownBricks() const;
 
 	// return reference to visual property A
-	CMirrorPropValueAlice<SPropVisualA, CPropLocationPacked<2>> &getVisualPropertyA();
+	CMirrorPropValueAlice<SPropVisualA, CPropLocationPacked<2> > &getVisualPropertyA();
 
 	// return reference to visual property B
-	CMirrorPropValueAlice<SPropVisualB, CPropLocationPacked<2>> &getVisualPropertyB();
+	CMirrorPropValueAlice<SPropVisualB, CPropLocationPacked<2> > &getVisualPropertyB();
 
 	// return reference to visual property C
-	CMirrorPropValueAlice<SPropVisualC, CPropLocationPacked<2>> &getVisualPropertyC();
+	CMirrorPropValueAlice<SPropVisualC, CPropLocationPacked<2> > &getVisualPropertyC();
 
 	// update visual information after inventory manipulation
 	void updateVisualInformation(uint16 InventoryEmpty, uint16 SlotEmpty, uint16 InventoryFull, uint16 SlotFull,
@@ -3239,7 +3239,7 @@ private:
 	NLMISC::CEntityId _LeagueInvitor;
 
 	// id of the current team
-	CMirrorPropValueAlice<uint16, CPropLocationPacked<2>> _TeamId;
+	CMirrorPropValueAlice<uint16, CPropLocationPacked<2> > _TeamId;
 
 	TChanID _LeagueId;
 

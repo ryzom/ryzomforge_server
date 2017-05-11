@@ -3789,7 +3789,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 
 		for (map<TAIAlias, CMission*>::iterator it = getMissionsBegin(); it != getMissionsEnd(); ++it)
 		{
-			vector<pair<bool, uint32>> texts;
+			vector<pair<bool, uint32> > texts;
 			(*it).second->sendContextTexts(_EntityRowId, c->getEntityRowId(), texts);
 
 			for (uint k = 0; k < texts.size(); k++)
@@ -3825,7 +3825,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 		{
 			for (uint j = 0; j < team->getMissions().size(); j++)
 			{
-				vector<pair<bool, uint32>> texts;
+				vector<pair<bool, uint32> > texts;
 				team->getMissions()[j]->sendContextTexts(_EntityRowId, c->getEntityRowId(), texts);
 
 				for (uint k = 0; k < texts.size(); k++)
