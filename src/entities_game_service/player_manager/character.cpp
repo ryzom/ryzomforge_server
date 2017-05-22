@@ -18353,7 +18353,7 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 	{
 		nlwarning("BADCHECK For player %s, for %s, player should have %u and he has %u !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), base, _PhysScores._PhysicalScores[score].Base);
-		// vl		_PhysScores._PhysicalScores[ score ].Base = base;
+		_PhysScores._PhysicalScores[ score ].Base = base;
 	}
 
 	// check regen
@@ -18368,8 +18368,8 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 		nlwarning("BADCHECK For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), baseRegenerateRepos,
 				  _PhysScores._PhysicalScores[score].BaseRegenerateRepos);
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
 	}
 }
 
@@ -18381,8 +18381,8 @@ void CCharacter::checkCharacAndScoresValues()
 
 	if (player != NULL)
 	{
-		if (player->havePriv(NoValueCheckingPriv))
-			return;
+		//if (player->havePriv(NoValueCheckingPriv))
+		//	return;
 	}
 
 	uint8 maxPhraseLvlValue[CHARACTERISTICS::NUM_CHARACTERISTICS];
