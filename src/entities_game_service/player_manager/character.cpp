@@ -18410,7 +18410,7 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 	{
 		nlwarning("BADCHECK For player %s, for %s, player should have %u and he has %u !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), base, _PhysScores._PhysicalScores[score].Base);
-		// vl		_PhysScores._PhysicalScores[ score ].Base = base;
+		_PhysScores._PhysicalScores[ score ].Base = base;
 	}
 
 	// check regen
@@ -18425,8 +18425,8 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 		nlwarning("BADCHECK For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), baseRegenerateRepos,
 				  _PhysScores._PhysicalScores[score].BaseRegenerateRepos);
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
 	}
 }
 
@@ -18485,17 +18485,22 @@ void CCharacter::checkCharacAndScoresValues()
 		for (sint charac = 0; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS; ++charac)
 		{
 			// compute theoretical value
-			tvalue
-				= _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
-			// TODO tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			// tvalue = _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			//tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
+			if (player != NULL && player->isTrialPlayer())
+				tvalue = 140;
+			else
+				tvalue = 10 + (maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep);
+				
 			// compare
 			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
 			{
-				nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
-						  _Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
-						  _PhysCharacs._PhysicalCharacteristics[charac].Base);
-				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
+				if (player == NULL || !player->isTrialPlayer())
+					nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
+							_Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
+							_PhysCharacs._PhysicalCharacteristics[charac].Base);
+				_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
 				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Current = tvalue;
 			}
 		}
