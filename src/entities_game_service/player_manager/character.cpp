@@ -18488,10 +18488,10 @@ void CCharacter::checkCharacAndScoresValues()
 			// tvalue = _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 			//tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
-			if (player != NULL && player->isTrialPlayer())
+			tvalue = 10 + (maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep);
+
+			if (player != NULL && player->isTrialPlayer() && tvalue > 140)
 				tvalue = 140;
-			else
-				tvalue = 10 + (maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep);
 				
 			// compare
 			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
