@@ -154,8 +154,8 @@ void CForageProgress::reportXP( CCharacter *extractor, const CHarvestSource *sou
 					if ( careCaster->forageProgress()->hasCastedUsefulCare() )
 					{
 						usefulCareCasters.push_back( careCaster );
-						if ( careCaster != prospector ) // don't count the prospector twice
-							++nbParticipants;
+						//if ( careCaster != prospector ) // don't count the prospector twice
+						//	++nbParticipants;
 					}
 				}
 				else

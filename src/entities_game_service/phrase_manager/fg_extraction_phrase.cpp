@@ -258,6 +258,19 @@ bool CFgExtractionPhrase::build( const TDataSetRow & actorRowId, const std::vect
 						PHRASE_UTILITIES::sendDynamicSystemMessage( _ActorRowId, "FORAGE_NO_CARE_FIRST" );
 						player->sendCloseTempInventoryImpulsion(); // close the item window that was auto-opened by the client
 						return false;
+					} else {
+						CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(player->getId()));
+						if (p != NULL)
+						{
+							if (p->isTrialPlayer()) {
+								//Check if it's a f2p and in same time than forager
+								CCharacter *foragerPlayer = (CCharacter *) CEntityBaseManager::getEntityBasePtr( _Source->foragers().front() );
+								if (foragerPlayer->getTeamId() == CTEAM::InvalidTeamId || foragerPlayer->getTeamId() != player->getTeamId() ) {
+									PHRASE_UTILITIES::sendDynamicSystemMessage( _ActorRowId, "FORAGE_NO_CARE_FIRST" );
+									return false;
+								}
+							}
+						}
 					}
 				}
 				else
