@@ -3265,7 +3265,11 @@ void CCharacter::computeSkillUsedForDodge()
 {
 	for (int i = 0; i < SKILLS::NUM_SKILLS; i++)
 	{
-		const sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+		sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && val > 125)
+		val = 125;
 
 		if (val > _BaseDodgeLevel)
 		{
@@ -20337,6 +20341,11 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 		_CurrentParrySkill = skill;
 	else
 		_CurrentParrySkill = BarehandCombatSkill;
+
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && _BaseParryLevel > 125)
+		_BaseParryLevel = 125;
+
 
 	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
 	_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
