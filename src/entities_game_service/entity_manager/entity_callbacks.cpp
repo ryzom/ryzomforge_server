@@ -650,12 +650,15 @@ void finalizeClientReady( uint32 userId, uint32 index )
 	c->getEncyclopedia().sendEncycloToClient();
 
 	// update newbieland flag (defailt to 1 if there's aproblem determining the true value)
-	nlinfo("Updating IS_NEWBIE flag for character: %s",c->getId().toString().c_str());
 //	c->_PropertyDatabase.setProp("USER:IS_NEWBIE", c->isNewbie());
 	CBankAccessor_PLR::getUSER().setIS_NEWBIE(c->_PropertyDatabase, c->isNewbie());
 	bool trialPlayer = player->isTrialPlayer();
 //	c->_PropertyDatabase.setProp("USER:IS_TRIAL", trialPlayer);
 	CBankAccessor_PLR::getUSER().setIS_TRIAL(c->_PropertyDatabase, trialPlayer);
+
+	// checks for freetrial
+	if (trialPlayer)
+		c->checksForFreeTrial();
 
 
 	if (IsRingShard)

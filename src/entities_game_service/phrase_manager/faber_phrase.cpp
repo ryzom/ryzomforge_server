@@ -250,6 +250,11 @@ bool CFaberPhrase::validate()
 	}
 
 
+	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( c->getId() ));
+
+	if (p->isTrialPlayer() && _Recommended > 150)
+		_Recommended = 150;
+
 	// check quality of right hand item (need be >= Recommended (level of item))
 	if (rightHandItem->recommended()+49 < _Recommended)
 	{

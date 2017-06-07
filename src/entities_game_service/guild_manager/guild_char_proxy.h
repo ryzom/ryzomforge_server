@@ -20,7 +20,7 @@
 #include "gameplay_module_lib/gameplay_module_lib.h"
 #include "game_share/string_manager_sender.h"
 #include "egs_pd.h"
-//#include "player_manager/character.h"
+#include "player_manager/character.h"
 
 class CCreature;
 
