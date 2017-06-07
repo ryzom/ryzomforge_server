@@ -7851,7 +7851,11 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			}
 
 			// update best skill for dodge if needed
-			const sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+			sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+
+			CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+			if (p->isTrialPlayer() && dodgeVal > 125)
+				dodgeVal = 125;
 
 			if (dodgeVal > _BaseDodgeLevel)
 			{
@@ -7891,6 +7895,10 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			if (parry)
 			{
 				_BaseParryLevel = skill->Base;
+
+				if (p->isTrialPlayer() && _BaseParryLevel > 125)
+					_BaseParryLevel = 125;
+				
 				_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 				//				_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase,
 				//_BaseParryLevel);
@@ -20342,12 +20350,13 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 	else
 		_CurrentParrySkill = BarehandCombatSkill;
 
+
+	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+
 	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 	if (p->isTrialPlayer() && _BaseParryLevel > 125)
 		_BaseParryLevel = 125;
 
-
-	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
 	_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel );
 	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));
