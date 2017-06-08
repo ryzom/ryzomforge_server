@@ -772,13 +772,13 @@ public:
 	const std::set<NLMISC::CSheetId> &getKnownBricks() const;
 
 	// return reference to visual property A
-	CMirrorPropValueAlice<SPropVisualA, CPropLocationPacked<2>> &getVisualPropertyA();
+	CMirrorPropValueAlice<SPropVisualA, CPropLocationPacked<2> > &getVisualPropertyA();
 
 	// return reference to visual property B
-	CMirrorPropValueAlice<SPropVisualB, CPropLocationPacked<2>> &getVisualPropertyB();
+	CMirrorPropValueAlice<SPropVisualB, CPropLocationPacked<2> > &getVisualPropertyB();
 
 	// return reference to visual property C
-	CMirrorPropValueAlice<SPropVisualC, CPropLocationPacked<2>> &getVisualPropertyC();
+	CMirrorPropValueAlice<SPropVisualC, CPropLocationPacked<2> > &getVisualPropertyC();
 
 	// update visual information after inventory manipulation
 	void updateVisualInformation(uint16 InventoryEmpty, uint16 SlotEmpty, uint16 InventoryFull, uint16 SlotFull,

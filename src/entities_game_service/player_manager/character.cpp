@@ -1573,7 +1573,6 @@ uint32 CCharacter::tickUpdate()
 			removeMissionFromHistories(missionAlias);
 		}
 	}
-
 	return nextUpdate;
 } // tickUpdate //
 
@@ -3302,7 +3301,11 @@ void CCharacter::computeSkillUsedForDodge()
 {
 	for (int i = 0; i < SKILLS::NUM_SKILLS; i++)
 	{
-		const sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+		sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && val > 125)
+		val = 125;
 
 		if (val > _BaseDodgeLevel)
 		{
@@ -7882,7 +7885,11 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			}
 
 			// update best skill for dodge if needed
-			const sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+			sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+
+			CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+			if (p->isTrialPlayer() && dodgeVal > 125)
+				dodgeVal = 125;
 
 			if (dodgeVal > _BaseDodgeLevel)
 			{
@@ -7922,6 +7929,9 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			if (parry)
 			{
 				_BaseParryLevel = skill->Base;
+				if (p->isTrialPlayer() && _BaseParryLevel > 125)
+					_BaseParryLevel = 125;
+				
 				_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 				//				_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase,
 				//_BaseParryLevel);
@@ -12918,7 +12928,6 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		//			tpl->getMissionName().c_str());
 
 		//		EGSPD::missionLog(MissionResultStatLogTag[result], _Id, tpl->getMissionName());
-
 		// Erase CheckPos with name of mission
 		for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end();)
 		{
@@ -18452,7 +18461,7 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 	{
 		nlwarning("BADCHECK For player %s, for %s, player should have %u and he has %u !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), base, _PhysScores._PhysicalScores[score].Base);
-		// vl		_PhysScores._PhysicalScores[ score ].Base = base;
+		_PhysScores._PhysicalScores[ score ].Base = base;
 	}
 
 	// check regen
@@ -18467,8 +18476,8 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 		nlwarning("BADCHECK For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), baseRegenerateRepos,
 				  _PhysScores._PhysicalScores[score].BaseRegenerateRepos);
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
 	}
 }
 
@@ -18527,17 +18536,22 @@ void CCharacter::checkCharacAndScoresValues()
 		for (sint charac = 0; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS; ++charac)
 		{
 			// compute theoretical value
-			tvalue
-				= _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
-			// TODO tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			// tvalue = _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			//tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
+			tvalue = 10 + (maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep);
+
+			if (player != NULL && player->isTrialPlayer() && tvalue > 140)
+				tvalue = 140;
+				
 			// compare
 			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
 			{
-				nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
-						  _Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
-						  _PhysCharacs._PhysicalCharacteristics[charac].Base);
-				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
+				if (player == NULL || !player->isTrialPlayer())
+					nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
+							_Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
+							_PhysCharacs._PhysicalCharacteristics[charac].Base);
+				_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
 				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Current = tvalue;
 			}
 		}
@@ -20375,7 +20389,12 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 	else
 		_CurrentParrySkill = BarehandCombatSkill;
 
+
 	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && _BaseParryLevel > 125)
+		_BaseParryLevel = 125;
+
 	_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel );
 	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));

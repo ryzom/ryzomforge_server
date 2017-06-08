@@ -184,6 +184,10 @@ void CCharacter::initInventoriesDb()
 	{
 		_CurrentParrySkill = BarehandCombatSkill;
 		_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer() && _BaseParryLevel > 125)
+			_BaseParryLevel = 125;
+		
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
 		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
@@ -1155,6 +1159,10 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 	{
 		_CurrentParrySkill = BarehandCombatSkill;
 		_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer() && _BaseParryLevel > 125)
+			_BaseParryLevel = 125;
+		
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
 		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
@@ -1439,7 +1447,20 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 
 	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 
-	if (p->isTrialPlayer() && (form->Family != ITEMFAMILY::RAW_MATERIAL))
+	if (p->isTrialPlayer() && (
+		form->Family != ITEMFAMILY::RAW_MATERIAL &&
+		form->Family != ITEMFAMILY::TELEPORT &&
+		form->Family != ITEMFAMILY::CRYSTALLIZED_SPELL &&
+		form->Family != ITEMFAMILY::ITEM_SAP_RECHARGE &&
+		form->Family != ITEMFAMILY::MISSION_ITEM &&
+		form->Family != ITEMFAMILY::PET_ANIMAL_TICKET &&
+		form->Family != ITEMFAMILY::CONSUMABLE &&
+		form->Family != ITEMFAMILY::XP_CATALYSER &&
+		form->Family != ITEMFAMILY::SCROLL &&
+		form->Family != ITEMFAMILY::FOOD &&
+		form->Family != ITEMFAMILY::SCROLL_R2 &&
+		form->Family != ITEMFAMILY::GENERIC_ITEM
+		))
 	{
 		if (item->recommended() > 150)
 			requiredRespected = false;
