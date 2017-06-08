@@ -79,7 +79,8 @@ void CForageProgress::fillFromExtraction(const CHarvestSource *source, float qua
 		else
 			_MaxQuality = item->recommended(); // for others max Q of mats are same than the Q of pike
 	}
-	vector<CCharacter*> usefulCareCasters;
+	
+	/*vector<CCharacter*> usefulCareCasters;
 	const CHarvestSource::CForagers& foragers = source->foragers();
 	CHarvestSource::CForagers::const_iterator itf = foragers.begin();
 	for (++itf; itf!=foragers.end(); ++itf)
@@ -92,9 +93,11 @@ void CForageProgress::fillFromExtraction(const CHarvestSource *source, float qua
 			if (item->recommended() < 50) // For pike with Q less than Q50 => Max quality of mats are 50
 				_MaxQuality = 50;
 			else
-				_MaxQuality = item->recommended(); // for others max Q of mats are same than the Q of pike
+				_MaxQuality = min(_MaxQuality, (float)item->recommended()); // for others max Q of mats are same than the Q of pike
 		}
 	}
+	*/
+	
 	if (_Quality > _MaxQuality)
 		_Quality = _MaxQuality;
 	
@@ -154,8 +157,8 @@ void CForageProgress::reportXP( CCharacter *extractor, const CHarvestSource *sou
 					if ( careCaster->forageProgress()->hasCastedUsefulCare() )
 					{
 						usefulCareCasters.push_back( careCaster );
-						if ( careCaster != prospector ) // don't count the prospector twice
-							++nbParticipants;
+						//if ( careCaster != prospector ) // don't count the prospector twice
+						//	++nbParticipants;
 					}
 				}
 				else

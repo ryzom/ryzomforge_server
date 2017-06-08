@@ -454,12 +454,12 @@ CCharacter::CCharacter()
 	_MeleeCombatIsValid = false;
 	_CurrentBotChatType = BOTCHATTYPE::UnknownFlag;
 	/*
-		_HaveMweaTool = false;
-		_HaveRweaTool = false;
-		_HaveAmmoTool = false;
-		_HaveArmorTool = false;
-		_HaveJewelTool = false;
-		_HaveForageTool = false;
+	_HaveMweaTool = false;
+	_HaveRweaTool = false;
+	_HaveAmmoTool = false;
+	_HaveArmorTool = false;
+	_HaveJewelTool = false;
+	_HaveForageTool = false;
 	*/
 	_DateOfNextAllowedAction = 0;
 	_OldHpBarSentToTeam = 0;
@@ -936,39 +936,39 @@ uint32 CCharacter::tickUpdate()
 			return (uint32) - 1;
 	}
 	/*
-		{
-			H_AUTO(CharacterAntiBugCheckContinent);
-			//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
-			//Note: Characters teleporting on a mount may provoke this warning!
-			uint32 in = getInstanceNumber();
+	{
+		H_AUTO(CharacterAntiBugCheckContinent);
+		//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
+		//Note: Characters teleporting on a mount may provoke this warning!
+		uint32 in = getInstanceNumber();
 		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of teleports
-			if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
-			{
+		if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
+		{
 			nlwarning("<ANTIBUG>%s IS ON AN INVALID CONTINENT. x= %d, y = %d ",_Id.toString().c_str(),_EntityState.X(),
 	_EntityState.Y() );
-				CContinent * cont = CZoneManager::getInstance().getContinent(_EntityState.X,_EntityState.Y);
-				if ( cont )
+			CContinent * cont = CZoneManager::getInstance().getContinent(_EntityState.X,_EntityState.Y);
+			if ( cont )
+			{
+				in = CUsedContinent::instance().getInstanceForContinent( CONTINENT::TContinent(cont->getId()) );
+				if ( in == INVALID_AI_INSTANCE )
 				{
-					in = CUsedContinent::instance().getInstanceForContinent( CONTINENT::TContinent(cont->getId()) );
-					if ( in == INVALID_AI_INSTANCE )
-					{
 					nlwarning("%s will arrive in an invalid continent (WE NAME : '%s') (REAL NAME : '%s')
 	",_Id.toString().c_str(), NLMISC::strlwr( cont->getName() ).c_str(),
 	CONTINENT::toString(CONTINENT::TContinent(cont->getId())).c_str() );
-					}
 				}
-				else
-				{
+			}
+			else
+			{
 				nlwarning("<ANTIBUG>%s AT x= %d, y = %d NO VALID CONTINENT
 	FOUND",_Id.toString().c_str(),_EntityState.X() , _EntityState.Y() );
-				}
-				setInstanceNumber( in );
+			}
+			setInstanceNumber( in );
 
 			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent !!!") )
-					return (uint32)-1;
-			}
-			// end of ANTIBUG
+				return (uint32)-1;
 		}
+		// end of ANTIBUG
+	}
 	*/
 	{
 		H_AUTO(CharacterCheckEnterLeaveZone);
@@ -3313,7 +3313,11 @@ void CCharacter::computeSkillUsedForDodge()
 {
 	for (int i = 0; i < SKILLS::NUM_SKILLS; i++)
 	{
-		const sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+		sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && val > 125)
+		val = 125;
 
 		if (val > _BaseDodgeLevel)
 		{
@@ -5791,6 +5795,7 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 
 	return slot;
 }
+
 //-----------------------------------------------
 // CCharacter::checkAnimalCount return true if can add 'delta' pets to current player pets
 //-----------------------------------------------
@@ -7901,7 +7906,11 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			}
 
 			// update best skill for dodge if needed
-			const sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+			sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+
+			CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+			if (p->isTrialPlayer() && dodgeVal > 125)
+				dodgeVal = 125;
 
 			if (dodgeVal > _BaseDodgeLevel)
 			{
@@ -7941,6 +7950,10 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			if (parry)
 			{
 				_BaseParryLevel = skill->Base;
+
+				if (p->isTrialPlayer() && _BaseParryLevel > 125)
+					_BaseParryLevel = 125;
+				
 				_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 				//				_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase,
 				//_BaseParryLevel);
@@ -18471,7 +18484,7 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 	{
 		nlwarning("BADCHECK For player %s, for %s, player should have %u and he has %u !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), base, _PhysScores._PhysicalScores[score].Base);
-		// vl		_PhysScores._PhysicalScores[ score ].Base = base;
+		_PhysScores._PhysicalScores[ score ].Base = base;
 	}
 
 	// check regen
@@ -18486,8 +18499,8 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 		nlwarning("BADCHECK For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), baseRegenerateRepos,
 				  _PhysScores._PhysicalScores[score].BaseRegenerateRepos);
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
 	}
 }
 
@@ -18546,17 +18559,22 @@ void CCharacter::checkCharacAndScoresValues()
 		for (sint charac = 0; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS; ++charac)
 		{
 			// compute theoretical value
-			tvalue
-				= _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
-			// TODO tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			// tvalue = _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			//tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
+			tvalue = 10 + (maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep);
+
+			if (player != NULL && player->isTrialPlayer() && tvalue > 140)
+				tvalue = 140;
+				
 			// compare
 			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
 			{
-				nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
-						  _Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
-						  _PhysCharacs._PhysicalCharacteristics[charac].Base);
-				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
+				if (player == NULL || !player->isTrialPlayer())
+					nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
+							_Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
+							_PhysCharacs._PhysicalCharacteristics[charac].Base);
+				_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
 				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Current = tvalue;
 			}
 		}
@@ -19168,16 +19186,16 @@ void CCharacter::setPVPFlag(bool pvpFlag)
 
 		// OLD PVP
 		/*		if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false &&
-					CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
-				{
-					// character can set it's tag pvp on if none of his clan is in war
-					SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
-					sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
+			CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
+		{
+			// character can set it's tag pvp on if none of his clan is in war
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
+			sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
 		//			_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:COUNTER", ++_PvPDatabaseCounter );
 			CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase,
 		uint8(++_PvPDatabaseCounter));
-					return;
-				}
+			return;
+		}
 		*/
 	}
 
@@ -20394,7 +20412,13 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 	else
 		_CurrentParrySkill = BarehandCombatSkill;
 
+
 	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && _BaseParryLevel > 125)
+		_BaseParryLevel = 125;
+
 	_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel );
 	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));

@@ -184,6 +184,11 @@ void CCharacter::initInventoriesDb()
 	{
 		_CurrentParrySkill = BarehandCombatSkill;
 		_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer() && _BaseParryLevel > 125)
+			_BaseParryLevel = 125;
+		
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
 		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
@@ -452,13 +457,13 @@ void CCharacter::itemPickup(const NLMISC::CEntityId &entity, bool harvest)
 
 				/*
 				case RYZOMID::deposit:
-				{
-					staticActionInProgress( true );
-					nlwarning("<cbItemPickup> Invalid entity type deposit");
-					// TO DO
-				}
-				break;
-				*/
+					{
+						staticActionInProgress( true );
+						nlwarning("<cbItemPickup> Invalid entity type deposit");
+						// TO DO
+					}
+					break;
+					*/
 				default:
 					nlwarning("<cbItemPickup> Invalid entity type %u", entity.getType());
 					break;
@@ -988,18 +993,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 		return;
 	}
 
-	// if an item is equipped in destination slot unequip it
-	if (dstInv->getItem(dstSlot) != NULL)
-	{
-		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
-		{
-			// if item is locked just return
-			return;
-		}
-
-		unequipCharacter(dstInvId, dstSlot);
-	}
-
 	// check if bag slot is not empty
 	CGameItemPtr item = bagInv->getItem(bagSlot);
 
@@ -1034,6 +1027,17 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 			&& (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL))
 		return;
 
+	// if an item is equipped in destination slot unequip it
+	if (dstInv->getItem(dstSlot) != NULL)
+	{
+		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
+		{
+			// if item is locked just return
+			return;
+		}
+
+		unequipCharacter(dstInvId, dstSlot);
+	}
 
 	// set the item in ref inventory
 	dstInv->insertItem(item, dstSlot);
@@ -1156,6 +1160,11 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 	{
 		_CurrentParrySkill = BarehandCombatSkill;
 		_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		if (p->isTrialPlayer() && _BaseParryLevel > 125)
+			_BaseParryLevel = 125;
+		
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
 		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
@@ -1441,6 +1450,27 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 
 	if (p->isTrialPlayer() && (form->Family != ITEMFAMILY::RAW_MATERIAL))
+	{
+		if (item->recommended() > 150)
+			requiredRespected = false;
+	}
+
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+
+	if (p->isTrialPlayer() && (
+		form->Family != ITEMFAMILY::RAW_MATERIAL &&
+		form->Family != ITEMFAMILY::TELEPORT &&
+		form->Family != ITEMFAMILY::CRYSTALLIZED_SPELL &&
+		form->Family != ITEMFAMILY::ITEM_SAP_RECHARGE &&
+		form->Family != ITEMFAMILY::MISSION_ITEM &&
+		form->Family != ITEMFAMILY::PET_ANIMAL_TICKET &&
+		form->Family != ITEMFAMILY::CONSUMABLE &&
+		form->Family != ITEMFAMILY::XP_CATALYSER &&
+		form->Family != ITEMFAMILY::SCROLL &&
+		form->Family != ITEMFAMILY::FOOD &&
+		form->Family != ITEMFAMILY::SCROLL_R2 &&
+		form->Family != ITEMFAMILY::GENERIC_ITEM
+		))
 	{
 		if (item->recommended() > 150)
 			requiredRespected = false;
@@ -2592,13 +2622,13 @@ void CCharacter::sendItemInfos(uint16 slotId)
 
 		infos.CreatorName = CEntityIdTranslator::getInstance()->getEntityNameStringId(item->getCreator());
 		/*
-				CEntityBase* creator = CEntityBaseManager::getEntityBasePtr(item->getCreator());
-				infos.CreatorName = 0;
-				if( creator && TheDataset.isAccessible( creator->getEntityRowId() ) )
-				{
-					CMirrorPropValueRO<uint32> nameIndex( TheDataset, creator->getId(), "NameIndex" );
-					 = nameIndex();
-				}
+		CEntityBase* creator = CEntityBaseManager::getEntityBasePtr(item->getCreator());
+		infos.CreatorName = 0;
+		if( creator && TheDataset.isAccessible( creator->getEntityRowId() ) )
+		{
+			CMirrorPropValueRO<uint32> nameIndex( TheDataset, creator->getId(), "NameIndex" );
+			 = nameIndex();
+		}
 		*/
 		infos.slotId = slotId;
 		sint32 skillVal = 0;
@@ -3093,7 +3123,7 @@ void CCharacter::procEnchantment()
 				}
 
 				/*	else
-						nlwarning("user %s : no valid image for right weapon", _Id.toString().c_str());*/
+					nlwarning("user %s : no valid image for right weapon", _Id.toString().c_str());*/
 			}
 			else
 			{
