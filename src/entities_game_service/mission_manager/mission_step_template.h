@@ -49,6 +49,7 @@ public:
 		NLMISC::CSheetId	Sheet;
 		uint16		Quality;
 		uint32		Quantity;
+		std::string Dynamic;
 	};
 
 
@@ -264,6 +265,7 @@ public:
 		NLMISC::CSheetId	Sheet;
 		uint16				Quality;
 		uint16				Quantity;
+		std::string			Dynamic;
 	};
 
 	/// Return the properties of the requested items

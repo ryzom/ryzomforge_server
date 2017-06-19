@@ -317,10 +317,8 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot, bool 
 			
 			CCharacter * user = getMainEntity();
 			user->getPositionCheck(toUpper(templ->getMissionName()), x, y, textName);
-			nlinfo("add compass target for %s, %d,%d = %s (%d)", templ->getMissionName().c_str(), x, y, textName.c_str(), targetId);
 
 			if (targetId != 0) {
-				nlinfo("update db");
 				CBankAccessor_PLR::getMISSIONS().getArray(_ClientIndex).getTARGET(freeIdx).setX(user->_PropertyDatabase, x*1000);
 				CBankAccessor_PLR::getMISSIONS().getArray(_ClientIndex).getTARGET(freeIdx).setY(user->_PropertyDatabase, y*1000);
 				CBankAccessor_PLR::getMISSIONS().getArray(_ClientIndex).getTARGET(freeIdx).setTITLE(user->_PropertyDatabase, targetId);
@@ -365,7 +363,6 @@ void CMissionBaseBehaviour::addCompassTarget( uint32 targetId, bool isBot, bool 
 		}
 		else if (isPosition)
 		{
-			nlinfo("isposition");
 			string textName;
 			CCharacter * user = getMainEntity();
 			if (user)

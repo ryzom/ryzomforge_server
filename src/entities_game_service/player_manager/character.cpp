@@ -589,6 +589,10 @@ CCharacter::CCharacter()
 	_DuelOpponent = NULL;
 	_LastTpTick = 0;
 	_LastOverSpeedTick = 0;
+	_LastMountTick = 0;
+	_LastUnMountTick = 0;
+	_LastFreeMount = 0;
+	_LastExchangeMount = 0;
 	_LastCivPointWriteDB = ~0;
 	_LastCultPointWriteDB = ~0;
 	_DeclaredCult = PVP_CLAN::Unknown;
@@ -941,8 +945,7 @@ uint32 CCharacter::tickUpdate()
 		//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
 		//Note: Characters teleporting on a mount may provoke this warning!
 		uint32 in = getInstanceNumber();
-		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of
-	teleports
+		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of teleports
 		if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
 		{
 			nlwarning("<ANTIBUG>%s IS ON AN INVALID CONTINENT. x= %d, y = %d ",_Id.toString().c_str(),_EntityState.X(),
@@ -965,8 +968,7 @@ uint32 CCharacter::tickUpdate()
 			}
 			setInstanceNumber( in );
 
-			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent
-	!!!") )
+			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent !!!") )
 				return (uint32)-1;
 		}
 		// end of ANTIBUG
@@ -1536,6 +1538,43 @@ uint32 CCharacter::tickUpdate()
 
 	_SavedPosX = _EntityState.X();
 	_SavedPosY = _EntityState.Y();
+	// ARK Check Position
+	vector<string> missionToRemove;
+
+	for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end(); ++it)
+	{
+		sint32 A = (_SavedPosX / 1000) - (*it).X;
+		sint32 B = (_SavedPosY / 1000) - (*it).Y;
+		uint32 R = (*it).Radius;
+
+		if ((double)(A * A) + (double)(B * B) <= (double)(R * R))
+		{
+			TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName((*it).Name);
+			CMission* mission = _Missions->getMissions(missionAlias);
+
+			if (mission != NULL)
+			{
+				vector<string> params = getCustomMissionParams((*it).Name);
+
+				if (params.size() >= 2)
+				{
+					validateDynamicMissionStep(params[0]);
+					missionToRemove.push_back((*it).Name);
+				}
+			}
+		}
+	}
+
+	for (uint32 i = 0; i < missionToRemove.size(); i++)
+	{
+		TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(missionToRemove[i]);
+
+		if (missionAlias)
+		{
+			removeMission(missionAlias, mr_success);
+			removeMissionFromHistories(missionAlias);
+		}
+	}
 	return nextUpdate;
 } // tickUpdate //
 
@@ -2535,7 +2574,6 @@ void CCharacter::applyRegenAndClipCurrentValue()
 
 		if (speedVariationModifier > 0)
 		{
-			nlinfo("Current speedVariationModifier = %d", speedVariationModifier);
 			_LastOverSpeedTick = CTickEventHandler::getGameCycle();
 		}
 	}
@@ -3947,8 +3985,6 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 			// add cheksum : pnj eid
 			url += "&teid=" + c->getId().toString();
 			string defaultSalt = toString(getLastConnectedDate());
-			nlinfo(defaultSalt.c_str());
-			nlinfo(url.c_str());
 			string control = "&hmac="
 							 + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
 							 .toString();
@@ -5561,7 +5597,9 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		}
 	}
 
-	_LastTpTick = CTickEventHandler::getGameCycle();
+	if (_IntangibleEndDate != ~0) // Don't save Last Tp Tick if player respawns
+		_LastTpTick = CTickEventHandler::getGameCycle();
+	
 	_TpCoordinate.X = x;
 	_TpCoordinate.Y = y;
 	_TpCoordinate.Z = z;
@@ -7895,7 +7933,6 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			if (parry)
 			{
 				_BaseParryLevel = skill->Base;
-
 				if (p->isTrialPlayer() && _BaseParryLevel > 125)
 					_BaseParryLevel = 125;
 				
@@ -12336,6 +12373,8 @@ bool CCharacter::validateExchange()
 			invalidateExchange();
 			return false;
 		}
+
+		_LastExchangeMount = CTickEventHandler::getGameCycle();
 	}
 
 	return true;
@@ -12895,6 +12934,15 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		//			tpl->getMissionName().c_str());
 
 		//		EGSPD::missionLog(MissionResultStatLogTag[result], _Id, tpl->getMissionName());
+		// Erase CheckPos with name of mission
+		for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end();)
+		{
+			if ((*it).Name == toUpper(tpl->getMissionName()))
+				it = _CheckPos.erase(it);
+			else
+				++it;
+		}
+
 		if (!doNotClearJournal)
 			mission->clearUsersJournalEntry();
 	}
@@ -14335,7 +14383,6 @@ bool CCharacter::isSpawnValid(bool inVillage, bool inOutpost, bool inStable, boo
 		if (p)
 		{
 			PLACE_TYPE::TPlaceType place_type = p->getPlaceType();
-			nlinfo("Place type = %s", PLACE_TYPE::toString(p->getPlaceType()).c_str());
 
 			if (!inVillage && (place_type == PLACE_TYPE::Village || place_type == PLACE_TYPE::Capital))
 			{
@@ -14967,7 +15014,6 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 				  .toString();
 	}
 
-	nlinfo(url.c_str());
 	uint32 userId = PlayerManager.getPlayerId(getId());
 	SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
 	textParams[0].Literal = "WEB : " + url + control;
@@ -15057,7 +15103,6 @@ void CCharacter::addPositionCheck(sint32 x, sint32 y, uint32 r, const std::strin
 	poscheck.Radius = r;
 	poscheck.Name = name;
 	_CheckPos.push_back(poscheck);
-	nlinfo("Checking : %d, %d, %d, %s", x, y, r, name.c_str());
 }
 
 /// get Ark position check
@@ -15459,7 +15504,7 @@ bool CCharacter::pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial)
 			return false; // don't try to quarter an item for looting
 		}
 
-		// Send url for Arcc triggers
+		// Send url for ARK triggers
 		vector<string> params = getCustomMissionParams("__LOOT_SHEET__");
 
 		if (params.size() >= 2)
@@ -20352,7 +20397,6 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 
 
 	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
-
 	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 	if (p->isTrialPlayer() && _BaseParryLevel > 125)
 		_BaseParryLevel = 125;
