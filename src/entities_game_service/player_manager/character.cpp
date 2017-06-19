@@ -589,6 +589,10 @@ CCharacter::CCharacter()
 	_DuelOpponent = NULL;
 	_LastTpTick = 0;
 	_LastOverSpeedTick = 0;
+	_LastMountTick = 0;
+	_LastUnMountTick = 0;
+	_LastFreeMount = 0;
+	_LastExchangeMount = 0;
 	_LastCivPointWriteDB = ~0;
 	_LastCultPointWriteDB = ~0;
 	_DeclaredCult = PVP_CLAN::Unknown;
@@ -941,8 +945,7 @@ uint32 CCharacter::tickUpdate()
 		//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
 		//Note: Characters teleporting on a mount may provoke this warning!
 		uint32 in = getInstanceNumber();
-		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of
-	teleports
+		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of teleports
 		if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
 		{
 			nlwarning("<ANTIBUG>%s IS ON AN INVALID CONTINENT. x= %d, y = %d ",_Id.toString().c_str(),_EntityState.X(),
@@ -965,8 +968,7 @@ uint32 CCharacter::tickUpdate()
 			}
 			setInstanceNumber( in );
 
-			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent
-	!!!") )
+			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent !!!") )
 				return (uint32)-1;
 		}
 		// end of ANTIBUG
@@ -3792,7 +3794,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 
 		for (map<TAIAlias, CMission*>::iterator it = getMissionsBegin(); it != getMissionsEnd(); ++it)
 		{
-			vector<pair<bool, uint32>> texts;
+			vector<pair<bool, uint32> > texts;
 			(*it).second->sendContextTexts(_EntityRowId, c->getEntityRowId(), texts);
 
 			for (uint k = 0; k < texts.size(); k++)
@@ -3828,7 +3830,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 		{
 			for (uint j = 0; j < team->getMissions().size(); j++)
 			{
-				vector<pair<bool, uint32>> texts;
+				vector<pair<bool, uint32> > texts;
 				team->getMissions()[j]->sendContextTexts(_EntityRowId, c->getEntityRowId(), texts);
 
 				for (uint k = 0; k < texts.size(); k++)
@@ -5595,7 +5597,9 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		}
 	}
 
-	_LastTpTick = CTickEventHandler::getGameCycle();
+	if (_IntangibleEndDate != ~0) // Don't save Last Tp Tick if player respawns
+		_LastTpTick = CTickEventHandler::getGameCycle();
+	
 	_TpCoordinate.X = x;
 	_TpCoordinate.Y = y;
 	_TpCoordinate.Z = z;
@@ -12369,6 +12373,8 @@ bool CCharacter::validateExchange()
 			invalidateExchange();
 			return false;
 		}
+
+		_LastExchangeMount = CTickEventHandler::getGameCycle();
 	}
 
 	return true;
