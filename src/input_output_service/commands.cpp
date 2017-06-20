@@ -671,3 +671,39 @@ NLMISC_COMMAND(showChat,"show or hide chat messages","")
 	return true;
 
 } // showChat //
+
+
+NLMISC_COMMAND(chat, "send message chat", "<char_name> <chat_group> <message>")
+{
+	if (args.size() < 3)
+		return false;
+	
+	CCharacterInfos *ci = IOS->getCharInfos(args[0]);
+	if (ci == NULL)
+	{
+		log.displayNL("ERR: Unknown %s", args[0].c_str());
+		return false;
+	}
+	
+	CChatGroup::TGroupType mode = CChatGroup::stringToGroupType(args[1]);
+	ucstring ucstr = args[2];
+	TDataSetRow rowId = ci->DataSetIndex;
+	try
+	{
+		CChatGroup::TGroupType oldMode = IOS->getChatManager().getClient(rowId).getChatMode();
+		if (mode != oldMode)
+			IOS->getChatManager().getClient(rowId).setChatMode(mode);
+		
+		IOS->getChatManager().getClient(rowId).updateAudience();
+		IOS->getChatManager().chat(rowId, ucstr);
+
+		if (oldMode != mode)
+			IOS->getChatManager().getClient(rowId).setChatMode(oldMode);
+	}
+	catch(const Exception &e)
+	{
+		nlwarning("<cbChatMessage> %s",e.what());
+	}
+	
+	return true;
+}

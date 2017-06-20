@@ -454,12 +454,12 @@ CCharacter::CCharacter()
 	_MeleeCombatIsValid = false;
 	_CurrentBotChatType = BOTCHATTYPE::UnknownFlag;
 	/*
-		_HaveMweaTool = false;
-		_HaveRweaTool = false;
-		_HaveAmmoTool = false;
-		_HaveArmorTool = false;
-		_HaveJewelTool = false;
-		_HaveForageTool = false;
+	_HaveMweaTool = false;
+	_HaveRweaTool = false;
+	_HaveAmmoTool = false;
+	_HaveArmorTool = false;
+	_HaveJewelTool = false;
+	_HaveForageTool = false;
 	*/
 	_DateOfNextAllowedAction = 0;
 	_OldHpBarSentToTeam = 0;
@@ -589,6 +589,10 @@ CCharacter::CCharacter()
 	_DuelOpponent = NULL;
 	_LastTpTick = 0;
 	_LastOverSpeedTick = 0;
+	_LastMountTick = 0;
+	_LastUnMountTick = 0;
+	_LastFreeMount = 0;
+	_LastExchangeMount = 0;
 	_LastCivPointWriteDB = ~0;
 	_LastCultPointWriteDB = ~0;
 	_DeclaredCult = PVP_CLAN::Unknown;
@@ -936,41 +940,39 @@ uint32 CCharacter::tickUpdate()
 			return (uint32) - 1;
 	}
 	/*
+	{
+		H_AUTO(CharacterAntiBugCheckContinent);
+		//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
+		//Note: Characters teleporting on a mount may provoke this warning!
+		uint32 in = getInstanceNumber();
+		// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because of teleports
+		if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
 		{
-			H_AUTO(CharacterAntiBugCheckContinent);
-			//ANTIBUG : CHARACTERS MUST BE IN A CONTINENT IF THEY ARE NOT BEING TELEPORTED
-			//Note: Characters teleporting on a mount may provoke this warning!
-			uint32 in = getInstanceNumber();
-			// if the instance is invalid and char on valid coords, we have a problem. We ignore invalid coords because
-	   of teleports
-			if ( in == ~0 && _EntityState.X > 0 && _EntityState.Y < 0)
+			nlwarning("<ANTIBUG>%s IS ON AN INVALID CONTINENT. x= %d, y = %d ",_Id.toString().c_str(),_EntityState.X(),
+	_EntityState.Y() );
+			CContinent * cont = CZoneManager::getInstance().getContinent(_EntityState.X,_EntityState.Y);
+			if ( cont )
 			{
-				nlwarning("<ANTIBUG>%s IS ON AN INVALID CONTINENT. x= %d, y = %d
-	   ",_Id.toString().c_str(),_EntityState.X(), _EntityState.Y() );
-				CContinent * cont = CZoneManager::getInstance().getContinent(_EntityState.X,_EntityState.Y);
-				if ( cont )
+				in = CUsedContinent::instance().getInstanceForContinent( CONTINENT::TContinent(cont->getId()) );
+				if ( in == INVALID_AI_INSTANCE )
 				{
-					in = CUsedContinent::instance().getInstanceForContinent( CONTINENT::TContinent(cont->getId()) );
-					if ( in == INVALID_AI_INSTANCE )
-					{
-						nlwarning("%s will arrive in an invalid continent (WE NAME : '%s') (REAL NAME : '%s')
-	   ",_Id.toString().c_str(), NLMISC::strlwr( cont->getName() ).c_str(),
-	   CONTINENT::toString(CONTINENT::TContinent(cont->getId())).c_str() );
-					}
+					nlwarning("%s will arrive in an invalid continent (WE NAME : '%s') (REAL NAME : '%s')
+	",_Id.toString().c_str(), NLMISC::strlwr( cont->getName() ).c_str(),
+	CONTINENT::toString(CONTINENT::TContinent(cont->getId())).c_str() );
 				}
-				else
-				{
-					nlwarning("<ANTIBUG>%s AT x= %d, y = %d NO VALID CONTINENT
-	   FOUND",_Id.toString().c_str(),_EntityState.X() , _EntityState.Y() );
-				}
-				setInstanceNumber( in );
-
-				if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check
-	   continent !!!") )
-					return (uint32)-1;
 			}
-			// end of ANTIBUG
+			else
+			{
+				nlwarning("<ANTIBUG>%s AT x= %d, y = %d NO VALID CONTINENT
+	FOUND",_Id.toString().c_str(),_EntityState.X() , _EntityState.Y() );
+			}
+			setInstanceNumber( in );
+
+			if( !checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after Antibug check continent !!!") )
+				return (uint32)-1;
 		}
+		// end of ANTIBUG
+	}
 	*/
 	{
 		H_AUTO(CharacterCheckEnterLeaveZone);
@@ -1550,6 +1552,43 @@ uint32 CCharacter::tickUpdate()
 
 	_SavedPosX = _EntityState.X();
 	_SavedPosY = _EntityState.Y();
+	// ARK Check Position
+	vector<string> missionToRemove;
+
+	for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end(); ++it)
+	{
+		sint32 A = (_SavedPosX / 1000) - (*it).X;
+		sint32 B = (_SavedPosY / 1000) - (*it).Y;
+		uint32 R = (*it).Radius;
+
+		if ((double)(A * A) + (double)(B * B) <= (double)(R * R))
+		{
+			TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName((*it).Name);
+			CMission* mission = _Missions->getMissions(missionAlias);
+
+			if (mission != NULL)
+			{
+				vector<string> params = getCustomMissionParams((*it).Name);
+
+				if (params.size() >= 2)
+				{
+					validateDynamicMissionStep(params[0]);
+					missionToRemove.push_back((*it).Name);
+				}
+			}
+		}
+	}
+
+	for (uint32 i = 0; i < missionToRemove.size(); i++)
+	{
+		TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(missionToRemove[i]);
+
+		if (missionAlias)
+		{
+			removeMission(missionAlias, mr_success);
+			removeMissionFromHistories(missionAlias);
+		}
+	}
 	return nextUpdate;
 } // tickUpdate //
 
@@ -2549,7 +2588,6 @@ void CCharacter::applyRegenAndClipCurrentValue()
 
 		if (speedVariationModifier > 0)
 		{
-			nlinfo("Current speedVariationModifier = %d", speedVariationModifier);
 			_LastOverSpeedTick = CTickEventHandler::getGameCycle();
 		}
 	}
@@ -3279,7 +3317,11 @@ void CCharacter::computeSkillUsedForDodge()
 {
 	for (int i = 0; i < SKILLS::NUM_SKILLS; i++)
 	{
-		const sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+		sint32 val = getSkillEquivalentDodgeValue(SKILLS::ESkills(i));
+
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && val > 125)
+		val = 125;
 
 		if (val > _BaseDodgeLevel)
 		{
@@ -3966,8 +4008,6 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 			// add cheksum : pnj eid
 			url += "&teid=" + c->getId().toString();
 			string defaultSalt = toString(getLastConnectedDate());
-			nlinfo(defaultSalt.c_str());
-			nlinfo(url.c_str());
 			string control = "&hmac="
 							 + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
 							 .toString();
@@ -5580,7 +5620,9 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		}
 	}
 
-	_LastTpTick = CTickEventHandler::getGameCycle();
+	if (_IntangibleEndDate != ~0) // Don't save Last Tp Tick if player respawns
+		_LastTpTick = CTickEventHandler::getGameCycle();
+	
 	_TpCoordinate.X = x;
 	_TpCoordinate.Y = y;
 	_TpCoordinate.Z = z;
@@ -5735,6 +5777,29 @@ sint32 CCharacter::getFreePetSlot()
 	}
 
 	return -1;
+}
+
+// CCharacter::getMountOrFirstPetSlot return the slot of the mount pet or the first packer pet
+//-----------------------------------------------
+sint32 CCharacter::getMountOrFirstPetSlot()
+{
+	sint32 slot = -1;
+
+	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i)
+	{
+		if (_PlayerPets[i].TicketPetSheetId != CSheetId::Unknown)
+		{
+			if (slot == -1)
+				slot = i;
+
+			const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+
+			if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
+				return i;
+		}
+	}
+
+	return slot;
 }
 
 //-----------------------------------------------
@@ -7847,7 +7912,11 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			}
 
 			// update best skill for dodge if needed
-			const sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+			sint32 dodgeVal = getSkillEquivalentDodgeValue(skillEnum);
+
+			CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+			if (p->isTrialPlayer() && dodgeVal > 125)
+				dodgeVal = 125;
 
 			if (dodgeVal > _BaseDodgeLevel)
 			{
@@ -7887,6 +7956,9 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			if (parry)
 			{
 				_BaseParryLevel = skill->Base;
+				if (p->isTrialPlayer() && _BaseParryLevel > 125)
+					_BaseParryLevel = 125;
+				
 				_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 				//				_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase,
 				//_BaseParryLevel);
@@ -11029,6 +11101,40 @@ void CCharacter::checkSellStore()
 }
 
 //-----------------------------------------------------------------------------
+void CCharacter::checksForFreeTrial()
+{
+	// Check items
+	CGameItemPtr item;
+	CInventoryPtr equipInv = getInventory(INVENTORIES::equipment);
+
+	if (equipInv != NULL)
+	{
+		for (uint i = 0; i < equipInv->getSlotCount(); i++)
+		{
+			item = equipInv->getItem(i);
+
+			if (item != NULL && i != SLOT_EQUIPMENT::CHEST && i != SLOT_EQUIPMENT::LEGS && item->recommended() > 150)
+			{
+				unequipCharacter(INVENTORIES::equipment, i);
+			}
+		}
+	}
+
+	CInventoryPtr handlingInv = getInventory(INVENTORIES::handling);
+
+	if (handlingInv != NULL)
+	{
+		for (uint i = 0; i < handlingInv->getSlotCount(); i++)
+		{
+			item = handlingInv->getItem(i);
+
+			if (item != NULL && item->recommended() > 150)
+				unequipCharacter(INVENTORIES::handling, i);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
 void CCharacter::clearMissionHistories()
 {
 	_MissionHistories.clear();
@@ -12290,6 +12396,8 @@ bool CCharacter::validateExchange()
 			invalidateExchange();
 			return false;
 		}
+
+		_LastExchangeMount = CTickEventHandler::getGameCycle();
 	}
 
 	return true;
@@ -12849,6 +12957,15 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		//			tpl->getMissionName().c_str());
 
 		//		EGSPD::missionLog(MissionResultStatLogTag[result], _Id, tpl->getMissionName());
+		// Erase CheckPos with name of mission
+		for (vector<SCheckPosCoordinate>::iterator it = _CheckPos.begin(); it != _CheckPos.end();)
+		{
+			if ((*it).Name == toUpper(tpl->getMissionName()))
+				it = _CheckPos.erase(it);
+			else
+				++it;
+		}
+
 		if (!doNotClearJournal)
 			mission->clearUsersJournalEntry();
 	}
@@ -14289,7 +14406,6 @@ bool CCharacter::isSpawnValid(bool inVillage, bool inOutpost, bool inStable, boo
 		if (p)
 		{
 			PLACE_TYPE::TPlaceType place_type = p->getPlaceType();
-			nlinfo("Place type = %s", PLACE_TYPE::toString(p->getPlaceType()).c_str());
 
 			if (!inVillage && (place_type == PLACE_TYPE::Village || place_type == PLACE_TYPE::Capital))
 			{
@@ -14921,7 +15037,6 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 				  .toString();
 	}
 
-	nlinfo(url.c_str());
 	uint32 userId = PlayerManager.getPlayerId(getId());
 	SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
 	textParams[0].Literal = "WEB : " + url + control;
@@ -15011,7 +15126,6 @@ void CCharacter::addPositionCheck(sint32 x, sint32 y, uint32 r, const std::strin
 	poscheck.Radius = r;
 	poscheck.Name = name;
 	_CheckPos.push_back(poscheck);
-	nlinfo("Checking : %d, %d, %d, %s", x, y, r, name.c_str());
 }
 
 /// get Ark position check
@@ -15413,7 +15527,7 @@ bool CCharacter::pickUpRawMaterial(uint32 indexInTempInv, bool* lastMaterial)
 			return false; // don't try to quarter an item for looting
 		}
 
-		// Send url for Arcc triggers
+		// Send url for ARK triggers
 		vector<string> params = getCustomMissionParams("__LOOT_SHEET__");
 
 		if (params.size() >= 2)
@@ -18376,7 +18490,7 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 	{
 		nlwarning("BADCHECK For player %s, for %s, player should have %u and he has %u !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), base, _PhysScores._PhysicalScores[score].Base);
-		// vl		_PhysScores._PhysicalScores[ score ].Base = base;
+		_PhysScores._PhysicalScores[ score ].Base = base;
 	}
 
 	// check regen
@@ -18391,8 +18505,8 @@ void CCharacter::checkScoresValues(SCORES::TScores score, CHARACTERISTICS::TChar
 		nlwarning("BADCHECK For player %s, for %s regen, player should have %f and he has %f !", _Id.toString().c_str(),
 				  SCORES::toString(score).c_str(), baseRegenerateRepos,
 				  _PhysScores._PhysicalScores[score].BaseRegenerateRepos);
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
-		// vl		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateRepos = baseRegenerateRepos;
+		_PhysScores._PhysicalScores[ score ].BaseRegenerateAction = baseRegenerateAction;
 	}
 }
 
@@ -18451,17 +18565,22 @@ void CCharacter::checkCharacAndScoresValues()
 		for (sint charac = 0; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS; ++charac)
 		{
 			// compute theoretical value
-			tvalue
-				= _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
-			// TODO tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			// tvalue = _StartingCharacteristicValues[charac] + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
+			//tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
+			tvalue = 10 + (maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep);
+
+			if (player != NULL && player->isTrialPlayer() && tvalue > 140)
+				tvalue = 140;
+				
 			// compare
 			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
 			{
-				nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
-						  _Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
-						  _PhysCharacs._PhysicalCharacteristics[charac].Base);
-				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
+				if (player == NULL || !player->isTrialPlayer())
+					nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
+							_Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
+							_PhysCharacs._PhysicalCharacteristics[charac].Base);
+				_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
 				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Current = tvalue;
 			}
 		}
@@ -19073,17 +19192,17 @@ void CCharacter::setPVPFlag(bool pvpFlag)
 
 		// OLD PVP
 		/*		if( CPVPManager2::getInstance()->isFactionInWar( _DeclaredCult ) == false &&
-					CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
-				{
-					// character can set it's tag pvp on if none of his clan is in war
-					SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
-					sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
+			CPVPManager2::getInstance()->isFactionInWar( _DeclaredCiv ) == false)
+		{
+			// character can set it's tag pvp on if none of his clan is in war
+			SM_STATIC_PARAMS_1(params, STRING_MANAGER::integer);
+			sendDynamicSystemMessage(_EntityRowId, "PVP_TAG_PVP_NEED_ALLEGIANCE");
 		//			_PropertyDatabase.setProp("CHARACTER_INFO:PVP_FACTION_TAG:COUNTER", ++_PvPDatabaseCounter );
-					CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase,
+			CBankAccessor_PLR::getCHARACTER_INFO().getPVP_FACTION_TAG().setCOUNTER(_PropertyDatabase,
 		uint8(++_PvPDatabaseCounter));
-					return;
-				}
-				*/
+			return;
+		}
+		*/
 	}
 
 	// if player changed it's decision before timer if finished
@@ -20299,7 +20418,12 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 	else
 		_CurrentParrySkill = BarehandCombatSkill;
 
+
 	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
+	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+	if (p->isTrialPlayer() && _BaseParryLevel > 125)
+		_BaseParryLevel = 125;
+
 	_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 	//	_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel );
 	CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(_PropertyDatabase, checkedCast<uint16>(_BaseParryLevel));

@@ -95,6 +95,7 @@ CCreature::CCreature() : CEntityBase(true)
 
 	_AIGroupAlias = CAIAliasTranslator::Invalid;
 	_AIAlias = CAIAliasTranslator::Invalid;
+	_PrimAlias = 0;
 	_LootInventory = 0;
 //	harvestable( false );
 	_EntityLooter = CEntityId::Unknown;
@@ -207,9 +208,8 @@ CCreature::~CCreature()
 	PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->removeCreature(this);
 
 	CAIAliasTranslator::getInstance()->removeAssociation(_Id);
-	if (_PrimAlias == 900) // Spawned Bots
+	if (_PrimAlias >= 900 && _PrimAlias <= 999) // Spawned Bots
 	{
-		nlinfo("Delete Alias : %u", _AIAlias);
 		CAIAliasTranslator::getInstance()->removeNPCAlias(_AIAlias);
 	}
 

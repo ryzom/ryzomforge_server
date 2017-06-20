@@ -998,6 +998,16 @@ inline uint32 CCharacter::getLastUnMountTick() const
 	return _LastUnMountTick; 
 }
 
+inline uint32 CCharacter::getLastFreeMount() const
+{
+	return _LastFreeMount; 
+}
+
+inline uint32 CCharacter::getLastExchangeMount() const
+{
+	return _LastExchangeMount; 
+}
+
 //------------------------------------------------------------------------------
 
 inline const std::list<TCharacterLogTime>& CCharacter::getLastLogStats() const
