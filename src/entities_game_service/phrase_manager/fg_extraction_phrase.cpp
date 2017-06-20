@@ -265,7 +265,7 @@ bool CFgExtractionPhrase::build( const TDataSetRow & actorRowId, const std::vect
 							if (p->isTrialPlayer()) {
 								//Check if it's a f2p and in same time than forager
 								CCharacter *foragerPlayer = (CCharacter *) CEntityBaseManager::getEntityBasePtr( _Source->foragers().front() );
-								if (foragerPlayer->getTeamId() == CTEAM::InvalidTeamId || foragerPlayer->getTeamId() != player->getTeamId() ) {
+								 if (foragerPlayer != player && (foragerPlayer->getTeamId() == CTEAM::InvalidTeamId || foragerPlayer->getTeamId() != player->getTeamId())) {
 									PHRASE_UTILITIES::sendDynamicSystemMessage( _ActorRowId, "FORAGE_NO_CARE_FIRST" );
 									return false;
 								}

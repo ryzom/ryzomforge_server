@@ -589,6 +589,10 @@ CCharacter::CCharacter()
 	_DuelOpponent = NULL;
 	_LastTpTick = 0;
 	_LastOverSpeedTick = 0;
+	_LastMountTick = 0;
+	_LastUnMountTick = 0;
+	_LastFreeMount = 0;
+	_LastExchangeMount = 0;
 	_LastCivPointWriteDB = ~0;
 	_LastCultPointWriteDB = ~0;
 	_DeclaredCult = PVP_CLAN::Unknown;
@@ -5616,7 +5620,9 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		}
 	}
 
-	_LastTpTick = CTickEventHandler::getGameCycle();
+	if (_IntangibleEndDate != ~0) // Don't save Last Tp Tick if player respawns
+		_LastTpTick = CTickEventHandler::getGameCycle();
+	
 	_TpCoordinate.X = x;
 	_TpCoordinate.Y = y;
 	_TpCoordinate.Z = z;
@@ -12391,6 +12397,8 @@ bool CCharacter::validateExchange()
 			invalidateExchange();
 			return false;
 		}
+
+		_LastExchangeMount = CTickEventHandler::getGameCycle();
 	}
 
 	return true;
