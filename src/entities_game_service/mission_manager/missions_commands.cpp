@@ -2090,7 +2090,7 @@ NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var
 	
 	string value = "";
 
-	if (c->getValue(args[2], value))
+	if (c->getValue(args[1], value))
 		log.displayNL("%s", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
@@ -2104,9 +2104,10 @@ NLMISC_COMMAND(setPlayerVar, "set the value of a variable of player","<uid> <var
 	
 	GET_ACTIVE_CHARACTER;
 	
-	string value = "";
-
-	if (c->setValue(args[2], value))
+	sint32 value;
+	fromString(args[2], value);
+	
+	if (c->setValue(args[1], value))
 		log.displayNL("OK", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
@@ -2120,9 +2121,10 @@ NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <
 	
 	GET_ACTIVE_CHARACTER;
 	
-	string value = "";
+	sint32 value;
+	fromString(args[2], value);
 
-	if (c->modifyValue(args[2], value))
+	if (c->modifyValue(args[1], value))
 		log.displayNL("OK", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
