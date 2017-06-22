@@ -2090,7 +2090,7 @@ NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var
 	
 	string value = "";
 
-	if (c->getValue(args[2], value))
+	if (c->getValue(args[1], value))
 		log.displayNL("%s", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
@@ -2104,9 +2104,10 @@ NLMISC_COMMAND(setPlayerVar, "set the value of a variable of player","<uid> <var
 	
 	GET_ACTIVE_CHARACTER;
 	
-	string value = "";
-
-	if (c->setValue(args[2], value))
+	sint32 value;
+	fromString(args[2], value);
+	
+	if (c->setValue(args[1], value))
 		log.displayNL("OK", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
@@ -2120,49 +2121,10 @@ NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <
 	
 	GET_ACTIVE_CHARACTER;
 	
-	string value = "";
+	sint32 value;
+	fromString(args[2], value);
 
-	if (c->modifyValue(args[2], value))
-		log.displayNL("OK", value.c_str());
-	else
-		log.displayNL("ERR: Variable not found");
-}
-
-//----------------------------------------------------------------------------
-NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
-{
-	if (args.size() != 1)
-		return false;
-	
-	GET_ACTIVE_CHARACTER;
-
-	string msg = "";
-	
-	CTeam* pTeam = TeamManager.getRealTeam(c->getTeamId());
-	if (pTeam != NULL)
-	{
-		log.displayNL("%d", c->getTeamId());
-		vector<CEntityId> vMembers;
-		for (list<CEntityId>::const_iterator it = pTeam->getTeamMembers().begin(); it != pTeam->getTeamMembers().end(); ++it)
-		{
-			ucstring name = CEntityIdTranslator::getInstance()->getByEntity((*it));
-			CEntityIdTranslator::removeShardFromName(name);
-			log.displayNL("%"NL_I64"u|%s", (*it).asUint64(), name.toUtf8().c_str());
-		}
-	} else 
-		log.displayNL("0");
-}
-//----------------------------------------------------------------------------
-NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <var> <value>")
-{
-	if (args.size() != 3)
-		return false;
-	
-	GET_ACTIVE_CHARACTER;
-	
-	string value = "";
-
-	if (c->modifyValue(args[2], value))
+	if (c->modifyValue(args[1], value))
 		log.displayNL("OK", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
