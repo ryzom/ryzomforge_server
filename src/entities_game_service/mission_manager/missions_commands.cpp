@@ -2090,10 +2090,19 @@ NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var
 	
 	string value = "";
 
-	if (c->getValue(args[1], value))
+	if (c->getValue("Base"+args[1], value))
 		log.displayNL("%s", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
+		
+	if (c->getValue("Max"+args[1], value))
+		log.displayNL("%s", value.c_str());
+		
+	if (c->getValue("Current"+args[1], value))
+		log.displayNL("%s", value.c_str());
+		
+	if (c->getValue("Modifier"+args[1], value))
+		log.displayNL("%s", value.c_str());
 }
 
 //----------------------------------------------------------------------------
