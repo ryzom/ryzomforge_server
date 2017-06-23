@@ -1578,7 +1578,6 @@ uint32 CCharacter::tickUpdate()
 			}
 		}
 	}
-
 	for (uint32 i = 0; i < missionToRemove.size(); i++)
 	{
 		TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(missionToRemove[i]);
@@ -7956,7 +7955,6 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			if (parry)
 			{
 				_BaseParryLevel = skill->Base;
-
 				if (p->isTrialPlayer() && _BaseParryLevel > 125)
 					_BaseParryLevel = 125;
 				
@@ -12966,7 +12964,6 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 			else
 				++it;
 		}
-
 		if (!doNotClearJournal)
 			mission->clearUsersJournalEntry();
 	}
@@ -20422,7 +20419,6 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 
 
 	_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
-
 	CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 	if (p->isTrialPlayer() && _BaseParryLevel > 125)
 		_BaseParryLevel = 125;

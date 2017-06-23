@@ -184,7 +184,6 @@ void CCharacter::initInventoriesDb()
 	{
 		_CurrentParrySkill = BarehandCombatSkill;
 		_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
-
 		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 		if (p->isTrialPlayer() && _BaseParryLevel > 125)
 			_BaseParryLevel = 125;
@@ -1040,7 +1039,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 			&& (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL))
 		return;
 
-
 	// set the item in ref inventory
 	dstInv->insertItem(item, dstSlot);
 
@@ -1162,7 +1160,6 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 	{
 		_CurrentParrySkill = BarehandCombatSkill;
 		_BaseParryLevel = getSkillBaseValue(_CurrentParrySkill);
-
 		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 		if (p->isTrialPlayer() && _BaseParryLevel > 125)
 			_BaseParryLevel = 125;
