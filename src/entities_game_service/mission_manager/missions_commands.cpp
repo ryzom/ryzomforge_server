@@ -2080,6 +2080,30 @@ NLMISC_COMMAND(getLastUnMountTick,"get tick of last umount","<uid>")
 	log.displayNL("%d", c->getLastUnMountTick());
 }
 
+//-----------------------------------------------
+NLMISC_COMMAND(getLastFreeMount,"get tick of last free mount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastFreeMount());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastExchangeMount,"get tick of last exchange mount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastExchangeMount());
+}
+
+
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var>")
 {
