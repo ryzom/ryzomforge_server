@@ -377,7 +377,7 @@ public:
 	CAIGainAggroMsg	()
 	{	}
 
-	CAIGainAggroMsg	(const TDataSetRow &targetRowId, const TDataSetRow &playerRowId) : PlayerRowId(playerRowId), TargetRowId(targetRowId)
+	CAIGainAggroMsg	(const TDataSetRow &targetRowId, const TDataSetRow &playerRowId, bool isBoss) : PlayerRowId(playerRowId), TargetRowId(targetRowId), IsBoss(isBoss)
 	{
 #ifdef NL_DEBUG
 		nlassert(playerRowId.isValid());
@@ -387,12 +387,14 @@ public:
 
 	TDataSetRow		PlayerRowId;
 	TDataSetRow		TargetRowId;
+	bool			IsBoss;
 	
 	virtual void description ()
 	{
 		className ("CAIGainAggroMsg");
 		property ("PlayerRowId", PropDataSetRow, TDataSetRow(), PlayerRowId);
 		property ("TargetRowId", PropDataSetRow, TDataSetRow(), TargetRowId);
+		property ("IsBoss", PropBool, false, IsBoss);
 	}
 	virtual void callback (const std::string &/* name */, NLNET::TServiceId /* id */) {}
 };

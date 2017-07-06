@@ -120,6 +120,7 @@ CCreature::CCreature() : CEntityBase(true)
 	_FilterExplicitActionTradeByBotRace= true;
 
 	_NbOfPlayersInAggroList = 0;
+	_NbOfGuardiansKillers = 0;
 
 	_Form = 0;
 
@@ -149,6 +150,7 @@ CCreature::CCreature() : CEntityBase(true)
 	_Organization = 0;
 
 	_LockedLoot = CTEAM::InvalidTeamId;
+	_LockedLootTime = 0;
 
 //	_MissionIconFlags.IsMissionStepIconDisplayable = true;
 //	_MissionIconFlags.IsMissionGiverIconDisplayable = true;
@@ -2008,6 +2010,24 @@ void CCreature::setOutpostBuilding(COutpostBuilding *pOB)
 }
 
 //--------------------------------------------------------------
+//	Add guardian killer in list
+//--------------------------------------------------------------
+void CCreature::addGuardianKiller( TDataSetRow PlayerRowId )
+{
+	CCharacter * pChar = PlayerManager.getChar(PlayerRowId);
+	if ( pChar != NULL )
+	{
+		// Update _LockedLootTime each time a player is aggro by a boss guardian (increase the end of the lock)
+		_LockedLootTime = CTickEventHandler::getGameCycle();
+		if( _GuardiansKillers.find( PlayerRowId ) == _GuardiansKillers.end() )
+		{
+			_GuardiansKillers.insert( PlayerRowId );
+			++_NbOfGuardiansKillers;
+		}
+	}
+}
+
+//--------------------------------------------------------------
 //	keep aggressiveness	of a creature against player character
 //--------------------------------------------------------------
 void CCreature::addAggressivenessAgainstPlayerCharacter( TDataSetRow PlayerRowId )
@@ -2095,52 +2115,95 @@ uint32 CCreature::tickUpdate()
 		}
 	}
 
-	if (!isDead() && (_NbOfPlayersInAggroList || _LockedLoot != CTEAM::InvalidTeamId))
+	if (_LockedLootTime != 0 && _LockedLootTime + 900 < CTickEventHandler::getGameCycle())
+	{
+		nlinfo("Boss unlocked : %s at %d", _Id.toString().c_str(), CTickEventHandler::getGameCycle());
+		_LockedLootTime = 0;
+		_NbOfGuardiansKillers = 0;
+		_GuardiansKillers.clear();
+	}
+
+
+	if (!isDead() && (_NbOfGuardiansKillers || _NbOfPlayersInAggroList || _LockedLoot != CTEAM::InvalidTeamId))
 	{
 		if (_LockedLoot != CTEAM::InvalidTeamId)
 		{
-			bool keepLock = false;
-			for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
+			if (_LockedLootTime == 0)
 			{
-				CCharacter * pChar = PlayerManager.getChar( *it );
-				if (pChar && pChar->getTeamId() == _LockedLoot)
+				bool keepLock = false;
+				for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
 				{
-					keepLock = true;
-					break;
+					CCharacter * pChar = PlayerManager.getChar( *it );
+					if (pChar && pChar->getTeamId() == _LockedLoot)
+					{
+						keepLock = true;
+						break;
+					}
 				}
-			}
 
-			if (!keepLock)
-			{
-				_LockedLoot = CTEAM::InvalidTeamId;
-				nlinfo("unlock me");
+				if (!keepLock)
+				{
+					_LockedLoot = CTEAM::InvalidTeamId;
+					nlinfo("unlock me");
+				}
 			}
 		}
 		else
 		{
 			vector< uint16 > teams;
 
-			for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
+			// It's a Boss creature with Guardians killers
+			if (_LockedLootTime != 0) 
 			{
-
-				CCharacter * pChar = PlayerManager.getChar( *it );
-				if (pChar && pChar->getTeamId() != CTEAM::InvalidTeamId)
+				// Check if 2 guardians killers are in same team and so lock the loot
+				for ( set<TDataSetRow>::iterator it = _GuardiansKillers.begin(); it != _GuardiansKillers.end(); ++it )
 				{
-					uint16 pTeam = pChar->getTeamId();
-					for( vector< uint16 >::const_iterator itTeam = teams.begin(); itTeam != teams.end(); ++itTeam )
+					CCharacter * pChar = PlayerManager.getChar( *it );
+					if (pChar && pChar->getTeamId() != CTEAM::InvalidTeamId)
 					{
-						if (pTeam == *itTeam)
+						uint16 pTeam = pChar->getTeamId();
+						for( vector< uint16 >::const_iterator itTeam = teams.begin(); itTeam != teams.end(); ++itTeam )
 						{
-							_LockedLoot = *itTeam;
-							break;
+							if (pTeam == *itTeam)
+							{
+								_LockedLoot = *itTeam;
+								break;
+							}
 						}
+						teams.push_back(pTeam);
 					}
-					teams.push_back(pTeam);
-				}
 
-				if (_LockedLoot != CTEAM::InvalidTeamId) {
-					nlinfo("lock me");
-					break;
+					if (_LockedLoot != CTEAM::InvalidTeamId) {
+						nlinfo("locked by guardians killers");
+						break;
+					}
+				}
+			}
+
+			// If not locked with guardians killers, check with players in aggro list
+			if (_LockedLoot == CTEAM::InvalidTeamId)
+			{
+				for ( set<TDataSetRow>::iterator it = _Agressiveness.begin(); it != _Agressiveness.end(); ++it )
+				{
+					CCharacter * pChar = PlayerManager.getChar( *it );
+					if (pChar && pChar->getTeamId() != CTEAM::InvalidTeamId)
+					{
+						uint16 pTeam = pChar->getTeamId();
+						for( vector< uint16 >::const_iterator itTeam = teams.begin(); itTeam != teams.end(); ++itTeam )
+						{
+							if (pTeam == *itTeam)
+							{
+								_LockedLoot = *itTeam;
+								break;
+							}
+						}
+						teams.push_back(pTeam);
+					}
+
+					if (_LockedLoot != CTEAM::InvalidTeamId) {
+						nlinfo("locked by killers");
+						break;
+					}
 				}
 			}
 		}
@@ -2148,7 +2211,7 @@ uint32 CCreature::tickUpdate()
 
 
 	if (currentHp()!=maxHp() && !isDead()) return 12;
-	return 24;		
+	return 24;
 } // tickUpdate //
 
 //---------------------------------------------------
