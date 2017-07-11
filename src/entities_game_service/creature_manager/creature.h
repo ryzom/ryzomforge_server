@@ -383,6 +383,8 @@ public:
 
 	inline uint16 getLockLoot() { return _LockedLoot; }
 
+	inline NLMISC::TGameCycle getLockLootTime() { return _LockedLootTime; }
+
 	/// get the resist value associated to effect type
 	uint32 getMagicResistance(EFFECT_FAMILIES::TEffectFamily effectFamily);
 
@@ -418,6 +420,11 @@ public:
 	bool deathReportHasBeenSent() const { return _DeathReportHasBeenSent; }
 	void deathReportSent() { _DeathReportHasBeenSent = true; }
 //#endif
+
+
+	/// Add guardian killer in list
+	void addGuardianKiller(TDataSetRow PlayerRowId);
+
 
 	/// keep aggressiveness	of a creature against player character
 	void addAggressivenessAgainstPlayerCharacter( TDataSetRow PlayerRowId );
@@ -616,7 +623,8 @@ private:
 	// loot rights management
 	std::vector< TDataSetRow >		_LootRight;					// list of CCharacter have loot right after creature death, if emty all have loot right
 	NLMISC::TGameCycle				_LootRightDuration;			// Duration of loot right before all have loot right
-	uint16						_LockedLoot;				// Loot is locked by the player
+	uint16							_LockedLoot;				// Loot is locked by the player
+	NLMISC::TGameCycle				_LockedLootTime;		// Time of lock of loot (for bosses)
 
 //#ifdef NL_DEBUG
 	// Looking for a 'Zombie' bug (creature dead on EGS, but not on AIS)
@@ -639,6 +647,12 @@ private:
 	// creature agressiveness against player character
 	std::set< TDataSetRow >			_Agressiveness;
 
+	// players attacking the boss guardians
+	std::set< TDataSetRow >			_GuardiansKillers;
+
+	// keep nb of guardians killers
+	uint16							_NbOfGuardiansKillers;
+	
 	// keep nb of players in creature aggro list (as aggro list also contains npcs or creatures)
 	uint16						_NbOfPlayersInAggroList;
 

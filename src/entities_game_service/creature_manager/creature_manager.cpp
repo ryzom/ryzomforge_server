@@ -661,6 +661,14 @@ void CAIGainAggroMsgImp::callback (const std::string &name, NLNET::TServiceId id
 	if( creature )
 	{
 //		creature->getCreatureOpponent().storeAggressor(PlayerRowId,0);
-		creature->addAggressivenessAgainstPlayerCharacter( PlayerRowId );
+		if (IsBoss)
+		{
+			creature->addGuardianKiller(PlayerRowId);
+			nlinfo("Player is a guardian killer");
+		}
+		else
+		{
+			creature->addAggressivenessAgainstPlayerCharacter( PlayerRowId );
+		}
 	}
 }

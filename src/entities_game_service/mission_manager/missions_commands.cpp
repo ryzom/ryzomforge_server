@@ -2080,6 +2080,30 @@ NLMISC_COMMAND(getLastUnMountTick,"get tick of last umount","<uid>")
 	log.displayNL("%d", c->getLastUnMountTick());
 }
 
+//-----------------------------------------------
+NLMISC_COMMAND(getLastFreeMount,"get tick of last free mount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastFreeMount());
+}
+
+//-----------------------------------------------
+NLMISC_COMMAND(getLastExchangeMount,"get tick of last exchange mount","<uid>")
+{
+	if (args.size() != 1)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	log.displayNL("%d", c->getLastExchangeMount());
+}
+
+
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var>")
 {
@@ -2090,10 +2114,19 @@ NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var
 	
 	string value = "";
 
-	if (c->getValue(args[2], value))
+	if (c->getValue("Base"+args[1], value))
 		log.displayNL("%s", value.c_str());
 	else
 		log.displayNL("ERR: Variable not found");
+		
+	if (c->getValue("Max"+args[1], value))
+		log.displayNL("%s", value.c_str());
+		
+	if (c->getValue("Current"+args[1], value))
+		log.displayNL("%s", value.c_str());
+		
+	if (c->getValue("Modifier"+args[1], value))
+		log.displayNL("%s", value.c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -2104,10 +2137,8 @@ NLMISC_COMMAND(setPlayerVar, "set the value of a variable of player","<uid> <var
 	
 	GET_ACTIVE_CHARACTER;
 	
-	string value = "";
-
-	if (c->setValue(args[2], value))
-		log.displayNL("OK", value.c_str());
+	if (c->setValue(args[1], args[2]))
+		log.displayNL("OK");
 	else
 		log.displayNL("ERR: Variable not found");
 }
@@ -2119,51 +2150,9 @@ NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <
 		return false;
 	
 	GET_ACTIVE_CHARACTER;
-	
-	string value = "";
 
-	if (c->modifyValue(args[2], value))
-		log.displayNL("OK", value.c_str());
-	else
-		log.displayNL("ERR: Variable not found");
-}
-
-//----------------------------------------------------------------------------
-NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
-{
-	if (args.size() != 1)
-		return false;
-	
-	GET_ACTIVE_CHARACTER;
-
-	string msg = "";
-	
-	CTeam* pTeam = TeamManager.getRealTeam(c->getTeamId());
-	if (pTeam != NULL)
-	{
-		log.displayNL("%d", c->getTeamId());
-		vector<CEntityId> vMembers;
-		for (list<CEntityId>::const_iterator it = pTeam->getTeamMembers().begin(); it != pTeam->getTeamMembers().end(); ++it)
-		{
-			ucstring name = CEntityIdTranslator::getInstance()->getByEntity((*it));
-			CEntityIdTranslator::removeShardFromName(name);
-			log.displayNL("%"NL_I64"u|%s", (*it).asUint64(), name.toUtf8().c_str());
-		}
-	} else 
-		log.displayNL("0");
-}
-//----------------------------------------------------------------------------
-NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <var> <value>")
-{
-	if (args.size() != 3)
-		return false;
-	
-	GET_ACTIVE_CHARACTER;
-	
-	string value = "";
-
-	if (c->modifyValue(args[2], value))
-		log.displayNL("OK", value.c_str());
+	if (c->modifyValue(args[1], args[2]))
+		log.displayNL("OK");
 	else
 		log.displayNL("ERR: Variable not found");
 }

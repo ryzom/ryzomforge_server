@@ -1039,7 +1039,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 			&& (form->Family != ITEMFAMILY::CRAFTING_TOOL && form->Family != ITEMFAMILY::HARVEST_TOOL))
 		return;
 
-
 	// set the item in ref inventory
 	dstInv->insertItem(item, dstSlot);
 
