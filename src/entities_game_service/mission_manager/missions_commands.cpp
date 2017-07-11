@@ -1122,18 +1122,33 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 	}
 	
 	log.displayNL(msg.c_str());
-	
-	return true;
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getMoney, "get money of player", "<uid>")
+NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<uid> <quantity>")
 {
 
 	GET_ACTIVE_CHARACTER
 
-	string value = toString("%"NL_I64"u", c->getMoney());
+	uint64 money = c->getMoney()
 
+	if (args.size() == 2)
+	{
+		uint64 quantity;
+		fromString(args[1], quantity);
+		if (money >= quantity)
+		{
+			money -= quantity
+			c->setMoney(money);
+		}
+		else
+		{
+			log.displayNL("-1"); // No enough money
+			return true;
+		}
+	}
+
+	string value = toString("%"NL_I64"u", money);
 	log.displayNL(value.c_str());
 }
 
@@ -1189,13 +1204,26 @@ NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
-
 	std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance = c->getAllegiance();
 
-
 	log.displayNL("%s|%s|%u", PVP_CLAN::toString(allegiance.first).c_str(), PVP_CLAN::toString(allegiance.second).c_str(), c->getOrganization());
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
+{
+	GET_ACTIVE_CHARACTER
+
+	if (args.size() != 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	uint32 org;
+	fromString(args[1], org);
+	c->setOrganization(org);
 }
 
 
