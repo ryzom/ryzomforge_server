@@ -1227,9 +1227,23 @@ uint32 CCharacter::tickUpdate()
 				CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(
 					_PropertyDatabase, checkedCast<uint8>(skillBaseValue));
 			}
-
-			if (!checkCharacterStillValide(
-						"<CCharacter::tickUpdate> Character corrupted : after update target HP/STA/SAP !!!"))
+			else
+			{
+				CCreature * creature = dynamic_cast< CCreature *>(target);
+				if (creature)
+				{
+					if (creature->getLockLoot() != CTEAM::InvalidTeamId)
+					{
+						if (creature->getLockLoot() == _TeamId)
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
+						else
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
+					}
+					else
+						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
+				}
+			}
+			if (!checkCharacterStillValide("<CCharacter::tickUpdate> Character corrupted : after update target HP/STA/SAP !!!"))
 				return (uint32) - 1;
 		}
 	}
@@ -1564,7 +1578,6 @@ uint32 CCharacter::tickUpdate()
 			}
 		}
 	}
-
 	for (uint32 i = 0; i < missionToRemove.size(); i++)
 	{
 		TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(missionToRemove[i]);
@@ -3547,6 +3560,15 @@ void CCharacter::setTarget(const CEntityId &targetId, bool sendMessage)
 				else
 				{
 					rangeLevel = (((form->getLevel() - 1) / 5) << 1) + (((form->getLevel() - 1) % 5) >= 2 ? 2 : 1);
+					if (creature->getLockLoot() != CTEAM::InvalidTeamId)
+					{
+						if (creature->getLockLoot() == _TeamId)
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 2);
+						else
+							CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 1);
+					}
+					else
+						CBankAccessor_PLR::getTARGET().getBARS().setPLAYER_LEVEL(_PropertyDatabase, 0);
 
 					if (rangeLevel > 11)
 						rangeLevel = 11;
@@ -12942,7 +12964,6 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 			else
 				++it;
 		}
-
 		if (!doNotClearJournal)
 			mission->clearUsersJournalEntry();
 	}
@@ -14383,6 +14404,7 @@ bool CCharacter::isSpawnValid(bool inVillage, bool inOutpost, bool inStable, boo
 		if (p)
 		{
 			PLACE_TYPE::TPlaceType place_type = p->getPlaceType();
+
 
 			if (!inVillage && (place_type == PLACE_TYPE::Village || place_type == PLACE_TYPE::Capital))
 			{

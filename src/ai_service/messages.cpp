@@ -35,6 +35,7 @@
 #include "ai_profile_fauna.h"	// for CCorpseFaunaProfile
 #include "dyn_mission.h"
 #include "mirrors.h"
+#include "commands.h"
 
 
 #include "game_share/tick_event_handler.h"
@@ -1144,8 +1145,36 @@ void	sAggroGain(TDataSetRow playerBot, TDataSetRow targetBot)
 		||	CMirrors::getEntityId(playerBot).getType()!=RYZOMID::player)
 		return;
 
-	CAIGainAggroMsg	msg(targetBot, playerBot);
+	CAIGainAggroMsg	msg(targetBot, playerBot, false);
 	msg.send("EGS");
+
+	CAIEntityPhysical *botEntity = CAIEntityPhysicalLocator::getInstance()->getEntity(targetBot);
+	CSpawnBotNpc* bot = dynamic_cast<CSpawnBotNpc*>(botEntity);
+	if (bot && bot->getPersistent().getOwner()) {
+		std::string groupName = bot->getPersistent().getOwner()->getName();
+		if (groupName.substr(0, 6) == "group_") {
+			if (groupName.find("_guardian_") != std::string::npos) {
+				strFindReplace(groupName, "_guardian_", "_boss_");
+				std::vector<CBot*> bots;
+				/// try to find the bot name
+				buildFilteredBotList(bots, groupName);
+				if (!bots.empty())
+				{
+					FOREACH(itBot, std::vector<CBot*>, bots)
+					{
+						CBot* bot = *itBot;
+						CSpawnBot *const sp = bot->getSpawnObj();
+						if	(sp && sp->isAlive())
+						{	
+							CAIGainAggroMsg	msg(sp->dataSetRow(), playerBot, true);
+							msg.send("EGS");
+						}
+					}
+				}
+			}
+		}
+	}
+
 
 	CBotPlayer	*player=NLMISC::safe_cast<CBotPlayer*>(entity);
 	if	(!player)
