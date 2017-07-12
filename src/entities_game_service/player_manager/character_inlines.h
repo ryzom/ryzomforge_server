@@ -47,16 +47,10 @@ inline const NLMISC::CEntityId& CCharacter::getId() const
 	return CEntityBase::getId(); 
 }
 
-//------------------------------------------------------------------------------
-
-inline CCharacter::killMe() const
-{
-	kill(_EntityRowId); 
-}
 
 //------------------------------------------------------------------------------
 
-inline uint32 CCharacter::getStartupInstance()				
+inline uint32 CCharacter::getStartupInstance()
 {
 	return _StartupInstance; 
 }

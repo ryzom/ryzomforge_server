@@ -22559,3 +22559,10 @@ bool CCharacter::initPetInventory(uint8 index)
 
 	return false;
 }
+
+//------------------------------------------------------------------------------
+
+void CCharacter::killMe()
+{
+	kill(_EntityRowId); 
+}
