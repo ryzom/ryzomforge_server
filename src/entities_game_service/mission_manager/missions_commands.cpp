@@ -645,8 +645,6 @@ NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<
 	if (args.size() > 7)
 		extra = args[7];
 
-	string msg;
-
 	if (selected_inv != "*")
 	{
 		std::vector<string> invs;
@@ -746,8 +744,6 @@ NLMISC_COMMAND(getNamedItemList, "get list of named items of character by filter
 
 	if (args.size() > 7)
 		extra = args[7];
-
-	string msg;
 
 	if (selected_inv != "*")
 	{
@@ -956,7 +952,7 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 				if( sheetId == creatureSheetId )
 				{
 					double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
-					if( !creature || (creature && distance < minDistance) )
+					if (!creature || distance < minDistance)
 					{
 						creature = (*it).second;
 						minDistance = distance;
@@ -1130,7 +1126,7 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<
 
 	GET_ACTIVE_CHARACTER
 
-	uint64 money = c->getMoney()
+	uint64 money = c->getMoney();
 
 	if (args.size() == 2)
 	{
@@ -1182,7 +1178,8 @@ NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 
 	GET_ACTIVE_CHARACTER
 
-	switch (c->getRace()) {
+	switch (c->getRace())
+	{
 		case EGSPD::CPeople::Fyros:
 			log.displayNL("f");
 			break;
@@ -1414,7 +1411,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 					if( sheetId == creatureSheetId )
 					{
 						double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
-						if( !creature || (creature && distance < minDistance) )
+						if (!creature || distance < minDistance)
 						{
 							creature = (*it).second;
 							minDistance = distance;
@@ -2193,13 +2190,10 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 	
 	GET_ACTIVE_CHARACTER;
 
-	string msg = "";
-	
 	CTeam* pTeam = TeamManager.getRealTeam(c->getTeamId());
 	if (pTeam != NULL)
 	{
 		log.displayNL("%d", c->getTeamId());
-		vector<CEntityId> vMembers;
 		for (list<CEntityId>::const_iterator it = pTeam->getTeamMembers().begin(); it != pTeam->getTeamMembers().end(); ++it)
 		{
 			ucstring name = CEntityIdTranslator::getInstance()->getByEntity((*it));
