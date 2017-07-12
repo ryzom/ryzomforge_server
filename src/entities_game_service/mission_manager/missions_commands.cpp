@@ -1585,7 +1585,7 @@ NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
 	
 	GET_ACTIVE_CHARACTER
 	
-	c->kill(c->getEntityRowId());
+	c->killMe();
 	return true;
 }
 
