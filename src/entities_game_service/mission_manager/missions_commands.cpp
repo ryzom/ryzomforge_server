@@ -1572,6 +1572,26 @@ NLMISC_COMMAND(addRespawnPoint,"Add re-spawn point","<uid> <Re-spawn point name>
 }
 
 
+//-----------------------------------------------
+// Kill the player
+//-----------------------------------------------
+NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
+{
+	if (args.size () < 1)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+	
+	c->kill(c->getEntityRowId());
+	return true;
+}
+
+
+
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientation groupname x y look cell")
 {
