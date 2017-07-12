@@ -197,39 +197,6 @@ NLMISC_COMMAND(addSuccessfulMission,"add a successful mission to the player","<p
 	return true;
 } // addSuccesfulMission
 
-
-
-NLMISC_COMMAND(createMissionItem,"","")
-{
-	if ( args.size() != 3 )
-		return false;
-	string varName;
-
-	CEntityId id;
-	id.fromString(args[0].c_str());
-	CCharacter * user = PlayerManager.getChar(id);
-
-	if ( !user )
-	{
-		log.displayNL( "invalid char" );
-		return true;
-	}
-
-	uint16 quantity;
-	NLMISC::fromString(args[1], quantity);
-
-	std::vector< std::string > script;
-	vector< pair<string, STRING_MANAGER::TParamType > > chatParams;
-	NLMISC::splitString( args[2],":",script );
-
-	CMissionItem item;
-	item.buildFromScript( script,chatParams, varName );
-
-	item.createItemInTempInv( user,quantity );
-		
-	return true;
-} // createMissionItem
-
 NLMISC_COMMAND(clearMissionDone,"Clear the list of already done missions.","<character id(id:type:crea:dyn)>")
 {
 	if (args.size() != 1)
@@ -606,6 +573,28 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 
 	return true;
 }
+
+NLMISC_COMMAND(createItem, "Create a Mission Item", "<uid> <quantity> <params>") // See mission_item.cpp for params
+{
+
+	GET_ACTIVE_CHARACTER
+	
+	if (args.size() != 3)
+		return false;
+
+	uint16 quantity;
+	NLMISC::fromString(args[1], quantity);
+
+	std::vector< std::string > script;
+	NLMISC::splitString(args[2], ":", script);
+
+	CMissionItem item;
+	item.buildFromScript(script, varName);
+	item.createItemInTempInv(user, quantity);
+		
+	return true;
+} // createMissionItem
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<uid> [bag sheet quantity_min quantity_max quality_min quality_max extra_infos]")
