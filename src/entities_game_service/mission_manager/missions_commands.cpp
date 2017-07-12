@@ -1138,7 +1138,7 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<
 		fromString(args[1], quantity);
 		if (money >= quantity)
 		{
-			money -= quantity
+			money -= quantity;
 			c->setMoney(money);
 		}
 		else
