@@ -49,7 +49,7 @@ bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
 	}
 	NLMISC::fromString(script[1], _Quality);
 
-	_NoDrop = script[2] == "0"
+	_NoDrop = script[2] == "0";
 
 	vector<string> vars;
 	NLMISC::splitString(script[3], ";", vars);
@@ -128,7 +128,7 @@ bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
 				if ( _SPhraseId == CSheetId::Unknown )
 				{
 					MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
-					ret = false;
+					return false;
 				}
 			}
 			else
@@ -153,7 +153,7 @@ bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
 					break;
 				default:
 					MISLOG("Invalid param '%s'", args[0].c_str());
-					ret = false;
+					return false;
 				}
 			}
 		}
@@ -164,7 +164,7 @@ bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
 		else
 		{
 			MISLOG("Invalid property defined with 0 or more than 2 params");
-			ret = false;
+			return false;
 		}
 	}
 	
