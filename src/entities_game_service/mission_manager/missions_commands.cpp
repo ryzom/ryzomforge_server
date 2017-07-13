@@ -574,7 +574,7 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 	return true;
 }
 
-NLMISC_COMMAND(createItem, "Create a Mission Item", "<uid> <quantity> <params>") // See mission_item.cpp for params
+NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <quantity> <params>") // See mission_item.cpp for params
 {
 
 	GET_ACTIVE_CHARACTER
@@ -593,7 +593,7 @@ NLMISC_COMMAND(createItem, "Create a Mission Item", "<uid> <quantity> <params>")
 	item.createItemInTempInv(c, quantity);
 		
 	return true;
-} // createMissionItem
+}
 
 
 //----------------------------------------------------------------------------
