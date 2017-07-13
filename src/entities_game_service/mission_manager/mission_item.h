@@ -34,7 +34,7 @@ class CMissionItem
 public:
 	CMissionItem();
 	/// build this class from a script. Return true on success
-	bool buildFromScript( const std::vector<std::string> & script, std::string & varName );
+	bool buildFromScript( const std::vector<std::string> & script);
 	/// create an ingame item from this class and put it in user temp inventory
 	CGameItemPtr createItemInTempInv(CCharacter * user, uint16 quantity);
 	/// create an item from the mission item data

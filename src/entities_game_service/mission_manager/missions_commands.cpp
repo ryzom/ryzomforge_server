@@ -589,8 +589,8 @@ NLMISC_COMMAND(createItem, "Create a Mission Item", "<uid> <quantity> <params>")
 	NLMISC::splitString(args[2], ":", script);
 
 	CMissionItem item;
-	item.buildFromScript(script, "");
-	item.createItemInTempInv(user, quantity);
+	item.buildFromScript(script);
+	item.createItemInTempInv(c, quantity);
 		
 	return true;
 } // createMissionItem
