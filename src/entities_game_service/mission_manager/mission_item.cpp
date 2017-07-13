@@ -32,164 +32,142 @@
 using namespace std;
 using namespace NLMISC;
 
-bool CMissionItem::buildFromScript( const std::vector<std::string> & script, std::string & varName)
-{
-	_NoDrop = false;
-	
+bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
 	// script = NLMISC::splitString(args[2], ":", script);
-	if (script.size() < 4 || script.size() > 7)
+	if (script.size() != 4)
 	{
-		MISLOG("syntax error usage : '<item_name>:<sheetid>:<quality>:(nodrop|<param>=<value>[;*]|<phraseid>)");
+		MISLOG("syntax error usage : '<sheetid>:<quality>:<drop=0|1>:(<phraseid>|(<param>=<value>[;*]))");
 		return false;
 	}
-	string val;
-	bool ret = true;
 
-	// get the variable name (ulu: for what?????)
-	varName = CMissionParser::getNoBlankString( script[0] );
 	// get the sheet
-	_SheetId = CSheetId( CMissionParser::getNoBlankString( script[2] ) + ".sitem" );
+	_SheetId = CSheetId(script[0] + ".sitem");
 	if (_SheetId == CSheetId::Unknown)
 	{
-		MISLOG("Invalid sitem sheet '%s'", (CMissionParser::getNoBlankString( script[2] ) + ".sitem").c_str());
-		ret = false;
+		MISLOG("Invalid sitem sheet '%s'", (script[0]+".sitem").c_str());
+		return false;
 	}
-	NLMISC::fromString(script[3], _Quality);
+	NLMISC::fromString(script[1], _Quality);
 
-	for (uint i = 4; i < script.size(); i++)
+	_NoDrop = script[2] == "0"
+
+	vector<string> vars;
+	NLMISC::splitString(script[3], ";", vars);
+	
+	for (uint i = 0; i < vars.size(); i++)
 	{
-		if (!nlstricmp("nodrop", script[i]))
-			_NoDrop = true;
-		else
+		vector<string> args;
+		CMissionParser::tokenizeString(vars[i], "=", args);
+		if (args.size() == 2)
 		{
-			vector<string> vars;
-			NLMISC::splitString(script[i], ";", vars);
-
-			for (uint j = 0; j < vars.size(); j++)
-			{	
-				vector<string> args;
-				CMissionParser::tokenizeString(vars[j], "=", args);
-				if (args.size() == 2)
+			float value;
+			NLMISC::fromString(args[1], value);
+			// 2 params means that it is an item property
+			if(!nlstricmp(args[0], "Durability"))
+				_Params.Durability = value;
+			else if(!nlstricmp(args[0], "Weight"))
+				_Params.Weight = value;
+			else if(!nlstricmp(args[0], "SapLoad"))
+				_Params.SapLoad = value;
+			else if(!nlstricmp(args[0], "Dmg"))
+				_Params.Dmg = value;
+			else if(!nlstricmp(args[0], "Speed"))
+				_Params.Speed = value;
+			else if(!nlstricmp(args[0], "Range"))
+				_Params.Range = value;
+			else if(!nlstricmp(args[0], "DodgeModifier"))
+				_Params.DodgeModifier = value;
+			else if(!nlstricmp(args[0], "ParryModifier"))
+				_Params.ParryModifier = value;
+			else if(!nlstricmp(args[0], "AdversaryDodgeModifier"))
+				_Params.AdversaryDodgeModifier = value;
+			else if(!nlstricmp(args[0], "AdversaryParryModifier"))
+				_Params.AdversaryParryModifier = value;
+			else if(!nlstricmp(args[0], "ProtectionFactor"))
+				_Params.ProtectionFactor = value;
+			else if(!nlstricmp(args[0], "MaxSlashingProtection"))
+				_Params.MaxSlashingProtection = value;
+			else if(!nlstricmp(args[0], "MaxBluntProtection"))
+				_Params.MaxBluntProtection = value;
+			else if(!nlstricmp(args[0], "MaxPiercingProtection"))
+				_Params.MaxPiercingProtection = value;
+			else if(!nlstricmp(args[0], "HpBuff"))
+				_Params.HpBuff = value;
+			else if(!nlstricmp(args[0], "SapBuff"))
+				_Params.SapBuff = value;
+			else if(!nlstricmp(args[0], "StaBuff"))
+				_Params.StaBuff = value;
+			else if(!nlstricmp(args[0], "FocusBuff"))
+				_Params.FocusBuff = value;
+			else if(!nlstricmp(args[0], "Color"))
+			{
+				uint8 color;
+				NLMISC::fromString(args[1], color);
+				if( color <= 7 )
 				{
-					float value;
-					NLMISC::fromString(args[1], value);
-					// 2 params means that it is an item property
-					if(!nlstricmp(args[0], "Durability"))
-						_Params.Durability = value;
-					else if(!nlstricmp(args[0], "Weight"))
-						_Params.Weight = value;
-					else if(!nlstricmp(args[0], "SapLoad"))
-						_Params.SapLoad = value;
-					else if(!nlstricmp(args[0], "Dmg"))
-						_Params.Dmg = value;
-					else if(!nlstricmp(args[0], "Speed"))
-						_Params.Speed = value;
-					else if(!nlstricmp(args[0], "Range"))
-						_Params.Range = value;
-					else if(!nlstricmp(args[0], "DodgeModifier"))
-						_Params.DodgeModifier = value;
-					else if(!nlstricmp(args[0], "ParryModifier"))
-						_Params.ParryModifier = value;
-					else if(!nlstricmp(args[0], "AdversaryDodgeModifier"))
-						_Params.AdversaryDodgeModifier = value;
-					else if(!nlstricmp(args[0], "AdversaryParryModifier"))
-						_Params.AdversaryParryModifier = value;
-					else if(!nlstricmp(args[0], "ProtectionFactor"))
-						_Params.ProtectionFactor = value;
-					else if(!nlstricmp(args[0], "MaxSlashingProtection"))
-						_Params.MaxSlashingProtection = value;
-					else if(!nlstricmp(args[0], "MaxBluntProtection"))
-						_Params.MaxBluntProtection = value;
-					else if(!nlstricmp(args[0], "MaxPiercingProtection"))
-						_Params.MaxPiercingProtection = value;
-					
-					else if(!nlstricmp(args[0], "HpBuff"))
-						NLMISC::fromString(args[1], _Params.HpBuff);
-					else if(!nlstricmp(args[0], "SapBuff"))
-						NLMISC::fromString(args[1], _Params.SapBuff);
-					else if(!nlstricmp(args[0], "StaBuff"))
-						NLMISC::fromString(args[1], _Params.StaBuff);
-					else if(!nlstricmp(args[0], "FocusBuff"))
-						NLMISC::fromString(args[1], _Params.FocusBuff);
-					else if(!nlstricmp(args[0], "Color"))
-					{
-						uint8 color;
-						NLMISC::fromString(args[1], color);
-						if( color <= 7 )
-						{
-							_Params.Color[color] = 1;
-						}
-					}
-					else if(!nlstricmp(args[0], "AcidProtection"))
-						_Params.AcidProtectionFactor = value;
-					else if(!nlstricmp(args[0], "ColdProtection"))
-						_Params.ColdProtectionFactor = value;
-					else if(!nlstricmp(args[0], "FireProtection"))
-						_Params.FireProtectionFactor = value;
-					else if(!nlstricmp(args[0], "RotProtection"))
-						_Params.RotProtectionFactor = value;
-					else if(!nlstricmp(args[0], "ShockWaveProtection"))
-						_Params.ShockWaveProtectionFactor = value;
-					else if(!nlstricmp(args[0], "PoisonProtection"))
-						_Params.PoisonProtectionFactor = value;
-					else if(!nlstricmp(args[0], "ElectricityProtection"))
-						_Params.ElectricityProtectionFactor = value;
-					else if (!nlstricmp(args[0], "Phrase"))
-					{
-						_SPhraseId = CSheetId (args[0] + ".sphrase");
-						if ( _SPhraseId == CSheetId::Unknown )
-						{
-							MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
-							ret = false;
-						}
-					}
-					else if (!nlstricmp(args[0], "Phrase"))
-					{
-						_SPhraseId = CSheetId(args[0]+".sphrase");
-						if (_SPhraseId == CSheetId::Unknown)
-						{
-							MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
-							ret = false;
-						}
-					}
-					else
-					{
-						RESISTANCE_TYPE::TResistanceType resistance = RESISTANCE_TYPE::fromString(args[0]);
-						switch( resistance )
-						{
-						case RESISTANCE_TYPE::Desert:
-							_Params.DesertResistanceFactor = value;
-							break;
-						case RESISTANCE_TYPE::Forest:
-							_Params.ForestResistanceFactor = value;
-							break;
-						case RESISTANCE_TYPE::Lacustre:
-							_Params.LacustreResistanceFactor = value;
-							break;
-						case RESISTANCE_TYPE::Jungle:
-							_Params.JungleResistanceFactor = value;
-							break;
-						case RESISTANCE_TYPE::PrimaryRoot:
-							_Params.PrimaryRootResistanceFactor = value;
-							break;
-						default:
-							MISLOG("Invalid param '%s'", args[0].c_str());
-							ret = false;
-						}
-					}
+					_Params.Color[color] = 1;
 				}
-				else if (args.size() == 1)
+			}
+			else if(!nlstricmp(args[0], "AcidProtection"))
+				_Params.AcidProtectionFactor = value;
+			else if(!nlstricmp(args[0], "ColdProtection"))
+				_Params.ColdProtectionFactor = value;
+			else if(!nlstricmp(args[0], "FireProtection"))
+				_Params.FireProtectionFactor = value;
+			else if(!nlstricmp(args[0], "RotProtection"))
+				_Params.RotProtectionFactor = value;
+			else if(!nlstricmp(args[0], "ShockWaveProtection"))
+				_Params.ShockWaveProtectionFactor = value;
+			else if(!nlstricmp(args[0], "PoisonProtection"))
+				_Params.PoisonProtectionFactor = value;
+			else if(!nlstricmp(args[0], "ElectricityProtection"))
+				_Params.ElectricityProtectionFactor = value;
+			else if (!nlstricmp(args[0], "Phrase"))
+			{
+				_SPhraseId = CSheetId (args[0] + ".sphrase");
+				if ( _SPhraseId == CSheetId::Unknown )
 				{
-					_PhraseId = args[0];
-				else
-				{
-					MISLOG("Invalid property defined with 0 or more than 2 params");
+					MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
 					ret = false;
 				}
-				
+			}
+			else
+			{
+				RESISTANCE_TYPE::TResistanceType resistance = RESISTANCE_TYPE::fromString(args[0]);
+				switch( resistance )
+				{
+				case RESISTANCE_TYPE::Desert:
+					_Params.DesertResistanceFactor = value;
+					break;
+				case RESISTANCE_TYPE::Forest:
+					_Params.ForestResistanceFactor = value;
+					break;
+				case RESISTANCE_TYPE::Lacustre:
+					_Params.LacustreResistanceFactor = value;
+					break;
+				case RESISTANCE_TYPE::Jungle:
+					_Params.JungleResistanceFactor = value;
+					break;
+				case RESISTANCE_TYPE::PrimaryRoot:
+					_Params.PrimaryRootResistanceFactor = value;
+					break;
+				default:
+					MISLOG("Invalid param '%s'", args[0].c_str());
+					ret = false;
+				}
 			}
 		}
+		else if (args.size() == 1)
+		{
+			_PhraseId = args[0];
+		}
+		else
+		{
+			MISLOG("Invalid property defined with 0 or more than 2 params");
+			ret = false;
+		}
 	}
+	
 	return true;
 }// CMissionItem::buildFromScript
 

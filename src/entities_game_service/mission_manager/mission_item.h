@@ -32,6 +32,7 @@ class CCharacter;
 class CMissionItem
 {
 public:
+	CMissionItem();
 	/// build this class from a script. Return true on success
 	bool buildFromScript( const std::vector<std::string> & script, std::string & varName );
 	/// create an ingame item from this class and put it in user temp inventory
