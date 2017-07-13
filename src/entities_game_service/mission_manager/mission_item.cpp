@@ -32,7 +32,7 @@
 using namespace std;
 using namespace NLMISC;
 
-bool CMissionItem::buildFromScript( const std::vector<std::string> & script, std::vector< std::pair< std::string, std::string & varName)
+bool CMissionItem::buildFromScript( const std::vector<std::string> & script, std::string & varName)
 {
 	_NoDrop = false;
 	
