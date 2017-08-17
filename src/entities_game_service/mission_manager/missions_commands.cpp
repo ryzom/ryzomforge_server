@@ -574,22 +574,31 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 	return true;
 }
 
-NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <quantity> <params>") // See mission_item.cpp for params
+/*
+spawnItem 530162 1 icbm2ss_2:250:0:Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
+*/
+NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <sheetid> <quality> <quantity> <drop=0|1> <phraseid> [<param>=<value>[,*]]")
 {
 
 	GET_ACTIVE_CHARACTER
 	
-	if (args.size() != 3)
+	if (args.size() != 7)
 		return false;
 
-	uint16 quantity;
-	NLMISC::fromString(args[1], quantity);
+	uint16 quality;
+	NLMISC::fromString(args[2], quality);
 
-	std::vector< std::string > script;
-	NLMISC::splitString(args[2], ":", script);
+	uint16 quantity;
+	NLMISC::fromString(args[3], quantity);
+
+	bool drop = args[4] == "1";
 
 	CMissionItem item;
-	item.buildFromScript(script);
+
+	std::vector< std::string > script;
+	NLMISC::splitString(args[6], ":", script);
+
+	item.buildFromScript(args[1], quality, drop, args[5], script);
 	item.createItemInTempInv(c, quantity);
 		
 	return true;
@@ -1253,16 +1262,16 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 					
 					log.displayNL("%d", cell);
 				} else {
-					log.displayNL("ERR: invalid number");
+					log.displayNL("ERR: invalid cell");
 					return false;
 				}
 			}
 		} else {
-			log.displayNL("ERR: invalid number");
+			log.displayNL("ERR: invalid template");
 			return false;
 		}
 	} else {
-		log.displayNL("ERR: invalid number");
+		log.displayNL("ERR: invalid building");
 		return false;
 	}
 	return true;
