@@ -598,7 +598,7 @@ NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <sheetid> <quality> <q
 	std::vector< std::string > script;
 	NLMISC::splitString(args[6], ":", script);
 
-	item.buildFromScript(args[1], quality, drop, args[5], script);
+	item.buildFromScript(script);
 	item.createItemInTempInv(c, quantity);
 		
 	return true;
