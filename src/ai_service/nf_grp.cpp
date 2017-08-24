@@ -1644,8 +1644,9 @@ void setUrl_ss_(CStateInstance* entity, CScriptStack& stack)
 			msg.Entities.push_back(pbot->dataSetRow());
 		}
 	}
-	group->setActionName(actionName);
-	group->setUrl(url);
+	CSpawnGroup* spawnGroup = group->getSpawnObj();
+	spawnGroup->setActionName(actionName);
+	spawnGroup->setUrl(url);
 	msg.ActionName = actionName;
 	msg.Url = url;
 	msg.send(egsString);
