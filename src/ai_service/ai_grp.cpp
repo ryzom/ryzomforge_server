@@ -378,8 +378,8 @@ void CSpawnGroup::checkRespawn()
 		return;
 
 	// Send url to EGS
-	string url = getUrl();
-	string actionName = getActionName();
+	std::string url = getUrl();
+	std::string actionName = getActionName();
 	CCreatureSetUrlMsg msg;
 	
 	//FOREACH_NOINC(it, std::vector<CBotToSpawn>, _BotsToRespawn)

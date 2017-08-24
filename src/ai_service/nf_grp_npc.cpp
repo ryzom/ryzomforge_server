@@ -2648,20 +2648,19 @@ void rename_s_(CStateInstance* entity, CScriptStack& stack)
 			CBot* bot = *itBot;
 			if (bot)
 			{
-				ucstring name;
-				name.fromUtf8(newName);
-				CSpawnBotNpc* spawnBotNpc = bot->getSpawn();
-				&spawnBotNpc->getPersistent().setCustomName(name);
 				if (bot->isSpawned())
 				{
 					CSpawnBot *spawnBot = bot->getSpawnObj(); 
 					if (spawnBot)
 					{
 						TDataSetRow	row = spawnBot->dataSetRow();
+						ucstring name;
+						name.fromUtf8(newName);
 						NLNET::CMessage	msgout("CHARACTER_NAME");
 						msgout.serial(row);
 						msgout.serial(name);
 						sendMessageViaMirror("IOS", msgout);
+						spawnBot->getPersistent().setCustomName(name);
 					}
 				}
 			}
