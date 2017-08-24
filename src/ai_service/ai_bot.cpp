@@ -617,7 +617,7 @@ bool CBot::spawn()
 	}
 	
 	// Finalize spawn object creation
-	return finalizeSpawn(botWPos, spawnTheta, botMeterSize);		
+	return finalizeSpawn(botWPos, spawnTheta, botMeterSize);
 }
 
 void CBot::despawnBot()
