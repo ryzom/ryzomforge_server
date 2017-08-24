@@ -81,6 +81,7 @@ void CSpawnBot::setVisualPropertiesName()
 		return;
 	
 	
+/* Ulu: Ring is dead !
 	// In ringshard we use npc with fauna sheet but we want to be enable to change theire name
 	if (! botRef.getFaunaBotUseBotName()) //false by default
 	{
@@ -88,7 +89,7 @@ void CSpawnBot::setVisualPropertiesName()
 			return;
 		// the npc name is displayed as a fauna
 	}
-
+*/
 	
 	CVisualPropertiesInterface::setName(dataSetRow(), name);
 }
@@ -617,7 +618,7 @@ bool CBot::spawn()
 	}
 	
 	// Finalize spawn object creation
-	return finalizeSpawn(botWPos, spawnTheta, botMeterSize);
+	return finalizeSpawn(botWPos, spawnTheta, botMeterSize);		
 }
 
 void CBot::despawnBot()
