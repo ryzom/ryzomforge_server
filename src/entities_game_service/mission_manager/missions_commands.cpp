@@ -2221,3 +2221,19 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 	} else 
 		log.displayNL("0");
 }
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setTrigger, "set a custom trigger", "<trigger> [<web_app>] [<args>]")
+{
+	if (args.size() < 1)
+		return false;
+
+	sint32 triggerId;
+	fromString(args[0], triggerId);
+	
+	if (args.size() == 3)
+		CBuildingManager::getInstance()->setCustomTrigger(triggerId, args[1]+" "+args[2]);
+	else
+		CBuildingManager::getInstance()->setCustomTrigger(triggerId, "");
+}

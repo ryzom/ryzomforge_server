@@ -63,7 +63,6 @@ void cbLiftIn( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TS
 	TDataSetRow rowId;
 	msgin.serial(triggerId);
 	msgin.serial(rowId);
-
 	CBuildingManager::getInstance()->addTriggerRequest( rowId, triggerId );
 }
 /// a player left a lift
@@ -388,6 +387,7 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 		nlwarning("<BUILDING> row %u is invalid",rowId.getIndex() );
 		return;
 	}
+	
 
 
 	// build a request for our user
@@ -395,56 +395,72 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 	request.Page = 0;
 	request.Session = 0;
 
-	CTriggerRequestEntry entry;
-	const uint destCount = (uint)trigger.Destinations.size();
-	for ( uint i = 0; i < destCount; i++ )
+	// Get the custom trigger (if exists)
+	std::string url = getCustomTrigger(triggerId);
+	
+	if (url.empty()) // No custom trigger, build it from parsed primitives
 	{
-		entry.Destination = trigger.Destinations[i];
-		if (entry.Destination == NULL)
+		CTriggerRequestEntry entry;
+		const uint destCount = (uint)trigger.Destinations.size();
+		for ( uint i = 0; i < destCount; i++ )
 		{
-			nlwarning("<BUILDING> NULL destination in trigger");
+			entry.Destination = trigger.Destinations[i];
+			if (entry.Destination == NULL)
+			{
+				nlwarning("<BUILDING> NULL destination in trigger");
+				return;
+			}
+			const uint16 ownerCount = entry.Destination->getEntryCount();
+			bool addSession = false;
+			for ( uint16 j = 0; j < ownerCount; j++ )
+			{
+				if ( entry.Destination->isUserAllowed(user,j) )
+				{
+					entry.OwnerIndex = j;
+					request.Entries.push_back( entry );
+					addSession = true;
+				}
+			}
+			if ( addSession )
+				request.Session += entry.Destination->getStateCounter();
+		}
+		if ( request.Entries.empty() )
+		{
 			return;
 		}
-		const uint16 ownerCount = entry.Destination->getEntryCount();
-		bool addSession = false;
-		for ( uint16 j = 0; j < ownerCount; j++ )
-		{
-			if ( entry.Destination->isUserAllowed(user,j) )
-			{
-				entry.OwnerIndex = j;
-				request.Entries.push_back( entry );
-				addSession = true;
-			}
-		}
-		if ( addSession )
-			request.Session += entry.Destination->getStateCounter();
 	}
-	if ( request.Entries.empty() )
-	{
-		return;
-	}
-
+	
 	request.Timer = new CTimer;
 	request.Timer->setRemaining( TriggerRequestTimout, new CTriggerRequestTimoutEvent(rowId) );
 	// add the request to our manager
 	_TriggerRequests.insert( make_pair( rowId, request ) );
 
-	// if it is an auto teleport, force entity teleportation
-	if ( trigger.AutoTeleport )
+	// Don't teleport when it's a custom trigger, send url instead
+	if (!url.empty())
 	{
-		triggerTeleport( user , 0);
-		return;
+
+		user->sendUrl(url, "");
 	}
+	else
+	{
 
-	// tell client
-	NLNET::CMessage msgout( "IMPULSION_ID" );
-	CEntityId id = user->getId();
-	msgout.serial( id );
-	CBitMemStream bms;
-	nlverify( GenericMsgManager.pushNameToStream( "GUILD:ASCENSOR", bms) );
+		// if it is an auto teleport, force entity teleportation
+		if ( trigger.AutoTeleport )
+		{
+			triggerTeleport( user , 0);
+			return;
+		}
 
-	msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
-	sendMessageViaMirror( NLNET::TServiceId(id.getDynamicId()), msgout );
+		// tell client
+		NLNET::CMessage msgout( "IMPULSION_ID" );
+		CEntityId id = user->getId();
+		msgout.serial( id );
+		CBitMemStream bms;
+		nlverify( GenericMsgManager.pushNameToStream( "GUILD:ASCENSOR", bms) );
+
+		msgout.serialBufferWithSize((uint8*)bms.buffer(), bms.length());
+		sendMessageViaMirror( NLNET::TServiceId(id.getDynamicId()), msgout );
+	}
 }
 
 
@@ -838,6 +854,27 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 		//const sint32 oldCellId = mirrorValue;
 		removePlayerFromRoom( user );
 	}
+}
+
+//----------------------------------------------------------------------------
+void CBuildingManager::setCustomTrigger(sint32 triggerId, const std::string & url)
+{
+	std::map<sint,std::string>::iterator it = _CustomTriggers.find( triggerId );
+	if (it != _CustomTriggers.end())
+		_CustomTriggers.erase(it);
+	
+	if (!url.empty())
+		_CustomTriggers.insert(make_pair(triggerId, url));
+}
+
+//----------------------------------------------------------------------------
+std::string CBuildingManager::getCustomTrigger(sint32 triggerId)
+{
+	std::map<sint,std::string>::iterator it = _CustomTriggers.find( triggerId );
+	if ( it != _CustomTriggers.end() )
+		return (*it).second;
+	
+	return "";
 }
 
 //----------------------------------------------------------------------------
