@@ -789,14 +789,14 @@ public:
 
 	// tp wanted, check if tp is regular and send a server tp command
 	void tpWanted(sint32 x, sint32 y, sint32 z, bool useHeading = false, float heading = 0.0f, uint8 continent = 0xFF,
-				  sint32 cell = 0);
+				  sint32 cell = 0, bool fromVortex = false);
 
 	void teleportCharacter(sint32 x, sint32 y);
 
 	// teleport character with or without his mount, check if tp is regular and send a server tp command
 	void teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWithMount, bool useHeading = false,
 						   float heading = 0.0f, uint8 continent = 0xFF, sint32 cell = 0, uint8 season = 0xff,
-						   const R2::TR2TpInfos &tpInfos = R2::TR2TpInfos());
+						   bool fromVortex = false, const R2::TR2TpInfos &tpInfos = R2::TR2TpInfos());
 
 	// return the season in which is the current character
 	uint8 getRingSeason() const

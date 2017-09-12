@@ -1020,7 +1020,7 @@ void CBSAIDeathReport::callback(const std::string &name, NLNET::TServiceId id)
 							continue;
 						CAIEntityPhysical* ep = CAIS::instance().getEntityPhysical(aggroIt->first);
 						if (!ep)
-							continue;			
+							continue;
 						CBotPlayer const* const player = NLMISC::safe_cast<CBotPlayer const*>(ep);
 						if (!player)
 							continue;

@@ -5530,7 +5530,7 @@ void CCharacter::setVisualPropertyForEquipment(uint16 slot, const CStaticItem* s
 // allowNearPetTp() or forbidNearPetTp() must have been called
 //-----------------------------------------------
 void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWithMount, bool useHeading, float heading,
-								   uint8 continent, sint32 cell, uint8 season, const R2::TR2TpInfos &tpInfos)
+								   uint8 continent, sint32 cell, uint8 season, bool fromVortex, const R2::TR2TpInfos &tpInfos)
 {
 	if (!getEnterFlag()) // wait for the properties to be in the mirror
 		return;
@@ -5619,7 +5619,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		}
 	}
 
-	if (_IntangibleEndDate != ~0) // Don't save Last Tp Tick if player respawns
+	if (_IntangibleEndDate != ~0 && !fromVortex) // Don't save Last Tp Tick if player respawns or teleport from Vortex
 		_LastTpTick = CTickEventHandler::getGameCycle();
 	
 	_TpCoordinate.X = x;
@@ -21017,9 +21017,9 @@ void CCharacter::updateTarget()
 
 //------------------------------------------------------------------------------
 
-void CCharacter::tpWanted(sint32 x, sint32 y, sint32 z, bool useHeading, float heading, uint8 continent, sint32 cell)
+void CCharacter::tpWanted(sint32 x, sint32 y, sint32 z, bool useHeading, float heading, uint8 continent, sint32 cell, bool fromVortex)
 {
-	teleportCharacter(x, y, z, false, useHeading, heading, continent, cell);
+	teleportCharacter(x, y, z, false, useHeading, heading, continent, cell, 0xFF, fromVortex);
 }
 
 //------------------------------------------------------------------------------
