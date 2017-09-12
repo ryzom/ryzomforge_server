@@ -418,6 +418,8 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP(uint32,_LastOverSpeedTick)\
 	PROP(uint32,_LastMountTick)\
 	PROP(uint32,_LastUnMountTick)\
+	PROP(uint32,_LastFreeMount)\
+	PROP(uint32,_LastExchangeMount)\
 	PROP(uint32,_PvpPoint)\
 	PROP2(_LangChannel,string,_LangChannel,_LangChannel=val)\
 	PROP(uint32,_Organization)\

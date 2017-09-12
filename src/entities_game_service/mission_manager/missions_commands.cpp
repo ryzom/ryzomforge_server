@@ -197,39 +197,6 @@ NLMISC_COMMAND(addSuccessfulMission,"add a successful mission to the player","<p
 	return true;
 } // addSuccesfulMission
 
-
-
-NLMISC_COMMAND(createMissionItem,"","")
-{
-	if ( args.size() != 3 )
-		return false;
-	string varName;
-
-	CEntityId id;
-	id.fromString(args[0].c_str());
-	CCharacter * user = PlayerManager.getChar(id);
-
-	if ( !user )
-	{
-		log.displayNL( "invalid char" );
-		return true;
-	}
-
-	uint16 quantity;
-	NLMISC::fromString(args[1], quantity);
-
-	std::vector< std::string > script;
-	vector< pair<string, STRING_MANAGER::TParamType > > chatParams;
-	NLMISC::splitString( args[2],":",script );
-
-	CMissionItem item;
-	item.buildFromScript( script,chatParams, varName );
-
-	item.createItemInTempInv( user,quantity );
-		
-	return true;
-} // createMissionItem
-
 NLMISC_COMMAND(clearMissionDone,"Clear the list of already done missions.","<character id(id:type:crea:dyn)>")
 {
 	if (args.size() != 1)
@@ -607,6 +574,37 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 	return true;
 }
 
+/*
+spawnItem 530162 1 icbm2ss_2:250:0:Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
+*/
+NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <sheetid> <quality> <quantity> <drop=0|1> <phraseid> [<param>=<value>[,*]]")
+{
+
+	GET_ACTIVE_CHARACTER
+	
+	if (args.size() != 7)
+		return false;
+
+	uint16 quality;
+	NLMISC::fromString(args[2], quality);
+
+	uint16 quantity;
+	NLMISC::fromString(args[3], quantity);
+
+	bool drop = args[4] == "1";
+
+	CMissionItem item;
+
+	std::vector< std::string > script;
+	NLMISC::splitString(args[6], ":", script);
+
+	item.buildFromScript(script);
+	item.createItemInTempInv(c, quantity);
+		
+	return true;
+}
+
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<uid> [bag sheet quantity_min quantity_max quality_min quality_max extra_infos]")
 {
@@ -644,8 +642,6 @@ NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<
 
 	if (args.size() > 7)
 		extra = args[7];
-
-	string msg;
 
 	if (selected_inv != "*")
 	{
@@ -746,8 +742,6 @@ NLMISC_COMMAND(getNamedItemList, "get list of named items of character by filter
 
 	if (args.size() > 7)
 		extra = args[7];
-
-	string msg;
 
 	if (selected_inv != "*")
 	{
@@ -956,7 +950,7 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 				if( sheetId == creatureSheetId )
 				{
 					double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
-					if( !creature || (creature && distance < minDistance) )
+					if (!creature || distance < minDistance)
 					{
 						creature = (*it).second;
 						minDistance = distance;
@@ -1122,18 +1116,33 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 	}
 	
 	log.displayNL(msg.c_str());
-	
-	return true;
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getMoney, "get money of player", "<uid>")
+NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<uid> <quantity>")
 {
 
 	GET_ACTIVE_CHARACTER
 
-	string value = toString("%"NL_I64"u", c->getMoney());
+	uint64 money = c->getMoney();
 
+	if (args.size() == 2)
+	{
+		uint64 quantity;
+		fromString(args[1], quantity);
+		if (money >= quantity)
+		{
+			money -= quantity;
+			c->setMoney(money);
+		}
+		else
+		{
+			log.displayNL("-1"); // No enough money
+			return true;
+		}
+	}
+
+	string value = toString("%"NL_I64"u", money);
 	log.displayNL(value.c_str());
 }
 
@@ -1167,7 +1176,8 @@ NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 
 	GET_ACTIVE_CHARACTER
 
-	switch (c->getRace()) {
+	switch (c->getRace())
+	{
 		case EGSPD::CPeople::Fyros:
 			log.displayNL("f");
 			break;
@@ -1189,13 +1199,26 @@ NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
-
 	std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance = c->getAllegiance();
 
-
 	log.displayNL("%s|%s|%u", PVP_CLAN::toString(allegiance.first).c_str(), PVP_CLAN::toString(allegiance.second).c_str(), c->getOrganization());
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
+{
+	GET_ACTIVE_CHARACTER
+
+	if (args.size() != 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	uint32 org;
+	fromString(args[1], org);
+	c->setOrganization(org);
 }
 
 
@@ -1239,16 +1262,16 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 					
 					log.displayNL("%d", cell);
 				} else {
-					log.displayNL("ERR: invalid number");
+					log.displayNL("ERR: invalid cell");
 					return false;
 				}
 			}
 		} else {
-			log.displayNL("ERR: invalid number");
+			log.displayNL("ERR: invalid template");
 			return false;
 		}
 	} else {
-		log.displayNL("ERR: invalid number");
+		log.displayNL("ERR: invalid building");
 		return false;
 	}
 	return true;
@@ -1386,7 +1409,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 					if( sheetId == creatureSheetId )
 					{
 						double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
-						if( !creature || (creature && distance < minDistance) )
+						if (!creature || distance < minDistance)
 						{
 							creature = (*it).second;
 							minDistance = distance;
@@ -1545,6 +1568,26 @@ NLMISC_COMMAND(addRespawnPoint,"Add re-spawn point","<uid> <Re-spawn point name>
 	c->getRespawnPoints().addRespawnPoint(respawnPoint);
 	return true;
 }
+
+
+//-----------------------------------------------
+// Kill the player
+//-----------------------------------------------
+NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
+{
+	if (args.size () < 1)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+	
+	c->killMe();
+	return true;
+}
+
+
 
 
 //----------------------------------------------------------------------------
@@ -2165,13 +2208,10 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 	
 	GET_ACTIVE_CHARACTER;
 
-	string msg = "";
-	
 	CTeam* pTeam = TeamManager.getRealTeam(c->getTeamId());
 	if (pTeam != NULL)
 	{
 		log.displayNL("%d", c->getTeamId());
-		vector<CEntityId> vMembers;
 		for (list<CEntityId>::const_iterator it = pTeam->getTeamMembers().begin(); it != pTeam->getTeamMembers().end(); ++it)
 		{
 			ucstring name = CEntityIdTranslator::getInstance()->getByEntity((*it));

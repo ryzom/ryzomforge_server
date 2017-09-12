@@ -2845,6 +2845,9 @@ public:
 		return (_EntityState.X() != _OldPosX || _EntityState.Y() != _OldPosY);
 	}
 
+	/// Kill the player
+	void killMe();
+
 	///////////////////
 	// Protected methods
 	///////////////////

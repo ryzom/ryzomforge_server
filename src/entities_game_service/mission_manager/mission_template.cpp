@@ -384,12 +384,14 @@ bool CMissionTemplate::build(const NLLIGO::IPrimitive* prim,CMissionGlobalParsin
 				Type = MISSION_DESC::Guild;
 			else if ( script[0] == "decl_item" )
 			{
+				/* ULUKYN : Deactivated because not used (i suppose nevrax used named item instead...
+				 *  the code of CMissionItem::buildFromScript are just... no words :D
 				CMissionItem item;
 				string itemName;
 				if ( item.buildFromScript( script, missionData.ChatParams , itemName) )
 					missionData.Items.push_back( make_pair(itemName,item) );
 				else
-					ret = false;
+					ret = false;*/
 			}
 			else if ( script[0] == "decl" )
 				ret = parseScriptVar( i+1, script, missionData.ChatParams ) && ret;
