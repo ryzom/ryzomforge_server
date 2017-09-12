@@ -1815,7 +1815,7 @@ void CCreature::kill(TDataSetRow killerRowId)
 //-----------------------------------------------
 // CCreature::::tpWanted a tp wanted, check if tp is regular and send a server tp command
 //-----------------------------------------------
-void CCreature::tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading , float heading , uint8 continent , sint32 cell )
+void CCreature::tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading , float heading , uint8 continent , sint32 cell, bool tpWanted )
 { 
 	CPhraseManager::getInstance().removeEntity(TheDataset.getDataSetRow(_Id), false);
 

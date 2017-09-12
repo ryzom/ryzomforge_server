@@ -845,7 +845,7 @@ public:
 	inline void decPreventEntityMove() { if (_PreventEntityMoves>0) --_PreventEntityMoves; }
 
 	// tp wanted for an entity
-	virtual void tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading = false, float heading = 0.0f , uint8 continent = 0xFF, sint32 cell = 0) = 0;
+	virtual void tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading = false, float heading = 0.0f , uint8 continent = 0xFF, sint32 cell = 0, bool fromVortex = false) = 0;
 
 // memorize xp gain per agressor for offensive action
 //	void addAgressorXp( const NLMISC::CEntityId& agressor, double xp, const std::string& Skill );
