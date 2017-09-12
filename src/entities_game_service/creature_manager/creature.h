@@ -357,7 +357,7 @@ public:
 	}
 
 	// tp wanted for an entity
-	void tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading = false, float heading = 0.0f , uint8 continent = 0xFF, sint32 cell = 0);
+	void tpWanted( sint32 x, sint32 y, sint32 z , bool useHeading = false, float heading = 0.0f , uint8 continent = 0xFF, sint32 cell = 0, bool tpWanted = false);
 
 	/// request a despawn after a number of game cycles
 	void requestDespawn(NLMISC::TGameCycle waitCycles = 0);

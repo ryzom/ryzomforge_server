@@ -497,7 +497,7 @@ public:
 			return;
 		}
 
-		c->teleportCharacter(sint32(1000.0f*x), sint32(1000.0f*y), sint32(1000.0f*z), true, false, 0.f, 0xFF, 0, season, tpInfos);
+		c->teleportCharacter(sint32(1000.0f*x), sint32(1000.0f*y), sint32(1000.0f*z), true, false, 0.f, 0xFF, 0, season, false, tpInfos);
 	}
 
 	virtual void disconnectChar(NLNET::IModuleProxy *sender, uint32 charId)

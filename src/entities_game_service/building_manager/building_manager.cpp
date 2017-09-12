@@ -438,7 +438,6 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 	// Don't teleport when it's a custom trigger, send url instead
 	if (!url.empty())
 	{
-
 		user->sendUrl(url, "");
 	}
 	else
@@ -738,8 +737,6 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 		return;
 	}
 
-
-
 	// check if sessions mactch between user and system
 	uint16 session = 0;
 	const uint16 destCount = (uint16)(*it).second.Entries.size();
@@ -844,7 +841,9 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 				PlayerManager.sendImpulseToClient(user->getId(), "GUILD:OPEN_INVENTORY");
 		}
 		else
-			user->tpWanted(x,y,z,true,heading);
+		{
+			user->tpWanted(x,y,z,true,heading,0xFF,0,true);
+		}
 	}
 	else
 	{
