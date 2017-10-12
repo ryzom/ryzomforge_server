@@ -95,8 +95,9 @@ uint32 CCharacterVersionAdapter::currentVersionNumber() const
 	// 24 : (23/10/2014) fix post merge rite bonus issue
 	// 25 : (05/03/2015) fix required faction in items on inventory
 	// 26 : (23/04/2015) fix foragetool HP
+	// 27 : (10/10/2017) fix /learnAllBrick exploit
 	////////////////////////////////////
-	return 26;
+	return 27;
 }
 
 
@@ -132,6 +133,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	case 23: adaptToVersion24(character);
 	case 24: adaptToVersion25(character);
 	case 25: adaptToVersion26(character);
+	case 26: adaptToVersion27(character);
 	default:;
 	}
 }
@@ -1366,6 +1368,61 @@ void CCharacterVersionAdapter::adaptToVersion26(CCharacter &character) const
 
 				if (phraseId.substr(0, 11) == "foragetool_")
 					item->addHp(item->durability());
+			}
+		}
+	}
+}
+
+
+//---------------------------------------------------
+void CCharacterVersionAdapter::adaptToVersion27(CCharacter &character) const
+{
+
+	vector<string> bricks;
+	bricks.push_back("bmcc00180");
+	bricks.push_back("bmcc00250");
+	bricks.push_back("bmcr00100");
+	bricks.push_back("bmcr00120");
+	bricks.push_back("bmcc00225");
+	bricks.push_back("bmcc00200");
+
+	nlinfo("Adapt to v27");
+	const uint sizeInv = INVENTORIES::NUM_INVENTORY;
+	for ( uint i = 0; i < sizeInv ; i++ )
+	if (character._Inventory[i] != NULL)
+	{
+		CInventoryPtr childSrc = character._Inventory[i];
+		for ( uint j = 0; j < childSrc->getSlotCount(); j++ )
+		{
+			CGameItemPtr item = childSrc->getItem(j);
+			if (item != NULL && item->getEnchantment().size() > 0)
+			{
+				nlinfo("Have item with enchant!");
+				vector< CSheetId > enchant = item->getEnchantment();
+				bool reset_it = false;
+				for (uint k = 0; k < enchant.size(); k++)
+				{
+					nlinfo("Check brick : %s", enchant[k].toString().c_str());
+					for (uint l = 0; l < bricks.size(); l++)
+					{
+						if (CSheetId(bricks[l]+".sbrick") == enchant[k]) {
+							nlinfo("Have unautorized brick !");
+							reset_it = true;
+							break;
+						}
+					}
+
+					if (reset_it)
+					{
+						nlinfo("Reset Enchant");
+						item->resetEnchantment();
+						break;
+					}
+				}
+			}
+			else if (item->getSheetId() == CSheetId("crystalized_spell.sitem"))
+			{
+					
 			}
 		}
 	}
