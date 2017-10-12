@@ -71,6 +71,10 @@ public:
 	void removeTriggerRequest( const TDataSetRow & rowId);
 	/// teleport a user through a lift
 	void triggerTeleport(CCharacter * user, uint16 index);
+	/// pacs trigger will launch an url and no more teleport a player
+	void setCustomTrigger(sint32 triggerId, const std::string & url);
+	/// get url from CustomTrigger
+	std::string getCustomTrigger(sint32 triggerId);
 	//@}
 
 
@@ -197,6 +201,9 @@ private:
 	
 	/// container of triggers
 	CHashMap< sint,CTrigger >	_Triggers;
+
+	/// container of custom triggers
+	std::map< sint,std::string >	_CustomTriggers;
 
 	/// trigger requests of the players
 	typedef CHashMap< TDataSetRow , CTriggerRequest , TDataSetRow::CHashCode > TTriggerRequestCont;

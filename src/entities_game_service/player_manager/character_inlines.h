@@ -47,9 +47,10 @@ inline const NLMISC::CEntityId& CCharacter::getId() const
 	return CEntityBase::getId(); 
 }
 
+
 //------------------------------------------------------------------------------
 
-inline uint32 CCharacter::getStartupInstance()				
+inline uint32 CCharacter::getStartupInstance()
 {
 	return _StartupInstance; 
 }

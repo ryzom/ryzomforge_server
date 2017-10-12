@@ -32,172 +32,156 @@
 using namespace std;
 using namespace NLMISC;
 
-bool CMissionItem::buildFromScript( const std::vector<std::string> & script, std::vector< std::pair< std::string, STRING_MANAGER::TParamType > > & chatParams, std::string & varName)
-{
-	_NoDrop = false;
-	if( script.size() < 4 || script.size() > 7)
+bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
+	// script = NLMISC::splitString(args[2], ":", script);
+	if (script.size() < 3)
 	{
-		MISLOG("syntax error usage : '%s:<item_name> : <brick_craft_plan> : <req_skill> : +[ [<property>|<resist>] <value> ; | <action> ;] [ : <phrase_id>] [ : nodrop]",script[0].c_str() );
+		MISLOG("syntax error usage : '<sheetid>:<quality>:<drop=0|1>:(<phraseid>|(<param>=<value>[,*]))");
 		return false;
 	}
-	string val;
-	bool ret = true;
 
-	// get the variable name
-	varName = CMissionParser::getNoBlankString( script[1] );
 	// get the sheet
-	_SheetId = CSheetId( CMissionParser::getNoBlankString( script[2] ) + ".sitem" );
-	if  ( _SheetId == CSheetId::Unknown )
+	_SheetId = CSheetId(script[0] + ".sitem");
+	if (_SheetId == CSheetId::Unknown)
 	{
-		MISLOG("Invalid sitem sheet '%s'", (CMissionParser::getNoBlankString( script[1] ) + ".sitem").c_str());
-		ret = false;
+		MISLOG("Invalid sitem sheet '%s'", (script[0]+".sitem").c_str());
+		return false;
 	}
-	NLMISC::fromString(script[3], _Quality);
+	
+	NLMISC::fromString(script[1], _Quality);
 
-	for ( uint i = 4; i < script.size(); i++)
-	{
-		if ( !nlstricmp( "nodrop", script[i] ) )
-			_NoDrop = true;
-		else
+	_NoDrop = script[2] == "0";
+
+	if (script.size() > 3) {
+		vector<string> vars;
+		NLMISC::splitString(script[3], ",", vars);
+		
+		for (uint i = 0; i < vars.size(); i++)
 		{
-			vector<string> vars;
-			NLMISC::splitString( script[i], ";",vars );
-
-			bool propFound = false;
-			for ( uint i = 0; i < vars.size(); i++ )
-			{	
-				vector<string> args;
-				CMissionParser::tokenizeString( vars[i], " \t",args );
-				if ( args.size() == 2 )
+			vector<string> args;
+			CMissionParser::tokenizeString(vars[i], "=", args);
+			if (args.size() == 2)
+			{
+				float value;
+				NLMISC::fromString(args[1], value);
+				// 2 params means that it is an item property
+				if(!nlstricmp(args[0], "Durability"))
+					_Params.Durability = value;
+				else if(!nlstricmp(args[0], "Weight"))
+					_Params.Weight = value;
+				else if(!nlstricmp(args[0], "SapLoad"))
+					_Params.SapLoad = value;
+				else if(!nlstricmp(args[0], "Dmg"))
+					_Params.Dmg = value;
+				else if(!nlstricmp(args[0], "Speed"))
+					_Params.Speed = value;
+				else if(!nlstricmp(args[0], "Range"))
+					_Params.Range = value;
+				else if(!nlstricmp(args[0], "DodgeModifier"))
+					_Params.DodgeModifier = value;
+				else if(!nlstricmp(args[0], "ParryModifier"))
+					_Params.ParryModifier = value;
+				else if(!nlstricmp(args[0], "AdversaryDodgeModifier"))
+					_Params.AdversaryDodgeModifier = value;
+				else if(!nlstricmp(args[0], "AdversaryParryModifier"))
+					_Params.AdversaryParryModifier = value;
+				else if(!nlstricmp(args[0], "ProtectionFactor"))
+					_Params.ProtectionFactor = value;
+				else if(!nlstricmp(args[0], "MaxSlashingProtection"))
+					_Params.MaxSlashingProtection = value;
+				else if(!nlstricmp(args[0], "MaxBluntProtection"))
+					_Params.MaxBluntProtection = value;
+				else if(!nlstricmp(args[0], "MaxPiercingProtection"))
+					_Params.MaxPiercingProtection = value;
+				else if(!nlstricmp(args[0], "HpBuff"))
+					_Params.HpBuff = value;
+				else if(!nlstricmp(args[0], "SapBuff"))
+					_Params.SapBuff = value;
+				else if(!nlstricmp(args[0], "StaBuff"))
+					_Params.StaBuff = value;
+				else if(!nlstricmp(args[0], "FocusBuff"))
+					_Params.FocusBuff = value;
+				else if(!nlstricmp(args[0], "Color"))
 				{
-					// 2 params means that it is an item property
-					if( !nlstricmp(args[0],"Durability" ) )
-						_Params.Durability = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"Weight" ) )
-						_Params.Weight = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"SapLoad" ) )
-						_Params.SapLoad = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"Dmg" ) )
-						_Params.Dmg = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"Speed" ) )
-						_Params.Speed = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"Range" ) )
-						_Params.Range = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"DodgeModifier" ) )
-						_Params.DodgeModifier = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"ParryModifier" ) )
-						_Params.ParryModifier = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"AdversaryDodgeModifier" ) )
-						_Params.AdversaryDodgeModifier = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"AdversaryParryModifier" ) )
-						_Params.AdversaryParryModifier = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"ProtectionFactor" ) )
-						_Params.ProtectionFactor = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"MaxSlashingProtection" ) )
-						_Params.MaxSlashingProtection = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"MaxBluntProtection" ) )
-						_Params.MaxBluntProtection = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"MaxPiercingProtection" ) )
-						_Params.MaxPiercingProtection = (float)atof(args[1].c_str());
-					
-					else if( !nlstricmp(args[0],"HpBuff" ) )
-						NLMISC::fromString(args[1], _Params.HpBuff);
-					else if( !nlstricmp(args[0],"SapBuff" ) )
-						NLMISC::fromString(args[1], _Params.SapBuff);
-					else if( !nlstricmp(args[0],"StaBuff" ) )
-						NLMISC::fromString(args[1], _Params.StaBuff);
-					else if( !nlstricmp(args[0],"FocusBuff" ) )
-						NLMISC::fromString(args[1], _Params.FocusBuff);
-					else if( !nlstricmp(args[0],"Color" ) )
+					uint8 color;
+					NLMISC::fromString(args[1], color);
+					if( color <= 7 )
 					{
-						uint8 color;
-						NLMISC::fromString(args[1], color);
-						if( color <= 7 )
-						{
-							_Params.Color[color] = 1;
-						}
-					}
-					else if( !nlstricmp(args[0],"AcidProtection") )
-						_Params.AcidProtectionFactor = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"ColdProtection") )
-						_Params.ColdProtectionFactor = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"FireProtection") )
-						_Params.FireProtectionFactor = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"RotProtection") )
-						_Params.RotProtectionFactor = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"ShockWaveProtection") )
-						_Params.ShockWaveProtectionFactor = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"PoisonProtection") )
-						_Params.PoisonProtectionFactor = (float)atof(args[1].c_str());
-					else if( !nlstricmp(args[0],"ElectricityProtection") )
-						_Params.ElectricityProtectionFactor = (float)atof(args[1].c_str());
-					else
-					{
-						RESISTANCE_TYPE::TResistanceType resistance = RESISTANCE_TYPE::fromString( args[1] );
-						switch( resistance )
-						{
-						case RESISTANCE_TYPE::Desert:
-							_Params.DesertResistanceFactor = 1.0f;
-							break;
-						case RESISTANCE_TYPE::Forest:
-							_Params.ForestResistanceFactor = 1.0f;
-							break;
-						case RESISTANCE_TYPE::Lacustre:
-							_Params.LacustreResistanceFactor = 1.0f;
-							break;
-						case RESISTANCE_TYPE::Jungle:
-							_Params.JungleResistanceFactor = 1.0f;
-							break;
-						case RESISTANCE_TYPE::PrimaryRoot:
-							_Params.PrimaryRootResistanceFactor = 1.0f;
-							break;
-						default:
-							MISLOG("Invalid param '%s'", args[0].c_str());
-							ret = false;
-						}
-					}
-					propFound = true;
-				}
-				else if ( args.size() > 2 )
-				{
-					MISLOG("Invalid property defined with more than 2 params");
-					ret = false;
-				}
-				else if ( args.size() == 1 && i != 0 )
-				{
-					CSheetId enchantId = CSheetId( CMissionParser::getNoBlankString( args[0] ) + ".sphrase" );
-					if (enchantId == CSheetId::Unknown)
-					{
-						MISLOG("Invalid enchantement '%s.sphrase'", args[0].c_str());
-						ret = false;
-					}
-					else
-					{
-						_SPhraseId = CSheetId (args[0] + ".sphrase");
-						if ( _SPhraseId == CSheetId::Unknown )
-						{
-							MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
-							ret = false;
-						}
+						_Params.Color[color] = 1;
 					}
 				}
-				else if ( !propFound )
-					_PhraseId = CMissionParser::getNoBlankString( args[0] );
+				else if(!nlstricmp(args[0], "AcidProtection"))
+					_Params.AcidProtectionFactor = value;
+				else if(!nlstricmp(args[0], "ColdProtection"))
+					_Params.ColdProtectionFactor = value;
+				else if(!nlstricmp(args[0], "FireProtection"))
+					_Params.FireProtectionFactor = value;
+				else if(!nlstricmp(args[0], "RotProtection"))
+					_Params.RotProtectionFactor = value;
+				else if(!nlstricmp(args[0], "ShockWaveProtection"))
+					_Params.ShockWaveProtectionFactor = value;
+				else if(!nlstricmp(args[0], "PoisonProtection"))
+					_Params.PoisonProtectionFactor = value;
+				else if(!nlstricmp(args[0], "ElectricityProtection"))
+					_Params.ElectricityProtectionFactor = value;
+				else if (!nlstricmp(args[0], "Phrase"))
+				{
+					_SPhraseId = CSheetId (args[0] + ".sphrase");
+					if ( _SPhraseId == CSheetId::Unknown )
+					{
+						MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
+						return false;
+					}
+				}
+				else
+				{
+					RESISTANCE_TYPE::TResistanceType resistance = RESISTANCE_TYPE::fromString(args[0]);
+					switch( resistance )
+					{
+					case RESISTANCE_TYPE::Desert:
+						_Params.DesertResistanceFactor = value;
+						break;
+					case RESISTANCE_TYPE::Forest:
+						_Params.ForestResistanceFactor = value;
+						break;
+					case RESISTANCE_TYPE::Lacustre:
+						_Params.LacustreResistanceFactor = value;
+						break;
+					case RESISTANCE_TYPE::Jungle:
+						_Params.JungleResistanceFactor = value;
+						break;
+					case RESISTANCE_TYPE::PrimaryRoot:
+						_Params.PrimaryRootResistanceFactor = value;
+						break;
+					default:
+						MISLOG("Invalid param '%s'", args[0].c_str());
+						return false;
+					}
+				}
 			}
-			///\todo : actions
+			else if (args.size() == 1)
+			{
+				_PhraseId = args[0];
+			}
+			else
+			{
+				MISLOG("Invalid property defined with 0 or more than 2 params");
+				return false;
+			}
 		}
 	}
+	
 	return true;
 }// CMissionItem::buildFromScript
 
 
 CGameItemPtr CMissionItem::createItemInTempInv(CCharacter * user, uint16 quantity)
 {
-	TLogContext_Item_Mission	logContext(user->getId());
+	TLogContext_Item_Mission logContext(user->getId());
 
 	nlassert(user);
 	CGameItemPtr item = createItem(quantity);
-	if ( item == NULL )
+	if (item == NULL)
 	{
 		nlwarning("<CMissionItem createItem> could not create item sheet'%s' for '%s'",_SheetId.toString().c_str(), user->getId().toString().c_str());
 		return NULL;
@@ -210,12 +194,13 @@ CGameItemPtr CMissionItem::createItemInTempInv(CCharacter * user, uint16 quantit
 
 CGameItemPtr CMissionItem::createItem(uint16 quantity)
 {
-	CGameItemPtr item = GameItemManager.createInGameItem(_Quality,quantity,_SheetId,CEntityId::Unknown,&_PhraseId);
-	if ( item == NULL )
+	CGameItemPtr item = GameItemManager.createInGameItem(_Quality, quantity, _SheetId, CEntityId::Unknown, &_PhraseId);
+	if (item == NULL)
 	{
 		nlwarning("<CMissionItem createItem> could not create mission item");
 		return NULL;
 	}
+	
 	setItemParam(item);
 	return item;
 }// CMissionItem::createItem

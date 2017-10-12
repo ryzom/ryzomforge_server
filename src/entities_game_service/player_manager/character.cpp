@@ -5530,7 +5530,7 @@ void CCharacter::setVisualPropertyForEquipment(uint16 slot, const CStaticItem* s
 // allowNearPetTp() or forbidNearPetTp() must have been called
 //-----------------------------------------------
 void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWithMount, bool useHeading, float heading,
-								   uint8 continent, sint32 cell, uint8 season, const R2::TR2TpInfos &tpInfos)
+								   uint8 continent, sint32 cell, uint8 season, bool fromVortex, const R2::TR2TpInfos &tpInfos)
 {
 	if (!getEnterFlag()) // wait for the properties to be in the mirror
 		return;
@@ -5619,7 +5619,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		}
 	}
 
-	if (_IntangibleEndDate != ~0) // Don't save Last Tp Tick if player respawns
+	if (_IntangibleEndDate != ~0 && !fromVortex) // Don't save Last Tp Tick if player respawns or teleport from Vortex
 		_LastTpTick = CTickEventHandler::getGameCycle();
 	
 	_TpCoordinate.X = x;
@@ -7032,6 +7032,10 @@ void CCharacter::removePetCharacterAfterDeath(uint32 index)
 	// forget it
 	if (_PlayerPets[index].ItemPtr != 0)
 	{
+		const CStaticItem* form = _PlayerPets[index].ItemPtr->getStaticForm();
+		if (form && form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
+			_LastFreeMount = CTickEventHandler::getGameCycle();
+		
 		uint32 slot = _PlayerPets[index].ItemPtr->getInventorySlot();
 		// release our ref before we destroy the item
 		_PlayerPets[index].ItemPtr = 0;
@@ -12395,8 +12399,6 @@ bool CCharacter::validateExchange()
 			invalidateExchange();
 			return false;
 		}
-
-		_LastExchangeMount = CTickEventHandler::getGameCycle();
 	}
 
 	return true;
@@ -12467,6 +12469,9 @@ void CCharacter::removeExchangeItems(vector<CGameItemPtr> &itemRemoved, vector<C
 
 		if (form && form->Family == ITEMFAMILY::PET_ANIMAL_TICKET)
 		{
+			if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
+				_LastExchangeMount = CTickEventHandler::getGameCycle();
+				
 			for (uint p = 0; p < _PlayerPets.size(); p++)
 			{
 				if (_PlayerPets[p].ItemPtr == item)
@@ -12485,8 +12490,9 @@ void CCharacter::removeExchangeItems(vector<CGameItemPtr> &itemRemoved, vector<C
 		}
 	}
 
-	if (needUpdatePetDatabase)
+	if (needUpdatePetDatabase) {
 		updatePetDatabase();
+	}
 
 	spendMoney(_ExchangeMoney);
 } // removeExchangeItems //
@@ -12530,6 +12536,7 @@ void CCharacter::addExchangeItems(
 
 	if (updatePetDataBase)
 	{
+		_LastExchangeMount = CTickEventHandler::getGameCycle();
 		updatePetDatabase();
 	}
 
@@ -12539,6 +12546,15 @@ void CCharacter::addExchangeItems(
 	// add the items to the character bag
 	for (uint i = 0; i < itemToAdd.size(); ++i)
 	{
+		CGameItemPtr item = itemToAdd[i];
+
+		if (item == NULL)
+			continue;
+		
+		const CStaticItem* form = CSheets::getForm(item->getSheetId());
+		if (form && form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
+			_LastExchangeMount = CTickEventHandler::getGameCycle();
+				
 		if (!addItemToInventory(INVENTORIES::bag, itemToAdd[i])
 				&& !addItemToInventory(INVENTORIES::temporary, itemToAdd[i]))
 		{
@@ -21001,9 +21017,9 @@ void CCharacter::updateTarget()
 
 //------------------------------------------------------------------------------
 
-void CCharacter::tpWanted(sint32 x, sint32 y, sint32 z, bool useHeading, float heading, uint8 continent, sint32 cell)
+void CCharacter::tpWanted(sint32 x, sint32 y, sint32 z, bool useHeading, float heading, uint8 continent, sint32 cell, bool fromVortex)
 {
-	teleportCharacter(x, y, z, false, useHeading, heading, continent, cell);
+	teleportCharacter(x, y, z, false, useHeading, heading, continent, cell, 0xFF, fromVortex);
 }
 
 //------------------------------------------------------------------------------
@@ -22558,4 +22574,11 @@ bool CCharacter::initPetInventory(uint8 index)
 	}
 
 	return false;
+}
+
+//------------------------------------------------------------------------------
+
+void CCharacter::killMe()
+{
+	kill(_EntityRowId); 
 }
