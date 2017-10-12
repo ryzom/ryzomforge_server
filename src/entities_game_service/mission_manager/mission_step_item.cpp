@@ -66,7 +66,7 @@ bool	IMissionStepItem::buildStep( uint32 line, const std::vector< std::string > 
 			if ((args.size() == 1) && (args[0] == "#dynamic#"))
 			{
 				subStep.Dynamic = missionData.Name;
-				subStep.Quantity = 1;
+				subStep.Quantity = 1000; // Use a very high value to prevent end of mission
 			}
 			////
 			else
@@ -144,6 +144,8 @@ inline void IMissionStepItem::getTextParams(uint & nbSubSteps, TVectorParamCheck
 			{
 				//// Dynamic Mission Args
 				vector<string> params = _User->getCustomMissionParams(_SubSteps[i].Dynamic);
+				vector<string> status = _User->getCustomMissionParams(_SubSteps[i].Dynamic+"_STATUS");
+
 				if (params.size() < 2)
 				{
 					itemSheet = CSheetId::Unknown;
@@ -153,14 +155,17 @@ inline void IMissionStepItem::getTextParams(uint & nbSubSteps, TVectorParamCheck
 					itemSheet = CSheetId(params[1]);
 				}
 
-				if (params.size() > 2) {
+				if (params.size() > 2)
 					NLMISC::fromString(params[2], quantity);
-					quantity = min(quantity, subStepStates[i]);
-				}
+						
+				if (status.size() > 0) // Use saved step quantity
+					NLMISC::fromString(status[0], quantity);
 
 				if (params.size() > 3) {
 					NLMISC::fromString(params[3], quality);
 				}
+
+				nlinfo("Sheet : %s, Quality : %d, Quantity: %d", itemSheet.toString().c_str(), quality, quantity);
 				////
 			}
 
@@ -259,15 +264,77 @@ MISSION_REGISTER_STEP(CMissionStepForage,"forage")
 
 
 // ----------------------------------------------------------------------------
+/// !!!!!!!!!!!! UNUSED !!!!!!!!!!!!!
+// ----------------------------------------------------------------------------
 class CMissionStepLootItem : public IMissionStepItem
 {
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
+		string webAppUrl;
+		uint16 quantity = 1;
+		_User = PlayerManager.getChar(getEntityIdFromRow(userRow));
+
+		nlinfo("ok");
+		
 		if ( event.Type == CMissionEvent::LootItem )
 		{
+			nlinfo("ok");
+			CSheetId itemSheet;
+			uint16 quality;
+
+			if (_SubSteps[subStepIndex].Dynamic.empty()) {
+				itemSheet = _SubSteps[subStepIndex].Sheet;
+				quality = _SubSteps[subStepIndex].Quality;
+			}
+			else
+			{   /// Dynamic Mission Args
+				vector<string> params = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic);
+				vector<string> status = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS");
+				webAppUrl = params[0];
+				if (params.size() < 2)
+				{
+					LOGMISSIONSTEPERROR("loot : invalid item");
+					return 0;
+				}
+				else
+				{
+					itemSheet = CSheetId(params[1]);
+				}
+
+
+				if (params.size() < 3) // If no quantity in mission params => 1 by default
+					params[2] = "1";
+
+				if (status.size() == 0) // If no saved quantity => use mission param
+					status.push_back(params[2]);
+				
+				NLMISC::fromString(status[0], quantity); // Use saved quantity
+
+				if (params.size() > 3)
+					NLMISC::fromString(params[3], quality);
+			}
+
+		
 			CMissionEventLootItem & eventSpe = (CMissionEventLootItem&)event;
-			if ( eventSpe.Sheet == _SubSteps[subStepIndex].Sheet && eventSpe.Quality >= _SubSteps[subStepIndex].Quality )
+			nlinfo("Sheet : %s, Quality : %d / %d, Quantity: %d / %d", eventSpe.Sheet.toString().c_str(), eventSpe.Quality, quality, eventSpe.Quantity, quantity);
+			if ( eventSpe.Sheet == itemSheet && eventSpe.Quality >= quality )
 			{
+				if (!webAppUrl.empty())
+					{
+						if (quantity <= eventSpe.Quantity)
+						{
+							_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", "");
+							_User->validateDynamicMissionStep(webAppUrl);
+							LOGMISSIONSTEPSUCCESS("loot_item");
+							return 1000; // Force the end of mission
+
+						}
+						else
+						{
+							_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", NLMISC::toString("%d", quantity-eventSpe.Quantity));
+						}
+					}
+				
 				LOGMISSIONSTEPSUCCESS("loot_item");
 				return eventSpe.Quantity;
 			}
@@ -290,11 +357,68 @@ MISSION_REGISTER_STEP(CMissionStepLootItem,"loot_item")
 // ----------------------------------------------------------------------------
 uint CMissionStepLootRm::processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 {
+	string webAppUrl;
+	uint16 quantity = 1;
+	_User = PlayerManager.getChar(getEntityIdFromRow(userRow));
+
+
 	if ( event.Type == CMissionEvent::LootRm )
 	{
+		CSheetId itemSheet;
+		uint16 quality;
+
+		if (_SubSteps[subStepIndex].Dynamic.empty()) {
+			itemSheet = _SubSteps[subStepIndex].Sheet;
+			quality = _SubSteps[subStepIndex].Quality;
+		}
+		else
+		{   /// Dynamic Mission Args
+			vector<string> params = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic);
+			vector<string> status = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS");
+			webAppUrl = params[0];
+			if (params.size() < 2)
+			{
+				LOGMISSIONSTEPERROR("loot : invalid item");
+				return 0;
+			}
+			else
+			{
+				itemSheet = CSheetId(params[1]);
+			}
+
+
+			if (params.size() < 3) // If no quantity in mission params => 1 by default
+				params[2] = "1";
+
+			if (status.size() == 0) // If no saved quantity => use mission param
+				status.push_back(params[2]);
+			
+			NLMISC::fromString(status[0], quantity); // Use saved quantity
+
+			if (params.size() > 3)
+				NLMISC::fromString(params[3], quality);
+		}
+		
 		CMissionEventLootRm & eventSpe = (CMissionEventLootRm&)event;
-		if ( eventSpe.Sheet == _SubSteps[subStepIndex].Sheet && eventSpe.Quality >= _SubSteps[subStepIndex].Quality )
+		nlinfo("Sheet : %s, Quality : %d / %d, Quantity: %d / %d", eventSpe.Sheet.toString().c_str(), eventSpe.Quality, quality, eventSpe.Quantity, quantity);
+		if ( eventSpe.Sheet == itemSheet && eventSpe.Quality >= quality )
 		{
+			if (!webAppUrl.empty())
+				{
+					if (quantity <= eventSpe.Quantity)
+					{
+						_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", "");
+						_User->validateDynamicMissionStep(webAppUrl);
+						LOGMISSIONSTEPSUCCESS("loot_item");
+						return 1000; // Force the end of mission
+
+					}
+					else
+					{
+						_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", NLMISC::toString("%d", quantity-eventSpe.Quantity));
+					}
+				}
+			
 			LOGMISSIONSTEPSUCCESS("loot_mp");
 			return eventSpe.Quantity;
 		}

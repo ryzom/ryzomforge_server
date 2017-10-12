@@ -186,8 +186,12 @@ CGameItemPtr CMissionItem::createItemInTempInv(CCharacter * user, uint16 quantit
 		nlwarning("<CMissionItem createItem> could not create item sheet'%s' for '%s'",_SheetId.toString().c_str(), user->getId().toString().c_str());
 		return NULL;
 	}
-	if (user->addItemToInventory(INVENTORIES::temporary, item, false)) // no autostack because we need to return the item
+
+	bool res = user->addItemToInventory(INVENTORIES::temporary, item, false); // no autostack because we need to return the item
+	if (res)
 		return item;
+
+	item.deleteItem();
 	return NULL;
 }// CMissionItem::createItem
 
