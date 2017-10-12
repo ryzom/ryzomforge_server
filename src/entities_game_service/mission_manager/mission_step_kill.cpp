@@ -77,7 +77,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				if ((args.size() == 2) && (args[0] == "#dynamic#"))
 				{
 					subStep.Dynamic = missionData.Name;
-					subStep.Quantity = atoi(args[1].c_str());
+					subStep.Quantity = 1000; // Use a very high value to prevent end of mission
 				}
 				////
 				else
@@ -119,6 +119,8 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 	uint processEvent( const TDataSetRow & userRow, const CMissionEvent & event,uint subStepIndex,const TDataSetRow & giverRow )
 	{
 		string webAppUrl;
+		vector<string> status;
+		uint16 quantity = 1;
 		_User = PlayerManager.getChar(getEntityIdFromRow(userRow));
 
 		if ( event.Type == CMissionEvent::Kill )
@@ -134,6 +136,9 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			else
 			{
 				vector<string> params = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic);
+				status = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS");
+				
+
 				if (params.size() < 2)
 				{
 					LOGMISSIONSTEPERROR("kill_fauna : invalid dynamic creature");
@@ -143,13 +148,22 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				{
 					webAppUrl = params[0];
 					faunaSheet = CSheetId(params[1]);
-					
-					if (params.size() > 2) {
-						string placeStr = CMissionParser::getNoBlankString( params[2] );
+
+					if (params.size() < 3)
+						params[2] = "1";
+
+					if (status.size() == 0)
+						status.push_back(params[2]);
+
+					NLMISC::fromString(status[0], quantity);
+
+					if (params.size() > 3)
+					{
+						string placeStr = CMissionParser::getNoBlankString( params[3] );
 						CPlace * place = CZoneManager::getInstance().getPlaceFromName( placeStr );
 						if ( !place )
 						{
-							LOGMISSIONSTEPERROR("kill_fauna : invalid place "+params[2]);
+							LOGMISSIONSTEPERROR("kill_fauna : invalid place "+params[3]);
 							return 0;
 						}
 						else
@@ -158,7 +172,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				}
 				////
 			}
-
+			
 			if ( !c )
 			{
 				LOGMISSIONSTEPERROR("kill_fauna : invalid creature " + toString(event.TargetEntity.getIndex()));
@@ -166,6 +180,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			}
 			else if ( faunaSheet == c->getType() )
 			{
+				
 				if ( _Place != 0xFFFF )
 				{
 					float gooDistance;
@@ -179,7 +194,20 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 					if ( region && region->getId() == _Place )
 					{
 						if (!webAppUrl.empty())
-							_User->validateDynamicMissionStep(webAppUrl);
+						{
+							if (quantity <= 1)
+							{
+								_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", "");
+								_User->validateDynamicMissionStep(webAppUrl);
+								LOGMISSIONSTEPSUCCESS("kill_fauna");
+								return 1000; // force the end of mission
+
+							}
+							else
+							{
+								_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", NLMISC::toString("%d", quantity-1));
+							}
+						}
 						LOGMISSIONSTEPSUCCESS("kill_fauna");
 						return 1;
 					}
@@ -189,7 +217,20 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 						if ( places[i] && places[i]->getId() == _Place )
 						{
 							if (!webAppUrl.empty())
-								_User->validateDynamicMissionStep(webAppUrl);
+							{
+								if (quantity <= 1)
+								{
+									_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", "");
+									_User->validateDynamicMissionStep(webAppUrl);
+									LOGMISSIONSTEPSUCCESS("kill_fauna");
+									return 1000;
+								}
+								else
+								{
+									_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", NLMISC::toString("%d", quantity-1));
+								}
+
+							}
 							LOGMISSIONSTEPSUCCESS("kill_fauna");
 							return 1;
 						}
@@ -199,7 +240,20 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				else
 				{
 					if (!webAppUrl.empty())
-						_User->validateDynamicMissionStep(webAppUrl);
+					{
+						if (quantity <= 1)
+						{
+							_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", "");
+							_User->validateDynamicMissionStep(webAppUrl);
+							LOGMISSIONSTEPSUCCESS("kill_fauna");
+							return 1000;
+
+						}
+						else
+						{
+							_User->setCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS", NLMISC::toString("%d", quantity-1));
+						}
+					}
 					LOGMISSIONSTEPSUCCESS("kill_fauna");
 					return 1;
 				}
@@ -223,7 +277,10 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 		static const std::string stepText = "MIS_KILL_FAUNA_";
 		static const std::string stepTextLoc = "MIS_KILL_FAUNA_LOC_";
 		nlassert( _SubSteps.size() == subStepStates.size() );
-		CSheetId faunaSheet;
+
+		CSheetId faunaSheet = CSheetId::Unknown;
+		uint32 quantity = 1;
+		
 		for ( uint i  = 0; i < subStepStates.size(); i++ )
 		{
 			if( subStepStates[i] != 0 )
@@ -231,23 +288,27 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				if (_SubSteps[i].Dynamic.empty())
 				{
 					faunaSheet = _SubSteps[i].Sheet;
+					quantity = subStepStates[i];
 				}
 				else
 				{
+					
 					//// Dynamic Mission Args
 					vector<string> params = _User->getCustomMissionParams(_SubSteps[i].Dynamic);
-					if (params.size() < 2)
-					{
-						faunaSheet = CSheetId::Unknown;
-					}
-					else
-					{
-						faunaSheet = CSheetId(params[1]);
-					}
+					vector<string> status = _User->getCustomMissionParams(_SubSteps[i].Dynamic+"_STATUS");
 
-					if ((_Place == 0xFFFF) && (params.size() > 2))
+					if (params.size() > 1)
+						faunaSheet = CSheetId(params[1]);
+					
+					if (params.size() > 2)
+						NLMISC::fromString(params[2], quantity);
+						
+					if (status.size() > 0) // Use saved step quantity
+						NLMISC::fromString(status[0], quantity);
+
+					if ((_Place == 0xFFFF) && (params.size() > 3))
 					{
-						string placeStr = CMissionParser::getNoBlankString( params[2] );
+						string placeStr = CMissionParser::getNoBlankString( params[3] );
 						CPlace * place = CZoneManager::getInstance().getPlaceFromName( placeStr );
 						if ( !place )
 						{
@@ -268,7 +329,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 					
 					retParams.push_back(STRING_MANAGER::TParam());
 					retParams.back().Type = STRING_MANAGER::integer;
-					retParams.back().Int = subStepStates[i];
+					retParams.back().Int = quantity;
 				}
 			}
 		}
