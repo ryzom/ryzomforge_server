@@ -14703,6 +14703,15 @@ void CCharacter::checkPhrases()
 			// Get a reference on the current phrase (just easier to code).
 			const CSheetId &brick = phrase.PhraseDesc.Bricks[brickIndex];
 
+			if (_KnownBricks.find(brick) == _KnownBricks.end())
+			{
+				// brick isn't known by player
+				nlwarning("Player %s have a memorized phrase with brick %s, but doesn't known it.",
+						  _Id.toString().c_str(), brick.toString().c_str());
+				deleteKnownPhrase(phraseIndex);
+				break;
+			}
+
 			// If the sheet does not exist,
 			if (CSheets::getSBrickForm(brick) == 0)
 			{
