@@ -501,7 +501,7 @@ NLMISC_COMMAND(removeMission,"Remove mission of character","<character_id> <miss
 //-----------------------------------------------
 // removeMission
 //-----------------------------------------------
-NLMISC_COMMAND(addMission,"Add mission to character","<character_id> <Mission giver Alias> <mission alias>")
+NLMISC_COMMAND(addMission,"Add mission to character", "<character_id> <Mission giver Alias> <mission alias>")
 {
 	if (args.size() != 3)
 		return false;
@@ -575,32 +575,57 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 }
 
 /*
-spawnItem 530162 1 icbm2ss_2:250:0:Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
+spawnItem 530162 1 icbm2ss_2 250 0 Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
+spawnItem 530162 1 iczm1sa_3.sitem 250 1 '
+
 */
-NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <sheetid> <quality> <quantity> <drop=0|1> <phraseid> [<param>=<value>[,*]]")
+NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <quantity(0=force)> <sheetid> <quality> <drop=0|1> <phraseid>|<param>=<value>,*")
 {
 
 	GET_ACTIVE_CHARACTER
 	
-	if (args.size() != 7)
+	if (args.size() < 5)
 		return false;
 
-	uint16 quality;
-	NLMISC::fromString(args[2], quality);
-
 	uint16 quantity;
-	NLMISC::fromString(args[3], quantity);
+	NLMISC::fromString(args[1], quantity);
 
-	bool drop = args[4] == "1";
+	if (quantity == 0)
+	{
+		uint16 quality;
+		NLMISC::fromString(args[3], quality);
 
-	CMissionItem item;
+		CSheetId sheet = CSheetId(args[2].c_str());
 
-	std::vector< std::string > script;
-	NLMISC::splitString(args[6], ":", script);
+		if (sheet == CSheetId::Unknown)
+		{
+			log.displayNL("sheetId '%s' is Unknown", args[2].c_str());
+			return false;
+		}
 
-	item.buildFromScript(script);
-	item.createItemInTempInv(c, quantity);
-		
+		CGameItemPtr item = GameItemManager.createItem(sheet, quality, true, true);
+		if (item != NULL)
+		{
+			bool res = c->addItemToInventory(INVENTORIES::temporary, item);
+			if (!res)
+				item.deleteItem();
+		}
+	}
+	else
+	{
+		CMissionItem item;
+
+		string params = args[2]+":"+args[3]+":"+args[4];
+		if (args.size() == 6)
+			params += ":"+args[5];
+			
+		std::vector< std::string > script;
+		NLMISC::splitString(params, ":", script);
+
+		item.buildFromScript(script);
+		item.createItemInTempInv(c, quantity);
+	}
+	
 	return true;
 }
 
@@ -801,7 +826,7 @@ NLMISC_COMMAND(getNamedItemList, "get list of named items of character by filter
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory", "<uid> <sheetnames> <quality> <quantity>")
+NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory", "<uid> <inventory> <sheetnames> <quality> <quantity>")
 {
 	if (args.size () < 5)
 	{
@@ -813,12 +838,14 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 
 	std::map<string, uint32> need_items;
 
+	string selected_inv = args[1];
+
 	std::vector<string> sheet_names;
-	NLMISC::splitString(args[1], ",", sheet_names);
+	NLMISC::splitString(args[2], ",", sheet_names);
 	std::vector<string> qualities;
-	NLMISC::splitString(args[2], ",", qualities);
+	NLMISC::splitString(args[3], ",", qualities);
 	std::vector<string> quantities;
-	NLMISC::splitString(args[3], ",", quantities);
+	NLMISC::splitString(args[4], ",", quantities);
 
 	for (uint32 i=0; i < std::min(quantities.size(), std::min(qualities.size(), sheet_names.size())); i++)
 	{
@@ -831,7 +858,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 	std::map<string, uint32>::iterator itNeedItems;
 
 	// Save list of slots and quantities to delete
-	CInventoryPtr inventory = c->getInventory(INVENTORIES::bag);
+	CInventoryPtr inventory = getInventory(c, selected_inv);
 	if (inventory != NULL)
 	{
 		for ( uint32 j = 0; j < inventory->getSlotCount(); j++ )
@@ -867,6 +894,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 		}
 	}
 
+	log.displayNL("OK");
 	return true;
 }
 
@@ -1223,7 +1251,7 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [can_xp,cant_dead,can_teleport,can_speedup]")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup]")
 {
 	GET_ACTIVE_CHARACTER
 
@@ -1234,8 +1262,8 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName("building_instance_ZO_player_111");
 
 	string powoFlags = "";
-	if (args.size () >= 4)
-		powoFlags = args[3];
+	if (args.size () >= 5)
+		powoFlags = args[4];
 
 	if (building)
 	{
@@ -1259,7 +1287,15 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 					if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
 					if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
 					if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
-					
+
+					if (args.size () >= 4) // Change the default exit by exit of instance building
+					{
+						building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
+						if (building)
+						{
+							c->setBuildingExitZone( building->getDefaultExitSpawn() );
+						}
+					}
 					log.displayNL("%d", cell);
 				} else {
 					log.displayNL("ERR: invalid cell");
@@ -1312,6 +1348,7 @@ NLMISC_COMMAND(slide, "slide to the powo", "<uid> x y cell [z] [h]")
 
 	if (args.size() >= 6)
 		fromString(args[5], h);
+
 
 	c->teleportCharacter(x,y,z,false,true,h,0xFF,cell);
 

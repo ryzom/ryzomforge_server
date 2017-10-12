@@ -15098,11 +15098,6 @@ vector<string> CCharacter::getCustomMissionParams(const string &missionName)
 {
 	vector<string> params;
 
-	if (_CustomMissionsParams.empty())
-	{
-		return params;
-	}
-
 	if (!_CustomMissionsParams.empty() && _CustomMissionsParams.find(missionName) != _CustomMissionsParams.end())
 	{
 		if (!_CustomMissionsParams[missionName].empty())
