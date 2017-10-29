@@ -564,6 +564,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 
 		// info for log the chat message
 		string senderName;
+		ucstring ucSenderName;
 		{
 			// ignore muted users
 //			if ( _MutedUsers.find( eid ) != _MutedUsers.end() )
@@ -574,7 +575,10 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				senderName = TheDataset.getEntityId(sender).toString();
 			}
 			else
-				senderName = ci->Name.toString();
+			{
+				ucSenderName = ci->Name;
+				senderName = ucSenderName.toString();
+			}
 		}
 
 		static const char*	groupNames[]=
@@ -677,11 +681,12 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				_DestUsers.push_back(grpId);
 
 				double date = 1000.0*(double)CTime::getSecondsSince1970();
-				string name = senderName;
-
-				string::size_type pos = senderName.find('(');
-				if (pos != string::npos)
-					name = senderName.substr(0, pos);
+				
+				string name;
+				if (!ucSenderName.empty())
+					name = IOS->getRocketName(ucSenderName);
+				else
+					name = senderName;
 
 #ifdef HAVE_MONGO
 				CMongo::insert("ryzom_chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'univers', 'chatId': 'all', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), date));
@@ -715,12 +720,10 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				sGuildId << guildId;
 
 				double date = 1000.0*(double)CTime::getSecondsSince1970();
-
-				string name = senderName;
-
-				string::size_type pos = senderName.find('(');
-				if (pos != string::npos)
-					name = senderName.substr(0, pos);
+				
+				string name;
+				if (!ucSenderName.empty())
+					name = IOS->getRocketName(ucSenderName);
 				else
 					name = senderName;
 
@@ -760,10 +763,11 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					nlinfo("CHAT : %s", chatId.c_str());
 					double date = 1000.0*(double)CTime::getSecondsSince1970();
 					
-					string name = senderName;
-					string::size_type pos = senderName.find('(');
-					if (pos != string::npos)
-						name = senderName.substr(0, pos);
+					string name;
+					if (!ucSenderName.empty())
+						name = IOS->getRocketName(ucSenderName);
+					else
+						name = senderName;
 						
 					CMongo::insert("ryzom_chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'dynamic', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
 #endif
@@ -2160,18 +2164,12 @@ void CChatManager::farTell( const NLMISC::CEntityId &senderCharId, const ucstrin
 {
 	if (receiver[0] == '~')
 	{
-		/// MONGODB
-		//
-
 		double date = 1000.0*(double)CTime::getSecondsSince1970();
 
-		string username = toLower(senderName.toString());
-		string::size_type pos = username.find('(');
-		if (pos != string::npos)
-			username = username.substr(0, pos);
+		string username = IOS->getRocketName(senderName);
 
-		string chatId = toLower(receiver.toString().substr(1));
-		pos = chatId.find('(');
+		string chatId = receiver.toString().substr(1);
+		ucstring::size_type pos = chatId.find('(');
 		if (pos != string::npos)
 			chatId = chatId.substr(0, pos);
 
