@@ -2259,7 +2259,6 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 		log.displayNL("0");
 }
 
-
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setTrigger, "set a custom trigger", "<trigger> [<web_app>] [<args>]")
 {
@@ -2274,3 +2273,70 @@ NLMISC_COMMAND(setTrigger, "set a custom trigger", "<trigger> [<web_app>] [<args
 	else
 		CBuildingManager::getInstance()->setCustomTrigger(triggerId, "");
 }
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(muteUser, "mute a user", "<player name> <duration> [<universe>?]")
+{
+	if (args.size() < 2)
+		return false;
+
+	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
+	if (!target || !TheDataset.isAccessible(target->getEntityRowId()))
+	{
+		log.displayNL("ERR: user not found");
+		return true;
+	}
+
+	uint32 duration;
+	NLMISC::fromString(args[1], duration);
+	NLMISC::TGameCycle cycle = (NLMISC::TGameCycle)(duration / CTickEventHandler::getGameTimeStep() + CTickEventHandler::getGameCycle());
+	if (args.size() == 3)
+		PlayerManager.muteUniverse(CEntityId::Unknown, cycle, target->getId());
+	else
+		PlayerManager.addGMMute(CEntityId::Unknown, target->getId(), cycle);
+	log.displayNL("OK");
+	return true;
+}
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(sendMessageToUser, "send a message to a user", "<player name> <message>")
+{
+	if (args.size() != 2)
+		return false;
+
+	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
+	if (!target || !TheDataset.isAccessible(target->getEntityRowId()))
+	{
+		log.displayNL("ERR: user not found");
+		return true;
+	}
+	SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
+	params[0].Literal = args[1];
+
+	CCharacter::sendDynamicSystemMessage(target->getId(), "LITERAL", params );
+	log.displayNL("OK");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <url>")
+{
+	if (args.size() != 2)
+		return false;
+
+	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
+	if (!target || !TheDataset.isAccessible(target->getEntityRowId()))
+	{
+		log.displayNL("ERR: user not found");
+		return true;
+	}
+	
+	target->sendUrl(args[1], "");
+	log.displayNL("OK");
+	return true;
+}
+
+
+
+
