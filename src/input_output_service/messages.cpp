@@ -1620,6 +1620,9 @@ void cbDynChatRemoveChan(CMessage& msgin, const string &serviceName, TServiceId 
 	TChanID chanID;
 	msgin.serial(chanID);
 	bool res = IOS->getChatManager().getDynChat().removeChan(chanID);
+	if (res && _ChanNames.getB(chanID) != NULL)
+		_ChanNames.removeWithA(chanID);
+
 	if (!res) nlwarning("Couldn't remove chan %s", chanID.toString().c_str());
 }
 
