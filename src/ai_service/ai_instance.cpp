@@ -17,6 +17,7 @@
 #include "stdpch.h"
 #include "server_share/r2_vision.h"
 #include "ai_instance.h"
+#include "ais_actions.h"
 
 #include "ai_player.h"
 #include "ai_grp_npc.h"
@@ -216,6 +217,7 @@ void CAIInstance::initInstance(string const& continentName, uint32 instanceNumbe
 	_InstanceNumber = instanceNumber;
 
 	_LastSpawnAlias =  (900 + _InstanceNumber) << LigoConfig.getDynamicAliasSize();
+	_LastStateAlias = 0;
 
 	sendInstanceInfoToEGS();
 
@@ -293,12 +295,21 @@ void CAIInstance::addGroupInfo(CGroup* grp)
 {
 	string const& name = grp->aliasTreeOwner()->getName();
 	uint32 alias = grp->aliasTreeOwner()->getAlias();
-
 	if (!name.empty())
 		_GroupFromNames[name].push_back(grp);
 	if (alias)
 		_GroupFromAlias[alias] = grp;
 }
+
+void CAIInstance::addGroupInfo(CGroup* grp, const string &name, uint32 alias)
+{
+	nlinfo("AddGroupInfo : %s(%d)",  name.c_str(), alias);
+	if (!name.empty())
+		_GroupFromNames[name].push_back(grp);
+	if (alias)
+		_GroupFromAlias[alias] = grp;
+}
+
 
 void CAIInstance::removeGroupInfo(CGroup* grp, CAliasTreeOwner* grpAliasTreeOwner)
 {
@@ -680,7 +691,10 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 	_EventNpcManager->groups().addAliasChild(grp);
 	// Set the group parameters
 	grp->setAutoSpawn(false);
-	grp->setName(NLMISC::toString("event_group_%u", grp->getChildIndex()));
+
+	string name = botsName.empty() ? NLMISC::toString("event_group_%u", grp->getChildIndex()):botsName;
+
+	grp->setName(name);
 	grp->clearParameters();
 	grp->setPlayerAttackable(true);
 	grp->setBotAttackable(true);
@@ -689,13 +703,16 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 
 	grp->clrBotsAreNamedFlag();
 
+	addGroupInfo(grp, name, grp->getAlias());
+
+
 	{
 		// build unnamed bot
 		for	(uint i=0; i<nbBots; ++i) 
 		{
 			_LastSpawnAlias++;
 			nlinfo("Spawn with alias : %d (%s)", _LastSpawnAlias, _LigoConfig.aliasToString(_LastSpawnAlias).c_str());
-			grp->bots().addChild(new CBotNpc(grp, _LastSpawnAlias, botsName.empty() ? grp->getName():botsName), i); // Doub: 0 instead of getAlias()+i otherwise aliases are wrong
+			grp->bots().addChild(new CBotNpc(grp, _LastSpawnAlias, name), i); // Doub: 0 instead of getAlias()+i otherwise aliases are wrong
 
 			CBotNpc* const bot = NLMISC::safe_cast<CBotNpc*>(grp->bots()[i]);
 
@@ -712,7 +729,7 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 				bot->setStuck(true);
 			}
 			// Spawn all randomly except if only 1 bot
-			if (nbBots > 1)
+			if (nbBots > 1 || dispersionRadius > 0.1)
 			{
 				RYAI_MAP_CRUNCH::CWorldMap const& worldMap = CWorldContainer::getWorldMap();
 				RYAI_MAP_CRUNCH::CWorldPosition	wp;
@@ -752,6 +769,27 @@ CGroupNpc* CAIInstance::eventCreateNpcGroup(uint nbBots, NLMISC::CSheetId const&
 	destZone->setPosAndRadius(AITYPES::vp_auto, CAIPos(pos, 0, 0), (uint32)(dispersionRadius*1000.));
 	spawnGroup->movingProfile().setAIProfile(new CGrpProfileWanderNoPrim(spawnGroup, destZone));
 
+	if (!botsName.empty())
+	{
+		CStateMachine* sm = _EventNpcManager->getStateMachine();
+		uint32 stateAlias = grp->getStateAlias("start");
+		CAIStatePositional* statePositional;
+		if (stateAlias == 0)
+		{
+			_LastStateAlias++;
+			nlinfo("_LastStateAlias = %d", _LastStateAlias);
+			statePositional = new CAIStatePositional(sm, _LastStateAlias, "start");
+			grp->setStateAlias("start", statePositional->getAlias());
+			nlinfo("Adding STATE 'start' (%d)", statePositional->getAlias());
+			sm->states().addChild(statePositional);
+		}
+		else
+		{
+			statePositional = safe_cast<CAIStatePositional*>(sm->states().getChildByAlias(stateAlias));
+		}
+		grp->setNextState(statePositional);
+	}
+	
 	if (spawnBots)
 		grp->getSpawnObj()->spawnBots();
 

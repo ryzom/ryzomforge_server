@@ -495,16 +495,18 @@ void CStateInstance::processStateEvent(CAIEvent const& stateEvent, CAIState cons
 			return;
 	}
 
+
 	bool foundReaction=false;
 	//	nlassert(_mgr);
 	for (uint i=0;i<stateEvent.reactionList().size();++i)
 	{
 		const CAIEventReaction	&reaction=*stateEvent.reactionList()[i];
+			
 		if	(!reaction.testCompatibility(this,state))
 			continue;
-
+			
 		getDebugHistory()->addHistory("STATE: '%s' EVENT: '%s' REACTION: '%s'",	state->getAliasNode()->fullName().c_str(),
-			stateEvent.getName().c_str(),	reaction.getAliasNode()->fullName().c_str());
+			stateEvent.getName().c_str(), reaction.getAliasNode()->fullName().c_str());
 
 		foundReaction=true;
 
@@ -520,6 +522,8 @@ void CStateInstance::processStateEvent(CAIEvent const& stateEvent, CAIState cons
 			continue;
 		}
 
+		nlinfo("[%i] STATE: '%s' EVENT: '%s' REACTION: '%s'",	i, state->getAliasNode()->fullName().c_str(),
+			stateEvent.getName().c_str(),	reaction.getAliasNode()->fullName().c_str());
 	}
 	if (!foundReaction)
 	{
