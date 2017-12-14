@@ -2783,6 +2783,97 @@ void maxHitRange_f_(CStateInstance* entity, CScriptStack& stack)
 //	}
 //}
 
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection setEventCode_sss
+Sets and event to execute when event triggers
+
+Arguments:
+s(event) -> @param[in] The name of the state 
+s(event) -> @param[in] The name of the event
+s(code) -> @param[in] The code tu execute coded in hex
+
+@code
+()maxHitRange(50); // Set the max hit range in 50 meters all npc in group
+@endcode
+
+*/
+// CBotNpc
+void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
+{
+	string code = stack.top();
+	stack.pop();
+
+	string event_name = stack.top();
+	stack.pop();
+
+	string state_name = stack.top();
+	stack.pop();
+
+	CAIEventDescription eventDescription;
+	CAIEventActionNode::TSmartPtr eventAction;
+	CAIEventReaction* event;
+	
+	// Create event handler
+	eventDescription.EventType = event_name;
+	
+	// Create event action
+	eventAction = new CAIEventActionNode;
+	eventAction->Action = "code";
+	eventAction->Weight = 1;
+
+	code = scriptHex_decode(code);
+	vector<string> lines_of_code;
+	NLMISC::splitString(code, "\n", lines_of_code);
+	if (!lines_of_code.empty())
+	{
+		FOREACHC(it, vector<string>, lines_of_code)
+		{
+			nlinfo("Code: %s", (*it).c_str());
+			eventAction->Args.push_back(*it);
+		}
+	}
+	
+	// Register event action
+	eventDescription.Action = eventAction;
+	eventAction = NULL;
+	
+	CGroup* group = entity->getGroup();
+	CGroupNpc* npcGroup = NLMISC::safe_cast<CGroupNpc*>(group);
+	CStateMachine* sm = &npcGroup->getEventContainer();
+	CAIStatePositional* statePositional;
+	
+	uint32 stateAlias = npcGroup->getStateAlias(state_name);
+	if (stateAlias == 0)
+	{
+		nlinfo("STATE %s not found !", state_name.c_str());
+		statePositional = new CAIStatePositional(sm, 0, state_name);
+		npcGroup->setStateAlias(state_name, statePositional->getAlias());
+		sm->states().addChild(statePositional);
+	}
+	else
+	{
+		statePositional = safe_cast<CAIStatePositional*>(sm->states().getChildByAlias(stateAlias));
+	}
+
+	uint32 stateEventAlias = npcGroup->getStateEventAlias(event_name);
+	if (stateEventAlias != 0)
+		sm->eventReactions().removeChildByIndex(sm->eventReactions().getChildIndexByAlias(stateEventAlias));
+
+	// Register event handler
+	stateEventAlias = sm->getLastStateEventAlias();
+	event = new CAIEventReaction(sm, stateEventAlias, eventDescription.EventType);
+	event->processEventDescription(&eventDescription, sm);
+	event->setGroup(npcGroup->getAlias());
+	nlinfo("Add Event: %s(%d) in State : %d", event_name.c_str(), stateEventAlias, statePositional->getAlias());
+	event->setState(statePositional->getAlias());
+	npcGroup->setStateEventAlias(event_name, stateEventAlias);
+	
+	sm->eventReactions().addChild(event);
+	event = NULL;
+}
+
 
 std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 {
@@ -2847,6 +2938,8 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, endScenarioTiming_f_);
 
 	REGISTER_NATIVE_FUNC(functions, maxHitRange_f_);
+
+	REGISTER_NATIVE_FUNC(functions, setEventCode_sss_);
 
 //	REGISTER_NATIVE_FUNC(functions, hideMissionStepIcon_b_);
 //	REGISTER_NATIVE_FUNC(functions, hideMissionGiverIcon_b_);
