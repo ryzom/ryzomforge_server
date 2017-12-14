@@ -1142,6 +1142,12 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 				msg += "0";
 		}
 	}
+	else
+	{
+		string name;
+		CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+		msg += name;
+	}
 	
 	log.displayNL(msg.c_str());
 }
@@ -2182,8 +2188,6 @@ NLMISC_COMMAND(getLastExchangeMount,"get tick of last exchange mount","<uid>")
 	log.displayNL("%d", c->getLastExchangeMount());
 }
 
-
-
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var>")
 {
@@ -2256,7 +2260,8 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 			log.displayNL("%"NL_I64"u|%s", (*it).asUint64(), name.toUtf8().c_str());
 		}
 	} else 
-		log.displayNL("0");
+		log.displayNL("-1");
+	return true;
 }
 
 //----------------------------------------------------------------------------
