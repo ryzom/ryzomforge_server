@@ -32,6 +32,7 @@
 #include "mission_manager/mission_team.h"
 #include "mission_manager/mission_step_ai.h"
 #include "mission_manager/mission_guild.h"
+#include "shop_type/named_items.h"
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
 #include "building_manager/building_manager.h"
@@ -563,6 +564,29 @@ CInventoryPtr getInventory(CCharacter *c, const string &inv)
 	return inventoryPtr;
 }
 
+INVENTORIES::TInventory getTInventory(const string &inv)
+{
+	INVENTORIES::TInventory inventory = INVENTORIES::bag;
+	INVENTORIES::TInventory strinv = INVENTORIES::toInventory(inv.c_str());
+	switch (strinv)
+	{
+		case INVENTORIES::temporary:
+		case INVENTORIES::bag:
+		case INVENTORIES::pet_animal1:
+		case INVENTORIES::pet_animal2:
+		case INVENTORIES::pet_animal3:
+		case INVENTORIES::pet_animal4:
+		case INVENTORIES::guild:
+		case INVENTORIES::player_room:
+			inventory = strinv;
+			break;
+
+		default:
+			inventory = INVENTORIES::bag;
+	}
+	return inventory;
+}
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 {
@@ -575,59 +599,80 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 }
 
 /*
-spawnItem 530162 1 icbm2ss_2 250 0 Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
-spawnItem 530162 1 iczm1sa_3.sitem 250 1 '
-
+spawnItem 530162 temp 1 icbm2ss_2 250 0 Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
+spawnItem 530162 temp 1 iczm1sa_3.sitem 250 1 '
 */
-NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <quantity(0=force)> <sheetid> <quality> <drop=0|1> <phraseid>|<param>=<value>,*")
+NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <sheetid> <quality> <drop=0|1> [<phraseid>|<param>=<value>,*]")
 {
 
 	GET_ACTIVE_CHARACTER
 	
-	if (args.size() < 5)
+	if (args.size() < 6)
 		return false;
 
+	string selected_inv = args[1];
+
+	CInventoryPtr inventory = getInventory(c, selected_inv);
+	if (inventory == NULL)
+	{
+		log.displayNL("ERR: invalid inventory");
+		return true;
+	}
+
 	uint16 quantity;
-	NLMISC::fromString(args[1], quantity);
+	NLMISC::fromString(args[2], quantity);
 
 	if (quantity == 0)
 	{
+		CSheetId sheet = CSheetId(args[3].c_str());
 		uint16 quality;
-		NLMISC::fromString(args[3], quality);
-
-		CSheetId sheet = CSheetId(args[2].c_str());
+		NLMISC::fromString(args[4], quality);
 
 		if (sheet == CSheetId::Unknown)
 		{
-			log.displayNL("sheetId '%s' is Unknown", args[2].c_str());
-			return false;
+			log.displayNL("ERR: sheetId is Unknown");
+			return true;
 		}
 
-		CGameItemPtr item = GameItemManager.createItem(sheet, quality, true, true);
+		CGameItemPtr item = GameItemManager.createItem(sheet, quality, args[5] == "1", args[5] == "1");
 		if (item != NULL)
 		{
-			bool res = c->addItemToInventory(INVENTORIES::temporary, item);
-			if (!res)
-				item.deleteItem();
+			if (c->addItemToInventory(getTInventory(selected_inv), item))
+			{
+				log.displayNL("OK");
+				return true;
+			}
+			item.deleteItem();
 		}
 	}
 	else
 	{
 		CMissionItem item;
 
-		string params = args[2]+":"+args[3]+":"+args[4];
-		if (args.size() == 6)
-			params += ":"+args[5];
+		string params = args[3]+":"+args[4]+":"+args[5];
+		if (args.size() == 7)
+			params += ":"+args[6];
 			
 		std::vector< std::string > script;
 		NLMISC::splitString(params, ":", script);
 
 		item.buildFromScript(script);
-		item.createItemInTempInv(c, quantity);
+		CGameItemPtr finalItem = item.createItem(quantity);
+		if (finalItem != NULL)
+		{
+			if (c->addItemToInventory(getTInventory(selected_inv), finalItem))
+			{
+				log.displayNL("OK");
+				return true;
+			}
+			finalItem.deleteItem();
+		}
 	}
 	
+	log.displayNL("ERR: adding item");
 	return true;
 }
+
 
 
 //----------------------------------------------------------------------------
