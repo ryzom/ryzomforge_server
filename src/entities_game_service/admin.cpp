@@ -86,7 +86,6 @@
 #include "guild_manager/guild_char_proxy.h"
 #include "guild_manager/fame_manager.h"
 #include "mission_manager/mission_solo.h"
-#include "mission_manager/mission_solo.h"
 #include "position_flag_manager.h"
 //#include "name_manager.h"
 #include "zone_manager.h"
@@ -8043,9 +8042,10 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 		return true;
 	}
 
-	NLMISC::CSheetId sheetId(args[2]);
-	if (sheetId==CSheetId::Unknown)
-		sheetId = args[2] + ".creature";
+	string sheetName = args[2];
+	if (sheetName.find(".creature") == string::npos)
+		sheetName += ".creature";
+	NLMISC::CSheetId sheetId(sheetName);
 	if (sheetId==CSheetId::Unknown)
 	{
 		log.displayNL("invalid sheet id");

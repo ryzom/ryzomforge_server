@@ -14703,6 +14703,15 @@ void CCharacter::checkPhrases()
 			// Get a reference on the current phrase (just easier to code).
 			const CSheetId &brick = phrase.PhraseDesc.Bricks[brickIndex];
 
+			if (_KnownBricks.find(brick) == _KnownBricks.end())
+			{
+				// brick isn't known by player
+				nlwarning("Player %s have a memorized phrase with brick %s, but doesn't known it.",
+						  _Id.toString().c_str(), brick.toString().c_str());
+				deleteKnownPhrase(phraseIndex);
+				break;
+			}
+
 			// If the sheet does not exist,
 			if (CSheets::getSBrickForm(brick) == 0)
 			{
@@ -18533,14 +18542,18 @@ void CCharacter::checkCharacAndScoresValues()
 	}
 
 	uint8 maxPhraseLvlValue[CHARACTERISTICS::NUM_CHARACTERISTICS];
+	uint8 maxBrickLvlValue[CHARACTERISTICS::NUM_CHARACTERISTICS];
 
 	for (sint charac = 0; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS; ++charac)
+	{
 		maxPhraseLvlValue[charac] = 0;
+		maxBrickLvlValue[charac] = 0;
+	}
 
 	{
 		H_AUTO(GetHigestLevelUpgradePhrase);
 		// get all charac highest level upgrade phrase
-		std::string phraseStr, code, txt;
+		std::string phraseStr, brickStr, code, txt;
 		uint8 lvl;
 
 		for (set<CSheetId>::const_iterator it = _BoughtPhrases.begin(); it != _BoughtPhrases.end(); ++it)
@@ -18557,20 +18570,35 @@ void CCharacter::checkCharacAndScoresValues()
 				NLMISC::fromString(txt, lvl);
 				CHARACTERISTICS::TCharacteristics charac = CHARACTERISTICS::getCharacteristicFromCode(code);
 
-				if (charac < CHARACTERISTICS::NUM_CHARACTERISTICS)
-				{
-					if (maxPhraseLvlValue[charac] < lvl)
-					{
-						maxPhraseLvlValue[charac] = lvl;
-					}
-				}
+				if (charac < CHARACTERISTICS::NUM_CHARACTERISTICS && maxPhraseLvlValue[charac] < lvl)
+					maxPhraseLvlValue[charac] = lvl;
+			}
+		}
+
+		for (set<CSheetId>::const_iterator it = _KnownBricks.begin(); it != _KnownBricks.end(); ++it)
+		{
+			// test bricks is a charac upgrade
+			brickStr = (*it).toString();
+
+			if (brickStr.find("bpp") != string::npos)
+			{
+				// brick = bppXZZ.sphrase with X = characteristic code and ZZ = brick level
+				// (CharacteristicBrickStep*ZZ)
+				code = brickStr.substr(3, 1); // string( text[3] );
+				txt = brickStr.substr(4, 2);
+				NLMISC::fromString(txt, lvl);
+				CHARACTERISTICS::TCharacteristics charac = CHARACTERISTICS::getCharacteristicFromCode(code);
+
+				if (charac < CHARACTERISTICS::NUM_CHARACTERISTICS && maxBrickLvlValue[charac] < lvl)
+					maxBrickLvlValue[charac] = lvl;
 			}
 		}
 	}
+	
 	{
 		H_AUTO(CheckCharacteristics);
 		// check caracs
-		sint32 tvalue;
+		sint32 tvalue, bvalue;
 
 		for (sint charac = 0; charac < (sint)CHARACTERISTICS::NUM_CHARACTERISTICS; ++charac)
 		{
@@ -18579,22 +18607,36 @@ void CCharacter::checkCharacAndScoresValues()
 			//tvalue = StartCharacteristicsValue + maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep;
 
 			tvalue = 10 + (maxPhraseLvlValue[charac] * (sint32)CharacteristicBrickStep);
+			bvalue = 10 + (maxBrickLvlValue[charac] * (sint32)CharacteristicBrickStep);
 
 			if (player != NULL && player->isTrialPlayer() && tvalue > 140)
 				tvalue = 140;
+
+			if (player != NULL && player->isTrialPlayer() && bvalue > 140)
+				bvalue = 140;
 				
 			// compare
 			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
 			{
 				if (player == NULL || !player->isTrialPlayer())
-					nlwarning("BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
+					nlwarning("PHRASE BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
 							_Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), tvalue,
 							_PhysCharacs._PhysicalCharacteristics[charac].Base);
-				_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
-				// vl			_PhysCharacs._PhysicalCharacteristics[charac].Current = tvalue;
+				//_PhysCharacs._PhysicalCharacteristics[charac].Base = tvalue;
+				///// vl			_PhysCharacs._PhysicalCharacteristics[charac].Current = tvalue;
+			}
+
+			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != bvalue)
+			{
+				if (player == NULL || !player->isTrialPlayer())
+					nlwarning("BRICK BADCHECK For player %s, for charac %s, player should have %u and he has %u !",
+							_Id.toString().c_str(), CHARACTERISTICS::toString(charac).c_str(), bvalue,
+							_PhysCharacs._PhysicalCharacteristics[charac].Base);
+				_PhysCharacs._PhysicalCharacteristics[charac].Base = bvalue;
 			}
 		}
 	}
+	
 	{
 		H_AUTO(CheckScores);
 		// Check Scores

@@ -24,6 +24,50 @@
 extern NLMISC::CVariable<std::string> PdrFilename;
 
 
+static std::string scriptHex_decode(std::string str)
+{
+	std::string output;
+	for (size_t i=0; i<(str.length()-1); i+=2)
+	{
+		char c1 = str[i], c2 = str[i+1];
+		char buffer[3] = { c1, c2, '\0' };
+		char c = (char)strtol(buffer, NULL, 16);
+		output.push_back(c);
+	}
+	return output;
+}
+
+
+static std::string script_decode(std::string str)
+{
+	std::string output;
+	uint8 step = 0;
+	char buffer[3] = {'x', 'y', '\0'};
+	for (size_t i=0; i<(str.length()-1); i++)
+	{
+		if (step != 0)
+		{
+			buffer[step-1] = str[i];
+			step++;
+			if (step == 3)
+			{
+				char c = (char)strtol(buffer, NULL, 16);
+				output.push_back(c);
+				step = 0;
+			}
+		}
+		else
+		{
+			if (str[i] == '%')
+				step++;
+			else
+				output.push_back(str[i]);
+		}
+	}
+	return output;
+}
+
+
 
 
 /*
