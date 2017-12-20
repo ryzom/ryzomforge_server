@@ -32,6 +32,8 @@ class CCharacter;
 class CMissionItem
 {
 public:
+	/// decode a string encoded in Hexadecimal
+	std::string hex_decode(const std::string & str);
 	/// build this class from a script. Return true on success
 	bool buildFromScript( const std::vector<std::string> & script);
 	/// create an ingame item from this class and put it in user temp inventory
@@ -59,6 +61,8 @@ private:
 	bool					_NoDrop;
 	/// sheet of the phrase
 	NLMISC::CSheetId		_SPhraseId;
+	ucstring				_CustomText;
+	ucstring				_CustomName;
 };
 
 
