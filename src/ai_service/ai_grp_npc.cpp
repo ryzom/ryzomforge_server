@@ -1093,6 +1093,41 @@ void CGroupNpc::firstBotSpawned()
 	setFirstBotSpawned();
 }
 
+void CGroupNpc::setStateAlias(const std::string &state, uint32 alias)
+{
+	TStatesToAlias::iterator it=_StatesToAlias.find(state);
+	if (it != _StatesToAlias.end())
+		it->second = alias;
+	else
+		_StatesToAlias.insert(make_pair(state, alias));
+}
+
+uint32 CGroupNpc::getStateAlias(const std::string &state)
+{
+	TStatesToAlias::iterator it=_StatesToAlias.find(state);
+	if (it != _StatesToAlias.end())
+		return it->second;
+	return 0;
+}
+
+void CGroupNpc::setStateEventAlias(const std::string &stateEvent, uint32 alias)
+{
+	TStatesToAlias::iterator it=_StateEventToAlias.find(stateEvent);
+	if (it != _StateEventToAlias.end())
+		it->second = alias;
+	else
+		_StateEventToAlias.insert(make_pair(stateEvent, alias));
+}
+
+uint32 CGroupNpc::getStateEventAlias(const std::string &state)
+{
+	TStatesToAlias::iterator it=_StateEventToAlias.find(state);
+	if (it != _StateEventToAlias.end())
+		return it->second;
+	return 0;
+}
+
+
 void CGroupNpc::setColour(uint8 colour)
 {
 	FOREACH(itBot, CCont<CBot>, bots())

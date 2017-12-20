@@ -165,6 +165,7 @@ public:
 	//-------------------------------------------------------------------
 	// group name/alias retreiver
 	void addGroupInfo(CGroup* grp);
+	void addGroupInfo(CGroup* grp, const std::string &name, uint32 alias);
 	void removeGroupInfo(CGroup* grp, CAliasTreeOwner* grpAliasTreeOwner);
 	CGroup* findGroup(uint32 alias);
 	void findGroup(std::vector<CGroup*>& result, std::string const& name);
@@ -246,6 +247,7 @@ private:
 	CMgrNpc* _EventNpcManager;
 
 	uint32 _LastSpawnAlias;
+	uint32 _LastStateAlias;
 	
 	///	easter egg manager
 	NLMISC::CRefPtr<CMgrNpc> _EasterEggManager;

@@ -32,8 +32,20 @@
 using namespace std;
 using namespace NLMISC;
 
+string CMissionItem::hex_decode(const string & str)
+{
+	string output;
+	for (size_t i=0; i<(str.length()-1); i+=2)
+	{
+		char c1 = str[i], c2 = str[i+1];
+		char buffer[3] = { c1, c2, '\0' };
+		char c = (char)strtol(buffer, NULL, 16);
+		output.push_back(c);
+	}
+	return output;
+}
+
 bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
-	// script = NLMISC::splitString(args[2], ":", script);
 	if (script.size() < 3)
 	{
 		MISLOG("syntax error usage : '<sheetid>:<quality>:<drop=0|1>:(<phraseid>|(<param>=<value>[,*]))");
@@ -62,100 +74,107 @@ bool CMissionItem::buildFromScript(const std::vector<std::string> & script) {
 			CMissionParser::tokenizeString(vars[i], "=", args);
 			if (args.size() == 2)
 			{
-				float value;
-				NLMISC::fromString(args[1], value);
 				// 2 params means that it is an item property
-				if(!nlstricmp(args[0], "Durability"))
-					_Params.Durability = value;
-				else if(!nlstricmp(args[0], "Weight"))
-					_Params.Weight = value;
-				else if(!nlstricmp(args[0], "SapLoad"))
-					_Params.SapLoad = value;
-				else if(!nlstricmp(args[0], "Dmg"))
-					_Params.Dmg = value;
-				else if(!nlstricmp(args[0], "Speed"))
-					_Params.Speed = value;
-				else if(!nlstricmp(args[0], "Range"))
-					_Params.Range = value;
-				else if(!nlstricmp(args[0], "DodgeModifier"))
-					_Params.DodgeModifier = value;
-				else if(!nlstricmp(args[0], "ParryModifier"))
-					_Params.ParryModifier = value;
-				else if(!nlstricmp(args[0], "AdversaryDodgeModifier"))
-					_Params.AdversaryDodgeModifier = value;
-				else if(!nlstricmp(args[0], "AdversaryParryModifier"))
-					_Params.AdversaryParryModifier = value;
-				else if(!nlstricmp(args[0], "ProtectionFactor"))
-					_Params.ProtectionFactor = value;
-				else if(!nlstricmp(args[0], "MaxSlashingProtection"))
-					_Params.MaxSlashingProtection = value;
-				else if(!nlstricmp(args[0], "MaxBluntProtection"))
-					_Params.MaxBluntProtection = value;
-				else if(!nlstricmp(args[0], "MaxPiercingProtection"))
-					_Params.MaxPiercingProtection = value;
-				else if(!nlstricmp(args[0], "HpBuff"))
-					_Params.HpBuff = value;
-				else if(!nlstricmp(args[0], "SapBuff"))
-					_Params.SapBuff = value;
-				else if(!nlstricmp(args[0], "StaBuff"))
-					_Params.StaBuff = value;
-				else if(!nlstricmp(args[0], "FocusBuff"))
-					_Params.FocusBuff = value;
-				else if(!nlstricmp(args[0], "Color"))
-				{
-					uint8 color;
-					NLMISC::fromString(args[1], color);
-					if( color <= 7 )
-					{
-						_Params.Color[color] = 1;
-					}
-				}
-				else if(!nlstricmp(args[0], "AcidProtection"))
-					_Params.AcidProtectionFactor = value;
-				else if(!nlstricmp(args[0], "ColdProtection"))
-					_Params.ColdProtectionFactor = value;
-				else if(!nlstricmp(args[0], "FireProtection"))
-					_Params.FireProtectionFactor = value;
-				else if(!nlstricmp(args[0], "RotProtection"))
-					_Params.RotProtectionFactor = value;
-				else if(!nlstricmp(args[0], "ShockWaveProtection"))
-					_Params.ShockWaveProtectionFactor = value;
-				else if(!nlstricmp(args[0], "PoisonProtection"))
-					_Params.PoisonProtectionFactor = value;
-				else if(!nlstricmp(args[0], "ElectricityProtection"))
-					_Params.ElectricityProtectionFactor = value;
-				else if (!nlstricmp(args[0], "Phrase"))
-				{
-					_SPhraseId = CSheetId (args[0] + ".sphrase");
-					if ( _SPhraseId == CSheetId::Unknown )
-					{
-						MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
-						return false;
-					}
-				}
+				if(!nlstricmp(args[0], "CustomName"))
+					_CustomName.fromUtf8(hex_decode(args[1]));
+				else if(!nlstricmp(args[0], "CustomText"))
+					_CustomText.fromUtf8(hex_decode(args[1]));
 				else
 				{
-					RESISTANCE_TYPE::TResistanceType resistance = RESISTANCE_TYPE::fromString(args[0]);
-					switch( resistance )
+					float value;
+					NLMISC::fromString(args[1], value);
+					if(!nlstricmp(args[0], "Durability"))
+						_Params.Durability = value;
+					else if(!nlstricmp(args[0], "Weight"))
+						_Params.Weight = value;
+					else if(!nlstricmp(args[0], "SapLoad"))
+						_Params.SapLoad = value;
+					else if(!nlstricmp(args[0], "Dmg"))
+						_Params.Dmg = value;
+					else if(!nlstricmp(args[0], "Speed"))
+						_Params.Speed = value;
+					else if(!nlstricmp(args[0], "Range"))
+						_Params.Range = value;
+					else if(!nlstricmp(args[0], "DodgeModifier"))
+						_Params.DodgeModifier = value;
+					else if(!nlstricmp(args[0], "ParryModifier"))
+						_Params.ParryModifier = value;
+					else if(!nlstricmp(args[0], "AdversaryDodgeModifier"))
+						_Params.AdversaryDodgeModifier = value;
+					else if(!nlstricmp(args[0], "AdversaryParryModifier"))
+						_Params.AdversaryParryModifier = value;
+					else if(!nlstricmp(args[0], "ProtectionFactor"))
+						_Params.ProtectionFactor = value;
+					else if(!nlstricmp(args[0], "MaxSlashingProtection"))
+						_Params.MaxSlashingProtection = value;
+					else if(!nlstricmp(args[0], "MaxBluntProtection"))
+						_Params.MaxBluntProtection = value;
+					else if(!nlstricmp(args[0], "MaxPiercingProtection"))
+						_Params.MaxPiercingProtection = value;
+					else if(!nlstricmp(args[0], "HpBuff"))
+						_Params.HpBuff = value;
+					else if(!nlstricmp(args[0], "SapBuff"))
+						_Params.SapBuff = value;
+					else if(!nlstricmp(args[0], "StaBuff"))
+						_Params.StaBuff = value;
+					else if(!nlstricmp(args[0], "FocusBuff"))
+						_Params.FocusBuff = value;
+					else if(!nlstricmp(args[0], "Color"))
 					{
-					case RESISTANCE_TYPE::Desert:
-						_Params.DesertResistanceFactor = value;
-						break;
-					case RESISTANCE_TYPE::Forest:
-						_Params.ForestResistanceFactor = value;
-						break;
-					case RESISTANCE_TYPE::Lacustre:
-						_Params.LacustreResistanceFactor = value;
-						break;
-					case RESISTANCE_TYPE::Jungle:
-						_Params.JungleResistanceFactor = value;
-						break;
-					case RESISTANCE_TYPE::PrimaryRoot:
-						_Params.PrimaryRootResistanceFactor = value;
-						break;
-					default:
-						MISLOG("Invalid param '%s'", args[0].c_str());
-						return false;
+						uint8 color;
+						NLMISC::fromString(args[1], color);
+						if( color <= 7 )
+						{
+							_Params.Color[color] = 1;
+						}
+					}
+					else if(!nlstricmp(args[0], "AcidProtection"))
+						_Params.AcidProtectionFactor = value;
+					else if(!nlstricmp(args[0], "ColdProtection"))
+						_Params.ColdProtectionFactor = value;
+					else if(!nlstricmp(args[0], "FireProtection"))
+						_Params.FireProtectionFactor = value;
+					else if(!nlstricmp(args[0], "RotProtection"))
+						_Params.RotProtectionFactor = value;
+					else if(!nlstricmp(args[0], "ShockWaveProtection"))
+						_Params.ShockWaveProtectionFactor = value;
+					else if(!nlstricmp(args[0], "PoisonProtection"))
+						_Params.PoisonProtectionFactor = value;
+					else if(!nlstricmp(args[0], "ElectricityProtection"))
+						_Params.ElectricityProtectionFactor = value;
+					else if (!nlstricmp(args[0], "Phrase"))
+					{
+						_SPhraseId = CSheetId (args[0] + ".sphrase");
+						if ( _SPhraseId == CSheetId::Unknown )
+						{
+							MISLOG("Invalid sheet '%s.sphrase'", args[0].c_str());
+							return false;
+						}
+					}
+					else
+					{
+						RESISTANCE_TYPE::TResistanceType resistance = RESISTANCE_TYPE::fromString(args[0]);
+						switch( resistance )
+						{
+						case RESISTANCE_TYPE::Desert:
+							_Params.DesertResistanceFactor = value;
+							break;
+						case RESISTANCE_TYPE::Forest:
+							_Params.ForestResistanceFactor = value;
+							break;
+						case RESISTANCE_TYPE::Lacustre:
+							_Params.LacustreResistanceFactor = value;
+							break;
+						case RESISTANCE_TYPE::Jungle:
+							_Params.JungleResistanceFactor = value;
+							break;
+						case RESISTANCE_TYPE::PrimaryRoot:
+							_Params.PrimaryRootResistanceFactor = value;
+							break;
+						default:
+							MISLOG("Invalid param '%s'", args[0].c_str());
+							return false;
+						}
 					}
 				}
 			}
@@ -186,8 +205,12 @@ CGameItemPtr CMissionItem::createItemInTempInv(CCharacter * user, uint16 quantit
 		nlwarning("<CMissionItem createItem> could not create item sheet'%s' for '%s'",_SheetId.toString().c_str(), user->getId().toString().c_str());
 		return NULL;
 	}
-	if (user->addItemToInventory(INVENTORIES::temporary, item, false)) // no autostack because we need to return the item
+
+	bool res = user->addItemToInventory(INVENTORIES::temporary, item, false); // no autostack because we need to return the item
+	if (res)
 		return item;
+
+	item.deleteItem();
 	return NULL;
 }// CMissionItem::createItem
 
@@ -245,6 +268,12 @@ void CMissionItem::setItemParam(CGameItemPtr item)
 			item->destroyable(false);
 			item->dropable(false);
 		}
+
+		if (!_CustomText.empty())
+			item->setCustomText(_CustomText);
+
+		if (!_CustomName.empty())
+			item->setCustomName(_CustomName);
 	}
 }// CMissionItem::setItemParam
 

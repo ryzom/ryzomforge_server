@@ -32,6 +32,7 @@
 #include "mission_manager/mission_team.h"
 #include "mission_manager/mission_step_ai.h"
 #include "mission_manager/mission_guild.h"
+#include "shop_type/named_items.h"
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
 #include "building_manager/building_manager.h"
@@ -501,7 +502,7 @@ NLMISC_COMMAND(removeMission,"Remove mission of character","<character_id> <miss
 //-----------------------------------------------
 // removeMission
 //-----------------------------------------------
-NLMISC_COMMAND(addMission,"Add mission to character","<character_id> <Mission giver Alias> <mission alias>")
+NLMISC_COMMAND(addMission,"Add mission to character", "<character_id> <Mission giver Alias> <mission alias>")
 {
 	if (args.size() != 3)
 		return false;
@@ -563,6 +564,29 @@ CInventoryPtr getInventory(CCharacter *c, const string &inv)
 	return inventoryPtr;
 }
 
+INVENTORIES::TInventory getTInventory(const string &inv)
+{
+	INVENTORIES::TInventory inventory = INVENTORIES::bag;
+	INVENTORIES::TInventory strinv = INVENTORIES::toInventory(inv.c_str());
+	switch (strinv)
+	{
+		case INVENTORIES::temporary:
+		case INVENTORIES::bag:
+		case INVENTORIES::pet_animal1:
+		case INVENTORIES::pet_animal2:
+		case INVENTORIES::pet_animal3:
+		case INVENTORIES::pet_animal4:
+		case INVENTORIES::guild:
+		case INVENTORIES::player_room:
+			inventory = strinv;
+			break;
+
+		default:
+			inventory = INVENTORIES::bag;
+	}
+	return inventory;
+}
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 {
@@ -575,34 +599,80 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 }
 
 /*
-spawnItem 530162 1 icbm2ss_2:250:0:Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
+spawnItem 530162 temp 1 icbm2ss_2 250 0 Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
+spawnItem 530162 temp 1 iczm1sa_3.sitem 250 1 '
 */
-NLMISC_COMMAND(spawnItem, "Create a Mission Item", "<uid> <sheetid> <quality> <quantity> <drop=0|1> <phraseid> [<param>=<value>[,*]]")
+NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <sheetid> <quality> <drop=0|1> [<phraseid>|<param>=<value>,*]")
 {
 
 	GET_ACTIVE_CHARACTER
 	
-	if (args.size() != 7)
+	if (args.size() < 6)
 		return false;
 
-	uint16 quality;
-	NLMISC::fromString(args[2], quality);
+	string selected_inv = args[1];
+
+	CInventoryPtr inventory = getInventory(c, selected_inv);
+	if (inventory == NULL)
+	{
+		log.displayNL("ERR: invalid inventory");
+		return true;
+	}
 
 	uint16 quantity;
-	NLMISC::fromString(args[3], quantity);
+	NLMISC::fromString(args[2], quantity);
 
-	bool drop = args[4] == "1";
+	if (quantity == 0)
+	{
+		CSheetId sheet = CSheetId(args[3].c_str());
+		uint16 quality;
+		NLMISC::fromString(args[4], quality);
 
-	CMissionItem item;
+		if (sheet == CSheetId::Unknown)
+		{
+			log.displayNL("ERR: sheetId is Unknown");
+			return true;
+		}
 
-	std::vector< std::string > script;
-	NLMISC::splitString(args[6], ":", script);
+		CGameItemPtr item = GameItemManager.createItem(sheet, quality, args[5] == "1", args[5] == "1");
+		if (item != NULL)
+		{
+			if (c->addItemToInventory(getTInventory(selected_inv), item))
+			{
+				log.displayNL("OK");
+				return true;
+			}
+			item.deleteItem();
+		}
+	}
+	else
+	{
+		CMissionItem item;
 
-	item.buildFromScript(script);
-	item.createItemInTempInv(c, quantity);
-		
+		string params = args[3]+":"+args[4]+":"+args[5];
+		if (args.size() == 7)
+			params += ":"+args[6];
+			
+		std::vector< std::string > script;
+		NLMISC::splitString(params, ":", script);
+
+		item.buildFromScript(script);
+		CGameItemPtr finalItem = item.createItem(quantity);
+		if (finalItem != NULL)
+		{
+			if (c->addItemToInventory(getTInventory(selected_inv), finalItem))
+			{
+				log.displayNL("OK");
+				return true;
+			}
+			finalItem.deleteItem();
+		}
+	}
+	
+	log.displayNL("ERR: adding item");
 	return true;
 }
+
 
 
 //----------------------------------------------------------------------------
@@ -801,7 +871,7 @@ NLMISC_COMMAND(getNamedItemList, "get list of named items of character by filter
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory", "<uid> <sheetnames> <quality> <quantity>")
+NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory", "<uid> <inventory> <sheetnames> <quality> <quantity>")
 {
 	if (args.size () < 5)
 	{
@@ -813,12 +883,14 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 
 	std::map<string, uint32> need_items;
 
+	string selected_inv = args[1];
+
 	std::vector<string> sheet_names;
-	NLMISC::splitString(args[1], ",", sheet_names);
+	NLMISC::splitString(args[2], ",", sheet_names);
 	std::vector<string> qualities;
-	NLMISC::splitString(args[2], ",", qualities);
+	NLMISC::splitString(args[3], ",", qualities);
 	std::vector<string> quantities;
-	NLMISC::splitString(args[3], ",", quantities);
+	NLMISC::splitString(args[4], ",", quantities);
 
 	for (uint32 i=0; i < std::min(quantities.size(), std::min(qualities.size(), sheet_names.size())); i++)
 	{
@@ -831,7 +903,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 	std::map<string, uint32>::iterator itNeedItems;
 
 	// Save list of slots and quantities to delete
-	CInventoryPtr inventory = c->getInventory(INVENTORIES::bag);
+	CInventoryPtr inventory = getInventory(c, selected_inv);
 	if (inventory != NULL)
 	{
 		for ( uint32 j = 0; j < inventory->getSlotCount(); j++ )
@@ -867,6 +939,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 		}
 	}
 
+	log.displayNL("OK");
 	return true;
 }
 
@@ -1114,6 +1187,12 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 				msg += "0";
 		}
 	}
+	else
+	{
+		string name;
+		CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+		msg += name;
+	}
 	
 	log.displayNL(msg.c_str());
 }
@@ -1223,7 +1302,7 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [can_xp,cant_dead,can_teleport,can_speedup]")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup]")
 {
 	GET_ACTIVE_CHARACTER
 
@@ -1234,8 +1313,8 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName("building_instance_ZO_player_111");
 
 	string powoFlags = "";
-	if (args.size () >= 4)
-		powoFlags = args[3];
+	if (args.size () >= 5)
+		powoFlags = args[4];
 
 	if (building)
 	{
@@ -1259,7 +1338,15 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 					if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
 					if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
 					if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
-					
+
+					if (args.size () >= 4) // Change the default exit by exit of instance building
+					{
+						building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
+						if (building)
+						{
+							c->setBuildingExitZone( building->getDefaultExitSpawn() );
+						}
+					}
 					log.displayNL("%d", cell);
 				} else {
 					log.displayNL("ERR: invalid cell");
@@ -1312,6 +1399,7 @@ NLMISC_COMMAND(slide, "slide to the powo", "<uid> x y cell [z] [h]")
 
 	if (args.size() >= 6)
 		fromString(args[5], h);
+
 
 	c->teleportCharacter(x,y,z,false,true,h,0xFF,cell);
 
@@ -2145,8 +2233,6 @@ NLMISC_COMMAND(getLastExchangeMount,"get tick of last exchange mount","<uid>")
 	log.displayNL("%d", c->getLastExchangeMount());
 }
 
-
-
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var>")
 {
@@ -2219,5 +2305,88 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 			log.displayNL("%"NL_I64"u|%s", (*it).asUint64(), name.toUtf8().c_str());
 		}
 	} else 
-		log.displayNL("0");
+		log.displayNL("-1");
+	return true;
 }
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setTrigger, "set a custom trigger", "<trigger> [<web_app>] [<args>]")
+{
+	if (args.size() < 1)
+		return false;
+
+	sint32 triggerId;
+	fromString(args[0], triggerId);
+	
+	if (args.size() == 3)
+		CBuildingManager::getInstance()->setCustomTrigger(triggerId, args[1]+" "+args[2]);
+	else
+		CBuildingManager::getInstance()->setCustomTrigger(triggerId, "");
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(muteUser, "mute a user", "<player name> <duration> [<universe>?]")
+{
+	if (args.size() < 2)
+		return false;
+
+	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
+	if (!target || !TheDataset.isAccessible(target->getEntityRowId()))
+	{
+		log.displayNL("ERR: user not found");
+		return true;
+	}
+
+	uint32 duration;
+	NLMISC::fromString(args[1], duration);
+	NLMISC::TGameCycle cycle = (NLMISC::TGameCycle)(duration / CTickEventHandler::getGameTimeStep() + CTickEventHandler::getGameCycle());
+	if (args.size() == 3)
+		PlayerManager.muteUniverse(CEntityId::Unknown, cycle, target->getId());
+	else
+		PlayerManager.addGMMute(CEntityId::Unknown, target->getId(), cycle);
+	log.displayNL("OK");
+	return true;
+}
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(sendMessageToUser, "send a message to a user", "<player name> <message>")
+{
+	if (args.size() != 2)
+		return false;
+
+	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
+	if (!target || !TheDataset.isAccessible(target->getEntityRowId()))
+	{
+		log.displayNL("ERR: user not found");
+		return true;
+	}
+	SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
+	params[0].Literal = args[1];
+
+	CCharacter::sendDynamicSystemMessage(target->getId(), "LITERAL", params );
+	log.displayNL("OK");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <url>")
+{
+	if (args.size() != 2)
+		return false;
+
+	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
+	if (!target || !TheDataset.isAccessible(target->getEntityRowId()))
+	{
+		log.displayNL("ERR: user not found");
+		return true;
+	}
+	
+	target->sendUrl(args[1], "");
+	log.displayNL("OK");
+	return true;
+}
+
+
+
+
