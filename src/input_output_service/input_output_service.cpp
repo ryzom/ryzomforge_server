@@ -640,18 +640,21 @@ void CInputOutputService::addCharacterName( const TDataSetRow& chId, const ucstr
 				charInfos->ShortName.fromUtf8(name);
 			}
 
-			// Save the old name only if new name is not found (and the player is getting original name back)
-			itInfos = _RenamedCharInfos.find( charInfos->ShortName.toUtf8() );
-			if( itInfos != _RenamedCharInfos.end() ) // New name was in the saved list; player is getting original name back. // Remove the new name
-				_RenamedCharInfos.erase(charInfos->ShortName.toUtf8());
-			else // New name was not in the list, save old name
-				_RenamedCharInfos.insert( make_pair(oldname.toUtf8(), charInfos) );
-
 			TIdRealNames::iterator itRealName = _IdToRealName.find(eid);
 			if( itRealName != _IdToRealName.end() ) //Erase if found realname, the new name already update the entry
 				_IdToRealName.erase(eid);
-			_IdToRealName.insert(make_pair(eid, oldname.toUtf8()));
 				
+			// Save the old name only if new name is not found (and the player is getting original name back)
+			itInfos = _RenamedCharInfos.find( charInfos->ShortName.toUtf8() );
+			if( itInfos != _RenamedCharInfos.end() ) // New name was in the saved list; player is getting original name back. // Remove the new name
+			{
+				_RenamedCharInfos.erase(charInfos->ShortName.toUtf8());
+			}
+			else // New name was not in the list, save old name
+			{
+				_IdToRealName.insert(make_pair(eid, oldname.toUtf8()));
+				_RenamedCharInfos.insert( make_pair(oldname.toUtf8(), charInfos) );
+			}
 		}
 	}
 
@@ -770,7 +773,6 @@ string CInputOutputService::getRocketName(const ucstring& chName)
 	ucstring charname = chName;
 	string realName;
 	string reName;
-	
 	ucstring::size_type pos = charname.find('$');
 	if (pos != string::npos)
 		charname = charname.substr(0, pos);
@@ -782,13 +784,17 @@ string CInputOutputService::getRocketName(const ucstring& chName)
 		charInfos = itInfos->second;
 		realName = charInfos->Name.toString();
 	}
-
-	itInfos = _RenamedCharInfos.find(charname.toUtf8());
-	if (itInfos != _RenamedCharInfos.end()) // Char is renamed
+	else
 	{
-		realName = chName.toString();
-		charInfos = itInfos->second;
-		reName = charInfos->Name.toString();
+		itInfos = _RenamedCharInfos.find(charname.toUtf8());
+		if (itInfos != _RenamedCharInfos.end()) // Char is renamed
+		{
+			realName = chName.toString();
+			charInfos = itInfos->second;
+			if (charInfos != NULL) {
+				reName = charInfos->Name.toString();
+			}
+		}
 	}
 
 	if (reName.empty() && charInfos != NULL) // Search for a rename
@@ -811,8 +817,8 @@ string CInputOutputService::getRocketName(const ucstring& chName)
 		if (spos != string::npos)
 			reName = reName.substr(0, spos);
 	}
-		
-	if (charInfos && !reName.empty() && !charInfos->HavePrivilege)
+
+	if (charInfos != NULL && !reName.empty() && !charInfos->HavePrivilege)
 		realName = reName+"@"+realName;
 
 	return realName;
