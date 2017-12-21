@@ -353,21 +353,19 @@ public:
 		CEntityEntry		&entity = _ClientEntries[clientId].Entities[entityId];
 		if ( entity.AssociationBitsSent == currentAssociationBits )
 		{
-			//nlassertex(entity.Used, ("client=%d, entity=%d property=%d", clientId, entityId, property));
-			switch ( property )
+			//nlassertex(entity.Used, ("client=%d, entity=%d property=%d", clientId, entityId, property));		
+			if (property == CLFECOMMON::PROPERTY_POSITION)
 			{
-			case CLFECOMMON::PROPERTY_DISASSOCIATION:
-				break;
-			case CLFECOMMON::PROPERTY_POSITION:
 				entity.Mileage = 0;
-				break;
-			default:
-				{
+			}
+			else if (property != CLFECOMMON::PROPERTY_DISASSOCIATION)
+			{
 				CPropertyEntry	&entry = entity.Properties[property];
 				entry.HasValue = false;
-				}
 			}
 			return true;
+
+			
 		}
 		else
 		{
