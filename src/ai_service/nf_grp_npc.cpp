@@ -2723,6 +2723,182 @@ void maxHitRange_f_(CStateInstance* entity, CScriptStack& stack)
 	}
 }
 
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection addUserModel_sss_
+
+Arguments:  -> 
+
+arg0: is the user model id (a name)
+arg1: is the base sheet
+arg3: is the script (in hex)
+
+@code
+()addUserModel("toto", "ccbha1", "xxxxx");
+@endcode
+
+*/
+void addUserModel_sss_(CStateInstance* entity, CScriptStack& stack)
+{
+	string script = stack.top();
+	stack.pop();
+	
+	string baseSheet = stack.top();
+	stack.pop();
+	
+	string userModelId = stack.top(); // prefix with ARK_ to prevent stupid overwrite
+	stack.pop();
+
+	IManagerParent* const managerParent = entity->getGroup()->getOwner()->getOwner();
+	CAIInstance* const aiInstance = dynamic_cast<CAIInstance*>(managerParent);
+	if (!aiInstance)
+		return;
+		
+	std::vector<CAIActions::CArg> args;
+	args.push_back(CAIActions::CArg(900+aiInstance->getInstanceNumber()));
+	args.push_back(CAIActions::CArg("ARK_"+userModelId));
+	args.push_back(CAIActions::CArg(baseSheet));
+	args.push_back(CAIActions::CArg(scriptHex_decode(script)));
+	
+	CAIActions::execute("USR_MDL", args);
+}
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection addCustomLoot_ss_
+
+Arguments:  -> 
+
+arg0: is the custom table id (a name)
+arg1: is the script with syntax : <PROBA_1>:<hex:LOOT_SET_1>,<PROBA_2>:<hex:LOOT_SET_2>,...
+
+@code
+()addUserModel("toto", "<PROBA_1>:<hex:LOOT_SET_1>,<PROBA_2>:<hex:LOOT_SET_2>,...");
+@endcode
+
+*/
+void addCustomLoot_ss_(CStateInstance* entity, CScriptStack& stack)
+{
+	string script = stack.top();
+	stack.pop();
+		
+	string customTableId = stack.top();
+	stack.pop();
+
+	std::vector<std::string> loots;
+	NLMISC::splitString(script, ",", loots);
+	if (loots.empty())
+		return;
+
+	IManagerParent* const managerParent = entity->getGroup()->getOwner()->getOwner();
+	CAIInstance* const aiInstance = dynamic_cast<CAIInstance*>(managerParent);
+	if (!aiInstance)
+		return;
+
+	std::vector<CAIActions::CArg> args;
+	uint32 nbTables = 1;
+	args.push_back(CAIActions::CArg(nbTables));
+	args.push_back(CAIActions::CArg(900+aiInstance->getInstanceNumber()));
+	uint32 lootSets = loots.size();
+	args.push_back(CAIActions::CArg(lootSets));
+	args.push_back(CAIActions::CArg(customTableId));
+	float moneyProba = 0.0;
+	args.push_back(CAIActions::CArg(moneyProba));
+	float moneyFactor = 0.0;
+	args.push_back(CAIActions::CArg(moneyFactor));
+	uint32 moneyBase = 0;
+	args.push_back(CAIActions::CArg(moneyBase));
+
+	FOREACHC(it, std::vector<std::string>, loots)
+	{
+		std::vector<string> lootSet;
+		NLMISC::splitString(*it, ":", lootSet);
+		if (lootSet.size() == 2)
+		{
+			args.push_back(CAIActions::CArg(lootSet[0]));
+			args.push_back(CAIActions::CArg(scriptHex_decode(lootSet[1])));
+		}
+	}
+	
+	CAIActions::execute("CUSTOMLT", args);
+}
+
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection setUserModel_s_
+Set the user model of a creature
+
+Arguments: -> s(userModel)
+
+@code
+()setUserModel('my_model');
+
+@endcode
+
+*/
+void setUserModel_s_(CStateInstance* entity, CScriptStack& stack)
+{
+	string userModel = stack.top();
+	stack.pop();
+	
+	CGroup* group = entity->getGroup();
+	
+	FOREACH(botIt, CCont<CBot>,	group->bots())
+	{
+		CBot* bot = *botIt;
+		
+		//if (!bot->isSpawned()) return;
+		
+		if (bot->getRyzomType() == RYZOMID::npc)
+		{
+			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
+			botNpc->setUserModelId("ARK_"+userModel);
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection setCustomLoot_s_
+Set the custom loot of a creature
+
+Arguments: -> s(customTable)
+
+@code
+()setUserModel('my_loot_table');
+
+@endcode
+
+*/
+void setCustomLoot_s_(CStateInstance* entity, CScriptStack& stack)
+{
+	string customTable = stack.top();
+	stack.pop();
+	
+	CGroup* group = entity->getGroup();
+	
+	FOREACH(botIt, CCont<CBot>,	group->bots())
+	{
+		CBot* bot = *botIt;
+		
+		//if (!bot->isSpawned()) return;
+		
+		if (bot->getRyzomType() == RYZOMID::npc)
+		{
+			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
+			botNpc->setCustomLootTableId(customTable);
+		}
+	}
+}
+
+
 ////----------------------------------------------------------------------------
 ///** @page code
 //
@@ -2940,6 +3116,11 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, maxHitRange_f_);
 
 	REGISTER_NATIVE_FUNC(functions, setEventCode_sss_);
+
+	REGISTER_NATIVE_FUNC(functions, addUserModel_sss_);
+	REGISTER_NATIVE_FUNC(functions, addCustomLoot_ss_);
+	REGISTER_NATIVE_FUNC(functions, setUserModel_s_);
+	REGISTER_NATIVE_FUNC(functions, setCustomLoot_s_);
 
 //	REGISTER_NATIVE_FUNC(functions, hideMissionStepIcon_b_);
 //	REGISTER_NATIVE_FUNC(functions, hideMissionGiverIcon_b_);
