@@ -1761,6 +1761,11 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 
 	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
 
+	if (!continent) {
+		log.displayNL("ERR: invalid continent");
+		return false;
+	}
+	
 	uint32 aiInstance = CUsedContinent::instance().getInstanceForContinent((CONTINENT::TContinent)continent->getId());
 
 	if (aiInstance == ~0)
