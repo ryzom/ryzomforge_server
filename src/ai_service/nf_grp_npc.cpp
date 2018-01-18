@@ -2811,6 +2811,39 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 	string state_name = stack.top();
 	stack.pop();
 
+
+	//////////// Special Cases for Ark
+	if (event_name == "notify_on_death")
+	{
+		strFindReplace(code, "http://", "");
+		strFindReplace(code, "https://", "");
+		strFindReplace(code, "/index.php?", " ");
+		
+		CGroup* group = entity->getGroup();
+		FOREACH(botIt, CCont<CBot>,	group->bots())
+		{
+			CBot* bot = *botIt;
+			
+			if (!bot->isSpawned()) return;
+
+			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
+			if (botNpc)
+			{
+				CSpawnBotNpc* spawnBotNpc = botNpc->getSpawn();
+				if (spawnBotNpc)
+				{
+					CAINotifyDeathMsg *msg = new CAINotifyDeathMsg;
+					msg->Url = code;
+					msg->TargetRowId = spawnBotNpc->dataSetRow();
+					msg->send("EGS");
+				}
+			}
+		}
+		return;
+	}
+	///////////////////////////////////////////////////////
+
+	
 	CAIEventDescription eventDescription;
 	CAIEventActionNode::TSmartPtr eventAction;
 	CAIEventReaction* event;
