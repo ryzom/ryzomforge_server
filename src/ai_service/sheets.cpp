@@ -258,7 +258,7 @@ void AISHEETS::CCreature::calcFightAndVisualValues(std::string* left, std::strin
 void AISHEETS::CCreature::parseFightConfig(NLGEORGES::UForm const* form, std::string const& fightConfigString, uint32 actionListIndex, NLMISC::CDbgPtr<CActionList>& fightConfig)
 {
 	NLGEORGES::UFormElm const* actionListNode = NULL;
-	const_cast<NLGEORGES::UFormElm&>(form->getRootNode()).getNodeByName(&actionListNode, fightConfigString.c_str());
+	const_cast<NLGEORGES::UFormElm&>(form->getRootNode()).getNodeByName(&actionListNode, fightConfigString);
 	
 	if (actionListNode)
 	{
@@ -906,7 +906,7 @@ void AISHEETS::CSheets::packSheets(const std::string &writeFilesDirectoryName)
 			{
 				addSearchPath=true;
 				for (uint32 i=0;i<varPtr->size();++i)
-					CPath::addSearchPath(varPtr->asString(i).c_str(), true, false);
+					CPath::addSearchPath(NLMISC::expandEnvironmentVariables(varPtr->asString(i)), true, false);
 			}
 			loadForm2("aiaction",	writeFilesDirectoryName+AISPackedActionSheetsFilename, _ActionSheets, true);
 		}
@@ -918,7 +918,7 @@ void AISHEETS::CSheets::packSheets(const std::string &writeFilesDirectoryName)
 			{
 				addSearchPath=true;
 				for (uint32 i=0;i<varPtr->size();++i)
-					CPath::addSearchPath(varPtr->asString(i).c_str(), true, false);
+					CPath::addSearchPath(NLMISC::expandEnvironmentVariables(varPtr->asString(i)), true, false);
 			}
 			loadForm("actionlist", writeFilesDirectoryName+AISPackedFightConfigSheetsFilename, _ActionListSheets, true);
 		}
@@ -931,7 +931,7 @@ void AISHEETS::CSheets::packSheets(const std::string &writeFilesDirectoryName)
 			{
 				addSearchPath=true;
 				for (uint32 i=0;i<varPtr->size();++i)
-					CPath::addSearchPath(varPtr->asString(i).c_str(), true, false);
+					CPath::addSearchPath(NLMISC::expandEnvironmentVariables(varPtr->asString(i)), true, false);
 			}
 			loadForm2("creature", writeFilesDirectoryName+AISPackedSheetsFilename, _Sheets, true);
 		}
@@ -943,7 +943,7 @@ void AISHEETS::CSheets::packSheets(const std::string &writeFilesDirectoryName)
 			{
 				addSearchPath=true;
 				for (uint32 i=0;i<varPtr->size();++i)
-					CPath::addSearchPath(varPtr->asString(i).c_str(), true, false);
+					CPath::addSearchPath(NLMISC::expandEnvironmentVariables(varPtr->asString(i)), true, false);
 			}
 			loadForm2("race_stats", writeFilesDirectoryName+AISPackedRaceStatsSheetsFilename, _RaceStatsSheets, true);
 		}
@@ -1122,7 +1122,8 @@ NLMISC_COMMAND(setSheetProperty,"change a value read from a sheet","<sheet> leve
 	}
 
 	// get the value
-	float val = (float)atof(args[2].c_str());
+	float val;
+	NLMISC::fromString(args[2], val);
 	if (val==0 && args[2]!="0" && args[2]!="0.0")
 	{
 		log.displayNL("'%s' is not a valid value",args[2].c_str());
