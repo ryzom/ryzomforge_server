@@ -1338,6 +1338,7 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 					if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
 					if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
 					if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
+					if (powoFlags[4] == '1') c->setPowoFlag("dp", true);
 
 					if (args.size () >= 4) // Change the default exit by exit of instance building
 					{
@@ -1657,6 +1658,55 @@ NLMISC_COMMAND(addRespawnPoint,"Add re-spawn point","<uid> <Re-spawn point name>
 	return true;
 }
 
+//-----------------------------------------------
+// Respawn the player
+//-----------------------------------------------
+NLMISC_COMMAND(respawnPlayer,"Respawn the player at position","<uid> <withDp?> <x> <y> [<z> <heading>]")
+{
+	if (args.size() < 1)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+
+	bool withDp = false;
+
+	if (args.size() > 1)
+		withDp = args[1] == "true" || args[1] == "1";
+
+	sint32 x = c->getState().X;
+	sint32 y = c->getState().Y;
+	sint32 z = c->getState().Z;
+	float h = c->getState().Heading;
+
+	if (args.size() > 2)
+	{
+		fromString(args[2], x);
+		x *= 1000;
+	}
+
+	if (args.size() > 3)
+	{
+		fromString(args[3], y);
+		y *= 1000;
+	}
+
+	if (args.size() > 4)
+	{
+		fromString(args[4], z);
+		z *= 1000;
+	}
+
+	if (args.size() > 5)
+		fromString(args[5], h);
+
+	c->respawn(x, y, z, h, withDp);
+	return true;
+}
+
+
 
 //-----------------------------------------------
 // Kill the player
@@ -1761,6 +1811,11 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 
 	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
 
+	if (!continent) {
+		log.displayNL("ERR: invalid continent");
+		return false;
+	}
+	
 	uint32 aiInstance = CUsedContinent::instance().getInstanceForContinent((CONTINENT::TContinent)continent->getId());
 
 	if (aiInstance == ~0)
