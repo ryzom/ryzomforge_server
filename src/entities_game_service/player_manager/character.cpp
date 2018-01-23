@@ -1976,10 +1976,15 @@ void CCharacter::respawn(sint32 x, sint32 y, sint32 z, float heading, bool apply
 //---------------------------------------------------
 void CCharacter::applyRespawnEffects(bool applyDP)
 {
-	if (_NextDeathPenaltyFactor != 0)
-		_DeathPenalties->addDeath(*this, _NextDeathPenaltyFactor);
 
-	resetNextDeathPenaltyFactor();
+	if (applyDP)
+	{
+		if (_NextDeathPenaltyFactor != 0)
+			_DeathPenalties->addDeath(*this, _NextDeathPenaltyFactor);
+
+		resetNextDeathPenaltyFactor();
+	}
+	
 	_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base / 10;
 	_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base / 10;
 	_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base / 10;
