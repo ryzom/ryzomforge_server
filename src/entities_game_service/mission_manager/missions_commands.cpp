@@ -1198,7 +1198,7 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<uid> <quantity>")
+NLMISC_COMMAND(getMoney, "get money of player (if quantity, give/take/set the money)", "<uid> [+-]<quantity>")
 {
 
 	GET_ACTIVE_CHARACTER
@@ -1207,22 +1207,41 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<
 
 	if (args.size() == 2)
 	{
+		string quant = args[1];
 		uint64 quantity;
-		fromString(args[1], quantity);
-		if (money >= quantity)
+		if (quant[0] == '+')
 		{
-			money -= quantity;
-			c->setMoney(money);
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				money += quantity;
+			}
+		}
+		else if (quant[0] == '-')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				if (money >= quantity)
+				{
+					money -= quantity;
+				}
+				else
+				{
+					log.displayNL("-1"); // No enough money
+					return true;
+				}
+			}
 		}
 		else
 		{
-			log.displayNL("-1"); // No enough money
-			return true;
+			fromString(quant, money);
 		}
+
+		c->setMoney(money);
 	}
 
-	string value = toString("%"NL_I64"u", money);
-	log.displayNL(value.c_str());
+	log.displayNL("%"NL_I64"u", money);
 }
 
 
