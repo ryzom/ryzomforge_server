@@ -1307,13 +1307,13 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 	GET_ACTIVE_CHARACTER
 
 	IBuildingPhysical *building;
-	if (args.size () >= 3)
+	if (args.size() > 2)
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]);
 	else
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName("building_instance_ZO_player_111");
 
-	string powoFlags = "";
-	if (args.size () >= 5)
+	string powoFlags = "0000";
+	if (args.size() > 4)
 		powoFlags = args[4];
 
 	if (building)
@@ -1333,14 +1333,14 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 				sint32 cell;
 				if (buildingPlayer->addUser(c, 0, ownerId, cell))
 				{
+					nlinfo("Powo Flags : %s", powoFlags.c_str());
 					c->setPowoCell(cell);
-					if (powoFlags[0] == '1') c->setPowoFlag("xp", true);
-					if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
-					if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
-					if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
-					if (powoFlags[4] == '1') c->setPowoFlag("dp", true);
+					c->setPowoFlag("xp", powoFlags[0] == '1');
+					c->setPowoFlag("dead", powoFlags[1] == '1');
+					c->setPowoFlag("teleport", powoFlags[2] == '1');
+					c->setPowoFlag("speed", powoFlags[3] == '1');
 
-					if (args.size () >= 4) // Change the default exit by exit of instance building
+					if (args.size () > 3 && args[3] != "*") // Change the default exit by exit of instance building
 					{
 						building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
 						if (building)
