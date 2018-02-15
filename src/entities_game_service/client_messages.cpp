@@ -3226,7 +3226,11 @@ void cbClientEventSetItemCustomText( NLNET::CMessage& msgin, const std::string &
 		}
 
 		// prevent use of @WEB at begin
-		if (text.size() >= 4 && text[0]=='@' && text[1]=='W' && text[2]=='E' && text[3]=='B')
+		if (text.size() > 3 && text[0]=='@' && text[1]=='W' && text[2]=='E' && text[3]=='B')
+			text = text.substr(4, text.size() - 4);
+
+		// prevent use of @LUA at begin
+		if (text.size() > 3 && text[0]=='@' && text[1]=='L' && text[2]=='U' && text[3]=='A')
 			text = text.substr(4, text.size() - 4);
 
 		// force that the begin of the text for non admin is %mfc

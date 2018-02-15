@@ -8120,6 +8120,11 @@ NLMISC_COMMAND(eventCreateNpcGroup, "create an event npc group", "<player eid> <
 
 	//Get instance number from position
 	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
+	if (!continent)
+	{
+		log.displayNL("ERR: invalid continent");
+		return false;
+	}
 	uint32 instanceNumber = CUsedContinent::instance().getInstanceForContinent((CONTINENT::TContinent)continent->getId());
 
 	if (instanceNumber == ~0)

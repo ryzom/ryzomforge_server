@@ -1835,8 +1835,11 @@ public:
 	/// player choose a re-spawn for his death character
 	void respawn(uint16 index);
 
+	/// player respawn
+	void respawn(sint32 x, sint32 y, sint32 z, float heading, bool applyDP = true);
+
 	/// apply respawn malus
-	void applyRespawnEffects();
+	void applyRespawnEffects(bool applyDP = true);
 
 	// player accept resurrection by other character
 	void resurrected();
@@ -3969,6 +3972,7 @@ private:
 	bool _PowoCantDead;
 	bool _PowoCanTeleport;
 	bool _PowoCanSpeedUp;
+	bool _PowoCanDP;
 
 	uint32 _LastTpTick;
 	uint32 _LastOverSpeedTick;
@@ -4039,6 +4043,9 @@ public:
 
 		if (flag == "speed")
 			return _PowoCanSpeedUp;
+
+		if (flag == "dp")
+			return _PowoCanDP;
 	}
 
 	bool setPowoFlag(const std::string &flag, bool value)
@@ -4054,6 +4061,9 @@ public:
 
 		if (flag == "speed")
 			_PowoCanSpeedUp = value;
+
+		if (flag == "dp")
+			_PowoCanDP = value;
 	}
 
 	void resetPowoFlags()
@@ -4062,6 +4072,7 @@ public:
 		_PowoCantDead = false;
 		_PowoCanTeleport = false;
 		_PowoCanSpeedUp = false;
+		_PowoCanDP = false;
 	}
 
 	bool getGodModeSave() const

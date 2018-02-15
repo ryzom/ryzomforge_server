@@ -621,6 +621,9 @@ CCharacter::CCharacter()
 	_LangChannel = "en";
 	_NewTitle = "Refugee";
 	initDatabase();
+
+	_PowoCell = 0;
+	resetPowoFlags();
 } // CCharacter  //
 
 //-----------------------------------------------
@@ -1938,6 +1941,11 @@ void CCharacter::respawn(uint16 index)
 		zone->getRandomPoint(x, y, z, heading);
 	}
 
+	respawn(x, y, z, heading);
+}
+
+void CCharacter::respawn(sint32 x, sint32 y, sint32 z, float heading, bool applyDP)
+{
 	// remove character of vision of other PC
 	CMessage msgout("ENTITY_TELEPORTATION");
 	msgout.serial(_Id);
@@ -1951,7 +1959,7 @@ void CCharacter::respawn(uint16 index)
 	forbidNearPetTp();
 	// set player to intangible state
 	_IntangibleEndDate = ~0;
-	applyRespawnEffects();
+	applyRespawnEffects(applyDP);
 	TDataSetRow dsr = getEntityRowId();
 	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 	sint32 cell = srcCell;
@@ -1966,12 +1974,17 @@ void CCharacter::respawn(uint16 index)
 // apply respawn effects
 //
 //---------------------------------------------------
-void CCharacter::applyRespawnEffects()
+void CCharacter::applyRespawnEffects(bool applyDP)
 {
-	if (_NextDeathPenaltyFactor != 0)
-		_DeathPenalties->addDeath(*this, _NextDeathPenaltyFactor);
 
-	resetNextDeathPenaltyFactor();
+	if (applyDP)
+	{
+		if (_NextDeathPenaltyFactor != 0)
+			_DeathPenalties->addDeath(*this, _NextDeathPenaltyFactor);
+
+		resetNextDeathPenaltyFactor();
+	}
+	
 	_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base / 10;
 	_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base / 10;
 	_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base / 10;
@@ -5618,6 +5631,10 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 			}
 		}
 	}
+
+	if (_PowoCell != cell)
+		resetPowoFlags();
+
 
 	if (_IntangibleEndDate != ~0 && !fromVortex) // Don't save Last Tp Tick if player respawns or teleport from Vortex
 		_LastTpTick = CTickEventHandler::getGameCycle();
