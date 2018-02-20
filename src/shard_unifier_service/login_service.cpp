@@ -20,7 +20,7 @@
 #include "nel/net/module_builder_parts.h"
 #include "nel/net/login_cookie.h"
 
-#include "../../nelns/welcome_service/welcome_service_itf.h"
+#include "game_share/welcome_service_itf.h"
 
 #include "game_share/utils.h"
 #include "server_share/mysql_wrapper.h"
@@ -37,8 +37,6 @@ using namespace NLNET;
 using namespace MSW;
 using namespace RSMGR;
 using namespace ENTITYLOC;
-
-#include "../../../../nelns/welcome_service/welcome_service_itf.cpp"
 
 namespace LS
 {
@@ -357,8 +355,6 @@ namespace LS
 				// real user status.
 			}
 
-			/* Commented by Ulukyn
-
 			// Now prevent from logging-in at the same time with a free GM's player account and a GM CS account
 			CNelUserPtr nelUser = CNelUser::load(_NelDb, userId, __FILE__, __LINE__);
 			BOMB_IF(nelUser == NULL, "on_login : invalid nel user %u" << userId, loginResult(from, userId, "", 5, "Invalid user"); return);
@@ -386,7 +382,7 @@ namespace LS
 			CSString query;
 			query << "SELECT UId FROM user WHERE GMId = "<<userId<<"";
 			BOMB_IF(!_NelDb.query(query), "on_login : Failed to request in database", loginResult(from, userId, "", 6, "Failed request"); return);
-			auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_NelDb.storeResult());
+			CUniquePtr<CStoreResult> result(_NelDb.storeResult());
 			for (uint32 i=0; i!=result->getNumRows(); ++i)
 			{
 				result->fetchRow();
@@ -412,8 +408,7 @@ namespace LS
 				}
 			}
 
-			*/
-			
+
 			NLNET::CInetAddress addr(ipAddress);
 			//2 generate a cookie and set the player status and cookie in database
 			NLNET::CLoginCookie cookie(addr.internalIPAddress(), userId);
@@ -447,7 +442,7 @@ namespace LS
 			{
 				// invalid user !
 				nldebug("on_logout : invalid user %u", userId);
-				logoutResult(from, 1, "unkown user");
+				logoutResult(from, 1, "unknown user");
 				return;
 			}
 
