@@ -1845,33 +1845,46 @@ uint32 CCreature::getMagicResistance(EFFECT_FAMILIES::TEffectFamily effectFamily
 {
 	nlassert(_Form);
 
+	uint32 value;
 	switch(effectFamily)
 	{
 	case EFFECT_FAMILIES::Root:
-		return _Form->getResists().Root + _ResistModifiers.Root;
+		value = _Form->getResists().Root + _ResistModifiers.Root;
+		break;
 	case EFFECT_FAMILIES::Mezz:
-		return _Form->getResists().Sleep + _ResistModifiers.Sleep;
+		value = _Form->getResists().Sleep + _ResistModifiers.Sleep;
+		break;
 	case EFFECT_FAMILIES::Stun:
-		return _Form->getResists().Stun + _ResistModifiers.Stun;
+		value = _Form->getResists().Stun + _ResistModifiers.Stun;
+		break;
 	case EFFECT_FAMILIES::Blind:
-		return _Form->getResists().Blind + _ResistModifiers.Blind;
+		value = _Form->getResists().Blind + _ResistModifiers.Blind;
+		break;
 	case EFFECT_FAMILIES::SlowMove:
-		return _Form->getResists().Snare + _ResistModifiers.Snare;
+		value = _Form->getResists().Snare + _ResistModifiers.Snare;
+		break;
 	case EFFECT_FAMILIES::SlowMelee:
 	case EFFECT_FAMILIES::SlowRange:
 	case EFFECT_FAMILIES::SlowMagic:
 	case EFFECT_FAMILIES::SlowAttack:
-		return _Form->getResists().Slow + _ResistModifiers.Slow;
+		value = _Form->getResists().Slow + _ResistModifiers.Slow;
+		break;
 	case EFFECT_FAMILIES::Fear:
-		return _Form->getResists().Fear + _ResistModifiers.Fear;
+		value = _Form->getResists().Fear + _ResistModifiers.Fear;
+		break;
 	case EFFECT_FAMILIES::MadnessMelee:
 	case EFFECT_FAMILIES::MadnessMagic:
 	case EFFECT_FAMILIES::MadnessRange:
 	case EFFECT_FAMILIES::Madness:
-		return _Form->getResists().Madness + _ResistModifiers.Madness;
+		value = _Form->getResists().Madness + _ResistModifiers.Madness;
+		break;
 	default:
-		return 0;
+		value = 0;
 	};
+
+	if (value >= 10000)
+		value = CCreatureResists::ImmuneScore;
+	return value;
 } // getResistScore //
 
 //--------------------------------------------------------------
@@ -1881,25 +1894,37 @@ uint32 CCreature::getMagicResistance(DMGTYPE::EDamageType dmgType)
 {
 	nlassert(_Form);
 
+	uint32 value;
 	switch(dmgType) 
 	{
 	case DMGTYPE::ACID:
-		return _Form->getResists().Acid + _ResistModifiers.Acid;
+		value = _Form->getResists().Acid + _ResistModifiers.Acid;
+		break;
 	case DMGTYPE::COLD:
-		return _Form->getResists().Cold + _ResistModifiers.Cold;
+		value = _Form->getResists().Cold + _ResistModifiers.Cold;
+		break;
 	case DMGTYPE::ELECTRICITY:
-		return _Form->getResists().Electricity + _ResistModifiers.Electricity;
+		value = _Form->getResists().Electricity + _ResistModifiers.Electricity;
+		break;
 	case DMGTYPE::FIRE:
-		return _Form->getResists().Fire + _ResistModifiers.Fire;
+		value = _Form->getResists().Fire + _ResistModifiers.Fire;
+		break;
 	case DMGTYPE::POISON:
-		return _Form->getResists().Poison + _ResistModifiers.Poison;
+		value = _Form->getResists().Poison + _ResistModifiers.Poison;
+		break;
 	case DMGTYPE::ROT:
-		return _Form->getResists().Rot + _ResistModifiers.Rot;
+		value = _Form->getResists().Rot + _ResistModifiers.Rot;
+		break;
 	case DMGTYPE::SHOCK:
-		return _Form->getResists().Shockwave + _ResistModifiers.Shockwave;
+		value = _Form->getResists().Shockwave + _ResistModifiers.Shockwave;
+		break;
 	default:
 		return 0;
 	};
+	if (value >=10000)
+		value = CCreatureResists::ImmuneScore;
+
+	return value;
 } // getResistScore //
 
 

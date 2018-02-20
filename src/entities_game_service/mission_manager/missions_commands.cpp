@@ -1198,7 +1198,7 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<uid> <quantity>")
+NLMISC_COMMAND(getMoney, "get money of player (if quantity, give/take/set the money)", "<uid> [+-]<quantity>")
 {
 
 	GET_ACTIVE_CHARACTER
@@ -1207,22 +1207,41 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, take the money)", "<
 
 	if (args.size() == 2)
 	{
+		string quant = args[1];
 		uint64 quantity;
-		fromString(args[1], quantity);
-		if (money >= quantity)
+		if (quant[0] == '+')
 		{
-			money -= quantity;
-			c->setMoney(money);
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				money += quantity;
+			}
+		}
+		else if (quant[0] == '-')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				if (money >= quantity)
+				{
+					money -= quantity;
+				}
+				else
+				{
+					log.displayNL("-1"); // No enough money
+					return true;
+				}
+			}
 		}
 		else
 		{
-			log.displayNL("-1"); // No enough money
-			return true;
+			fromString(quant, money);
 		}
+
+		c->setMoney(money);
 	}
 
-	string value = toString("%"NL_I64"u", money);
-	log.displayNL(value.c_str());
+	log.displayNL("%"NL_I64"u", money);
 }
 
 
@@ -1307,13 +1326,13 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 	GET_ACTIVE_CHARACTER
 
 	IBuildingPhysical *building;
-	if (args.size () >= 3)
+	if (args.size() > 2)
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]);
 	else
 		building = CBuildingManager::getInstance()->getBuildingPhysicalsByName("building_instance_ZO_player_111");
 
-	string powoFlags = "";
-	if (args.size () >= 5)
+	string powoFlags = "0000";
+	if (args.size() > 4)
 		powoFlags = args[4];
 
 	if (building)
@@ -1333,13 +1352,14 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 				sint32 cell;
 				if (buildingPlayer->addUser(c, 0, ownerId, cell))
 				{
+					nlinfo("Powo Flags : %s", powoFlags.c_str());
 					c->setPowoCell(cell);
-					if (powoFlags[0] == '1') c->setPowoFlag("xp", true);
-					if (powoFlags[1] == '1') c->setPowoFlag("dead", true);
-					if (powoFlags[2] == '1') c->setPowoFlag("teleport", true);
-					if (powoFlags[3] == '1') c->setPowoFlag("speed", true);
+					c->setPowoFlag("xp", powoFlags[0] == '1');
+					c->setPowoFlag("dead", powoFlags[1] == '1');
+					c->setPowoFlag("teleport", powoFlags[2] == '1');
+					c->setPowoFlag("speed", powoFlags[3] == '1');
 
-					if (args.size () >= 4) // Change the default exit by exit of instance building
+					if (args.size () > 3 && args[3] != "*") // Change the default exit by exit of instance building
 					{
 						building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
 						if (building)
@@ -1657,6 +1677,55 @@ NLMISC_COMMAND(addRespawnPoint,"Add re-spawn point","<uid> <Re-spawn point name>
 	return true;
 }
 
+//-----------------------------------------------
+// Respawn the player
+//-----------------------------------------------
+NLMISC_COMMAND(respawnPlayer,"Respawn the player at position","<uid> <withDp?> <x> <y> [<z> <heading>]")
+{
+	if (args.size() < 1)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+
+	bool withDp = false;
+
+	if (args.size() > 1)
+		withDp = args[1] == "true" || args[1] == "1";
+
+	sint32 x = c->getState().X;
+	sint32 y = c->getState().Y;
+	sint32 z = c->getState().Z;
+	float h = c->getState().Heading;
+
+	if (args.size() > 2)
+	{
+		fromString(args[2], x);
+		x *= 1000;
+	}
+
+	if (args.size() > 3)
+	{
+		fromString(args[3], y);
+		y *= 1000;
+	}
+
+	if (args.size() > 4)
+	{
+		fromString(args[4], z);
+		z *= 1000;
+	}
+
+	if (args.size() > 5)
+		fromString(args[5], h);
+
+	c->respawn(x, y, z, h, withDp);
+	return true;
+}
+
+
 
 //-----------------------------------------------
 // Kill the player
@@ -1761,6 +1830,11 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 
 	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
 
+	if (!continent) {
+		log.displayNL("ERR: invalid continent");
+		return false;
+	}
+	
 	uint32 aiInstance = CUsedContinent::instance().getInstanceForContinent((CONTINENT::TContinent)continent->getId());
 
 	if (aiInstance == ~0)
