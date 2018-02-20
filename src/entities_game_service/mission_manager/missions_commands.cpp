@@ -35,6 +35,7 @@
 #include "shop_type/named_items.h"
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
+#include "guild_manager/fame_manager.h"
 #include "building_manager/building_manager.h"
 #include "building_manager/building_physical.h"
 #include "progression/progression_pvp.h"
@@ -1085,9 +1086,8 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 	return true;
 }
 
-
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getFame, "get fame of player", "<uid> faction")
+NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<enforce caps>?]")
 {
 
 	if (args.size () < 2)
@@ -1104,10 +1104,39 @@ NLMISC_COMMAND(getFame, "get fame of player", "<uid> faction")
 		log.displayNL("ERR: invalid fame");
 		return false;
 	}
-	
-	sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
-	log.displayNL("%d", fame);
 
+	sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
+
+	if (args.size() == 3)
+	{
+		string quant = args[2];
+		sint32 quantity;
+		if (quant[0] == '+')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				fame += quantity;
+			}
+		}
+		else
+		{
+			fromString(quant, fame);
+		}
+
+		CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame, false);
+	}
+
+	if (args.size() == 4 && args[3] == "1")
+	{
+		CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
+		// set tribe fame threshold and clamp fame if necessary
+		CFameManager::getInstance().setAndEnforceTribeFameCap(c->getId(), c->getAllegiance());
+		fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
+	}
+
+	log.displayNL("%d", fame);
+	
 	return true;
 }
 
