@@ -54,6 +54,7 @@ CVariable<uint32>	ShardAssocTimeout( "su", "ShardAssocTimeout", "Timeout (in s)b
 CVariable<uint32>	ForceWelcomerShard( "su", "ForceWelcomerShard", "SessionId of a shard to promote when joining any mainland (0=none)", 0, 0, true );
 CVariable<string>	DomainName("su", "DomainName", "The name of the domain", "ryzom", 0, true);
 CVariable<string>	PrivilegeForSessionAccess("su", "PrivilegeForSessionAccess", "A list of privilege allowed to join any animation session", ":GM:SGM:", 0, true);
+CVariable<string>	SecurityCheck("su", "SecurityCheck", "A Security Check", "", 0, true);
 
 namespace RSMGR
 {
@@ -648,7 +649,7 @@ namespace RSMGR
 			userAccessPriv.clear();
 			CSString query;
 			query << "SELECT AccessPrivilege FROM permission";
-			query << " WHERE UId = " << userId << " AND DomainId = (SELECT domain_id FROM domain WHERE domain_name = '" << DomainName << "')";
+			query << " WHERE UId = " << userId << " AND permission.ClientApplication = '" << DomainName << "'";
 
 			if (!_NelDb.query(query))
 			{
@@ -3450,7 +3451,7 @@ endOfWelcomeUserResult:
 				CSecurityCheckForFastDisconnection securityCheck;
 				securityCheck.setSessionId(sessionId);
 				securityCheck.setCookie(cookie); // must not be changed by joinSession(), because the client sends the one he knows before Far TPing
-				pjs.OptSecurityCode.setSecurityCode(securityCheck.encode(""));
+				pjs.OptSecurityCode.setSecurityCode(securityCheck.encode(SecurityCheck));
 			}
 			_PendingJoins.push_back(pjs);
 

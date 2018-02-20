@@ -21,6 +21,11 @@ TARGET_LINK_LIBRARIES(ryzom_servershare
 						${MYSQL_LIBRARIES}
 						${ZLIB_LIBRARIES})
 
+IF(MONGO_FOUND)
+  TARGET_LINK_LIBRARIES(ryzom_servershare ${MONGO_LIBRARIES})
+  ADD_DEFINITIONS(${MONGO_DEFINITIONS})
+ENDIF()
+
 NL_DEFAULT_PROPS(ryzom_servershare "Ryzom, Library: Service Shared")
 NL_ADD_RUNTIME_FLAGS(ryzom_servershare)
 NL_ADD_LIB_SUFFIX(ryzom_servershare)
