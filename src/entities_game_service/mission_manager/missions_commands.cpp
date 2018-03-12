@@ -2534,9 +2534,9 @@ NLMISC_COMMAND(sendMessageToUser, "send a message to a user", "<player name> <me
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <url>")
+NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <params>")
 {
-	if (args.size() != 2)
+	if (args.size() != 3)
 		return false;
 
 	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
@@ -2546,7 +2546,7 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <url>")
 		return true;
 	}
 	
-	target->sendUrl(args[1], "");
+	target->sendUrl(args[1]+" "+args[2], "");
 	log.displayNL("OK");
 	return true;
 }
