@@ -102,6 +102,19 @@ void CAILostAggroMsgImp::callback (const std::string &name, NLNET::TServiceId id
 	}
 }
 
+//----------------------------------------------------------------------------
+// CAINotifyDeathMsgImp::callback creature lost agro
+//----------------------------------------------------------------------------
+void CAINotifyDeathMsgImp::callback (const std::string &name, NLNET::TServiceId id)
+{
+	CCreature *creature = CreatureManager.getCreature( TargetRowId );
+	if( creature )
+	{
+		creature->setUrlForDeathNotification(Url);
+	}
+}
+
+
 
 namespace PROGRESSIONPVE
 {
@@ -326,10 +339,26 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 	// get most effective team or single player
 	const sint16 index = creatureTakenDmg.getMaxInflictedDamageTeamIndex();
 
+
+	CCreature *creaturePtr = CreatureManager.getCreature(creature);
+	if (creaturePtr)
+	{
+		string url = creaturePtr->getUrlForDeathNotification();
+		if (!url.empty())
+		{
+			// Notify Death for all players who have made action
+			for(TCharacterActionsContainer::iterator it = _CharacterActions.begin(); it != _CharacterActions.end(); ++it)
+			{
+				CCharacter *player = PlayerManager.getChar((*it).first);
+				if (player)
+					player->sendUrl(url, "");
+			}
+		}
+	}
+
 	// max damage have been done by players
 	if (index != -1)
 	{
-		CCreature *creaturePtr = CreatureManager.getCreature(creature);
 		if (creaturePtr && creaturePtr->getForm())
 		{
 			// Auto-quartering of mission items
@@ -490,7 +519,6 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 			// Get players list
 			std::set<NLMISC::CEntityId> players(creatureTakenDmg.getAllPlayers());
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::entity);
-			CCreature* creaturePtr = CreatureManager.getCreature(creature);
 			if (creaturePtr)
 			{
 				params[0].setEIdAIAlias( creaturePtr->getId(), CAIAliasTranslator::getInstance()->getAIAlias(creaturePtr->getId()) );
@@ -504,7 +532,6 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 			}
 		}
 
-		CCreature *creaturePtr = CreatureManager.getCreature(creature);
 		if (creaturePtr)
 		{
 			// disable loot for players by validating it for creature itself

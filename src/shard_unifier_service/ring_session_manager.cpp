@@ -19,7 +19,7 @@
 #include "nel/net/module_builder_parts.h"
 #include "nel/net/callback_server.h"
 
-#include "../../nelns/welcome_service/welcome_service_itf.h"
+#include "game_share/welcome_service_itf.h"
 #include "game_share/r2_types.h"
 
 
@@ -54,6 +54,7 @@ CVariable<uint32>	ShardAssocTimeout( "su", "ShardAssocTimeout", "Timeout (in s)b
 CVariable<uint32>	ForceWelcomerShard( "su", "ForceWelcomerShard", "SessionId of a shard to promote when joining any mainland (0=none)", 0, 0, true );
 CVariable<string>	DomainName("su", "DomainName", "The name of the domain", "ryzom", 0, true);
 CVariable<string>	PrivilegeForSessionAccess("su", "PrivilegeForSessionAccess", "A list of privilege allowed to join any animation session", ":GM:SGM:", 0, true);
+CVariable<string>	SecurityCheck("su", "SecurityCheck", "A Security Check", "", 0, true);
 
 namespace RSMGR
 {
@@ -299,7 +300,7 @@ namespace RSMGR
 			list<TSessionId> sessionIds;
 			{
 				// scope the result to make it destroyed at scope end
-				auto_ptr<MSW::CUseResult> result(_RingDb.useResult());
+				CUniquePtr<MSW::CUseResult> result(_RingDb.useResult());
 
 				// for each open session, put it in the locked state
 				while (result->fetchRow())
@@ -627,7 +628,7 @@ namespace RSMGR
 //			query << " AND ShardId = " << shardId;
 //
 //			BOMB_IF(!_NelDb.query(query), "registerWS : Failed to request into the NeL database", return CNelShardPtr());
-//			auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_NelDb.storeResult());
+//			CUniquePtr<CStoreResult> result(_NelDb.storeResult());
 //			BOMB_IF(result.get() == NULL, "registerWS : Failed to retrieve request result", return CNelShardPtr());
 //
 //			if (result->getNumRows() == 0)
@@ -648,7 +649,7 @@ namespace RSMGR
 			userAccessPriv.clear();
 			CSString query;
 			query << "SELECT AccessPrivilege FROM permission";
-			query << " WHERE UId = " << userId << " AND permission.ClientApplication = '"<<DomainName<<"'";
+			query << " WHERE UId = " << userId << " AND permission.ClientApplication = '" << DomainName << "'";
 
 			if (!_NelDb.query(query))
 			{
@@ -656,7 +657,7 @@ namespace RSMGR
 //				joinSessionResult(from, charId>>4, 0, 12, "failed to request for access permission", TSessionPartStatus::invalid_val);
 				return false;
 			}
-			auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_NelDb.storeResult());
+			CUniquePtr<CStoreResult> result(_NelDb.storeResult());
 			if (result->getNumRows() == 0)
 			{
 				return false;
@@ -1008,7 +1009,7 @@ restartLoop:
 			CSString query;
 			query << "SELECT id FROM scenario WHERE md5 = '"<<scenarioInfo.getScenarioKey().toString()<<"'";
 			BOMB_IF(!_RingDb.query(query), "Failed to request in ring database", return;);
-			auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_RingDb.storeResult());
+			CUniquePtr<CStoreResult> result(_RingDb.storeResult());
 			if (result->getNumRows() != 0)
 			{
 				result->fetchRow();
@@ -1139,7 +1140,7 @@ restartLoop:
 			CSString query;
 			query << "SELECT id FROM scenario WHERE md5 = '"<<scenarioInfo.getScenarioKey().toString()<<"'";
 			BOMB_IF(!_RingDb.query(query), "Failed to request in ring database", return;);
-			auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_RingDb.storeResult());
+			CUniquePtr<CStoreResult> result(_RingDb.storeResult());
 			if (result->getNumRows() != 0)
 			{
 				result->fetchRow();
@@ -1918,7 +1919,7 @@ endOfWelcomeUserResult:
 			CSString query;
 			query << "SELECT COUNT(*) FROM sessions WHERE owner = "<<charId<<" AND state = '"<<TSessionState::toString(TSessionState::ss_open)<<"' AND session_type = '"<<session->getSessionType().toString()<<"'";
 			BOMB_IF(!_RingDb.query(query), "Failed to count number of edit session for character "<<charId, invokeResult(from, charId>>4, 5, "Database failure"); return);
-			auto_ptr<MSW::CStoreResult> result = _RingDb.storeResult();
+			CUniquePtr<MSW::CStoreResult> result(_RingDb.storeResult());
 
 			result->fetchRow();
 			uint32 nbSession;
@@ -2114,7 +2115,7 @@ endOfWelcomeUserResult:
 			query << " AND session_type = 'st_edit'";
 			BOMB_IF(!_RingDb.query(query), "Error in database request", invokeResult(from, userId, 2, "Error in database request"); return);
 
-			auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_RingDb.storeResult());
+			CUniquePtr<CStoreResult> result(_RingDb.storeResult());
 
 			bool sessionClosed = false;
 			if (result->getNumRows() == 0)
@@ -2196,7 +2197,7 @@ endOfWelcomeUserResult:
 				query << "SELECT session_id FROM sessions";
 				query << " WHERE owner = "<<charId<<" AND session_type ='st_edit'";
 				BOMB_IF(!_RingDb.query(query), "on_hibernateEditSession : Failed to request in database", invokeResult(from, charId>>4, 1, "Database error"); return);
-				auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_RingDb.storeResult());
+				CUniquePtr<CStoreResult> result(_RingDb.storeResult());
 
 				// 1.1 : if no session so no need to hibernate (not an error)
 				if (result->getNumRows() != 0)
@@ -2243,7 +2244,7 @@ endOfWelcomeUserResult:
 				query << "SELECT session_id FROM sessions";
 				query << " WHERE owner = "<<charId<<" AND session_type ='st_anim'";
 				BOMB_IF(!_RingDb.query(query), "on_hibernateEditSession : Failed to request in database", invokeResult(from, charId>>4, 1, "Database error"); return);
-				auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_RingDb.storeResult());
+				CUniquePtr<CStoreResult> result(_RingDb.storeResult());
 
 				// 1.1 : if no session so no need to hibernate (not an error)
 				if (result->getNumRows() > 1)
@@ -3450,7 +3451,7 @@ endOfWelcomeUserResult:
 				CSecurityCheckForFastDisconnection securityCheck;
 				securityCheck.setSessionId(sessionId);
 				securityCheck.setCookie(cookie); // must not be changed by joinSession(), because the client sends the one he knows before Far TPing
-				pjs.OptSecurityCode.setSecurityCode(securityCheck.encode("QtXp1o1t?"));
+				pjs.OptSecurityCode.setSecurityCode(securityCheck.encode(SecurityCheck));
 			}
 			_PendingJoins.push_back(pjs);
 
@@ -3546,7 +3547,7 @@ endOfWelcomeUserResult:
 			query << "SELECT session_id FROM sessions";
 			query << " WHERE owner = "<<charId<<" AND session_type ='st_edit'";
 			BOMB_IF(!_RingDb.query(query), "on_joinEditSession : Failed to request in database", joinSessionResult(from, charId>>4, TSessionId(0), 11, "Database error", TSessionPartStatus::invalid_val); return);
-			auto_ptr<CStoreResult> result = auto_ptr<CStoreResult>(_RingDb.storeResult());
+			CUniquePtr<CStoreResult> result(_RingDb.storeResult());
 
 			// 1.1 : if no session found, return an error to the client
 			if (result->getNumRows() == 0)
@@ -4387,7 +4388,7 @@ endOfWelcomeUserResult:
 
 			set<uint32> sessionToClose;
 
-			auto_ptr<MSW::CUseResult> result = _RingDb.useResult();
+			CUniquePtr<MSW::CUseResult> result = _RingDb.useResult();
 
 			while (result->fetchRow())
 			{

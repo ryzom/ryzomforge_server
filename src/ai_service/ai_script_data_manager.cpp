@@ -128,9 +128,10 @@ string CAIScriptDataManager::makePdrFileName()
 {
 	string aisName;
 	// get the AIS local path
-	// CConfigFile::CVar *var = IService::getInstance()->ConfigFile.getVarPtr("AESAliasName");
-	aisName = IService::getInstance()->getServiceAliasName();
-	if (aisName.empty())
+	CConfigFile::CVar *var = IService::getInstance()->ConfigFile.getVarPtr("AESAliasName");
+	if (var)
+		aisName = var->asString(0);
+	else
 		aisName = "unamed_ais";
 
 	return string("ai_script_data/")+aisName+"_pdr.bin";
@@ -182,7 +183,7 @@ std::string CAIScriptDataManager::dirname()
 //	string fullfilename = dirname() + "/" + name + ".ai_script_data";
 //	if (!CFile::fileExists(fullfilename) || CFile::getFileSize(fullfilename)==0)
 //	{
-//		FILE* fp = fopen(fullfilename.c_str(), "w");
+//		FILE* fp = nlfopen(fullfilename, "w");
 //		if (fp)
 //		{
 //			fprintf(fp, "// This file contains data for the AI script\n");

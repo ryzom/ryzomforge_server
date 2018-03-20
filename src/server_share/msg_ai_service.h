@@ -400,6 +400,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AIS -> EGS Message used to indicate an aggro lost
+//----------------------------------------------------------------------------
+class CAINotifyDeathMsg : public CMirrorTransportClass
+{
+public:
+	std::string		Url;
+	TDataSetRow		TargetRowId;
+	
+	virtual void description ()
+	{
+		className ("CAINotifyDeathMsg");
+		property ("Url", PropString, std::string() ,Url);
+		property ("TargetRowId", PropDataSetRow, TDataSetRow(), TargetRowId);
+	}
+	virtual void callback (const std::string &/* name */, NLNET::TServiceId /* id */) {}
+};
+
+//---
+
+//----------------------------------------------------------------------------
 // EGS -> AIS Message used to indicate a player has respawned
 //----------------------------------------------------------------------------
 class CAIPlayerRespawnMsg : public CMirrorTransportClass

@@ -1488,7 +1488,8 @@ CCaseTracer::CCaseTracer(const CSmartPtr<CSubRuleTracer> &tracer, const string &
 		if (valChldTracer=chldTracer->getChildForName(s_kw_NUMBER))
 		{
 			const string &strRef=valChldTracer->_TextValue;
-			const float f=(float)atof(strRef.c_str()); 									
+			float f;
+			NLMISC::fromString(strRef, f);
 			_sortValue=*((size_t*)&f);
 			break;
 		}
@@ -1665,7 +1666,7 @@ void CSubRuleTracer::removeInvalidTracers()
 
 CSmartPtr<CSubRuleTracer> CSubRuleTracer::codifyTree()
 {
-	if (getHigherParent()==this) // an error occured.
+	if (getHigherParent()==this) // an error occurred.
 	{
 		bool errorAppened=false;
 		// Check.
@@ -1954,7 +1955,8 @@ void CSubRuleTracer::generateCode(CSmartPtr<AIVM::CByteCode> &cByteCode) const
 					NLMISC::fromString(param, index);
 					--index;
 					string &strRef=_childTracers[index]->_TextValue;
-					const float f=(float)atof(strRef.c_str());
+					float f;
+					NLMISC::fromString(strRef, f);
 					byteCode.push_back(*((size_t*)&f));
 					jumpTable.newCodeBlock();
 					break;
