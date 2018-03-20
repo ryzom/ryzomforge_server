@@ -315,6 +315,9 @@ public:
 	/// get the welcome chat message
 	inline const std::string & getWelcomeMessage() { return _WelcomePhrase; }
 
+	inline const std::string & getUrlForDeathNotification() { return _UrlForDeathNotification; }
+	inline void setUrlForDeathNotification(const std::string &url) { _UrlForDeathNotification = url; }
+
 	/**
 	 * apply the effect of the armor/shield on damage. Update the armor items if necessary
 	 * \return the remaining damages
@@ -688,6 +691,8 @@ private:
 	std::string						_CustomLootTableId;
 	//if the creature has a user model, this is the alias of the primitive where the model is defined
 	uint32							_PrimAlias;
+
+	std::string						_UrlForDeathNotification;
 };
 
 typedef NLMISC::CSmartPtr<CCreature> CCreaturePtr;

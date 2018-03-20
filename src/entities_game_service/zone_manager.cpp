@@ -1423,12 +1423,6 @@ bool CZoneManager::parsePVPSafeZones( const NLLIGO::IPrimitive * prim )
 CContinent * CZoneManager::getContinent( sint32 x, sint32 y )
 {
 	CVector vect( x * 0.001f, y * 0.001f, 0.0f );
-	for ( uint i = 0; i < _Continents.size(); i++ )
-	{
-		if ( _Continents[i].contains(vect) )
-			return &_Continents[i];
-	}
-	return NULL;
 	return getContinent(vect);
 }// CZoneManager getContinent*
 
