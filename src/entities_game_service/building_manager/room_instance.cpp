@@ -148,7 +148,7 @@ void CRoomInstancePlayer::removeUser( CCharacter* user )
 		return;
 	}
 
-	user->sendUrl("app_ryzhome action=quit_player_room&room_name="+playerBuilding->getName(), "");
+	user->sendUrl(toString("app_ryzhome action=quit_player_room&room_name=%s&powo=%d", playerBuilding->getName().c_str(), user->getPowoCell()), "");
 	
 	--_RefCount;
 	if ( _RefCount == 0 )
@@ -177,7 +177,7 @@ void CRoomInstancePlayer::addUser( CCharacter* user, const NLMISC::CEntityId & o
 		user->setInRoomOfPlayer(owner);
 	}
 	
-	user->sendUrl("app_ryzhome action=open_player_room&owner="+ owner.toString()+"&room_name="+playerBuilding->getName(), "");
+	user->sendUrl(toString("app_ryzhome action=open_player_room&room_name=%s&owner=%s&powo=%d",  owner.toString().c_str(), playerBuilding->getName().c_str(), user->getPowoCell()), "");
 
 	++_RefCount;
 }

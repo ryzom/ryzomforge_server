@@ -630,7 +630,7 @@ void CBuildingManager::registerPlayer( CCharacter * user )
 }
 
 //----------------------------------------------------------------------------
-void CBuildingManager::removePlayerFromRoom( CCharacter * user )
+void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool needDeleteRoom )
 {
 #ifdef NL_DEBUG
 	nlassert(user);
@@ -653,6 +653,29 @@ void CBuildingManager::removePlayerFromRoom( CCharacter * user )
 	}
 	// remove a reference from the room
 	_RoomInstances[idx].Ptr->removeUser( user );
+
+	if (needDeleteRoom)
+		deleteRoom(cell);
+}
+
+//----------------------------------------------------------------------------
+void CBuildingManager::deleteRoom(sint32 cell)
+{
+	if ( !isRoomCell(cell) )
+		return;
+
+	uint idx = getRoomIdxFromCell( cell );
+	if ( idx >= _RoomInstances.size() )
+	{
+		nlwarning("<BUILDING>cell %d is not a valid room ( count is  %u)", cell,_RoomInstances.size() );
+		return;
+	}
+	if ( !_RoomInstances[idx].Ptr )
+	{
+		nlwarning("<BUILDING>cell %d is not a valid room!", cell);
+		return;
+	}
+	
 	// if there is nobody in the room, remove it
 	if ( !_RoomInstances[idx].Ptr->isValid() )
 	{
