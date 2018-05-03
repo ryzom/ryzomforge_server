@@ -417,9 +417,12 @@ void CSpawnGroup::checkRespawn()
 		++i;
 	}
 
-	msg.ActionName = actionName;
-	msg.Url = url;
-	msg.send(egsString);
+	if(url != "")
+	{
+		msg.ActionName = actionName;
+		msg.Url = url;
+		msg.send(egsString);
+	}
 	
 }
 
