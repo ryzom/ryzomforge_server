@@ -3067,8 +3067,12 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 	}
 
 	uint32 stateEventAlias = npcGroup->getStateEventAlias(event_name);
-	if (stateEventAlias != 0)
-		sm->eventReactions().removeChildByIndex(sm->eventReactions().getChildIndexByAlias(stateEventAlias));
+	/*if (stateEventAlias != 0)
+	{
+		CAIEventReaction er = sm->eventReactions().getChildByAlias(stateEventAlias);
+		er->setGroup(0);
+	}*/
+	//	sm->eventReactions().removeChildByIndex(sm->eventReactions().getChildIndexByAlias(stateEventAlias));
 
 	// Register event handler
 	stateEventAlias = sm->getLastStateEventAlias();
@@ -3078,6 +3082,7 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 	nlinfo("Add Event: %s(%d) in State : %d", event_name.c_str(), stateEventAlias, statePositional->getAlias());
 	event->setState(statePositional->getAlias());
 	npcGroup->setStateEventAlias(event_name, stateEventAlias);
+	
 	
 	sm->eventReactions().addChild(event);
 	event = NULL;
