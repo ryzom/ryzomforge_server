@@ -1841,13 +1841,20 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 		return false;
 	}
 
-	GET_ACTIVE_CHARACTER
-
+	CCharacter *c = NULL;
+	
+	bool isChar = false;
+	if (args[0] != "*") {
+		GET_ACTIVE_CHARACTER2
+		isChar = true;
+	}
 
 	uint32 instanceNumber = 0;
 	sint32 x = 0;
 	sint32 y = 0;
-	sint32 z = c->getZ();
+	sint32 z = 0;
+	if (isChar)
+		z = c->getZ();
 	sint32 cell = 0;
 	sint32 orientation = 6666; // used to specify a random orientation
 
@@ -1875,7 +1882,7 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 
 	bool spawnBots = true;
 
-	if (args[4] == "self")
+	if (isChar && args[4] == "self")
 	{
 		orientation = (sint32)(c->getHeading() * 1000.0);
 	}
@@ -1903,7 +1910,7 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 			look += ".creature";
 	}
 
-	if (args[9] == "*")
+	if (isChar && args[9] == "*")
 	{
 		TDataSetRow dsr = c->getEntityRowId();
 		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
@@ -1928,7 +1935,9 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 	}
 	instanceNumber = aiInstance;
 
-	CEntityId playerId = c->getId();
+	CEntityId playerId;
+	if (isChar)
+		playerId = c->getId();
 
 	CMessage msgout("EVENT_CREATE_NPC_GROUP");
 	uint32 messageVersion = 1;
@@ -1957,15 +1966,25 @@ NLMISC_COMMAND(grpScript, "executes a script on an event npc group", "<uid> <gro
 {
 	if (args.size () < 3) return false;
 
-	GET_ACTIVE_CHARACTER
+	uint32 instanceNumber = std::numeric_limits<uint32>::max();
+	string playerEid = "";
 
-	uint32 instanceNumber = c->getInstanceNumber();
+	CCharacter *c = NULL;
+	
+	bool isChar = false;
+	if (args[0] != "*") {
+		GET_ACTIVE_CHARACTER2
+		isChar = true;
+		instanceNumber = c->getInstanceNumber();
+		playerEid = c->getId().toString();
+	}
 
 	uint32 nbString = (uint32)args.size();
  
 	string botsName = args[1];
-	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
+	if (instanceNumber == std::numeric_limits<uint32>::max() && !getAIInstanceFromGroupName(botsName, instanceNumber))
 	{
+		log.displayNL("ERR: invalid instance");
 		return false;
 	}
 
@@ -1974,7 +1993,6 @@ NLMISC_COMMAND(grpScript, "executes a script on an event npc group", "<uid> <gro
 	msgout.serial(messageVersion);
 	msgout.serial(nbString);
 
-	string playerEid = c->getId().toString();
 	msgout.serial(playerEid);
 	msgout.serial(botsName);
 	for (uint32 i=2; i<nbString; ++i)

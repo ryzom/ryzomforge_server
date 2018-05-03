@@ -996,13 +996,16 @@ void cbEventNpcGroupScript( NLNET::CMessage& msgin, const std::string &serviceNa
 	else
 	{
 		nlinfo("Event group script with %d strings :", nbString-1);
-		CEntityId playerId(eid);
+		CEntityId playerId;
+		if (!eid.empty())
+			playerId = CEntityId(eid);
+		
 		strings.resize(nbString-1);
-		NLMISC::CSString groupname = CSString(firstCommand);
+		CSString groupname = CSString(firstCommand);
 		if (firstCommand[0] == '#' && firstCommand[1] == '(')
 		{
-			NLMISC::CEntityId botEId = NLMISC::CEntityId(firstCommand.substr(1));
-			if (botEId==NLMISC::CEntityId::Unknown)
+			CEntityId botEId = CEntityId(firstCommand.substr(1));
+			if (botEId==CEntityId::Unknown)
 				return;
 			CAIEntityPhysical* entity = CAIEntityPhysicalLocator::getInstance()->getEntity(botEId);
 			CSpawnBotNpc* bot = dynamic_cast<CSpawnBotNpc*>(entity);
@@ -1015,7 +1018,10 @@ void cbEventNpcGroupScript( NLNET::CMessage& msgin, const std::string &serviceNa
 		}
 		else
 		{
-			strings[0] =  (string)groupname.replace("#last", _PlayersLastCreatedNpcGroup[playerId].c_str());
+			if (!eid.empty())
+				strings[0] = (string)groupname.replace("#last", _PlayersLastCreatedNpcGroup[playerId].c_str());
+			else
+				strings[0] = (string)groupname;
 		}
 		for (uint32 i=1; i<nbString-1; ++i)
 		{
