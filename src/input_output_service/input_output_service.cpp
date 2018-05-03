@@ -568,10 +568,9 @@ void CInputOutputService::addCharacterName( const TDataSetRow& chId, const ucstr
 	}
 	else
 	{
-		// remove previous name association
-//		_NameToInfos.erase(ucname);
+		// remove previous name association (because name have changed)
 		_NameToInfos.erase(charInfos->ShortName.toUtf8());
-		oldname = charInfos->ShortName;
+		oldname = charInfos->ShortName; // save the old name
 
 		if (charInfos->EntityId != eid)
 		{
@@ -619,7 +618,7 @@ void CInputOutputService::addCharacterName( const TDataSetRow& chId, const ucstr
 			}
 		}
 
-		// See if an existing player was renamed
+		// Check about a rename or get of original name back
 		if (!oldname.empty())
 		{
 			TSessionId sessionid;
@@ -641,16 +640,16 @@ void CInputOutputService::addCharacterName( const TDataSetRow& chId, const ucstr
 			}
 
 			TIdRealNames::iterator itRealName = _IdToRealName.find(eid);
-			if( itRealName != _IdToRealName.end() ) //Erase if found realname, the new name already update the entry
+			if( itRealName != _IdToRealName.end() ) //Erase if found realname. New name will be added if need
 				_IdToRealName.erase(eid);
-				
-			// Save the old name only if new name is not found (and the player is getting original name back)
+
+			// Lookup on _RenamedCharInfos about realname (if found => the player have a rename )
 			itInfos = _RenamedCharInfos.find( charInfos->ShortName.toUtf8() );
-			if( itInfos != _RenamedCharInfos.end() ) // New name was in the saved list; player is getting original name back. // Remove the new name
+			if( itInfos != _RenamedCharInfos.end() ) // New name was in the saved list; player is getting original name back
 			{
 				_RenamedCharInfos.erase(charInfos->ShortName.toUtf8());
 			}
-			else // New name was not in the list, save old name
+			else // New name was not in the list, save old name (it's the real name)
 			{
 				_IdToRealName.insert(make_pair(eid, oldname.toUtf8()));
 				_RenamedCharInfos.insert( make_pair(oldname.toUtf8(), charInfos) );
@@ -928,6 +927,12 @@ void CInputOutputService::removeEntity( const TDataSetRow &chId )
 //		index = itInfos->second->OldNameIndex;
 
 		_NameToInfos.erase(itInfos->second->ShortName.toUtf8());
+		TIdRealNames::iterator itRealName = _IdToRealName.find(eid);
+		if( itRealName != _IdToRealName.end() )  //Erase if found rename
+		{
+			_RenamedCharInfos.erase(itRealName->second);
+			_IdToRealName.erase(eid);
+		}
 
 		// erase the entry in _IdToInfos
 		delete itInfos->second;

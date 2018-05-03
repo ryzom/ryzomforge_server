@@ -93,7 +93,9 @@ public:
 	/// get a building destination from its name.
 	IBuildingPhysical* getBuildingPhysicalsByName( const std::string & name );
 	/// remove a player from a room
-	void removePlayerFromRoom( CCharacter * user );
+	void removePlayerFromRoom( CCharacter * user, bool needDeleteRoom = true );
+	/// delete a room
+	void deleteRoom(sint32 cell);
 	/// alocate a new room instance. Fills the room cell passed a sparam and returns a pointer on the instance
 	IRoomInstance * allocateRoom( sint32 & cellRet, BUILDING_TYPES::TBuildingType type );
 	/// get a room instance from its cell

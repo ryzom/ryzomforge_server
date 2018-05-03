@@ -35,6 +35,7 @@
 #include "shop_type/named_items.h"
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
+#include "guild_manager/fame_manager.h"
 #include "building_manager/building_manager.h"
 #include "building_manager/building_physical.h"
 #include "progression/progression_pvp.h"
@@ -1085,9 +1086,8 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 	return true;
 }
 
-
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getFame, "get fame of player", "<uid> faction")
+NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<enforce caps>?]")
 {
 
 	if (args.size () < 2)
@@ -1104,10 +1104,39 @@ NLMISC_COMMAND(getFame, "get fame of player", "<uid> faction")
 		log.displayNL("ERR: invalid fame");
 		return false;
 	}
-	
-	sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
-	log.displayNL("%d", fame);
 
+	sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
+
+	if (args.size() == 3)
+	{
+		string quant = args[2];
+		sint32 quantity;
+		if (quant[0] == '+')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				fame += quantity;
+			}
+		}
+		else
+		{
+			fromString(quant, fame);
+		}
+
+		CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame, false);
+	}
+
+	if (args.size() == 4 && args[3] == "1")
+	{
+		CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
+		// set tribe fame threshold and clamp fame if necessary
+		CFameManager::getInstance().setAndEnforceTribeFameCap(c->getId(), c->getAllegiance());
+		fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
+	}
+
+	log.displayNL("%d", fame);
+	
 	return true;
 }
 
@@ -1346,7 +1375,7 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 			nlinfo("playerEid = %s", playerEid.toString().c_str());
 			if (buildingPlayer && playerEid != CEntityId::Unknown)
 			{
-				CBuildingManager::getInstance()->removePlayerFromRoom(c);
+				CBuildingManager::getInstance()->removePlayerFromRoom(c, false);
 				uint16 ownerId = buildingPlayer->getOwnerIdx(playerEid);
 				nlinfo("ownerId = %d", ownerId);
 				sint32 cell;
@@ -1426,6 +1455,61 @@ NLMISC_COMMAND(slide, "slide to the powo", "<uid> x y cell [z] [h]")
 	return true;
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getPlayersInPowos, "get list of players in a powo", "")
+{
+	CPlayerManager::TMapPlayers::const_iterator itPlayer = PlayerManager.getPlayers().begin();
+
+	for (; itPlayer != PlayerManager.getPlayers().end(); ++itPlayer )
+	{
+		if ( (*itPlayer).second.Player )
+		{
+			CCharacter * player = (*itPlayer).second.Player->getActiveCharacter();
+			if ( player )
+			{
+				sint32 powo = player->getPowoCell();
+				if (powo != 0)
+					log.displayNL("%d: %s", powo, player->getName().toString().c_str());
+			}
+		}
+	}
+
+	return true;
+}
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(kickPlayersFromPowo, "kick players from powo", "<player1,player2,...> <powo>")
+{
+
+	if (args.size () < 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	
+	std::vector< std::string > players;
+	NLMISC::splitString(args[0], ",", players);
+	sint32 powo;
+	fromString(args[1], powo);
+	
+	for (uint32 i=0; i < players.size(); i++)
+	{
+		CCharacter * player = PlayerManager.getCharacterByName(players[i]);
+		if (player && player->getPowoCell() == powo)
+		{
+			const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(player->getBuildingExitZone());
+			if (zone)
+			{
+				sint32 x, y, z;
+				float heading;
+				zone->getRandomPoint(x, y, z, heading);
+				player->tpWanted(x, y, z, true, heading);
+			}
+		}
+	}
+}
 
 
 
@@ -2075,6 +2159,12 @@ NLMISC_COMMAND(getPlayerStats,"get player stats","<uid> <stat1,stat2,stat3..>")
 		i++;
 	}
 
+	if (i < stats.size() && stats[i] == "powo") // powo cell
+	{
+		log.displayNL("%d", c->getPowoCell());
+		i++;
+	}
+
 	return true;
 }
 
@@ -2444,9 +2534,9 @@ NLMISC_COMMAND(sendMessageToUser, "send a message to a user", "<player name> <me
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <url>")
+NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <params>")
 {
-	if (args.size() != 2)
+	if (args.size() != 3)
 		return false;
 
 	CCharacter * target = PlayerManager.getCharacterByName(args[0]);
@@ -2456,7 +2546,7 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <url>")
 		return true;
 	}
 	
-	target->sendUrl(args[1], "");
+	target->sendUrl(args[1]+" "+args[2], "");
 	log.displayNL("OK");
 	return true;
 }

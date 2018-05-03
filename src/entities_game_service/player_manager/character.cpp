@@ -5600,7 +5600,17 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		}
 	}
 
-	CBuildingManager::getInstance()->removePlayerFromRoom(this);
+
+	if (_PowoCell != cell) // leave the current Powo
+	{
+		resetPowoFlags();
+		_PowoCell = 0;
+		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
+	}
+	else
+		CBuildingManager::getInstance()->removePlayerFromRoom(this);
+
+
 
 	// despawn pets or stop it
 	for (uint i = 0; i < _PlayerPets.size(); i++)
@@ -5637,10 +5647,6 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 			}
 		}
 	}
-
-	if (_PowoCell != cell)
-		resetPowoFlags();
-
 
 	if (_IntangibleEndDate != ~0 && !fromVortex) // Don't save Last Tp Tick if player respawns or teleport from Vortex
 		_LastTpTick = CTickEventHandler::getGameCycle();

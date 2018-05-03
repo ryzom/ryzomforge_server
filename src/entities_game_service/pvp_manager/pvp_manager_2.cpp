@@ -264,6 +264,14 @@ std::vector<TChanID> CPVPManager2::getCharacterChannels(CCharacter * user)
 		}
 	}
 		
+	if (user->getOrganization() == 7) // ranger
+	{
+		TMAPExtraFactionChannel::iterator it = _ExtraFactionChannel.find("ranger");
+		if (it != _ExtraFactionChannel.end())
+		{
+			result.push_back((*it).second);
+		}
+	}
 
 	/*
 	bool matis = CFameInterface::getInstance().getFameIndexed(user->getId(), 0) >= PVPFameRequired*6000;
@@ -1165,6 +1173,7 @@ void CPVPManager2::onIOSMirrorUp()
 	*/
 
 	createExtraFactionChannel("marauders");
+	createExtraFactionChannel("ranger");
 
 	// Community Channels
 	createExtraFactionChannel("en", true);

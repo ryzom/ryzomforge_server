@@ -2913,35 +2913,6 @@ NLMISC_COMMAND(unloadPrimitiveFile,"unload a primitive file","<file name>")
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// MULTI_LINE_FORMATER                                                      //
-//////////////////////////////////////////////////////////////////////////////
-
-static int const MULTI_LINE_FORMATER_maxn = 78;
-void MULTI_LINE_FORMATER::pushTitle(std::vector<std::string>& container, std::string const& text)
-{
-	const sint maxn = MULTI_LINE_FORMATER_maxn;
-	sint n = maxn - (sint)text.length() - 4;
-	container.push_back(" _/");
-	container.back() += text;
-	container.back() += "\\" + std::string(n, '_');
-	container.push_back("/");
-	container.back() += std::string(maxn - 1, ' ');
-}
-
-void MULTI_LINE_FORMATER::pushEntry(std::vector<std::string>& container, std::string const& text)
-{
-	container.push_back("| ");
-	container.back() += text;
-}
-
-void MULTI_LINE_FORMATER::pushFooter(std::vector<std::string>& container)
-{
-	int const maxn = MULTI_LINE_FORMATER_maxn;
-	container.push_back("\\");
-		container.back() += std::string(maxn - 1, '_');
-}
-
-//////////////////////////////////////////////////////////////////////////////
 // Bug simulation                                                           //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -3138,8 +3109,8 @@ static void setRyzomDebugDate(CRyzomDate &rd)
 NLMISC_COMMAND(setDebugHour, "set the current debug hour", "<hour>")
 {
 	if (args.size() != 1) return false;	
-	int hour;
-	if (sscanf(args[0].c_str(), "%d", &hour) != 1) return false;
+	sint hour;
+	if (!fromString(args[0], hour)) return false;
 	CRyzomDate rd;
 	getRyzomDebugDate(rd);
 	rd.Time = fmodf(rd.Time, 1.f) + (float) hour;
@@ -3150,8 +3121,8 @@ NLMISC_COMMAND(setDebugHour, "set the current debug hour", "<hour>")
 NLMISC_COMMAND(setDebugDayOfYear, "set the current debug day of year (first day has index 1)", "<day>")
 {
 	if (args.size() != 1) return false;	
-	int day;
-	if (sscanf(args[0].c_str(), "%d", &day) != 1) return false;
+	sint day;
+	if (!fromString(args[0], day)) return false;
 	CRyzomDate rd;	
 	getRyzomDebugDate(rd);
 	rd.Day = day - 1; // for the user, days start at '1'

@@ -2987,6 +2987,39 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 	string state_name = stack.top();
 	stack.pop();
 
+
+	//////////// Special Cases for Ark
+	if (event_name == "notify_on_death")
+	{
+		strFindReplace(code, "http://", "");
+		strFindReplace(code, "https://", "");
+		strFindReplace(code, "/index.php?", " ");
+		
+		CGroup* group = entity->getGroup();
+		FOREACH(botIt, CCont<CBot>,	group->bots())
+		{
+			CBot* bot = *botIt;
+			
+			if (!bot->isSpawned()) return;
+
+			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
+			if (botNpc)
+			{
+				CSpawnBotNpc* spawnBotNpc = botNpc->getSpawn();
+				if (spawnBotNpc)
+				{
+					CAINotifyDeathMsg *msg = new CAINotifyDeathMsg;
+					msg->Url = code;
+					msg->TargetRowId = spawnBotNpc->dataSetRow();
+					msg->send("EGS");
+				}
+			}
+		}
+		return;
+	}
+	///////////////////////////////////////////////////////
+
+	
 	CAIEventDescription eventDescription;
 	CAIEventActionNode::TSmartPtr eventAction;
 	CAIEventReaction* event;
@@ -3034,8 +3067,12 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 	}
 
 	uint32 stateEventAlias = npcGroup->getStateEventAlias(event_name);
-	if (stateEventAlias != 0)
-		sm->eventReactions().removeChildByIndex(sm->eventReactions().getChildIndexByAlias(stateEventAlias));
+	/*if (stateEventAlias != 0)
+	{
+		CAIEventReaction er = sm->eventReactions().getChildByAlias(stateEventAlias);
+		er->setGroup(0);
+	}*/
+	//	sm->eventReactions().removeChildByIndex(sm->eventReactions().getChildIndexByAlias(stateEventAlias));
 
 	// Register event handler
 	stateEventAlias = sm->getLastStateEventAlias();
@@ -3045,6 +3082,7 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 	nlinfo("Add Event: %s(%d) in State : %d", event_name.c_str(), stateEventAlias, statePositional->getAlias());
 	event->setState(statePositional->getAlias());
 	npcGroup->setStateEventAlias(event_name, stateEventAlias);
+	
 	
 	sm->eventReactions().addChild(event);
 	event = NULL;
