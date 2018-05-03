@@ -2570,5 +2570,66 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <par
 }
 
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setGuildPoints, "get/set the guild points", "<uid> <value>")
+{
+	GET_ACTIVE_CHARACTER
+
+	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
+	if (guild)
+	{
+		uint32 points = guild->getXP();
+
+		if (args.size() == 2)
+		{
+			string quant = args[1];
+			uint32 quantity;
+			if (quant[0] == '+')
+			{
+				if (quant.size() > 1)
+				{
+					fromString(quant.substr(1), quantity);
+					points += quantity;
+				}
+			}
+			else if (quant[0] == '-')
+			{
+				if (quant.size() > 1)
+				{
+					fromString(quant.substr(1), quantity);
+					if (points >= quantity)
+					{
+						points -= quantity;
+					}
+					else
+					{
+						log.displayNL("ERR: not enough"); // No enough points
+						return true;
+					}
+				}
+			}
+			else
+			{
+				fromString(quant, points);
+			}
+
+			guild->setPoints(points);
+		}
+
+		log.displayNL("%u", points);
+	} else {
+		log.displayNL("ERR: no guild");
+	}
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(resetTodayGuildPoints, "reset the today guild points", "<uid>")
+{
+	GET_ACTIVE_CHARACTER
+	c->resetTodayGuildPoints();
+}
+
+
 
 
