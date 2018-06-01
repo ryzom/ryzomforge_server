@@ -1554,7 +1554,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 
 			if (!c->canEntityUseAction(bypassCheckFlags, true)) {
 				log.displayNL("ERR: PVP_TP_FORBIDEN");
-				return true;
+				return false;
 			}
 		}
 	}
@@ -1710,6 +1710,54 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 		c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
 	}
 }
+
+//-----------------------------------------------
+// Check Action Flags
+//-----------------------------------------------
+NLMISC_COMMAND(checkActionFlags,"Check Action Flags","<uid> [pvp_flag, pvp_tag, sitting, water, mount, fear, sleep, invu, stun]")
+{
+	if (args.size () != 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+
+	// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
+	bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
+	if (args[1][0] == '1' && !pvpFlagValid) {
+		log.displayNL("ERR: PVP_TP_FORBIDEN");
+		return false;
+	}
+
+	bool pvpTagValid =  c->getPVPFlag() == false;
+	if (args[1].length() > 1 && args[1][1] == '1' && !pvpTagValid)
+	{
+		log.displayNL("ERR: PVP_TP_FORBIDEN");
+		return false;
+	}
+
+	if (args[1].length() > 2)
+	{
+		CBypassCheckFlags bypassCheckFlags;
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[1].length() > 2 && args[1][2] == '1');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[1].length() > 3 && args[1][3] == '1');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[1].length() > 4 && args[1][4] == '1');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[1].length() > 5 && args[1][5] == '1');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[1].length() > 6 && args[1][6] == '1');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[1].length() > 7 && args[1][7] == '1');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[1].length() > 8 && args[1][8] == '1');
+
+		if (!c->canEntityUseAction(bypassCheckFlags, true)) {
+			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			return false;
+		}
+	}
+
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setRespawn, "set respawn point for the player", "<uid> x y cell")
