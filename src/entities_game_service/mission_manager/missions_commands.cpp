@@ -1725,9 +1725,9 @@ NLMISC_COMMAND(checkActionFlags,"Check Action Flags","<uid> [pvp_flag, pvp_tag, 
 	}
 	
 	GET_ACTIVE_CHARACTER
-
 	// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
 	bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
+	if (args[1][0] == '1' && !pvpFlagValid) 
 	{
 		CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "NO_ACTION_WHILE_PVP");
 		return false;
