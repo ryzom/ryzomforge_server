@@ -1514,7 +1514,7 @@ NLMISC_COMMAND(kickPlayersFromPowo, "kick players from powo", "<player1,player2,
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] teleportMektoub? checks sameCell checkPowoFlag")
+NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] teleportMektoub? checks sameCell checkPowoFlag")
 {
 	if (args.size () < 2)
 	{
@@ -1530,30 +1530,32 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 	{
 		bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
 		if (args[3][0] == '1' && !pvpFlagValid) {
-			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
+			log.displayNL("ERR: PVP_FLAG");
 			return false;
 		}
 
 		bool pvpTagValid =  c->getPVPFlag() == false;
 		if (args[3].length() > 1 && args[3][1] == '1' && !pvpTagValid)
 		{
-			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
+			log.displayNL("ERR: PVP_TAG");
 			return false;
 		}
 
 		if (args[3].length() > 2)
 		{
 			CBypassCheckFlags bypassCheckFlags;
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[3].length() > 2 && args[3][2] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[3].length() > 3 && args[3][3] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[3].length() > 4 && args[3][4] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[3].length() > 5 && args[3][5] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[3].length() > 6 && args[3][6] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[3].length() > 7 && args[3][7] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[3].length() > 8 && args[3][8] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[3].length() > 2 && args[3][2] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[3].length() > 3 && args[3][3] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[3].length() > 4 && args[3][4] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[3].length() > 5 && args[3][5] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[3].length() > 6 && args[3][6] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[3].length() > 7 && args[3][7] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[3].length() > 8 && args[3][8] == '0');
 
 			if (!c->canEntityUseAction(bypassCheckFlags, true)) {
-				log.displayNL("ERR: PVP_TP_FORBIDEN");
+				log.displayNL("ERR: OTHER_FLAG");
 				return false;
 			}
 		}
@@ -1726,35 +1728,38 @@ NLMISC_COMMAND(checkActionFlags,"Check Action Flags","<uid> [pvp_flag, pvp_tag, 
 
 	// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
 	bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
-	if (args[1][0] == '1' && !pvpFlagValid) {
-		log.displayNL("ERR: PVP_TP_FORBIDEN");
+	if (args[1][0] == '1' && !pvpFlagValid)
+	{
+		CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "NO_ACTION_WHILE_PVP");
+		log.displayNL("ERR: PVP_FLAG");
 		return false;
 	}
 
 	bool pvpTagValid =  c->getPVPFlag() == false;
 	if (args[1].length() > 1 && args[1][1] == '1' && !pvpTagValid)
 	{
-		log.displayNL("ERR: PVP_TP_FORBIDEN");
+		CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "NO_ACTION_WHILE_PVP");
+		log.displayNL("ERR: PVP_TAG");
 		return false;
 	}
 
 	if (args[1].length() > 2)
 	{
 		CBypassCheckFlags bypassCheckFlags;
-		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[1].length() > 2 && args[1][2] == '1');
-		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[1].length() > 3 && args[1][3] == '1');
-		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[1].length() > 4 && args[1][4] == '1');
-		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[1].length() > 5 && args[1][5] == '1');
-		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[1].length() > 6 && args[1][6] == '1');
-		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[1].length() > 7 && args[1][7] == '1');
-		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[1].length() > 8 && args[1][8] == '1');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[1].length() > 2 && args[1][2] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[1].length() > 3 && args[1][3] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[1].length() > 4 && args[1][4] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[1].length() > 5 && args[1][5] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[1].length() > 6 && args[1][6] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[1].length() > 7 && args[1][7] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[1].length() > 8 && args[1][8] == '0');
 
 		if (!c->canEntityUseAction(bypassCheckFlags, true)) {
-			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			log.displayNL("ERR: OTHER_FLAG");
 			return false;
 		}
 	}
-
+	log.displayNL("OK");
 	return true;
 }
 
