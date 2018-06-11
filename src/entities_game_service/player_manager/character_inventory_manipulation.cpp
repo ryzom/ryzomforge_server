@@ -1476,6 +1476,7 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 				|| (item->getRequiredFaction() == "karavan"
 					&& (allegeance.first != PVP_CLAN::Karavan || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "marauder" && (!neutralcult || !neutralciv || getOrganization() != 5))
+				|| (item->getRequiredFaction() == "ranger" && (!neutralcult || !neutralciv || getOrganization() != 7))
 				|| (item->getRequiredFaction() == "neutralcult" && (!neutralcult || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "neutralciv" && (!neutralciv || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "neutral" && (!neutralcult || !neutralciv || getOrganization() != 0))
