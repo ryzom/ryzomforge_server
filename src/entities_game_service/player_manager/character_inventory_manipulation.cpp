@@ -1487,9 +1487,15 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 				|| (item->getRequiredFaction() == "tryker"
 					&& (allegeance.second != PVP_CLAN::Tryker || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "zorai"
-					&& (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0))))
-		requiredRespected = false;
-
+					&& (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0)))){
+		if (equipCheck){
+			PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "REQUIRED_EQUIP_CIV_CULT_ORGA");
+			return false;
+		}else{
+			requiredRespected = false;
+		}
+	}
+	
 	if (requiredRespected == false && equipCheck)
 	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "REQUIRED_EQUIP");
