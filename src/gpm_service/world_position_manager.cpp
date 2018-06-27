@@ -2185,7 +2185,6 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 	bool								interior = (z&2)!=0;
 	bool								water = (z&4)!=0;
 	bool								correctPos = false;
-	float							correctSpeed = 0;
 
 	// 
 	CVectorD							movVector = entity->localMotion() ? 
@@ -2232,9 +2231,8 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 
 		if (movNorm > sqr(maxDist))
 		{
-			if (movNorm > sqr(6 * SecuritySpeedFactor * CTickEventHandler::getGameTimeStep() * ticksSinceLastUpdate)) {
-				correctSpeed = maxDist / sqrt(movNorm);
-				movVector *= correctSpeed;
+			if (movNorm > sqr(5 * SecuritySpeedFactor * CTickEventHandler::getGameTimeStep() * ticksSinceLastUpdate)) {
+				movVector *= (maxDist / sqrt(movNorm));
 			}
 		}
 	}
@@ -2293,7 +2291,7 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 			correctPos = true;
 			if (true/*VerboseSpeedAbuse*/)
 			{
-				nlwarning("PlayerAbuse %s = %f, %f", master->Id.toString().c_str(), diff2d.sqrnorm(), correctSpeed);
+				nlwarning("PlayerAbuse %s real=(%.1f,%.1f) targeted=(%.1f,%.1f)", master->Id.toString().c_str(), finalPos.x, finalPos.y, targetPos.x, targetPos.y);
 			}
 		}
 
@@ -2316,15 +2314,10 @@ void CWorldPositionManager::movePlayer(CWorldEntity *entity, sint32 x, sint32 y,
 
 	if (correctPos)
 	{
-		sint32 nothing = 0;
-		sint32 cSpeed = 0.8;
 		CMessage msgout( "IMPULSION_ID" );
 		msgout.serial( master->Id );
 		CBitMemStream bms;
 		GenericXmlMsgManager.pushNameToStream( "TP:CORRECT", bms );
-/*		bms.serial(nothing);	
-		bms.serial(cSpeed);
-		bms.serial(nothing);	*/
 		bms.serial( const_cast<sint32&>(entity->X()) );	
 		bms.serial( const_cast<sint32&>(entity->Y()) );	
 		bms.serial( const_cast<sint32&>(entity->Z()) );	

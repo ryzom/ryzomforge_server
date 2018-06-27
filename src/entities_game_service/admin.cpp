@@ -117,7 +117,7 @@
 //
 
 // Max number of user channel character can be have
-#define NB_MAX_USER_CHANNELS				8
+#define NB_MAX_USER_CHANNELS				2
 
 extern CPlayerManager			PlayerManager;
 extern CCreatureManager			CreatureManager;
