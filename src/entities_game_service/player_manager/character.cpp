@@ -5846,6 +5846,7 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 		return false;
 	}
 
+
 	if (form->Family != ITEMFAMILY::PET_ANIMAL_TICKET)
 	{
 		if (sendMessage)
@@ -5857,7 +5858,6 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		return false;
 	}
-
 	if (form->PetSheet == CSheetId::Unknown)
 	{
 		if (sendMessage)
@@ -5868,17 +5868,21 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		return false;
 	}
-
 	if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
 	{
 		uint32 nbMektoubMount = 0;
 
 		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
 		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
+
 			// check sheet is asigned (prevent an useless warning)
-			if ((*it).PetSheetId != CSheetId::Unknown)
+			if (petSheetId != CSheetId::Unknown)
 			{
-				const CStaticCreatures* form = CSheets::getCreaturesForm((*it).PetSheetId);
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 				if (form)
 				{
@@ -5907,10 +5911,14 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
 		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
 			// check sheet is asigned (prevent an useless warning)
-			if ((*it).PetSheetId != CSheetId::Unknown)
+			if (petSheetId != CSheetId::Unknown)
 			{
-				const CStaticCreatures* form = CSheets::getCreaturesForm((*it).PetSheetId);
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 				if (form)
 				{
@@ -5928,6 +5936,53 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 			if (sendMessage)
 			{
 				sendDynamicSystemMessage(_Id, "EGS_CANT_BUY_ANOTHER_PACKER");
+			}
+
+			return false;
+		}
+
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		BOMB_IF(p == NULL, "Failed to find player record for character: " << getId().toString(), return 0.0);
+
+		if (p->isTrialPlayer())
+		{
+			if (sendMessage)
+			{
+				sendDynamicSystemMessage(_Id, "EGS_CANT_BUY_PACKER_IS_TRIAL_PLAYER");
+			}
+
+			return false;
+		}
+	}
+	else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
+	{
+		uint32 nbAnimals = 0;
+		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
+		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
+			// check sheet is asigned (prevent an useless warning)
+			if (petSheetId != CSheetId::Unknown)
+			{
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
+
+				if (form)
+				{
+					if (form->getRace() == EGSPD::CPeople::Creature)
+					{
+						++nbAnimals;
+					}
+				}
+			}
+		}
+		// check we can add delta packer
+		if ((nbAnimals + delta) > MAX_OTHER_PET)
+		{
+			if (sendMessage)
+			{
+				sendDynamicSystemMessage(_Id, "EGS_CANT_GET_ANOTHER_PET");
 			}
 
 			return false;
@@ -7100,7 +7155,11 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 	if (_PlayerPets[i].PetStatus != CPetAnimal::not_present)
 	{
 		_PlayerPets[i].AnimalStatus = ANIMAL_STATUS::AliveFlag;
-		const CStaticCreatures* form = CSheets::getCreaturesForm(_PlayerPets[i].PetSheetId);
+		const CStaticItem* ticket_form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+		CSheetId petSheetId = CSheetId::Unknown;
+		if (ticket_form)
+			petSheetId = ticket_form->PetSheet;
+		const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 		if (form)
 		{
@@ -7461,6 +7520,19 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 		}
 	}
 }
+
+void CCharacter::setAnimalSheetId(uint8 petIndex, CSheetId sheetId)
+{
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
+
+	CPetAnimal &animal = _PlayerPets[petIndex];
+	animal.setSheetId(sheetId);
+}
+
 
 void CCharacter::setAnimalName(uint8 petIndex, ucstring customName)
 {
@@ -10866,7 +10938,7 @@ void CCharacter::sellItem(INVENTORIES::TInventory inv, uint32 slot, uint32 quant
 		return;
 	}
 
-	if (inv >= INVENTORIES::pet_animal1 && inv <= INVENTORIES::pet_animal4)
+	if (inv >= INVENTORIES::pet_animal1 && inv < INVENTORIES::max_pet_animal)
 	{
 		if ((_PlayerPets[inv - INVENTORIES::pet_animal1].AnimalStatus & ANIMAL_STATUS::InventoryAvailableFlag)
 				== false)
@@ -20260,7 +20332,12 @@ uint32 CPetAnimal::initLinkAnimalToTicket(CCharacter* c, uint8 index)
 //-----------------------------------------------
 uint32 CPetAnimal::getAnimalMaxBulk()
 {
-	const CStaticCreatures* form = CSheets::getCreaturesForm(PetSheetId);
+	// For max bulk use pet sheet from ticket (in case where sheet has changed)
+	const CStaticItem* ticket_form = CSheets::getForm(TicketPetSheetId);
+	CSheetId petSheetId = CSheetId::Unknown;
+	if (ticket_form)
+		petSheetId = ticket_form->PetSheet;
+	const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 	if (form)
 	{
