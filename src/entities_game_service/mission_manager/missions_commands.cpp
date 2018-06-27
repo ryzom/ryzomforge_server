@@ -20,6 +20,7 @@
 #include "nel/net/service.h"
 #include "nel/misc/command.h"
 #include "nel/misc/algo.h"
+#include "egs_sheets/egs_sheets.h"
 
 #include "player_manager/character.h"
 #include "player_manager/player_manager.h"
@@ -1352,6 +1353,9 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup]")
 {
+	if (args.size() != 2)
+		return false;
+	
 	GET_ACTIVE_CHARACTER
 
 	IBuildingPhysical *building;
@@ -1711,6 +1715,8 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	{
 		c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
 	}
+
+	log.displayNL("OK");
 }
 
 //-----------------------------------------------
@@ -1880,6 +1886,58 @@ NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
 	return true;
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid> <index> <sheetid>")
+{
+	if (args.size() != 3)
+		return false;
+		
+	GET_ACTIVE_CHARACTER
+	uint8 index;
+	fromString(args[1], index);
+	CSheetId sheet = CSheetId(args[2].c_str());
+	if (sheet != CSheetId::Unknown)
+		c->setAnimalSheetId(index, sheet);
+	else
+	{
+		log.displayNL("ERR: invalid sheet");
+		return true;
+	}
+	log.displayNL("OK");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerHaircut, "change the haircut of a player", "<uid> <sheet name>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	CSheetId sheetId(args[1]);
+	const CStaticItem * form = CSheets::getForm(sheetId);
+	if (form == NULL)
+	{
+		log.displayNL("ERR: item unknown '%s'", sheetId.toString().c_str());
+		return true;
+	}
+
+	if (form->Type != ITEM_TYPE::HAIR_MALE && form->Type != ITEM_TYPE::HAIR_FEMALE)
+	{
+		log.displayNL("ERR: item not haircut '%s'", sheetId.toString().c_str());
+		return true;
+	}
+
+	uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(form->SheetId, SLOTTYPE::HEAD_SLOT);
+	if (c->setHair(hairValue))
+	{
+		c->resetHairCutDiscount();
+	}
+
+	log.displayNL("OK");
+	return true;
+}
 
 
 
@@ -2556,6 +2614,8 @@ NLMISC_COMMAND(setTrigger, "set a custom trigger", "<trigger> [<web_app>] [<args
 		CBuildingManager::getInstance()->setCustomTrigger(triggerId, args[1]+" "+args[2]);
 	else
 		CBuildingManager::getInstance()->setCustomTrigger(triggerId, "");
+	log.displayNL("OK");
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2572,8 +2632,8 @@ NLMISC_COMMAND(muteUser, "mute a user", "<player name> <duration> [<universe>?]"
 	}
 
 	uint32 duration;
-	NLMISC::fromString(args[1], duration);
-	NLMISC::TGameCycle cycle = (NLMISC::TGameCycle)(duration / CTickEventHandler::getGameTimeStep() + CTickEventHandler::getGameCycle());
+	fromString(args[1], duration);
+	TGameCycle cycle = (NLMISC::TGameCycle)(duration / CTickEventHandler::getGameTimeStep() + CTickEventHandler::getGameCycle());
 	if (args.size() == 3)
 		PlayerManager.muteUniverse(CEntityId::Unknown, cycle, target->getId());
 	else
