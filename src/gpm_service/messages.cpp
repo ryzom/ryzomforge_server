@@ -542,7 +542,7 @@ void cbEntityTeleportation( CMessage& msgin, const string &serviceName, NLNET::T
 
 	if (cell > 0)
 	{
-		//nlwarning("cbEntityTeleportation(): cell=%d for %s should be zero or negative, forced to 0", cell, id.toString().c_str());
+		nlwarning("cbEntityTeleportation(): cell=%d for %s should be zero or negative, forced to 0", cell, id.toString().c_str());
 		cell = 0;
 	}
 
@@ -568,7 +568,7 @@ void cbEntityTeleportation( CMessage& msgin, const string &serviceName, NLNET::T
 	{
 		if (move_to_new_cell == 1)
 		{
-			//nlinfo("MSG: Sliding entity %d to cell %d) at tick: %d",index.getIndex(),cell,tick);
+			nlinfo("MSG: Sliding entity %d to cell %d) at tick: %d",index.getIndex(),cell,tick);
 			CWorldPositionManager::updateEntityPosition(CWorldPositionManager::getEntityPtr(index), cell);
 		}
 		else
