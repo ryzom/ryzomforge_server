@@ -2685,6 +2685,9 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <par
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setGuildPoints, "get/set the guild points", "<uid> <value>")
 {
+	if (args.size() != 2)
+		return false;
+	
 	GET_ACTIVE_CHARACTER
 
 	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
@@ -2740,8 +2743,62 @@ NLMISC_COMMAND(resetTodayGuildPoints, "reset the today guild points", "<uid>")
 {
 	GET_ACTIVE_CHARACTER
 	c->resetTodayGuildPoints();
+	log.displayNL("OK");
+	return true;
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid> <index> <sheetid>")
+{
+	if (args.size() != 3)
+		return false;
+		
+	GET_ACTIVE_CHARACTER
+	uint8 index;
+	fromString(args[1], index);
+	CSheetId sheet = CSheetId(args[2].c_str());
+	if (sheet != CSheetId::Unknown)
+		c->setAnimalSheetId(index, sheet);
+	else
+	{
+		log.displayNL("ERR: invalid sheet");
+		return true;
+	}
+	log.displayNL("OK");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerHaircut, "change the haircut of a player", "<uid> <sheet name>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	CSheetId sheetId(args[1]);
+	const CStaticItem * form = CSheets::getForm(sheetId);
+	if (form == NULL)
+	{
+		log.displayNL("ERR: item unknown '%s'", sheetId.toString().c_str());
+		return true;
+	}
+
+	if (form->Type != ITEM_TYPE::HAIR_MALE && form->Type != ITEM_TYPE::HAIR_FEMALE)
+	{
+		log.displayNL("ERR: item not haircut '%s'", sheetId.toString().c_str());
+		return true;
+	}
+
+	uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(form->SheetId, SLOTTYPE::HEAD_SLOT);
+	if (c->setHair(hairValue))
+	{
+		c->resetHairCutDiscount();
+	}
+
+	log.displayNL("OK");
+	return true;
+}
 
 
 
