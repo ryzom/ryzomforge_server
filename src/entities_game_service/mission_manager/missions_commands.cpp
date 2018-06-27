@@ -1732,7 +1732,7 @@ NLMISC_COMMAND(checkActionFlags,"Check Action Flags","<uid> [pvp_flag, pvp_tag, 
 	
 	GET_ACTIVE_CHARACTER
 	// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
-	bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
+	bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);
 	if (args[1][0] == '1' && !pvpFlagValid) 
 	{
 		CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "NO_ACTION_WHILE_PVP");
@@ -2679,6 +2679,67 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <par
 	target->sendUrl(args[1]+" "+args[2], "");
 	log.displayNL("OK");
 	return true;
+}
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setGuildPoints, "get/set the guild points", "<uid> <value>")
+{
+	GET_ACTIVE_CHARACTER
+
+	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
+	if (guild)
+	{
+		uint32 points = guild->getXP();
+
+		if (args.size() == 2)
+		{
+			string quant = args[1];
+			uint32 quantity;
+			if (quant[0] == '+')
+			{
+				if (quant.size() > 1)
+				{
+					fromString(quant.substr(1), quantity);
+					points += quantity;
+				}
+			}
+			else if (quant[0] == '-')
+			{
+				if (quant.size() > 1)
+				{
+					fromString(quant.substr(1), quantity);
+					if (points >= quantity)
+					{
+						points -= quantity;
+					}
+					else
+					{
+						log.displayNL("ERR: not enough"); // No enough points
+						return true;
+					}
+				}
+			}
+			else
+			{
+				fromString(quant, points);
+			}
+
+			guild->setPoints(points);
+		}
+
+		log.displayNL("%u", points);
+	} else {
+		log.displayNL("ERR: no guild");
+	}
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(resetTodayGuildPoints, "reset the today guild points", "<uid>")
+{
+	GET_ACTIVE_CHARACTER
+	c->resetTodayGuildPoints();
 }
 
 

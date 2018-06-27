@@ -3229,6 +3229,9 @@ private:
 	uint32 _FactionPoint[PVP_CLAN::EndClans - PVP_CLAN::BeginClans + 1];
 
 	uint32 _PvpPoint;
+	uint32 _GuildPoints;
+	uint8 _TodayGuildPoints;
+	NLMISC::TGameCycle _NextTodayGuildPointsReset;
 
 	uint32 _Organization;
 	uint32 _OrganizationStatus;
@@ -4081,6 +4084,12 @@ public:
 		_PowoCanTeleport = false;
 		_PowoCanSpeedUp = false;
 		_PowoCanDP = false;
+	}
+
+	void resetTodayGuildPoints()
+	{
+		_TodayGuildPoints = 0;
+		_NextTodayGuildPointsReset = CTickEventHandler::getGameCycle() + 10*60*60*20;
 	}
 
 	bool getGodModeSave() const
