@@ -348,6 +348,11 @@ struct CPetAnimal
 	{
 		CustomName = customName;
 	}
+
+	void setSheetId(NLMISC::CSheetId sheetId)
+	{
+		PetSheetId = sheetId;
+	}
 };
 
 /**
@@ -1061,6 +1066,9 @@ public:
 
 	// return the index of a player pet, or -1 if not found
 	sint32 getPlayerPet(const TDataSetRow &petRowId) const;
+
+	// Set the sheetid of the animal
+	void setAnimalSheetId(uint8 petIndex, NLMISC::CSheetId sheetId);
 
 	// Set the name of the animal
 	void setAnimalName(uint8 petIndex, ucstring customName);
