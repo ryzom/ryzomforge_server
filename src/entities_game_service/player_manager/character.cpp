@@ -1677,6 +1677,11 @@ void CCharacter::kill(TDataSetRow killerRowId)
 		CUnifiedNetwork::getInstance()->send("TTS", msgout);
 	}
 
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
+
 	_ContextualProperty.directAccessForStructMembers().talkableTo(false);
 	_ContextualProperty.setChanged();
 	CPhraseManager::getInstance().removeEntity(_EntityRowId, false);
@@ -1999,6 +2004,11 @@ void CCharacter::applyRespawnEffects(bool applyDP)
 	_Behaviour = MBEHAV::IDLE;
 	_IsDead = false;
 	_IsInAComa = false;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2016,6 +2026,11 @@ void CCharacter::resurrected()
 	// give spire effect if needed
 	CPVPFactionRewardManager::getInstance().giveTotemsEffects(this);
 	_RegionKilledInPvp = 0xffff;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2033,6 +2048,11 @@ void CCharacter::revive()
 	_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base;
 	_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base;
 	_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
