@@ -125,7 +125,7 @@ void cbClientItemEquip( NLNET::CMessage& msgin, const std::string &serviceName, 
 		// if player is stunned or dead cancel action
 		if (c->isDead() || c->isStunned())
 			return;
-		c->equipCharacter( INVENTORIES::TInventory(equippedInventory), equippedSlot, bagSlot, true );
+		c->equipCharacter( INVENTORIES::TInventory(equippedInventory), equippedSlot, bagSlot, false );
 	}
 }
 
@@ -151,7 +151,7 @@ void cbClientItemUnequip( NLNET::CMessage& msgin, const std::string &serviceName
 		if (c->isDead() || c->isStunned())
 			return;
 
-		c->unequipCharacter( INVENTORIES::TInventory(equippedInventory), equippedSlot, true );
+		c->unequipCharacter( INVENTORIES::TInventory(equippedInventory), equippedSlot, false );
 	}
 }
 
