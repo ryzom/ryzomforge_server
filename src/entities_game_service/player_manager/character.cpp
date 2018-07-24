@@ -11144,6 +11144,10 @@ void CCharacter::sellItem(INVENTORIES::TInventory inv, uint32 slot, uint32 quant
 					  "sell price %d, margin %d), must not permited by client",
 					  _Id.toString().c_str(), sheet.toString().c_str(), ufBasePrice, sellPrice,
 					  uint32(((sellPrice - ufBasePrice) * 100.0f) / ufBasePrice));
+			if(uint32(((sellPrice - ufBasePrice) * 100.0f) / ufBasePrice) > 9999)
+			{
+				return;
+			}
 		}
 
 		if (item->getRefInventory() == _Inventory[INVENTORIES::equipment])
