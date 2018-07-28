@@ -1,10 +1,6 @@
-FIND_PACKAGE_HELPER(RyzomGameShare continent.h RELEASE ryzom_gameshare_r ryzom_gameshare DEBUG ryzom_gameshare_d DIR ${NEL_DIR} ${RYZOM_DIR})
+FIND_PACKAGE_HELPER(RyzomGameShare game_share/continent.h RELEASE ryzom_gameshare_r ryzom_gameshare DEBUG ryzom_gameshare_d DIR ${NEL_DIR} nel ${RYZOM_DIR} ryzom)
 
 IF(RYZOMGAMESHARE_FOUND)
-  IF(NOT RyzomGameShare_FIND_QUIETLY)
-    MESSAGE(STATUS "Found Ryzom GameShare: ${RYZOMGAMESHARE_LIBRARIES}")
-  ENDIF()
-  
   SET(RYZOM_GAMESHARE_LIBRARIES ${RYZOMGAMESHARE_LIBRARIES})
   SET(RYZOM_GAMESHARE_FOUND ${RYZOMGAMESHARE_FOUND})
   SET(RYZOM_GAMESHARE_INCLUDE_DIR ${RYZOMGAMESHARE_INCLUDE_DIR})
