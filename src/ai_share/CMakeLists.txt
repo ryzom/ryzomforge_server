@@ -6,6 +6,7 @@ TARGET_LINK_LIBRARIES(ryzom_aishare
 						${RYZOM_GAMESHARE_LIBRARIES}
 						ryzom_servershare
 						${NELMISC_LIBRARIES}
+						${NELLIGO_LIBRARIES}
 						${NELNET_LIBRARIES}
 						${NELGEORGES_LIBRARIES}
 						${NELPACS_LIBRARIES})
