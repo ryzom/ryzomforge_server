@@ -38,7 +38,7 @@ SET(NEL_DRIVERS_AVAILABLE opengl opengles direct3d dsound fmod openal xaudio2)
 SET(NELMISC_FIND_REQUIRED ${NeL_FIND_REQUIRED})
 
 # Force search of NELMISC
-FIND_PACKAGE_HELPER(nelmisc nel/misc/types_nl.h RELEASE nelmisc_r nelmisc DEBUG nelmsic_d DIR ${NEL_DIR} QUIET)
+FIND_PACKAGE_HELPER(nelmisc nel/misc/types_nl.h RELEASE nelmisc_r nelmisc DEBUG nelmisc_d DIR ${NEL_DIR} VERBOSE QUIET)
 
 IF(NELMISC_FOUND)
   # define NEL_DIR if not specified
