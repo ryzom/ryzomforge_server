@@ -60,7 +60,7 @@ IF(Mercurial_HG_EXECUTABLE)
   EXECUTE_PROCESS(COMMAND ${Mercurial_HG_EXECUTABLE} --version
     OUTPUT_VARIABLE Mercurial_VERSION_HG
     OUTPUT_STRIP_TRAILING_WHITESPACE)
-	
+
   STRING(REGEX REPLACE ".*version ([\\.0-9]+).*"
     "\\1" Mercurial_VERSION_HG "${Mercurial_VERSION_HG}")
 
