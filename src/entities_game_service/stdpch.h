@@ -30,6 +30,7 @@
 #include <deque>
 #include <exception>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <list>
