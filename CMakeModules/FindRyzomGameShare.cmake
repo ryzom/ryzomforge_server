@@ -1,3 +1,5 @@
+INCLUDE(FindHelpers)
+
 FIND_PACKAGE_HELPER(RyzomGameShare game_share/continent.h RELEASE ryzom_gameshare_r ryzom_gameshare DEBUG ryzom_gameshare_d DIR ${NEL_DIR} ${RYZOM_DIR} SUFFIXES ryzom)
 
 IF(RYZOMGAMESHARE_FOUND)
