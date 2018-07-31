@@ -4046,6 +4046,8 @@ public:
 
 		if (flag == "dp")
 			return _PowoCanDP;
+
+		return false;
 	}
 
 	bool setPowoFlag(const std::string &flag, bool value)
@@ -4064,6 +4066,8 @@ public:
 
 		if (flag == "dp")
 			_PowoCanDP = value;
+
+		return true;
 	}
 
 	void resetPowoFlags()

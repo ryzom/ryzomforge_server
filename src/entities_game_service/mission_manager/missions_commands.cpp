@@ -1195,6 +1195,8 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 	}
 	
 	log.displayNL(msg.c_str());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1242,36 +1244,39 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, give/take/set the mo
 	}
 
 	log.displayNL("%" NL_I64 "u", money);
+
+	return true;
 }
 
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getPvpPoints, "get pvp points of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	string value = toString("%u", c->getPvpPoint());
 
 	log.displayNL(value.c_str());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getGender, "get gender of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	if (c->getGender() == GSGENDER::female)
 		log.displayNL("f");
 	else
 		log.displayNL("m");
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	switch (c->getRace())
@@ -1291,6 +1296,8 @@ NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 		default:
 			log.displayNL("0");
 	}
+
+	return true;
 }
 
 
@@ -1301,6 +1308,8 @@ NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>"
 	std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance = c->getAllegiance();
 
 	log.displayNL("%s|%s|%u", PVP_CLAN::toString(allegiance.first).c_str(), PVP_CLAN::toString(allegiance.second).c_str(), c->getOrganization());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1317,6 +1326,8 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 	uint32 org;
 	fromString(args[1], org);
 	c->setOrganization(org);
+
+	return true;
 }
 
 
@@ -1625,6 +1636,8 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 	{
 		c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
 	}
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1743,9 +1756,6 @@ NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
 	c->killMe();
 	return true;
 }
-
-
-
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientation groupname x y look cell")
@@ -2129,6 +2139,8 @@ NLMISC_COMMAND(addCheckPos,"add check pos","<uid> <x> <y> <radius> <mission_name
 	fromString(args[3], r);
 
 	c->addPositionCheck(x, y, r, args[4], args[5] == "1");
+
+	return true;
 }
 
 
@@ -2162,6 +2174,8 @@ NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>"
 	std::list< CMissionEvent* > eventList;
 	CMissionManager::getInstance()->instanciateMission(c, missionAlias,	giverAlias, eventList);
 	c->processMissionEventList(eventList,true, CAIAliasTranslator::Invalid);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2175,6 +2189,8 @@ NLMISC_COMMAND(removeArkMission,"remove Mission","<uid> <mission_name>")
 	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
 	c->removeMission(missionAlias, 0);
 	c->removeMissionFromHistories(missionAlias);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2188,6 +2204,8 @@ NLMISC_COMMAND(finishArkMission,"finish Mission","<uid> <mission_name>")
 	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
 	c->removeMission(missionAlias, 0, true);
 	c->removeMissionFromHistories(missionAlias);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2204,6 +2222,8 @@ NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1
 	for (uint32 i=3; i<nbString; ++i)
 		text +=  "\n"+getStringFromHash(args[i]);
 	c->setCustomMissionParams(args[1], text);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2215,6 +2235,8 @@ NLMISC_COMMAND(delArkMissionParams,"del Mission Params","<uid> <mission_name>")
 	GET_ACTIVE_CHARACTER;
 
 	c->setCustomMissionParams(args[1], "");
+
+	return true;
 }
 
 
@@ -2227,6 +2249,8 @@ NLMISC_COMMAND(setArkMissionParams,"set Mission Params","<uid> <mission_name> <p
 	GET_ACTIVE_CHARACTER;
 
 	c->setCustomMissionParams(args[1], args[3]+" "+args[4]+","+args[2]);
+
+	return true;
 }
 
 
@@ -2239,6 +2263,8 @@ NLMISC_COMMAND(addArkMissionParams,"add Mission Params","<uid> <mission_name> <p
 	GET_ACTIVE_CHARACTER;
 
 	c->addCustomMissionParam(args[1], args[2]);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2250,6 +2276,8 @@ NLMISC_COMMAND(getLastTpTick,"get tick of last teleport","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastTpTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2261,6 +2289,8 @@ NLMISC_COMMAND(getLastOverSpeedTick,"get tick of last over speed","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastOverSpeedTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2272,6 +2302,8 @@ NLMISC_COMMAND(getLastMountTick,"get tick of last mount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastMountTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2283,6 +2315,8 @@ NLMISC_COMMAND(getLastUnMountTick,"get tick of last umount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastUnMountTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2294,6 +2328,8 @@ NLMISC_COMMAND(getLastFreeMount,"get tick of last free mount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastFreeMount());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2305,6 +2341,8 @@ NLMISC_COMMAND(getLastExchangeMount,"get tick of last exchange mount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastExchangeMount());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2330,6 +2368,8 @@ NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var
 		
 	if (c->getValue("Modifier"+args[1], value))
 		log.displayNL("%s", value.c_str());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2344,6 +2384,8 @@ NLMISC_COMMAND(setPlayerVar, "set the value of a variable of player","<uid> <var
 		log.displayNL("OK");
 	else
 		log.displayNL("ERR: Variable not found");
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2358,6 +2400,8 @@ NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <
 		log.displayNL("OK");
 	else
 		log.displayNL("ERR: Variable not found");
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2396,6 +2440,8 @@ NLMISC_COMMAND(setTrigger, "set a custom trigger", "<trigger> [<web_app>] [<args
 		CBuildingManager::getInstance()->setCustomTrigger(triggerId, args[1]+" "+args[2]);
 	else
 		CBuildingManager::getInstance()->setCustomTrigger(triggerId, "");
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
