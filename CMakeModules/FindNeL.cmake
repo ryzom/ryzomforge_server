@@ -13,7 +13,6 @@
 # NELXXX_FOUND
 # NELXXX_LIBRARIES
 
-
 INCLUDE(FindHelpers)
 
 # Init all variables we'll set
