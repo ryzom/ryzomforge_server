@@ -607,7 +607,7 @@ void CPVPManager2::playerConnects(CCharacter * user)
 		playerName = playerName.substr(0, pos);
 
 #ifdef HAVE_MONGO
-	CMongo::update("ryzom_users", toString("{'name': '%s'}", playerName.c_str()), toString("{$set: {'cid': %"NL_I64"u, 'guildId': %d, 'online': true} }", user->getId().getShortId(), user->getGuildId()), true);
+	CMongo::update("ryzom_users", toString("{'name': '%s'}", playerName.c_str()), toString("{$set: {'cid': %" NL_I64 "u, 'guildId': %d, 'online': true} }", user->getId().getShortId(), user->getGuildId()), true);
 #endif
 
 	std::vector<TChanID> currentChannels = getCharacterUserChannels(user);
@@ -624,7 +624,7 @@ void CPVPManager2::playerDisconnects(CCharacter * user)
 	endDuel(user, "DUEL_DISCONNECT", "");
 
 #ifdef HAVE_MONGO
-	CMongo::update("ryzom_users", toString("{'cid': %"NL_I64"u}", user->getId().getShortId()), "{ $set: {'online': false} }");
+	CMongo::update("ryzom_users", toString("{'cid': %" NL_I64 "u}", user->getId().getShortId()), "{ $set: {'online': false} }");
 #endif
 
 	CPVPManager::getInstance()->playerDisconnects(user);

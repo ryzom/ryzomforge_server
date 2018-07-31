@@ -1241,7 +1241,7 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, give/take/set the mo
 		c->setMoney(money);
 	}
 
-	log.displayNL("%"NL_I64"u", money);
+	log.displayNL("%" NL_I64 "u", money);
 }
 
 
@@ -2376,7 +2376,7 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 		{
 			ucstring name = CEntityIdTranslator::getInstance()->getByEntity((*it));
 			CEntityIdTranslator::removeShardFromName(name);
-			log.displayNL("%"NL_I64"u|%s", (*it).asUint64(), name.toUtf8().c_str());
+			log.displayNL("%" NL_I64 "u|%s", (*it).asUint64(), name.toUtf8().c_str());
 		}
 	} else 
 		log.displayNL("-1");
