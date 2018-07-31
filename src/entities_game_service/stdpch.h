@@ -40,6 +40,10 @@
 #include <utility>
 #include <vector>
 
+#ifdef _SP
+#undef _SP
+#endif
+
 // NeL georges
 #include "nel/georges/load_form.h"
 #include "nel/georges/u_form.h"
