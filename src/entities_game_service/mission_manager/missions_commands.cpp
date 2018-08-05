@@ -20,6 +20,7 @@
 #include "nel/net/service.h"
 #include "nel/misc/command.h"
 #include "nel/misc/algo.h"
+#include "egs_sheets/egs_sheets.h"
 
 #include "player_manager/character.h"
 #include "player_manager/player_manager.h"
@@ -1352,6 +1353,9 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup]")
 {
+	if (args.size() != 2)
+		return false;
+	
 	GET_ACTIVE_CHARACTER
 
 	IBuildingPhysical *building;
@@ -1514,7 +1518,7 @@ NLMISC_COMMAND(kickPlayersFromPowo, "kick players from powo", "<player1,player2,
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] teleportMektoub? checks sameCell checkPowoFlag")
+NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] teleportMektoub? checks sameCell checkPowoFlag")
 {
 	if (args.size () < 2)
 	{
@@ -1530,31 +1534,33 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 	{
 		bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
 		if (args[3][0] == '1' && !pvpFlagValid) {
-			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
+			log.displayNL("ERR: PVP_FLAG");
 			return false;
 		}
 
 		bool pvpTagValid =  c->getPVPFlag() == false;
 		if (args[3].length() > 1 && args[3][1] == '1' && !pvpTagValid)
 		{
-			log.displayNL("ERR: PVP_TP_FORBIDEN");
+			CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
+			log.displayNL("ERR: PVP_TAG");
 			return false;
 		}
 
 		if (args[3].length() > 2)
 		{
 			CBypassCheckFlags bypassCheckFlags;
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[3].length() > 2 && args[3][2] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[3].length() > 3 && args[3][3] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[3].length() > 4 && args[3][4] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[3].length() > 5 && args[3][5] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[3].length() > 6 && args[3][6] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[3].length() > 7 && args[3][7] == '1');
-			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[3].length() > 8 && args[3][8] == '1');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[3].length() > 2 && args[3][2] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[3].length() > 3 && args[3][3] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[3].length() > 4 && args[3][4] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[3].length() > 5 && args[3][5] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[3].length() > 6 && args[3][6] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[3].length() > 7 && args[3][7] == '0');
+			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[3].length() > 8 && args[3][8] == '0');
 
 			if (!c->canEntityUseAction(bypassCheckFlags, true)) {
-				log.displayNL("ERR: PVP_TP_FORBIDEN");
-				return true;
+				log.displayNL("ERR: OTHER_FLAG");
+				return false;
 			}
 		}
 	}
@@ -1709,7 +1715,59 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z|player name|bot name] telep
 	{
 		c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
 	}
+
+	log.displayNL("OK");
 }
+
+//-----------------------------------------------
+// Check Action Flags
+//-----------------------------------------------
+NLMISC_COMMAND(checkActionFlags,"Check Action Flags","<uid> [pvp_flag, pvp_tag, sitting, water, mount, fear, sleep, invu, stun]")
+{
+	if (args.size () != 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+	
+	GET_ACTIVE_CHARACTER
+	// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
+	bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);
+	if (args[1][0] == '1' && !pvpFlagValid) 
+	{
+		CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "NO_ACTION_WHILE_PVP");
+		log.displayNL("ERR: PVP_FLAG");
+		return false;
+	}
+
+	bool pvpTagValid =  c->getPVPFlag() == false;
+	if (args[1].length() > 1 && args[1][1] == '1' && !pvpTagValid)
+	{
+		CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "NO_ACTION_WHILE_PVP");
+		log.displayNL("ERR: PVP_TAG");
+		return false;
+	}
+
+	if (args[1].length() > 2)
+	{
+		CBypassCheckFlags bypassCheckFlags;
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::WhileSitting, args[1].length() > 2 && args[1][2] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::InWater, args[1].length() > 3 && args[1][3] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::OnMount, args[1].length() > 4 && args[1][4] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Fear, args[1].length() > 5 && args[1][5] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Sleep, args[1].length() > 6 && args[1][6] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[1].length() > 7 && args[1][7] == '0');
+		bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[1].length() > 8 && args[1][8] == '0');
+
+		if (!c->canEntityUseAction(bypassCheckFlags, true)) {
+			log.displayNL("ERR: OTHER_FLAG");
+			return false;
+		}
+	}
+	log.displayNL("OK");
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setRespawn, "set respawn point for the player", "<uid> x y cell")
@@ -1827,9 +1885,6 @@ NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
 	c->killMe();
 	return true;
 }
-
-
-
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientation groupname x y look cell")
@@ -2504,6 +2559,8 @@ NLMISC_COMMAND(setTrigger, "set a custom trigger", "<trigger> [<web_app>] [<args
 		CBuildingManager::getInstance()->setCustomTrigger(triggerId, args[1]+" "+args[2]);
 	else
 		CBuildingManager::getInstance()->setCustomTrigger(triggerId, "");
+	log.displayNL("OK");
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2520,8 +2577,8 @@ NLMISC_COMMAND(muteUser, "mute a user", "<player name> <duration> [<universe>?]"
 	}
 
 	uint32 duration;
-	NLMISC::fromString(args[1], duration);
-	NLMISC::TGameCycle cycle = (NLMISC::TGameCycle)(duration / CTickEventHandler::getGameTimeStep() + CTickEventHandler::getGameCycle());
+	fromString(args[1], duration);
+	TGameCycle cycle = (NLMISC::TGameCycle)(duration / CTickEventHandler::getGameTimeStep() + CTickEventHandler::getGameCycle());
 	if (args.size() == 3)
 		PlayerManager.muteUniverse(CEntityId::Unknown, cycle, target->getId());
 	else
@@ -2569,6 +2626,124 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <par
 	return true;
 }
 
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setGuildPoints, "get/set the guild points", "<uid> <value>")
+{
+	if (args.size() == 0)
+		return false;
+	
+	GET_ACTIVE_CHARACTER
+
+	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
+	if (guild)
+	{
+		uint32 points = guild->getXP();
+
+		if (args.size() == 2)
+		{
+			string quant = args[1];
+			uint32 quantity;
+			if (quant[0] == '+')
+			{
+				if (quant.size() > 1)
+				{
+					fromString(quant.substr(1), quantity);
+					points += quantity;
+				}
+			}
+			else if (quant[0] == '-')
+			{
+				if (quant.size() > 1)
+				{
+					fromString(quant.substr(1), quantity);
+					if (points >= quantity)
+					{
+						points -= quantity;
+					}
+					else
+					{
+						log.displayNL("ERR: not enough"); // No enough points
+						return true;
+					}
+				}
+			}
+			else
+			{
+				fromString(quant, points);
+			}
+
+			guild->setPoints(points);
+		}
+
+		log.displayNL("%u", points);
+	} else {
+		log.displayNL("ERR: no guild");
+	}
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(resetTodayGuildPoints, "reset the today guild points", "<uid>")
+{
+	GET_ACTIVE_CHARACTER
+	c->resetTodayGuildPoints();
+	log.displayNL("OK");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid> <index> <sheetid>")
+{
+	if (args.size() != 3)
+		return false;
+		
+	GET_ACTIVE_CHARACTER
+	uint8 index;
+	fromString(args[1], index);
+	CSheetId sheet = CSheetId(args[2].c_str());
+	if (sheet != CSheetId::Unknown)
+		c->setAnimalSheetId(index, sheet);
+	else
+	{
+		log.displayNL("ERR: invalid sheet");
+		return true;
+	}
+	log.displayNL("OK");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerHaircut, "change the haircut of a player", "<uid> <sheet name>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+
+	CSheetId sheetId(args[1]);
+	const CStaticItem * form = CSheets::getForm(sheetId);
+	if (form == NULL)
+	{
+		log.displayNL("ERR: item unknown '%s'", sheetId.toString().c_str());
+		return true;
+	}
+
+	if (form->Type != ITEM_TYPE::HAIR_MALE && form->Type != ITEM_TYPE::HAIR_FEMALE)
+	{
+		log.displayNL("ERR: item not haircut '%s'", sheetId.toString().c_str());
+		return true;
+	}
+
+	uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(form->SheetId, SLOTTYPE::HEAD_SLOT);
+	if (c->setHair(hairValue))
+	{
+		c->resetHairCutDiscount();
+	}
+
+	log.displayNL("OK");
+	return true;
+}
 
 
 

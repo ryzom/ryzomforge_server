@@ -220,6 +220,9 @@ CVariable<uint32> CraftFailureProbaMpLost(
 // Number of login stats kept for a character
 CVariable<uint32> NBLoginStats("egs", "NBLoginStats", "Nb logins stats kept (logon time, logoff time", 50, 0, true);
 
+CVariable<bool> EnableGuildPoints(
+	"egs", "EnableGuildPoints", "Enable guild points", false, 0, true);
+
 // Max Bonus/malus/consumable effects displayed by client (database corresponding array must have the same size, and
 // client must process the same size)
 const uint32 MaxBonusMalusDisplayed = 12;
@@ -412,6 +415,9 @@ CCharacter::CCharacter()
 		_FactionPoint[i] = 0;
 
 	_PvpPoint = 0;
+	_GuildPoints = 0;
+	_TodayGuildPoints = 0;
+	_NextTodayGuildPointsReset = 0;
 	_PVPFlagLastTimeChange = 0;
 	_PVPFlagTimeSettedOn = 0;
 	_PvPDatabaseCounter = 0;
@@ -5846,6 +5852,7 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 		return false;
 	}
 
+
 	if (form->Family != ITEMFAMILY::PET_ANIMAL_TICKET)
 	{
 		if (sendMessage)
@@ -5857,7 +5864,6 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		return false;
 	}
-
 	if (form->PetSheet == CSheetId::Unknown)
 	{
 		if (sendMessage)
@@ -5868,17 +5874,21 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		return false;
 	}
-
 	if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
 	{
 		uint32 nbMektoubMount = 0;
 
 		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
 		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
+
 			// check sheet is asigned (prevent an useless warning)
-			if ((*it).PetSheetId != CSheetId::Unknown)
+			if (petSheetId != CSheetId::Unknown)
 			{
-				const CStaticCreatures* form = CSheets::getCreaturesForm((*it).PetSheetId);
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 				if (form)
 				{
@@ -5907,10 +5917,14 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
 		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
 			// check sheet is asigned (prevent an useless warning)
-			if ((*it).PetSheetId != CSheetId::Unknown)
+			if (petSheetId != CSheetId::Unknown)
 			{
-				const CStaticCreatures* form = CSheets::getCreaturesForm((*it).PetSheetId);
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 				if (form)
 				{
@@ -5928,6 +5942,53 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 			if (sendMessage)
 			{
 				sendDynamicSystemMessage(_Id, "EGS_CANT_BUY_ANOTHER_PACKER");
+			}
+
+			return false;
+		}
+
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		BOMB_IF(p == NULL, "Failed to find player record for character: " << getId().toString(), return 0.0);
+
+		if (p->isTrialPlayer())
+		{
+			if (sendMessage)
+			{
+				sendDynamicSystemMessage(_Id, "EGS_CANT_BUY_PACKER_IS_TRIAL_PLAYER");
+			}
+
+			return false;
+		}
+	}
+	else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
+	{
+		uint32 nbAnimals = 0;
+		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
+		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
+			// check sheet is asigned (prevent an useless warning)
+			if (petSheetId != CSheetId::Unknown)
+			{
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
+
+				if (form)
+				{
+					if (form->getRace() == EGSPD::CPeople::Creature)
+					{
+						++nbAnimals;
+					}
+				}
+			}
+		}
+		// check we can add delta packer
+		if ((nbAnimals + delta) > MAX_OTHER_PET)
+		{
+			if (sendMessage)
+			{
+				sendDynamicSystemMessage(_Id, "EGS_CANT_GET_ANOTHER_PET");
 			}
 
 			return false;
@@ -7100,7 +7161,11 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 	if (_PlayerPets[i].PetStatus != CPetAnimal::not_present)
 	{
 		_PlayerPets[i].AnimalStatus = ANIMAL_STATUS::AliveFlag;
-		const CStaticCreatures* form = CSheets::getCreaturesForm(_PlayerPets[i].PetSheetId);
+		const CStaticItem* ticket_form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+		CSheetId petSheetId = CSheetId::Unknown;
+		if (ticket_form)
+			petSheetId = ticket_form->PetSheet;
+		const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 		if (form)
 		{
@@ -7462,6 +7527,19 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 	}
 }
 
+void CCharacter::setAnimalSheetId(uint8 petIndex, CSheetId sheetId)
+{
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
+
+	CPetAnimal &animal = _PlayerPets[petIndex];
+	animal.setSheetId(sheetId);
+}
+
+
 void CCharacter::setAnimalName(uint8 petIndex, ucstring customName)
 {
 	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
@@ -7580,6 +7658,8 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 	if (XpGain == 0.0f)
 		return 0.0;
 
+	
+
 	// get pointer to static skills tree definition
 	CSheetId sheet("skills.skill_tree");
 	const CStaticSkillsTree* SkillsTree = CSheets::getSkillsTreeForm(sheet);
@@ -7602,6 +7682,65 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 	SSkill* skill = _Skills.getSkillStruct(skillName);
 	nlassert(skill);
 	nlassert(skillEnum != SKILLS::unknown);
+
+	string skillInitial = SKILLS::toString(skillEnum).substr(1, 1);
+
+	//// GUILDS POINTS 
+	CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
+	if (EnableGuildPoints.get() && guild)
+	{
+		if (CTickEventHandler::getGameCycle() >= _NextTodayGuildPointsReset)
+		{
+			_NextTodayGuildPointsReset = CTickEventHandler::getGameCycle() + 10*60*60*20;
+			_TodayGuildPoints = 0;
+		}
+
+		if (skill->MaxLvlReached >= 250) // when max level : quantity of points is different for each skill
+		{
+			switch (skillInitial[0])
+			{
+			case 'F': // Fight is x2
+				_GuildPoints += (uint32)(XpGain*2);
+				break;
+
+			case 'M': // Magic is x1
+				_GuildPoints += (uint32)(XpGain*1.5);
+				break;
+
+			case 'C': // Craft is x2
+				_GuildPoints += (uint32)(XpGain*2.5);
+				break;
+
+			case 'H': // Harvest is x0.5
+				_GuildPoints += (uint32)(XpGain*0.5);
+				break;
+			}
+		}
+		else // when not max level : win same quantity than xp
+			_GuildPoints += (uint32)XpGain;
+
+		
+		uint32 wantedPoints = 100; // >Todo remove hardcoded
+		if (_TodayGuildPoints > 10) // First 10 points are easy to win
+		{
+			wantedPoints *= 2*(_TodayGuildPoints - 9);
+		}
+		
+		if (_GuildPoints >= wantedPoints)
+		{
+			_TodayGuildPoints++;
+			guild->addXP(1);
+			_GuildPoints = 0;
+		}
+
+		nlinfo("Skill %u / %u", skill->MaxLvlReached, skill->Base);
+
+		if (skill->MaxLvlReached >= skill->Base)
+			nlinfo("%s : %u XP in MAX Skill %s => _TodayGuildPoints, wantedPoints, _GuildPoints = %u, %u, %u", _Name.toUtf8().c_str(), (uint32)(XpGain), skillInitial.c_str(), _TodayGuildPoints, wantedPoints, _GuildPoints);
+		else
+			nlinfo("%s : %u XP in Skill %s => _TodayGuildPoints, wantedPoints, _GuildPoints = %u, %u, %u", _Name.toUtf8().c_str(), (uint32)(XpGain), skillInitial.c_str(), _TodayGuildPoints, wantedPoints, _GuildPoints);
+	}
+	////
 
 	// treat ring scenarios as a special case...
 	if (IsRingShard)
@@ -7682,7 +7821,7 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			}
 		}
 
-		if (!p->isTrialPlayer())
+		if (!p->isTrialPlayer()) // Ulukyn: premium player have no use of catalyser but all the time x2
 		{
 			xpBonus = XpGain;
 		}
@@ -10866,7 +11005,7 @@ void CCharacter::sellItem(INVENTORIES::TInventory inv, uint32 slot, uint32 quant
 		return;
 	}
 
-	if (inv >= INVENTORIES::pet_animal1 && inv <= INVENTORIES::pet_animal4)
+	if (inv >= INVENTORIES::pet_animal1 && inv < INVENTORIES::max_pet_animal)
 	{
 		if ((_PlayerPets[inv - INVENTORIES::pet_animal1].AnimalStatus & ANIMAL_STATUS::InventoryAvailableFlag)
 				== false)
@@ -20260,7 +20399,12 @@ uint32 CPetAnimal::initLinkAnimalToTicket(CCharacter* c, uint8 index)
 //-----------------------------------------------
 uint32 CPetAnimal::getAnimalMaxBulk()
 {
-	const CStaticCreatures* form = CSheets::getCreaturesForm(PetSheetId);
+	// For max bulk use pet sheet from ticket (in case where sheet has changed)
+	const CStaticItem* ticket_form = CSheets::getForm(TicketPetSheetId);
+	CSheetId petSheetId = CSheetId::Unknown;
+	if (ticket_form)
+		petSheetId = ticket_form->PetSheet;
+	const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 	if (form)
 	{
