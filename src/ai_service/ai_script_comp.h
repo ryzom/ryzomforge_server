@@ -18,15 +18,14 @@
 #define _SCRIPT_COMP_H_
 
 
-struct ReadFightActionException	:public	NLMISC::Exception
+struct ReadFightActionException	: public	NLMISC::Exception
 {
-	ReadFightActionException(const	std::string	&reason):NLMISC::Exception(reason){}
+	ReadFightActionException(const std::string &reason):NLMISC::Exception(reason){}
 };
 
-class	CSpawnBot;
+class CSpawnBot;
 
-class	CFightScriptComp
-		:public	NLMISC::CRefCount
+class CFightScriptComp : public NLMISC::CRefCount
 {
 public:
 	CFightScriptComp()
@@ -35,30 +34,25 @@ public:
 	{}
 	virtual	std::string	toString() const = 0;
 
-	virtual	bool	update(CSpawnBot	&bot)	const = 0;	//	returns true if it behaves normally, false if there a problem and callers may not consider it behaves normally.
-																	//	for instance ONCE may not consider that this call happened.
-	virtual	void	remove(CFightScriptComp	*child)
+	virtual	bool update(CSpawnBot &bot) const = 0;	//	returns true if it behaves normally, false if there a problem and callers may not consider it behaves normally.
+													//	for instance ONCE may not consider that this call happened.
+	virtual	void remove(CFightScriptComp *child)
 	{}
-protected:
-private:
 };
 
-class CFightScriptCompReader
-	:public	NLMISC::CRefCount
+class CFightScriptCompReader : public NLMISC::CRefCount
 {
 public:
 	CFightScriptCompReader()
 	{}
 	virtual ~CFightScriptCompReader()
 	{}
-	virtual	CFightScriptComp	*create	(const	std::string	&inStr)	throw	(ReadFightActionException) = 0;
-	virtual	std::string	getName	()	const =0;
+	virtual	CFightScriptComp* create(const std::string &inStr) = 0;
+	virtual	std::string	getName() const =0;
 
-	static	CFightScriptCompReader	*getScriptReader	(const std::string &str) throw (ReadFightActionException);
+	static	CFightScriptCompReader* getScriptReader(const std::string &str);
 	
-	static	CFightScriptComp	*createScriptComp	(const std::string &str)	throw	(ReadFightActionException);
-protected:
-private:
+	static	CFightScriptComp* createScriptComp(const std::string &str);
 };
 
 
@@ -69,13 +63,11 @@ public:
 	virtual ~CFightScript()
 	{}
 
-	void	add(CFightScriptCompReader	*reader);
+	void add(CFightScriptCompReader	*reader);
 
-	typedef	CHashMap<std::string, NLMISC::CSmartPtr<CFightScriptCompReader> >	TFightScriptMap;
+	typedef	CHashMap<std::string, NLMISC::CSmartPtr<CFightScriptCompReader> > TFightScriptMap;
 
-	static	TFightScriptMap	_ScriptCompList;
-protected:	
-private:
+	static TFightScriptMap _ScriptCompList;
 };
 
 
@@ -83,8 +75,7 @@ private:
 //	Select Filter
 
 
-class	CFightSelectFilter
-		:public	CFightScriptComp
+class CFightSelectFilter : public CFightScriptComp
 {
 public:
 	CFightSelectFilter(CFightScriptComp	*customComp, std::string param)
@@ -94,34 +85,32 @@ public:
 
 	virtual ~CFightSelectFilter()
 	{}
-	bool	update	(CSpawnBot	&bot)	const;
-	const	std::string	&getParam()	const
+	bool update(CSpawnBot &bot) const;
+	const std::string &getParam() const
 	{
 		return	_Param;
 	}
 
 	std::string	toString() const;
 
-protected:
 private:
 	NLMISC::CSmartPtr<CFightScriptComp>	_CustomComp;
 	std::string	_Param;
 };
 
 
-class	CFightSelectFilterReader
-		:public	CFightScriptCompReader
+class CFightSelectFilterReader : public CFightScriptCompReader
 {
 public:
-	CFightSelectFilterReader()			{}
-	virtual ~CFightSelectFilterReader()	{}
+	CFightSelectFilterReader() {}
+	virtual ~CFightSelectFilterReader() {}
 
-	CFightScriptComp	*create	(const	std::string	&inStr)	throw	(ReadFightActionException);
-	std::string	getName	()	const
+	CFightScriptComp* create(const std::string &inStr);
+
+	std::string	getName() const
 	{
-		return	std::string("SELECT");
+		return std::string("SELECT");
 	}
-
 };
 
 #endif
