@@ -51,14 +51,12 @@ public:
 	{}
 	virtual ~CFightScriptCompReader()
 	{}
-	virtual	CFightScriptComp	*create	(const	std::string	&inStr)	throw	(ReadFightActionException) = 0;
-	virtual	std::string	getName	()	const =0;
+	virtual	CFightScriptComp* create(const std::string &inStr) = 0;
+	virtual	std::string	getName() const =0;
 
-	static	CFightScriptCompReader	*getScriptReader	(const std::string &str) throw (ReadFightActionException);
+	static	CFightScriptCompReader* getScriptReader(const std::string &str);
 	
-	static	CFightScriptComp	*createScriptComp	(const std::string &str)	throw	(ReadFightActionException);
-protected:
-private:
+	static	CFightScriptComp* createScriptComp(const std::string &str);
 };
 
 
@@ -116,8 +114,7 @@ public:
 	CFightSelectFilterReader()			{}
 	virtual ~CFightSelectFilterReader()	{}
 
-	CFightScriptComp	*create	(const	std::string	&inStr)	throw	(ReadFightActionException);
-	std::string	getName	()	const
+	std::string	getName() const
 	{
 		return	std::string("SELECT");
 	}
