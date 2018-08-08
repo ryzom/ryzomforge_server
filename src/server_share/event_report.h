@@ -69,7 +69,7 @@ struct SEventReport
 	}
 
 	/// Serialisation
-	void serial(class NLMISC::IStream &f) throw(NLMISC::EStream)
+	void serial(class NLMISC::IStream &f)
 	{
 		f.serial( ActingEntity );
 		f.serial( TargetEntity );
