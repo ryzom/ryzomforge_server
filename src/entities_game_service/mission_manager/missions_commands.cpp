@@ -3025,31 +3025,47 @@ NLMISC_COMMAND(setPlayerPetName, "change the name of a player pet", "<uid> <inde
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(setPlayerHaircut, "change the haircut of a player", "<uid> <sheet name>")
+NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[,<visual_prop1>,...] <args>")
 {
-	if (args.size() != 2)
+	if (args.size() < 2)
 		return false;
 
 	GET_ACTIVE_CHARACTER;
-
-	CSheetId sheetId(args[1]);
-	const CStaticItem * form = CSheets::getForm(sheetId);
-	if (form == NULL)
+	
+	std::vector< std::string > props;
+	NLMISC::splitString(args[1], ",", props);
+	uint32 i=0;
+	
+	for (i = 0; i < props.size(); i++)
 	{
-		log.displayNL("ERR: item unknown '%s'", sheetId.toString().c_str());
-		return true;
-	}
-
-	if (form->Type != ITEM_TYPE::HAIR_MALE && form->Type != ITEM_TYPE::HAIR_FEMALE)
-	{
-		log.displayNL("ERR: item not haircut '%s'", sheetId.toString().c_str());
-		return true;
-	}
-
-	uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(form->SheetId, SLOTTYPE::HEAD_SLOT);
-	if (c->setHair(hairValue))
-	{
-		c->resetHairCutDiscount();
+		if (props[i] == "haircut")
+		{
+			if (args.size() == 3)
+			{
+				CSheetId sheetId(args[2]);
+				if (sheetId == CSheetId::Unknown)
+				{
+					log.displayNL("ERR: sheet unknown '%s'", sheetId.toString().c_str());
+					return true;
+				}
+				
+				uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(sheetId, SLOTTYPE::HEAD_SLOT);
+				if (c->setHair(hairValue))
+				{
+					c->resetHairCutDiscount();
+				}
+			}
+			else
+			{
+				uint8 haircut = c->getHair();
+				CSheetId *sheet = CVisualSlotManager::getInstance()->index2Sheet(haircut, SLOTTYPE::HEAD_SLOT);
+				if (sheet)
+					log.displayNL("%s", sheet->toString().c_str());
+				else
+					log.displayNL("ERR: no haircut");
+				return true;
+			}
+		}
 	}
 
 	log.displayNL("OK");
