@@ -2778,7 +2778,7 @@ NLMISC_COMMAND(getTeam, "get the team of a player","<uid>")
 		{
 			ucstring name = CEntityIdTranslator::getInstance()->getByEntity((*it));
 			CEntityIdTranslator::removeShardFromName(name);
-			log.displayNL("%"NL_I64"u|%s", (*it).asUint64(), name.toUtf8().c_str());
+			log.displayNL("%" NL_I64 "u|%s", (*it).asUint64(), name.toUtf8().c_str());
 		}
 	} else 
 		log.displayNL("-1");
@@ -2924,12 +2924,92 @@ NLMISC_COMMAND(resetTodayGuildPoints, "reset the today guild points", "<uid>")
 {
 	GET_ACTIVE_CHARACTER
 	c->resetTodayGuildPoints();
+
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(addPlayerPet, "add a pet to player", "<uid> <sheetid>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	CSheetId ticket = CSheetId(args[1]);
+	
+	if( ticket != CSheetId::Unknown )
+	{
+		CGameItemPtr item = c->createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, ticket);
+		if( item != 0 )
+		{
+			if ( ! c->addCharacterAnimal( ticket, 0, item ))
+			{
+				item.deleteItem();
+				log.displayNL("ERR: CAN'T ADD ANIMAL");
+				return true;
+			}
+			log.displayNL("OK");
+			return true;
+		}
+
+		log.displayNL("ERR: CAN'T CREATE TICKET");
+		return true;
+	}
+
+	log.displayNL("ERR: CAN'T FOUND VALID TICKET");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid> <index> <sheetid> [<posx>] [<posy>]")
+{
+	if (args.size() < 3)
+		return false;
+		
+	GET_ACTIVE_CHARACTER
+	
+	uint8 index;
+	fromString(args[1], index);
+	CSheetId sheet = CSheetId(args[2].c_str());
+	if (sheet != CSheetId::Unknown) {
+		c->removeAnimalIndex(index, CPetCommandMsg::DESPAWN);
+		c->setAnimalSheetId(index, sheet);
+
+		if (args.size() == 5)
+		{
+			sint32 x;
+			sint32 y;
+			fromString(args[3], x);
+			fromString(args[4], y);
+			c->setAnimalPosition(index, x, y);
+		}
+
+		c->spawnCharacterAnimal(index);
+	}
+	else
+	{
+		log.displayNL("ERR: invalid sheet");
+		return true;
+	}
+
 	log.displayNL("OK");
 	return true;
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid> <index> <sheetid>")
+NLMISC_COMMAND(getPlayerPets, "get player pets", "<uid>")
+{
+	GET_ACTIVE_CHARACTER
+
+	string pets = c->getPets();
+	
+	log.displayNL("%s", pets.c_str());
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerPetName, "change the name of a player pet", "<uid> <index> <name>")
 {
 	if (args.size() != 3)
 		return false;
@@ -2937,14 +3017,9 @@ NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid>
 	GET_ACTIVE_CHARACTER
 	uint8 index;
 	fromString(args[1], index);
-	CSheetId sheet = CSheetId(args[2].c_str());
-	if (sheet != CSheetId::Unknown)
-		c->setAnimalSheetId(index, sheet);
-	else
-	{
-		log.displayNL("ERR: invalid sheet");
-		return true;
-	}
+	ucstring customName;
+	customName.fromUtf8(args[2]);
+	c->setAnimalName(index, customName);
 	log.displayNL("OK");
 	return true;
 }
