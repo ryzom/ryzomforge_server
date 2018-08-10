@@ -316,6 +316,7 @@ struct CPetAnimal
 	CGameItemPtr ItemPtr;
 	NLMISC::CEntityId OwnerId;
 	TDataSetRow SpawnedPets;
+	uint8 Size;
 	uint32 StableId;
 	sint32 Landscape_X;
 	sint32 Landscape_Y;
@@ -353,6 +354,18 @@ struct CPetAnimal
 	{
 		PetSheetId = sheetId;
 	}
+
+	void setPosition(sint32 x, sint32 y)
+	{
+		Landscape_X = x;
+		Landscape_Y = y;
+	}
+
+	void setSize(uint8 size)
+	{
+		Size = size;
+	}
+
 };
 
 /**
@@ -959,10 +972,13 @@ public:
 	bool addCharacterAnimal(const NLMISC::CSheetId &PetTicket, uint32 Price, CGameItemPtr ptr);
 
 	// return free slot for pet spawn or -1 if there are no free slot
-	sint32 getFreePetSlot();
+	sint32 getFreePetSlot(uint8 startSlot = 0);
 
 	// return the slot of the mount pet or the first packer pet or -1 if there are no pet slot
 	sint32 getMountOrFirstPetSlot();
+
+	// return a list of pets in text format (M=Mount, P=Packer, A=Animal, 0=None)
+	std::string getPets(); 
 
 	// return true if can add 'delta' pets to current player pets
 	bool checkAnimalCount(const NLMISC::CSheetId &PetTicket, bool sendMessage, sint32 delta);
@@ -1069,6 +1085,12 @@ public:
 
 	// Set the sheetid of the animal
 	void setAnimalSheetId(uint8 petIndex, NLMISC::CSheetId sheetId);
+
+	// Set the size of the animal
+	void setAnimalSize(uint8 petIndex, uint8 size);
+
+	// Set the position of the animal
+	void setAnimalPosition(uint8 petIndex, sint32 x, sint32 y);
 
 	// Set the name of the animal
 	void setAnimalName(uint8 petIndex, ucstring customName);
@@ -2332,6 +2354,8 @@ public:
 	void petTpAllowed(uint32 index, bool allowed);
 
 	void setSpawnPetFlag(uint32 index);
+
+	uint8 getHair() const;
 
 	// return if hair cute price discount apply
 	bool getHairCutDiscount() const;
@@ -4057,6 +4081,8 @@ public:
 
 		if (flag == "dp")
 			return _PowoCanDP;
+
+		return false;
 	}
 
 	bool setPowoFlag(const std::string &flag, bool value)
@@ -4075,6 +4101,8 @@ public:
 
 		if (flag == "dp")
 			_PowoCanDP = value;
+
+		return true;
 	}
 
 	void resetPowoFlags()
