@@ -22,6 +22,7 @@
 #include "nel/misc/algo.h"
 #include "egs_sheets/egs_sheets.h"
 
+#include "server_share/pet_interface_msg.h"
 #include "player_manager/character.h"
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"
@@ -30,6 +31,7 @@
 #include "primitives_parser.h"
 #include "team_manager/team.h"
 #include "team_manager/team_manager.h"
+#include "weather_everywhere.h"
 #include "mission_manager/mission_team.h"
 #include "mission_manager/mission_step_ai.h"
 #include "mission_manager/mission_guild.h"
@@ -41,6 +43,7 @@
 #include "building_manager/building_physical.h"
 #include "progression/progression_pvp.h"
 #include "zone_manager.h"
+#include "egs_sheets/egs_sheets.h"
 
 #include "admin.h"
 #include "creature_manager/creature_manager.h"
@@ -2866,9 +2869,6 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <par
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setGuildPoints, "get/set the guild points", "<uid> <value>")
 {
-	if (args.size() == 0)
-		return false;
-	
 	GET_ACTIVE_CHARACTER
 
 	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
