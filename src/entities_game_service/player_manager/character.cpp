@@ -15798,6 +15798,31 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	{
 		if (playerFame != NO_FAME)
 		{
+			// Update Marauder fame when < 50 and other fame change
+			uint32 marauderIdx = PVP_CLAN::getFactionIndex(PVP_CLAN::Marauder);
+			sint32	marauderFame = CFameInterface::getInstance().getFameIndexed(_Id, marauderIdx);
+			if (factionIndex != marauderIdx)
+			{
+				sint32 maxOtherfame = -100*6000;
+				for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+				{
+					if (fameIdx == marauderIdx)
+						continue;
+					
+					sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
+
+					if (fame > maxOtherfame)
+						maxOtherfame = fame;
+				}
+
+				// Marauder fame is when player have negative fame in other clans
+				maxOtherfame = -maxOtherfame;
+
+				if (marauderFame < 50 * 6000 || maxOtherfame < 50 * 6000) {
+					CFameManager::getInstance().setEntityFame(_Id, marauderIdx, maxOtherfame, false);
+				}
+			}
+			
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase),
 			// sint64(float(playerFame)/FameAbsoluteMax*100) );
 			CBankAccessor_PLR::getFAME()
