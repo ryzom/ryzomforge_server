@@ -5790,7 +5790,10 @@ bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGa
 		pet.PetSheetId = form->PetSheet;
 		pet.Satiety = form->PetHungerCount;
 		pet.MaxSatiety = form->PetHungerCount;
-		sint32 i = getFreePetSlot();
+		uint8 startSlot = 0;
+		if (form->Type == ITEM_TYPE::ANIMAL_TICKET) // Use only last slots for pets
+			startSlot = MAX_PACK_ANIMAL+MAX_MEKTOUB_MOUNT;
+		sint32 i = getFreePetSlot(startSlot);
 
 		if (i >= 0)
 		{
@@ -5814,9 +5817,9 @@ bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGa
 //-----------------------------------------------
 // CCharacter::getFreePetSlot return free slot for pet spawn or -1 if there are no free slot
 //-----------------------------------------------
-sint32 CCharacter::getFreePetSlot()
+sint32 CCharacter::getFreePetSlot(uint8 startSlot)
 {
-	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i)
+	for (sint32 i = startSlot; i < (sint32)_PlayerPets.size(); ++i)
 	{
 		if (_PlayerPets[i].TicketPetSheetId == CSheetId::Unknown)
 		{
@@ -5849,6 +5852,34 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 
 	return slot;
 }
+
+// CCharacter::getPets with stringlike M0PPAA (M=Mount, P=Packer, A=Animal, 0=None)
+//-----------------------------------------------
+string CCharacter::getPets()
+{
+	string pets = "";
+
+	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i)
+	{
+		if (_PlayerPets[i].TicketPetSheetId != CSheetId::Unknown)
+		{
+			const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+			if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
+				pets += "M";
+			else if (form->Type == ITEM_TYPE::MEKTOUB_PACKER_TICKET)
+				pets += "P";
+			else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
+				pets += "A";
+		}
+		else
+		{
+			pets += "0";
+		}
+	}
+
+	return pets;
+}
+
 
 //-----------------------------------------------
 // CCharacter::checkAnimalCount return true if can add 'delta' pets to current player pets
@@ -6003,7 +6034,7 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 				}
 			}
 		}
-		// check we can add delta packer
+		// check we can add delta animal
 		if ((nbAnimals + delta) > MAX_OTHER_PET)
 		{
 			if (sendMessage)
@@ -6320,8 +6351,7 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 //-----------------------------------------------
 // CCharacter::AnimalSpawned character buy a creature
 //-----------------------------------------------
-void CCharacter::onAnimalSpawned(
-	CPetSpawnConfirmationMsg::TSpawnError SpawnStatus, uint32 PetIdx, const TDataSetRow &PetMirrorRow)
+void CCharacter::onAnimalSpawned(CPetSpawnConfirmationMsg::TSpawnError SpawnStatus, uint32 PetIdx, const TDataSetRow &PetMirrorRow)
 {
 	CPetAnimal &animal = _PlayerPets[PetIdx];
 
@@ -6345,6 +6375,14 @@ void CCharacter::onAnimalSpawned(
 					setAnimalSatiety(PetIdx, animal.Satiety, c);
 					// set the race of owner
 					setAnimalPeople(PetIdx);
+
+					// Change size if non zero
+					if (animal.Size > 0)
+					{
+						CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, PetMirrorRow, DSPropertyVPB );
+						SET_STRUCT_MEMBER( visualPropertyB, PropertySubData.Scale, animal.Size );
+					}
+					
 				}
 
 				if (animal.PetStatus != CPetAnimal::death)
@@ -7195,7 +7233,7 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 
 			if (form2)
 			{
-				bulkMax = form2->BulkMax;
+				bulkMax = _PlayerPets[i].getAnimalMaxBulk();
 				weightMax = form2->WeightMax;
 			}
 		}
@@ -7559,6 +7597,31 @@ void CCharacter::setAnimalSheetId(uint8 petIndex, CSheetId sheetId)
 	animal.setSheetId(sheetId);
 }
 
+
+void CCharacter::setAnimalSize(uint8 petIndex, uint8 size)
+{
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
+
+	CPetAnimal &animal = _PlayerPets[petIndex];
+	animal.setSize(size);
+}
+
+
+void CCharacter::setAnimalPosition(uint8 petIndex, sint32 x, sint32 y)
+{
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
+
+	CPetAnimal &animal = _PlayerPets[petIndex];
+	animal.setPosition(x, y);
+}
 
 void CCharacter::setAnimalName(uint8 petIndex, ucstring customName)
 {
@@ -15961,6 +16024,31 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	{
 		if (playerFame != NO_FAME)
 		{
+			// Update Marauder fame when < 50 and other fame change
+			uint32 marauderIdx = PVP_CLAN::getFactionIndex(PVP_CLAN::Marauder);
+			sint32	marauderFame = CFameInterface::getInstance().getFameIndexed(_Id, marauderIdx);
+			if (factionIndex != marauderIdx)
+			{
+				sint32 maxOtherfame = -100*6000;
+				for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+				{
+					if (fameIdx == marauderIdx)
+						continue;
+					
+					sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
+
+					if (fame > maxOtherfame)
+						maxOtherfame = fame;
+				}
+
+				// Marauder fame is when player have negative fame in other clans
+				maxOtherfame = -maxOtherfame;
+
+				if (marauderFame < 50 * 6000 || maxOtherfame < 50 * 6000) {
+					CFameManager::getInstance().setEntityFame(_Id, marauderIdx, maxOtherfame, false);
+				}
+			}
+			
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase),
 			// sint64(float(playerFame)/FameAbsoluteMax*100) );
 			CBankAccessor_PLR::getFAME()
@@ -20297,6 +20385,7 @@ void CPetAnimal::clear()
 	OwnerId = NLMISC::CEntityId::Unknown;
 	SpawnedPets = TDataSetRow();
 	StableId = 0;
+	Size = 0;
 	Landscape_X = 0;
 	Landscape_Y = 0;
 	Landscape_Z = 0;
@@ -20384,6 +20473,7 @@ uint32 CPetAnimal::initLinkAnimalToTicket(CCharacter* c, uint8 index)
 			//			Slot = ItemPtr->getLocSlot();
 			ItemPtr->setPetIndex(index);
 			ItemPtr->setCustomName(CustomName);
+			ItemPtr->quality(Size);
 			Slot = ItemPtr->getInventorySlot();
 			return Slot;
 		}
@@ -20399,6 +20489,7 @@ uint32 CPetAnimal::initLinkAnimalToTicket(CCharacter* c, uint8 index)
 				Slot = ItemPtr->getInventorySlot();
 				ItemPtr->setPetIndex(index);
 				ItemPtr->setCustomName(CustomName);
+				ItemPtr->quality(Size);
 				return Slot;
 			}
 			else
@@ -20448,6 +20539,9 @@ uint32 CPetAnimal::getAnimalMaxBulk()
 
 		if (formBag)
 		{
+			// zig inventories have bulk proportionnal to size (size is 1->250)
+			if (creatureBagSheet == CSheetId("zig_inventory.sitem") && Size > 0)
+				return max((uint32)10, (uint32)ceil((formBag->BulkMax*Size)/100));
 			return formBag->BulkMax;
 		}
 	}
