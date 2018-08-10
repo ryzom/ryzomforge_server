@@ -1357,14 +1357,111 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, give/take/set the mo
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getPvpPoints, "get pvp points of player", "<uid>")
+NLMISC_COMMAND(getPvpPoints, "get pvp points of player (if quantity, give/take/set the points)", "<uid> [+-]<quantity>")
 {
 
 	GET_ACTIVE_CHARACTER
 
-	string value = toString("%u", c->getPvpPoint());
+	uint32 points = c->getPvpPoint();
 
-	log.displayNL(value.c_str());
+	if (args.size() == 2)
+	{
+		string quant = args[1];
+		uint32 quantity;
+		if (quant[0] == '+')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				points += quantity;
+			}
+		}
+		else if (quant[0] == '-')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				if (points >= quantity)
+				{
+					points -= quantity;
+				}
+				else
+				{
+					log.displayNL("-1"); // No enough points
+					return true;
+				}
+			}
+		}
+		else
+		{
+			fromString(quant, points);
+		}
+
+		c->setPvpPoint(points);
+	}
+
+	log.displayNL("%u", points);
+}
+
+
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getFactionPoints, "get faction points of player (if quantity, give/take/set the points)", "<uid> <faction> [[+-]<quantity>]")
+{
+
+	if (args.size() < 2)
+	{
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+	PVP_CLAN::TPVPClan clan = PVP_CLAN::fromString(args[1]);
+	if ((clan < PVP_CLAN::BeginClans) || (clan > PVP_CLAN::EndClans))
+	{
+		return false;
+	}
+
+	uint32 points = c->getFactionPoint(clan);
+
+	if (args.size() == 3)
+	{
+		string quant = args[1];
+		uint32 quantity;
+		if (quant[0] == '+')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				points += quantity;
+			}
+		}
+		else if (quant[0] == '-')
+		{
+			if (quant.size() > 1)
+			{
+				fromString(quant.substr(1), quantity);
+				if (points >= quantity)
+				{
+					points -= quantity;
+				}
+				else
+				{
+					log.displayNL("-1"); // No enough points
+					return true;
+				}
+			}
+		}
+		else
+		{
+			fromString(quant, points);
+		}
+
+		c->setFactionPoint(clan, points, true);
+	}
+
+	log.displayNL("%u", points);
 }
 
 //----------------------------------------------------------------------------
@@ -1377,6 +1474,8 @@ NLMISC_COMMAND(getGender, "get gender of player", "<uid>")
 		log.displayNL("f");
 	else
 		log.displayNL("m");
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1402,6 +1501,8 @@ NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 		default:
 			log.displayNL("0");
 	}
+
+	return true;
 }
 
 
@@ -1428,6 +1529,8 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 	uint32 org;
 	fromString(args[1], org);
 	c->setOrganization(org);
+
+	return true;
 }
 
 
@@ -1594,6 +1697,8 @@ NLMISC_COMMAND(kickPlayersFromPowo, "kick players from powo", "<player1,player2,
 			}
 		}
 	}
+
+	return true;
 }
 
 
@@ -1798,6 +1903,8 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	}
 
 	log.displayNL("OK");
+
+	return true;
 }
 
 //-----------------------------------------------
