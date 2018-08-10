@@ -1350,7 +1350,9 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, give/take/set the mo
 		c->setMoney(money);
 	}
 
-	log.displayNL("%"NL_I64"u", money);
+	log.displayNL("%" NL_I64 "u", money);
+
+	return true;
 }
 
 
