@@ -3072,5 +3072,50 @@ NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[
 	return true;
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(scaleEntity, "change the size of an entity", "<uid> <eid> <scale>")
+{
+	if (args.size() != 3)
+		return false;
 
+	GET_ACTIVE_CHARACTER;
+
+	CEntityId entityId(args[1]);
+
+	if (entityId == CEntityId::Unknown)
+	{
+		log.displayNL("ERR: invalid eid");
+		return true;
+	}
+	
+	TDataSetRow row = TheDataset.getDataSetRow(entityId);
+
+	uint32 scale;
+	fromString(args[2], scale);
+	
+	if (scale>255)
+		scale = 0;
+		
+	CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, row, DSPropertyVPB );
+	SET_STRUCT_MEMBER( visualPropertyB, PropertySubData.Scale, scale );
+
+	log.displayNL("OK");
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setPlayerPetSize, "change the name of a player pet", "<uid> <index> <size>")
+{
+	if (args.size() != 3)
+		return false;
+		
+	GET_ACTIVE_CHARACTER
+	uint8 index;
+	fromString(args[1], index);
+	uint8 size;
+	fromString(args[2], size);
+	c->setAnimalSize(index, size);
+	log.displayNL("OK");
+	return true;
+}
 
