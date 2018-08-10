@@ -600,10 +600,6 @@ NLMISC_COMMAND(getEid, "get entitiy id of entity", "<uid>")
 	return true;
 }
 
-/*
-spawnItem 530162 temp 1 icbm2ss_2 250 0 Durability=10,Weight=0.1,SapLoad=10,Dmg=100,Speed=10,Range=10,HpBuff=100000,StaBuff=100000,epee_de_malade
-spawnItem 530162 temp 1 iczm1sa_3.sitem 250 1 '
-*/
 NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <sheetid> <quality> <drop=0|1> [<phraseid>|<param>=<value>,*]")
 {
 
@@ -675,6 +671,41 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 	return true;
 }
 
+
+NLMISC_COMMAND(spawnNamedItem, "Spawn a named Item", "<uid> <inv> <quantity> <named_item>")
+{
+
+	GET_ACTIVE_CHARACTER
+	
+	if (args.size() < 4)
+		return false;
+
+	string selected_inv = args[1];
+
+	CInventoryPtr inventory = getInventory(c, selected_inv);
+	if (inventory == NULL)
+	{
+		log.displayNL("ERR: invalid inventory");
+		return true;
+	}
+
+	uint16 quantity;
+	NLMISC::fromString(args[2], quantity);
+
+	CGameItemPtr item = CNamedItems::getInstance().createNamedItem(args[3], quantity);
+	if (item != NULL)
+	{
+		if (c->addItemToInventory(getTInventory(selected_inv), item)) {
+			log.displayNL("OK");
+			return true;
+		}
+		
+		item.deleteItem();
+	}
+
+	log.displayNL("ERR: adding item");
+	return true;
+}
 
 
 //----------------------------------------------------------------------------

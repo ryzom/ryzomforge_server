@@ -691,6 +691,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	)\
 	PROP(CSheetId,PetSheetId)\
 	LPROP(uint32,Price,if(Price!=0))\
+	PROP(uint8,Size)\
 	PROP(CEntityId,OwnerId)\
 	PROP2(StableAlias,TAIAlias,stableAlias,\
 		if (val != CAIAliasTranslator::Invalid)\
