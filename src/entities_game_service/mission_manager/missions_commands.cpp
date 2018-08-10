@@ -2430,33 +2430,47 @@ NLMISC_COMMAND(getPlayerStats,"get player stats","<uid> <stat1,stat2,stat3..>")
 }
 
 //-----------------------------------------------
-NLMISC_COMMAND(getServerStats,"get server stats","<stat1,stat2,stat3..>")
+NLMISC_COMMAND(getServerStats,"get server stats","<uid> <stat1,stat2,stat3..> [<arg1>] [<arg2>]")
 {
 	
-	if (args.size() <= 0)
+	if (args.size() <= 1)
 		return false;
 
+	CCharacter *c = NULL;
+	
+	if (args[0] != "*") {
+		GET_ACTIVE_CHARACTER2
+	}
+
 	std::vector< std::string > stats;
-	NLMISC::splitString( args[0],",",stats );
+	NLMISC::splitString( args[1],",",stats );
 	uint32 i=0;
 	
-	
-	if (i < stats.size() && stats[i] == "time") // Atys time
+	for (i = 0; i < stats.size(); i++)
 	{
-		log.displayNL("%f", CTimeDateSeasonManager::getRyzomTimeReference().getRyzomTime ());
-		i++;
-	}
-
-	if (i < stats.size() && stats[i] == "date") // Atys date
-	{
-		log.displayNL("%d", CTimeDateSeasonManager::getRyzomTimeReference().getRyzomDay ());
-		i++;
-	}
-
-	if (i < stats.size() && stats[i] == "season") // Atys date
-	{
-		log.displayNL("%s", EGSPD::CSeason::toString(CTimeDateSeasonManager::getRyzomTimeReference().getRyzomSeason()).c_str());
-		i++;
+		if (stats[i] == "time") // Atys time
+			log.displayNL("%f", CTimeDateSeasonManager::getRyzomTimeReference().getRyzomTime ());
+		else if (stats[i] == "date") // Atys date
+			log.displayNL("%d", CTimeDateSeasonManager::getRyzomTimeReference().getRyzomDay ());
+		else if (stats[i] == "season") // Atys date
+			log.displayNL("%s", EGSPD::CSeason::toString(CTimeDateSeasonManager::getRyzomTimeReference().getRyzomSeason()).c_str());
+		else if (stats[i] == "weather") // Atys weather
+		{
+			CVector pos;
+			if (args.size() <= 2)
+			{
+				pos.x = c->getState().X / 1000.;
+				pos.y = c->getState().Y / 1000.;
+			}
+			else
+			{
+				fromString(args[2], pos.x);
+				fromString(args[3], pos.y);
+			}
+			pos.z = 0;
+			CRyzomTime::EWeather weather = WeatherEverywhere.getWeather( pos, CTimeDateSeasonManager::getRyzomTimeReference() );
+			log.displayNL( "%u", (uint)weather );
+		}
 	}
 
 	return true;
@@ -2480,6 +2494,8 @@ NLMISC_COMMAND(addCheckPos,"add check pos","<uid> <x> <y> <radius> <mission_name
 	fromString(args[3], r);
 
 	c->addPositionCheck(x, y, r, args[4], args[5] == "1");
+
+	return true;
 }
 
 
@@ -2513,6 +2529,8 @@ NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>"
 	std::list< CMissionEvent* > eventList;
 	CMissionManager::getInstance()->instanciateMission(c, missionAlias,	giverAlias, eventList);
 	c->processMissionEventList(eventList,true, CAIAliasTranslator::Invalid);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2526,6 +2544,8 @@ NLMISC_COMMAND(removeArkMission,"remove Mission","<uid> <mission_name>")
 	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
 	c->removeMission(missionAlias, 0);
 	c->removeMissionFromHistories(missionAlias);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2539,6 +2559,8 @@ NLMISC_COMMAND(finishArkMission,"finish Mission","<uid> <mission_name>")
 	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
 	c->removeMission(missionAlias, 0, true);
 	c->removeMissionFromHistories(missionAlias);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2555,29 +2577,35 @@ NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1
 	for (uint32 i=3; i<nbString; ++i)
 		text +=  "\n"+getStringFromHash(args[i]);
 	c->setCustomMissionParams(args[1], text);
+
+	return true;
 }
 
 //-----------------------------------------------
 NLMISC_COMMAND(delArkMissionParams,"del Mission Params","<uid> <mission_name>")
 {
-	if (args.size() != 5)
+	if (args.size() != 2)
 		return false;
 
 	GET_ACTIVE_CHARACTER;
 
 	c->setCustomMissionParams(args[1], "");
+
+	return true;
 }
 
 
 //-----------------------------------------------
 NLMISC_COMMAND(setArkMissionParams,"set Mission Params","<uid> <mission_name> <params> <app_callback> <callback_params>")
 {
-	if (args.size() != 5)
+	if (args.size() != 2)
 		return false;
 
 	GET_ACTIVE_CHARACTER;
 
 	c->setCustomMissionParams(args[1], args[3]+" "+args[4]+","+args[2]);
+
+	return true;
 }
 
 
@@ -2590,6 +2618,8 @@ NLMISC_COMMAND(addArkMissionParams,"add Mission Params","<uid> <mission_name> <p
 	GET_ACTIVE_CHARACTER;
 
 	c->addCustomMissionParam(args[1], args[2]);
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2601,6 +2631,8 @@ NLMISC_COMMAND(getLastTpTick,"get tick of last teleport","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastTpTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2612,6 +2644,8 @@ NLMISC_COMMAND(getLastOverSpeedTick,"get tick of last over speed","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastOverSpeedTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2623,6 +2657,8 @@ NLMISC_COMMAND(getLastMountTick,"get tick of last mount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastMountTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2634,6 +2670,8 @@ NLMISC_COMMAND(getLastUnMountTick,"get tick of last umount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastUnMountTick());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2645,6 +2683,8 @@ NLMISC_COMMAND(getLastFreeMount,"get tick of last free mount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastFreeMount());
+
+	return true;
 }
 
 //-----------------------------------------------
@@ -2656,6 +2696,8 @@ NLMISC_COMMAND(getLastExchangeMount,"get tick of last exchange mount","<uid>")
 	GET_ACTIVE_CHARACTER;
 
 	log.displayNL("%d", c->getLastExchangeMount());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2681,6 +2723,8 @@ NLMISC_COMMAND(getPlayerVar, "get the value of a variable of player","<uid> <var
 		
 	if (c->getValue("Modifier"+args[1], value))
 		log.displayNL("%s", value.c_str());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2695,6 +2739,8 @@ NLMISC_COMMAND(setPlayerVar, "set the value of a variable of player","<uid> <var
 		log.displayNL("OK");
 	else
 		log.displayNL("ERR: Variable not found");
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2709,6 +2755,8 @@ NLMISC_COMMAND(addPlayerVar, "add to the value of a variable of player","<uid> <
 		log.displayNL("OK");
 	else
 		log.displayNL("ERR: Variable not found");
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
