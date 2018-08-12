@@ -30,6 +30,7 @@
 #include <deque>
 #include <exception>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <list>
@@ -38,6 +39,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#ifdef _SP
+#undef _SP
+#endif
 
 // NeL georges
 #include "nel/georges/load_form.h"

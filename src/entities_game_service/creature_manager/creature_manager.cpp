@@ -277,15 +277,13 @@ void CCreatureSetUrlImp::callback(const string &, NLNET::TServiceId sid)
 				(string &)wp = "";
 				program &= ~(1 << BOTCHATTYPE::WebPageFlag);
 				c->setBotChatProgram(program);
-				return;
+				continue;
 			}
 			else
 				(string &)wp = Url;
 
 			const string &wpn = c->getWebPageName();
 			(string &)wpn = ActionName;
-
-			return;
 		}
 	}
 }

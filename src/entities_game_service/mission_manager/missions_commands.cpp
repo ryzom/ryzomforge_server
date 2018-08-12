@@ -1362,7 +1362,6 @@ NLMISC_COMMAND(getMoney, "get money of player (if quantity, give/take/set the mo
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getPvpPoints, "get pvp points of player (if quantity, give/take/set the points)", "<uid> [+-]<quantity>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	uint32 points = c->getPvpPoint();
@@ -1470,7 +1469,6 @@ NLMISC_COMMAND(getFactionPoints, "get faction points of player (if quantity, giv
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getGender, "get gender of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	if (c->getGender() == GSGENDER::female)
@@ -1484,7 +1482,6 @@ NLMISC_COMMAND(getGender, "get gender of player", "<uid>")
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(getRace, "get race of player", "<uid>")
 {
-
 	GET_ACTIVE_CHARACTER
 
 	switch (c->getRace())
@@ -1516,6 +1513,8 @@ NLMISC_COMMAND(getCivCultOrg, "get civ cult and organization of player", "<uid>"
 	std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance = c->getAllegiance();
 
 	log.displayNL("%s|%s|%u", PVP_CLAN::toString(allegiance.first).c_str(), PVP_CLAN::toString(allegiance.second).c_str(), c->getOrganization());
+
+	return true;
 }
 
 //----------------------------------------------------------------------------
