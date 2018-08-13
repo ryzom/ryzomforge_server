@@ -3050,19 +3050,40 @@ NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[
 				}
 				
 				uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(sheetId, SLOTTYPE::HEAD_SLOT);
-				if (c->setHair(hairValue))
+				if (!c->setHair(hairValue))
 				{
-					c->resetHairCutDiscount();
+					log.displayNL("ERR: same color");
+					return true;
 				}
+				c->resetHairCutDiscount();
 			}
 			else
 			{
 				uint8 haircut = c->getHair();
 				CSheetId *sheet = CVisualSlotManager::getInstance()->index2Sheet(haircut, SLOTTYPE::HEAD_SLOT);
 				if (sheet)
-					log.displayNL("%s", sheet->toString().c_str());
+					log.displayNL("%s|", sheet->toString().c_str());
 				else
 					log.displayNL("ERR: no haircut");
+				return true;
+			}
+		}
+		else if (props[i] == "haircolor")
+		{
+			if (args.size() == 3)
+			{
+				uint32 color;
+				fromString(args[2], color);
+				if (!c->setHairColor(color))
+				{
+					log.displayNL("ERR: same color");
+					return true;
+				}
+			}
+			else
+			{
+				uint32 haircolor = c->getHairColor();
+				log.displayNL("%u|", haircolor);
 				return true;
 			}
 		}
