@@ -115,7 +115,67 @@ MACRO(NL_ADD_RUNTIME_FLAGS name)
 #      LINK_FLAGS_DEBUG "${CMAKE_LINK_FLAGS_DEBUG}"
 #      LINK_FLAGS_RELEASE "${CMAKE_LINK_FLAGS_RELEASE}")
   ENDIF()
+  IF(WITH_STLPORT)
+    TARGET_LINK_LIBRARIES(${name} ${STLPORT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  ENDIF()
 ENDMACRO(NL_ADD_RUNTIME_FLAGS)
+
+MACRO(NL_ADD_STATIC_VID_DRIVERS name)
+  IF(WITH_STATIC_DRIVERS)
+    IF(WIN32)
+      IF(WITH_DRIVER_DIRECT3D)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_direct3d_win)
+      ENDIF()
+    ENDIF()
+
+    IF(WITH_DRIVER_OPENGL)
+      IF(WIN32)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_opengl_win)
+      ELSE()
+        TARGET_LINK_LIBRARIES(${name} nel_drv_opengl)
+      ENDIF()
+    ENDIF()
+
+    IF(WITH_DRIVER_OPENGLES)
+      IF(WIN32)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_opengles_win)
+      ELSE()
+        TARGET_LINK_LIBRARIES(${name} nel_drv_opengles)
+      ENDIF()
+    ENDIF()
+  ENDIF()
+ENDMACRO(NL_ADD_STATIC_VID_DRIVERS)
+
+MACRO(NL_ADD_STATIC_SND_DRIVERS name)
+  IF(WITH_STATIC_DRIVERS)
+    IF(WIN32)
+      IF(WITH_DRIVER_DSOUND)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_dsound_win)
+      ENDIF()
+
+      IF(WITH_DRIVER_XAUDIO2)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_xaudio2_win)
+      ENDIF()
+
+      IF(WITH_DRIVER_OPENAL)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_openal_win)
+      ENDIF()
+
+      IF(WITH_DRIVER_FMOD)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_fmod_win)
+      ENDIF()
+    ELSE()
+      IF(WITH_DRIVER_OPENAL)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_openal)
+      ENDIF()
+
+      IF(WITH_DRIVER_FMOD)
+        TARGET_LINK_LIBRARIES(${name} nel_drv_fmod)
+      ENDIF()
+    ENDIF()
+
+  ENDIF()
+ENDMACRO(NL_ADD_STATIC_SND_DRIVERS)
 
 ###
 # Checks build vs. source location. Prevents In-Source builds.
@@ -137,6 +197,10 @@ Remove the CMakeCache.txt file and try again from another folder, e.g.:
 ENDMACRO(CHECK_OUT_OF_SOURCE)
 
 MACRO(NL_SETUP_DEFAULT_OPTIONS)
+  IF(WITH_QT)
+    OPTION(WITH_STUDIO              "Build Core Studio"                             OFF )
+  ENDIF()
+
   ###
   # Features
   ###
@@ -182,10 +246,14 @@ MACRO(NL_SETUP_DEFAULT_OPTIONS)
   ENDIF()
   OPTION(WITH_INSTALL_LIBRARIES   "Install development files."                    ON )
 
+  OPTION(WITH_ASSIMP              "Use assimp exporter"                           OFF)
+
   ###
   # GUI toolkits
   ###
   OPTION(WITH_GTK                 "With GTK Support"                              OFF)
+  OPTION(WITH_QT                  "With Qt 4 Support"                             OFF)
+  OPTION(WITH_QT5                 "With Qt 5 Support"                             OFF)
 
   IF(WIN32 AND MFC_FOUND)
     OPTION(WITH_MFC               "With MFC Support"                              ON )
@@ -198,10 +266,59 @@ MACRO(NL_SETUP_DEFAULT_OPTIONS)
   ###
   OPTION(WITH_SYMBOLS             "Keep debug symbols in binaries"                OFF)
 
+  # only enable STLport for VC++ 2010 and less
+  IF(WIN32 AND MSVC_VERSION LESS 1600)
+    OPTION(WITH_STLPORT           "With STLport support."                         ON )
+  ELSE()
+    OPTION(WITH_STLPORT           "With STLport support."                         OFF)
+  ENDIF()
+
   OPTION(BUILD_DASHBOARD          "Build to the CDash dashboard"                  OFF)
+
+  OPTION(WITH_NEL                 "Build NeL (nearly always required)."           ON )
+  OPTION(WITH_NELNS               "Build NeL Network Services."                   OFF)
+  OPTION(WITH_RYZOM               "Build Ryzom Core."                             ON )
+  OPTION(WITH_SNOWBALLS           "Build Snowballs."                              OFF)
+  OPTION(WITH_TOOLS               "Build Tools"                                   OFF)
 ENDMACRO(NL_SETUP_DEFAULT_OPTIONS)
 
 MACRO(NL_SETUP_NEL_DEFAULT_OPTIONS)
+  ###
+  # Core libraries
+  ###
+  OPTION(WITH_NET                 "Build NLNET"                                   ON )
+  OPTION(WITH_3D                  "Build NL3D"                                    ON )
+  OPTION(WITH_GUI                 "Build GUI"                                     ON )
+  OPTION(WITH_PACS                "Build NLPACS"                                  ON )
+  OPTION(WITH_GEORGES             "Build NLGEORGES"                               ON )
+  OPTION(WITH_LIGO                "Build NLLIGO"                                  ON )
+  OPTION(WITH_LOGIC               "Build NLLOGIC"                                 ON )
+  OPTION(WITH_SOUND               "Build NLSOUND"                                 ON )
+
+  ###
+  # Drivers Support
+  ###
+  OPTION(WITH_DRIVER_OPENGL       "Build OpenGL Driver (3D)"                      ON )
+  OPTION(WITH_DRIVER_OPENGLES     "Build OpenGL ES Driver (3D)"                   OFF)
+  OPTION(WITH_DRIVER_DIRECT3D     "Build Direct3D Driver (3D)"                    OFF)
+  OPTION(WITH_DRIVER_OPENAL       "Build OpenAL Driver (Sound)"                   ON )
+  OPTION(WITH_DRIVER_FMOD         "Build FMOD Driver (Sound)"                     OFF)
+  OPTION(WITH_DRIVER_DSOUND       "Build DirectSound Driver (Sound)"              OFF)
+  OPTION(WITH_DRIVER_XAUDIO2      "Build XAudio2 Driver (Sound)"                  OFF)
+
+  ###
+  # Optional support
+  ###
+  OPTION(WITH_NEL_CEGUI           "Build CEGUI Renderer"                          OFF)
+  OPTION(WITH_NEL_TOOLS           "Build NeL Tools"                               ON )
+  OPTION(WITH_NEL_MAXPLUGIN       "Build NeL 3dsMax Plugin"                       OFF)
+  OPTION(WITH_NEL_SAMPLES         "Build NeL Samples"                             ON )
+  OPTION(WITH_NEL_TESTS           "Build NeL Unit Tests"                          ON )
+
+  OPTION(WITH_LIBOVR              "With LibOVR support"                           OFF)
+  OPTION(WITH_LIBVR               "With LibVR support"                            OFF)
+  OPTION(WITH_PERFHUD             "With NVIDIA PerfHUD support"                   OFF)
+
   OPTION(WITH_SSE2                "With SSE2"                                     ON )
   OPTION(WITH_SSE3                "With SSE3"                                     ON )
 
@@ -210,12 +327,43 @@ MACRO(NL_SETUP_NEL_DEFAULT_OPTIONS)
   ENDIF()
 ENDMACRO(NL_SETUP_NEL_DEFAULT_OPTIONS)
 
+MACRO(NL_SETUP_NELNS_DEFAULT_OPTIONS)
+  ###
+  # Core libraries
+  ###
+  OPTION(WITH_NELNS_SERVER        "Build NeLNS Services"                          ON )
+  OPTION(WITH_NELNS_LOGIN_SYSTEM  "Build NeLNS Login System Tools"                ON )
+ENDMACRO(NL_SETUP_NELNS_DEFAULT_OPTIONS)
+
 MACRO(NL_SETUP_RYZOM_DEFAULT_OPTIONS)
   ###
   # Core libraries
   ###
+  OPTION(WITH_RYZOM_CLIENT        "Build Ryzom Core Client"                       ON )
   OPTION(WITH_RYZOM_TOOLS         "Build Ryzom Core Tools"                        ON )
+  OPTION(WITH_RYZOM_SERVER        "Build Ryzom Core Services"                     ON )
+  OPTION(WITH_RYZOM_INSTALLER     "Build Ryzom Installer"                         OFF)
+
+  ###
+  # Optional support
+  ###
+  OPTION(WITH_LUA51               "Build Ryzom Core using Lua 5.1"                ON )
+  OPTION(WITH_LUA52               "Build Ryzom Core using Lua 5.2"                OFF)
+  OPTION(WITH_LUA53               "Build Ryzom Core using Lua 5.3"                OFF)
+  OPTION(WITH_RYZOM_CLIENT_UAC    "Ask to run as Administrator"                   OFF)
+  OPTION(WITH_RYZOM_PATCH         "Enable Ryzom in-game patch support"            OFF)
+  OPTION(WITH_RYZOM_CUSTOM_PATCH_SERVER "Only use patch server from CFG file"     OFF)
+  OPTION(WITH_RYZOM_STEAM         "Enable Steam features"                         OFF)
+  OPTION(WITH_RYZOM_SANDBOX       "Enable Sandbox under OS X"                     OFF)
 ENDMACRO(NL_SETUP_RYZOM_DEFAULT_OPTIONS)
+
+MACRO(NL_SETUP_SNOWBALLS_DEFAULT_OPTIONS)
+  ###
+  # Core libraries
+  ###
+  OPTION(WITH_SNOWBALLS_CLIENT    "Build Snowballs Client"                        ON )
+  OPTION(WITH_SNOWBALLS_SERVER    "Build Snowballs Services"                      ON )
+ENDMACRO(NL_SETUP_SNOWBALLS_DEFAULT_OPTIONS)
 
 MACRO(ADD_PLATFORM_FLAGS _FLAGS)
   SET(PLATFORM_CFLAGS "${PLATFORM_CFLAGS} ${_FLAGS}")
@@ -1070,6 +1218,19 @@ MACRO(SETUP_EXTERNAL)
     SET(THREADS_HAVE_PTHREAD_ARG ON)
     FIND_PACKAGE(Threads)
     # TODO: replace all -l<lib> by absolute path to <lib> in CMAKE_THREAD_LIBS_INIT
+  ENDIF()
+
+  IF(WITH_STLPORT)
+    FIND_PACKAGE(STLport REQUIRED)
+    INCLUDE_DIRECTORIES(${STLPORT_INCLUDE_DIR})
+  ENDIF()
+
+  IF(WIN32)
+    # Must include DXSDK before WINSDK
+    FIND_PACKAGE(DirectXSDK REQUIRED)
+    # IF(DXSDK_INCLUDE_DIR)
+    #   INCLUDE_DIRECTORIES(${DXSDK_INCLUDE_DIR})
+    # ENDIF()
   ENDIF()
 
   IF(MSVC)
