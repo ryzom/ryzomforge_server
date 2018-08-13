@@ -277,6 +277,11 @@ FOREACH(COMPONENT ${NeL_FIND_COMPONENTS})
   IF(${_UPNAME}_FOUND)
     LIST(APPEND NEL_MODULES_FOUND ${COMPONENT})
 
+    # all NeL libraries depend on nelmisc in static
+    IF(NEL_STATIC)
+      LIST(APPEND ${_UPNAME}_LIBRARIES ${NELMISC_LIBRARIES})
+    ENDIF()
+
     IF(COMPONENT STREQUAL "3d")
       IF(NEL_STATIC)
         # 3rd party dependencies
