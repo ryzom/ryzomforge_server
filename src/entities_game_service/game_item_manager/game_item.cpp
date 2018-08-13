@@ -1397,7 +1397,7 @@ void CGameItem::setStackSize(uint32 size)
 	uint32 prevSize = _StackSize;
 	_StackSize = size;
 
-	log_Item_UpdateQuantity(_ItemId, _StackSize, prevSize);
+//	log_Item_UpdateQuantity(_ItemId, _StackSize, prevSize);
 	
 	if (_LockCount > _StackSize)
 		_LockCount = _StackSize;

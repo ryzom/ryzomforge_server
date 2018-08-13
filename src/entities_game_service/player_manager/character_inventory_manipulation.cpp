@@ -995,7 +995,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 	// if an item is equipped in destination slot unequip it
 	if (dstInv->getItem(dstSlot) != NULL)
 	{
-		nlinfo(".");
 		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
 		{
 			// if item is locked just return
