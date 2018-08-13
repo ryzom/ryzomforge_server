@@ -2355,6 +2355,8 @@ public:
 
 	void setSpawnPetFlag(uint32 index);
 
+	uint8 getHairColor() const;
+	
 	uint8 getHair() const;
 
 	// return if hair cute price discount apply
