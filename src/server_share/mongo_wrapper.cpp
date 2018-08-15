@@ -87,7 +87,7 @@ CUniquePtr<DBClientCursor> CMongo::query(const string &collection, const string 
 	catch(const DBException& e)
 	{
 		nlwarning("mongo: query failed, caught DBException '%s'", e.toString().c_str());
-		return CUniquePtr<DBClientCursor>(NULL);
+		return CUniquePtr<DBClientCursor>(std::nullptr_t);
 	}
 }
 
