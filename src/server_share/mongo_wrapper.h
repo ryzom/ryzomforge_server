@@ -28,7 +28,7 @@ class CMongo {
 public:
 	static void init();
 	static void insert(const std::string &collection, const std::string &json);
-	static std::auto_ptr<DBClientCursor> query(const std::string &collection, const std::string &json);
+	static CUniquePtr<DBClientCursor> query(const std::string &collection, const std::string &json);
 	static void update(const std::string &collection, const std::string &jsonQuery, const std::string &jsonObj, bool upsert=false, bool multi=false);
 	static void remove(const string &collection, const string &jsonQuer, bool justOne = false);
 	static std::string quote(const std::string &s);
