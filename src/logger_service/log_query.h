@@ -1206,7 +1206,7 @@ public:
 		}
 
 		TParserResult(const TParserResult &other)
-			:	QueryTree(other.QueryTree),
+			:	QueryTree(CUniquePtrMove(other.QueryTree)),
 				FullContext(other.FullContext),
 				OutputPrefix(other.OutputPrefix)
 
