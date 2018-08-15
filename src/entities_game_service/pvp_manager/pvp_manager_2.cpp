@@ -1173,7 +1173,7 @@ void CPVPManager2::onIOSMirrorUp()
 	createExtraFactionChannel("ru", true);
 	createExtraFactionChannel("es", true);
 #ifdef HAVE_MONGO
-	std::auto_ptr<DBClientCursor> cursor = CMongo::query("ryzom_channels", toString("{}"));
+	CUniquePtr<DBClientCursor> cursor = CMongo::query("ryzom_channels", toString("{}"));
 	if (cursor.get())
 	{
 		while (cursor->more())
