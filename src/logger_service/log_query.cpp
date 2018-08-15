@@ -153,7 +153,7 @@ CQueryParser::TParserResult CQueryParser::parseQuery(const std::string &queryStr
 		if (tok.TokenType != tt_EOF)
 			throw EInvalidQuery(tok.It, "Not all the query content have been read");
 
-		pr.QueryTree = rootNode;
+		pr.QueryTree = CUniquePtrMove(rootNode);
 
 		return pr;
 	}
