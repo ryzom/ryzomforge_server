@@ -1746,9 +1746,13 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Invulnerability, args[3].length() > 7 && args[3][7] == '0');
 			bypassCheckFlags.setFlag(CHECK_FLAG_TYPE::Stun, args[3].length() > 8 && args[3][8] == '0');
 
-			if (!c->canEntityUseAction(bypassCheckFlags, true)) {
-				log.displayNL("ERR: OTHER_FLAG");
-				return false;
+			if (!c->canEntityUseAction(bypassCheckFlags, true))
+			{
+				if (!c->isDead() || (args[3].length() > 9 && args[3][9] == '1')) // Forbid if not dead or dead but not wanted
+				{
+					log.displayNL("ERR: OTHER_FLAG");
+					return false;
+				}
 			}
 		}
 	}
@@ -3023,6 +3027,7 @@ NLMISC_COMMAND(setPlayerPetName, "change the name of a player pet", "<uid> <inde
 	return true;
 }
 
+//setPlayerVisual 530162 haircut fy_hof_hair_basic02.sitem
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[,<visual_prop1>,...] <args>")
 {
@@ -3117,4 +3122,3 @@ NLMISC_COMMAND(setPlayerPetSize, "change the name of a player pet", "<uid> <inde
 	log.displayNL("OK");
 	return true;
 }
-

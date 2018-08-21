@@ -16407,7 +16407,11 @@ void CCharacter::endForageSession()
 bool CCharacter::canEntityUseAction(CBypassCheckFlags bypassCheckFlags, bool sendMessage) const
 {
 	if (!CEntityBase::canEntityUseAction(bypassCheckFlags, sendMessage))
+	{
+		if (!_IsDead && sendMessage) // Don't send message when dead because action can be validated later...
+			CCharacter::sendDynamicSystemMessage(_EntityRowId, "NO_ACTION_WHEN_AFFECTED_BY_SPELL");
 		return false;
+	}
 
 	// observer cannot use actions
 	if (havePriv(NoActionAllowedPriv))
