@@ -421,6 +421,9 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP(uint32,_LastFreeMount)\
 	PROP(uint32,_LastExchangeMount)\
 	PROP(uint32,_PvpPoint)\
+	PROP(uint32,_GuildPoints)\
+	PROP(uint8,_TodayGuildPoints)\
+	PROP_GAME_CYCLE_COMP(_NextTodayGuildPointsReset)\
 	PROP2(_LangChannel,string,_LangChannel,_LangChannel=val)\
 	PROP(uint32,_Organization)\
 	PROP(uint32,_OrganizationStatus)\
@@ -688,6 +691,7 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	)\
 	PROP(CSheetId,PetSheetId)\
 	LPROP(uint32,Price,if(Price!=0))\
+	PROP(uint8,Size)\
 	PROP(CEntityId,OwnerId)\
 	PROP2(StableAlias,TAIAlias,stableAlias,\
 		if (val != CAIAliasTranslator::Invalid)\

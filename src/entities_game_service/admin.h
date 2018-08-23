@@ -132,6 +132,29 @@ extern void GET_CHARACTER_Helper(std::string& command, const NLMISC::CEntityId& 
 		return false; \
 	} \
 
+#define GET_ACTIVE_CHARACTER2 \
+	if (args.size() < 1) { nlwarning ("ERR: Missing argument number 0 that should be the uid"); return false; } \
+	uint32 uid; \
+	NLMISC::fromString(args[0], uid); \
+	c = CPlayerManager::getInstance().getActiveChar(uid); \
+	if(c == 0) \
+	{ \
+		log.displayNL ("ERR: Unknown player '%u' (%s)", uid, args[0].c_str()); \
+		return false; \
+	} \
+	CEntityId eid = c->getId(); \
+	TLogContext_Character_AdminCommand commandContext(eid); \
+	if(!c->getEnterFlag()) \
+	{ \
+		log.displayNL ("ERR: '%s' is not entered", eid.toString().c_str()); \
+		return false; \
+	} \
+	if(!TheDataset.isAccessible(c->getEntityRowId())) \
+	{ \
+		log.displayNL ("ERR: '%s' is not valid in mirror", eid.toString().c_str()); \
+		return false; \
+	} \
+
 //#define GET_CHARACTER1 \
 //	if (args.size() < 2) { nlwarning ("Missing argument number 1 that should be the eid"); return false; } \
 //	CEntityId eid = CEntityIdTranslator::getInstance()->getByEntity(args[1]); \

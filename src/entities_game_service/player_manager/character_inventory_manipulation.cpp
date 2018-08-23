@@ -995,7 +995,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 	// if an item is equipped in destination slot unequip it
 	if (dstInv->getItem(dstSlot) != NULL)
 	{
-		nlinfo(".");
 		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
 		{
 			// if item is locked just return
@@ -1486,6 +1485,7 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 				|| (item->getRequiredFaction() == "karavan"
 					&& (allegeance.first != PVP_CLAN::Karavan || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "marauder" && (!neutralcult || !neutralciv || getOrganization() != 5))
+				|| (item->getRequiredFaction() == "ranger" && (!neutralcult || !neutralciv || getOrganization() != 7))
 				|| (item->getRequiredFaction() == "neutralcult" && (!neutralcult || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "neutralciv" && (!neutralciv || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "neutral" && (!neutralcult || !neutralciv || getOrganization() != 0))
@@ -1496,9 +1496,15 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 				|| (item->getRequiredFaction() == "tryker"
 					&& (allegeance.second != PVP_CLAN::Tryker || getOrganization() != 0))
 				|| (item->getRequiredFaction() == "zorai"
-					&& (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0))))
-		requiredRespected = false;
-
+					&& (allegeance.second != PVP_CLAN::Zorai || getOrganization() != 0)))){
+		if (equipCheck){
+			PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "REQUIRED_EQUIP_CIV_CULT_ORGA");
+			return false;
+		}else{
+			requiredRespected = false;
+		}
+	}
+	
 	if (requiredRespected == false && equipCheck)
 	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "REQUIRED_EQUIP");
