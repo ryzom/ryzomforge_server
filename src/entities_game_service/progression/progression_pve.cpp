@@ -339,28 +339,26 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 	// get most effective team or single player
 	const sint16 index = creatureTakenDmg.getMaxInflictedDamageTeamIndex();
 
-
 	CCreature *creaturePtr = CreatureManager.getCreature(creature);
-	if (creaturePtr)
-	{
-		string url = creaturePtr->getUrlForDeathNotification();
-		if (!url.empty())
-		{
-			// Notify Death for all players who have made action
-			for(TCharacterActionsContainer::iterator it = _CharacterActions.begin(); it != _CharacterActions.end(); ++it)
-			{
-				CCharacter *player = PlayerManager.getChar((*it).first);
-				if (player)
-					player->sendUrl(url, "");
-			}
-		}
-	}
-
 	// max damage have been done by players
 	if (index != -1)
 	{
+
 		if (creaturePtr && creaturePtr->getForm())
 		{
+			string url = creaturePtr->getUrlForDeathNotification();
+			if (!url.empty())
+			{
+				std::set<CEntityId> players(creatureTakenDmg.getAllPlayers());
+				std::set<CEntityId>::iterator itPlayer;
+				for (itPlayer=players.begin(); itPlayer!=players.end(); ++itPlayer)
+				{
+					CCharacter* player = PlayerManager.getChar(*itPlayer);
+					if (player)
+						player->sendUrl(url, "");
+				}
+			}
+			
 			// Auto-quartering of mission items
 			uint16 itemLevel = creaturePtr->getForm()->getXPLevel();
 			vector<CAutoQuarterItemDescription> matchingItemsForMissions; // point to creaturePtr->getForm()->getItemsForMission()

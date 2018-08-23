@@ -133,6 +133,8 @@ void	CWorldEntity::init( const CEntityId& id, const TDataSetRow &index )
 	Parent = NULL;
 	Control = NULL;
 
+	Dead = false;
+
 	PosInitialised = false;
 	Continent = INVALID_CONTINENT_INDEX;
 	MoveContainer = NULL;
