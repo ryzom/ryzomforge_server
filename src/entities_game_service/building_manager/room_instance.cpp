@@ -177,7 +177,7 @@ void CRoomInstancePlayer::addUser( CCharacter* user, const NLMISC::CEntityId & o
 		user->setInRoomOfPlayer(owner);
 	}
 	
-	user->sendUrl(toString("app_ryzhome action=open_player_room&room_name=%s&owner=%s&powo=%d",  owner.toString().c_str(), playerBuilding->getName().c_str(), user->getPowoCell()), "");
+	user->sendUrl(toString("app_ryzhome action=open_player_room&owner=%s&room_name=%s&powo=%d",  owner.toString().c_str(), playerBuilding->getName().c_str(), user->getPowoCell()), "");
 
 	++_RefCount;
 }

@@ -1192,7 +1192,7 @@ public:
 	{
 		/// The query tree
 		//mutable std::shared_ptr<TQueryNode> QueryTree;
-		mutable std::auto_ptr<TQueryNode> QueryTree;
+		mutable CUniquePtr<TQueryNode> QueryTree;
 
 		/// Option to extract full context with selected logs
 		bool		FullContext;
@@ -1206,7 +1206,7 @@ public:
 		}
 
 		TParserResult(const TParserResult &other)
-			:	QueryTree(other.QueryTree),
+			:	QueryTree(CUniquePtrMove(other.QueryTree)),
 				FullContext(other.FullContext),
 				OutputPrefix(other.OutputPrefix)
 
