@@ -1172,7 +1172,7 @@ NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<e
 	}
 
 	log.displayNL("%d", fame);
-	
+
 	return true;
 }
 
@@ -1750,8 +1750,8 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 			{
 				if (!c->isDead() || (args[3].length() > 9 && args[3][9] == '1')) // Forbid if not dead or dead but not wanted
 				{
-					log.displayNL("ERR: OTHER_FLAG");
-					return false;
+				log.displayNL("ERR: OTHER_FLAG");
+				return false;
 				}
 			}
 		}
@@ -3143,3 +3143,4 @@ NLMISC_COMMAND(setPlayerPetSize, "change the name of a player pet", "<uid> <inde
 	log.displayNL("OK");
 	return true;
 }
+
