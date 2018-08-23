@@ -995,7 +995,6 @@ void CCharacter::equipCharacter(INVENTORIES::TInventory dstInvId, uint32 dstSlot
 	// if an item is equipped in destination slot unequip it
 	if (dstInv->getItem(dstSlot) != NULL)
 	{
-		nlinfo(".");
 		if (dstInv->getItem(dstSlot)->getLockCount() != 0)
 		{
 			// if item is locked just return
@@ -1464,7 +1463,17 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 		))
 	{
 		if (item->recommended() > 150)
-			requiredRespected = false;
+		{
+			if(equipCheck)
+			{
+				PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "EGS_CANT_EQUIP_ITEM_IS_TRIAL_PLAYER");
+				return false;
+			}
+			else
+			{
+				requiredRespected = false;
+			}
+		}
 	}
 
 	pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegeance = getAllegiance();

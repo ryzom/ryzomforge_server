@@ -707,3 +707,21 @@ NLMISC_COMMAND(chat, "send message chat", "<char_name> <chat_group> <message>")
 	
 	return true;
 }
+
+NLMISC_COMMAND(getRealName, "getRealName", "<char_name>")
+{
+	if (args.size() != 1)
+		return false;
+	
+	CCharacterInfos *ci = IOS->getCharInfos(args[0]);
+	if (ci == NULL)
+	{
+		log.displayNL("ERR: Unknown %s", args[0].c_str());
+		return true;
+	}
+	
+	log.displayNL("%s", ci->ShortName.c_str());
+	
+	return true;
+}
+

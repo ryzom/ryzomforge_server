@@ -1677,6 +1677,11 @@ void CCharacter::kill(TDataSetRow killerRowId)
 		CUnifiedNetwork::getInstance()->send("TTS", msgout);
 	}
 
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
+
 	_ContextualProperty.directAccessForStructMembers().talkableTo(false);
 	_ContextualProperty.setChanged();
 	CPhraseManager::getInstance().removeEntity(_EntityRowId, false);
@@ -1999,6 +2004,11 @@ void CCharacter::applyRespawnEffects(bool applyDP)
 	_Behaviour = MBEHAV::IDLE;
 	_IsDead = false;
 	_IsInAComa = false;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2016,6 +2026,11 @@ void CCharacter::resurrected()
 	// give spire effect if needed
 	CPVPFactionRewardManager::getInstance().giveTotemsEffects(this);
 	_RegionKilledInPvp = 0xffff;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2033,6 +2048,11 @@ void CCharacter::revive()
 	_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base;
 	_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base;
 	_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2786,7 +2806,7 @@ void CCharacter::compassDatabaseUpdate()
 // serial: reading off-mirror, writing from mirror
 //
 //---------------------------------------------------
-void CCharacter::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
+void CCharacter::serial(NLMISC::IStream &f)
 {
 	nlerror("Serial method no longer exists!");
 } // serial //
@@ -11187,6 +11207,10 @@ void CCharacter::sellItem(INVENTORIES::TInventory inv, uint32 slot, uint32 quant
 					  "sell price %d, margin %d), must not permited by client",
 					  _Id.toString().c_str(), sheet.toString().c_str(), ufBasePrice, sellPrice,
 					  uint32(((sellPrice - ufBasePrice) * 100.0f) / ufBasePrice));
+			if(uint32(((sellPrice - ufBasePrice) * 100.0f) / ufBasePrice) > 9999)
+			{
+				return;
+			}
 		}
 
 		if (item->getRefInventory() == _Inventory[INVENTORIES::equipment])
@@ -16000,6 +16024,31 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	{
 		if (playerFame != NO_FAME)
 		{
+			// Update Marauder fame when < 50 and other fame change
+			uint32 marauderIdx = PVP_CLAN::getFactionIndex(PVP_CLAN::Marauder);
+			sint32	marauderFame = CFameInterface::getInstance().getFameIndexed(_Id, marauderIdx);
+			if (factionIndex != marauderIdx)
+			{
+				sint32 maxOtherfame = -100*6000;
+				for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+				{
+					if (fameIdx == marauderIdx)
+						continue;
+					
+					sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
+
+					if (fame > maxOtherfame)
+						maxOtherfame = fame;
+				}
+
+				// Marauder fame is when player have negative fame in other clans
+				maxOtherfame = -maxOtherfame;
+
+				if (marauderFame < 50 * 6000 || maxOtherfame < 50 * 6000) {
+					CFameManager::getInstance().setEntityFame(_Id, marauderIdx, maxOtherfame, false);
+				}
+			}
+			
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase),
 			// sint64(float(playerFame)/FameAbsoluteMax*100) );
 			CBankAccessor_PLR::getFAME()
@@ -20352,7 +20401,7 @@ void CPetAnimal::clear()
 }
 
 //-----------------------------------------------------------------------------
-void CPetAnimal::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
+void CPetAnimal::serial(NLMISC::IStream &f)
 {
 	// ensure we won't save in this format anymore
 	nlassertex(f.isReading(), ("<CPetAnimal::serial> you should not save in old format anymore!!!"));

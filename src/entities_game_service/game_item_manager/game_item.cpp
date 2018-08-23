@@ -298,7 +298,7 @@ RM_FABER_STAT_TYPE::TRMStatType CItemCraftParameters::getBestItemStat() const
 }
 
 	/// serial validated point for a character
-void CItemCraftParameters::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
+void CItemCraftParameters::serial(NLMISC::IStream &f)
 {
 	uint32 version = CItemCraftParameters::getCurrentVersion();
 	f.serial( version );
@@ -1397,7 +1397,7 @@ void CGameItem::setStackSize(uint32 size)
 	uint32 prevSize = _StackSize;
 	_StackSize = size;
 
-	log_Item_UpdateQuantity(_ItemId, _StackSize, prevSize);
+//	log_Item_UpdateQuantity(_ItemId, _StackSize, prevSize);
 	
 	if (_LockCount > _StackSize)
 		_LockCount = _StackSize;

@@ -76,7 +76,7 @@ void CMongo::insert(const string &collection, const string &json)
 	}
 }
 
-auto_ptr<DBClientCursor> CMongo::query(const string &collection, const string &json)
+CUniquePtr<DBClientCursor> CMongo::query(const string &collection, const string &json)
 {
 //	nlinfo("mongo: try to query in '%s': '%s'", collection.c_str(), json.c_str());
 
@@ -87,7 +87,7 @@ auto_ptr<DBClientCursor> CMongo::query(const string &collection, const string &j
 	catch(const DBException& e)
 	{
 		nlwarning("mongo: query failed, caught DBException '%s'", e.toString().c_str());
-		return auto_ptr<DBClientCursor>(0);
+		return CUniquePtr<DBClientCursor>();
 	}
 }
 

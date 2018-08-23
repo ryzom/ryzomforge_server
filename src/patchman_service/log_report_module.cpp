@@ -33,8 +33,7 @@
 #include "patchman_constants.h"
 #include "deployment_configuration_synchroniser.h"
 
-// nelns
-#include "../../nelns/admin_executor_service/log_report.cpp" // including cpp because the "DSP to Makefile" system does not suppport external dependencies
+#include "log_report.h"
 
 //-----------------------------------------------------------------------------
 // namespaces
