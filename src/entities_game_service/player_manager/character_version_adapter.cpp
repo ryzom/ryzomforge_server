@@ -96,8 +96,9 @@ uint32 CCharacterVersionAdapter::currentVersionNumber() const
 	// 25 : (05/03/2015) fix required faction in items on inventory
 	// 26 : (23/04/2015) fix foragetool HP
 	// 27 : (10/10/2017) fix /learnAllBrick exploit
+	// 28 : (21/07/2018) fix amps HP reset
 	////////////////////////////////////
-	return 27;
+	return 28;
 }
 
 
@@ -134,6 +135,7 @@ void CCharacterVersionAdapter::adaptCharacterFromVersion( CCharacter &character,
 	case 24: adaptToVersion25(character);
 	case 25: adaptToVersion26(character);
 	case 26: adaptToVersion27(character);
+	case 27: adaptToVersion28(character);
 	default:;
 	}
 }
@@ -1427,3 +1429,38 @@ void CCharacterVersionAdapter::adaptToVersion27(CCharacter &character) const
 		}
 	}
 }
+
+//---------------------------------------------------
+void CCharacterVersionAdapter::adaptToVersion28(CCharacter &character) const
+{
+	// parse all inventories and set amplis to max Hp
+	const uint sizeInv = INVENTORIES::NUM_INVENTORY;
+	for ( uint i = 0; i < sizeInv ; ++i )
+	{
+		if (character._Inventory[i] != NULL)
+		{
+			CInventoryPtr childSrc = character._Inventory[i];
+			for ( uint j = 0; j < childSrc->getSlotCount(); j++ )
+			{
+				CGameItemPtr item = childSrc->getItem(j);
+				if (item != NULL)
+				{
+					const CStaticItem * form = CSheets::getForm( item->getSheetId() );
+					if( form )
+					{
+						if( form->Type == ITEM_TYPE::MAGICIAN_STAFF )
+						{
+							if (item->maxDurability() > 0)
+							{
+								nlinfo("player %s, patching ampli %s HP, new value= %u", 
+									character.getId().toString().c_str(), item->getSheetId().toString().c_str(), item->maxDurability());
+								item->addHp(item->maxDurability());
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+

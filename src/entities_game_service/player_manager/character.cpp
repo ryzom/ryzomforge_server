@@ -220,6 +220,9 @@ CVariable<uint32> CraftFailureProbaMpLost(
 // Number of login stats kept for a character
 CVariable<uint32> NBLoginStats("egs", "NBLoginStats", "Nb logins stats kept (logon time, logoff time", 50, 0, true);
 
+CVariable<bool> EnableGuildPoints(
+	"egs", "EnableGuildPoints", "Enable guild points", false, 0, true);
+
 // Max Bonus/malus/consumable effects displayed by client (database corresponding array must have the same size, and
 // client must process the same size)
 const uint32 MaxBonusMalusDisplayed = 12;
@@ -412,6 +415,9 @@ CCharacter::CCharacter()
 		_FactionPoint[i] = 0;
 
 	_PvpPoint = 0;
+	_GuildPoints = 0;
+	_TodayGuildPoints = 0;
+	_NextTodayGuildPointsReset = 0;
 	_PVPFlagLastTimeChange = 0;
 	_PVPFlagTimeSettedOn = 0;
 	_PvPDatabaseCounter = 0;
@@ -1671,6 +1677,11 @@ void CCharacter::kill(TDataSetRow killerRowId)
 		CUnifiedNetwork::getInstance()->send("TTS", msgout);
 	}
 
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
+
 	_ContextualProperty.directAccessForStructMembers().talkableTo(false);
 	_ContextualProperty.setChanged();
 	CPhraseManager::getInstance().removeEntity(_EntityRowId, false);
@@ -1993,6 +2004,11 @@ void CCharacter::applyRespawnEffects(bool applyDP)
 	_Behaviour = MBEHAV::IDLE;
 	_IsDead = false;
 	_IsInAComa = false;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2010,6 +2026,11 @@ void CCharacter::resurrected()
 	// give spire effect if needed
 	CPVPFactionRewardManager::getInstance().giveTotemsEffects(this);
 	_RegionKilledInPvp = 0xffff;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2027,6 +2048,11 @@ void CCharacter::revive()
 	_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base;
 	_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base;
 	_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base;
+
+	CMessage msgout("SET_DEAD_STATUS");
+	msgout.serial(_Id);
+	msgout.serial(_IsDead);
+	sendMessageViaMirror("GPMS", msgout);
 }
 
 //---------------------------------------------------
@@ -2780,7 +2806,7 @@ void CCharacter::compassDatabaseUpdate()
 // serial: reading off-mirror, writing from mirror
 //
 //---------------------------------------------------
-void CCharacter::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
+void CCharacter::serial(NLMISC::IStream &f)
 {
 	nlerror("Serial method no longer exists!");
 } // serial //
@@ -5764,7 +5790,10 @@ bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGa
 		pet.PetSheetId = form->PetSheet;
 		pet.Satiety = form->PetHungerCount;
 		pet.MaxSatiety = form->PetHungerCount;
-		sint32 i = getFreePetSlot();
+		uint8 startSlot = 0;
+		if (form->Type == ITEM_TYPE::ANIMAL_TICKET) // Use only last slots for pets
+			startSlot = MAX_PACK_ANIMAL+MAX_MEKTOUB_MOUNT;
+		sint32 i = getFreePetSlot(startSlot);
 
 		if (i >= 0)
 		{
@@ -5788,9 +5817,9 @@ bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGa
 //-----------------------------------------------
 // CCharacter::getFreePetSlot return free slot for pet spawn or -1 if there are no free slot
 //-----------------------------------------------
-sint32 CCharacter::getFreePetSlot()
+sint32 CCharacter::getFreePetSlot(uint8 startSlot)
 {
-	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i)
+	for (sint32 i = startSlot; i < (sint32)_PlayerPets.size(); ++i)
 	{
 		if (_PlayerPets[i].TicketPetSheetId == CSheetId::Unknown)
 		{
@@ -5824,6 +5853,34 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 	return slot;
 }
 
+// CCharacter::getPets with stringlike M0PPAA (M=Mount, P=Packer, A=Animal, 0=None)
+//-----------------------------------------------
+string CCharacter::getPets()
+{
+	string pets = "";
+
+	for (sint32 i = 0; i < (sint32)_PlayerPets.size(); ++i)
+	{
+		if (_PlayerPets[i].TicketPetSheetId != CSheetId::Unknown)
+		{
+			const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+			if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
+				pets += "M";
+			else if (form->Type == ITEM_TYPE::MEKTOUB_PACKER_TICKET)
+				pets += "P";
+			else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
+				pets += "A";
+		}
+		else
+		{
+			pets += "0";
+		}
+	}
+
+	return pets;
+}
+
+
 //-----------------------------------------------
 // CCharacter::checkAnimalCount return true if can add 'delta' pets to current player pets
 //-----------------------------------------------
@@ -5846,6 +5903,7 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 		return false;
 	}
 
+
 	if (form->Family != ITEMFAMILY::PET_ANIMAL_TICKET)
 	{
 		if (sendMessage)
@@ -5857,7 +5915,6 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		return false;
 	}
-
 	if (form->PetSheet == CSheetId::Unknown)
 	{
 		if (sendMessage)
@@ -5868,17 +5925,21 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		return false;
 	}
-
 	if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
 	{
 		uint32 nbMektoubMount = 0;
 
 		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
 		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
+
 			// check sheet is asigned (prevent an useless warning)
-			if ((*it).PetSheetId != CSheetId::Unknown)
+			if (petSheetId != CSheetId::Unknown)
 			{
-				const CStaticCreatures* form = CSheets::getCreaturesForm((*it).PetSheetId);
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 				if (form)
 				{
@@ -5907,10 +5968,14 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 
 		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
 		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
 			// check sheet is asigned (prevent an useless warning)
-			if ((*it).PetSheetId != CSheetId::Unknown)
+			if (petSheetId != CSheetId::Unknown)
 			{
-				const CStaticCreatures* form = CSheets::getCreaturesForm((*it).PetSheetId);
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 				if (form)
 				{
@@ -5928,6 +5993,53 @@ bool CCharacter::checkAnimalCount(const CSheetId &PetTicket, bool sendMessage, s
 			if (sendMessage)
 			{
 				sendDynamicSystemMessage(_Id, "EGS_CANT_BUY_ANOTHER_PACKER");
+			}
+
+			return false;
+		}
+
+		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
+		BOMB_IF(p == NULL, "Failed to find player record for character: " << getId().toString(), return 0.0);
+
+		if (p->isTrialPlayer())
+		{
+			if (sendMessage)
+			{
+				sendDynamicSystemMessage(_Id, "EGS_CANT_BUY_PACKER_IS_TRIAL_PLAYER");
+			}
+
+			return false;
+		}
+	}
+	else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
+	{
+		uint32 nbAnimals = 0;
+		for (vector<CPetAnimal>::const_iterator it = _PlayerPets.begin(); it != _PlayerPets.end(); ++it)
+		{
+			const CStaticItem* ticket_form = CSheets::getForm((*it).TicketPetSheetId);
+			CSheetId petSheetId = CSheetId::Unknown;
+			if (ticket_form)
+				petSheetId = ticket_form->PetSheet;
+			// check sheet is asigned (prevent an useless warning)
+			if (petSheetId != CSheetId::Unknown)
+			{
+				const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
+
+				if (form)
+				{
+					if (form->getRace() == EGSPD::CPeople::Creature)
+					{
+						++nbAnimals;
+					}
+				}
+			}
+		}
+		// check we can add delta animal
+		if ((nbAnimals + delta) > MAX_OTHER_PET)
+		{
+			if (sendMessage)
+			{
+				sendDynamicSystemMessage(_Id, "EGS_CANT_GET_ANOTHER_PET");
 			}
 
 			return false;
@@ -6239,8 +6351,7 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 //-----------------------------------------------
 // CCharacter::AnimalSpawned character buy a creature
 //-----------------------------------------------
-void CCharacter::onAnimalSpawned(
-	CPetSpawnConfirmationMsg::TSpawnError SpawnStatus, uint32 PetIdx, const TDataSetRow &PetMirrorRow)
+void CCharacter::onAnimalSpawned(CPetSpawnConfirmationMsg::TSpawnError SpawnStatus, uint32 PetIdx, const TDataSetRow &PetMirrorRow)
 {
 	CPetAnimal &animal = _PlayerPets[PetIdx];
 
@@ -6264,6 +6375,14 @@ void CCharacter::onAnimalSpawned(
 					setAnimalSatiety(PetIdx, animal.Satiety, c);
 					// set the race of owner
 					setAnimalPeople(PetIdx);
+
+					// Change size if non zero
+					if (animal.Size > 0)
+					{
+						CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, PetMirrorRow, DSPropertyVPB );
+						SET_STRUCT_MEMBER( visualPropertyB, PropertySubData.Scale, animal.Size );
+					}
+					
 				}
 
 				if (animal.PetStatus != CPetAnimal::death)
@@ -7100,7 +7219,11 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 	if (_PlayerPets[i].PetStatus != CPetAnimal::not_present)
 	{
 		_PlayerPets[i].AnimalStatus = ANIMAL_STATUS::AliveFlag;
-		const CStaticCreatures* form = CSheets::getCreaturesForm(_PlayerPets[i].PetSheetId);
+		const CStaticItem* ticket_form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+		CSheetId petSheetId = CSheetId::Unknown;
+		if (ticket_form)
+			petSheetId = ticket_form->PetSheet;
+		const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 		if (form)
 		{
@@ -7110,7 +7233,7 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 
 			if (form2)
 			{
-				bulkMax = form2->BulkMax;
+				bulkMax = _PlayerPets[i].getAnimalMaxBulk();
 				weightMax = form2->WeightMax;
 			}
 		}
@@ -7462,6 +7585,44 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 	}
 }
 
+void CCharacter::setAnimalSheetId(uint8 petIndex, CSheetId sheetId)
+{
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
+
+	CPetAnimal &animal = _PlayerPets[petIndex];
+	animal.setSheetId(sheetId);
+}
+
+
+void CCharacter::setAnimalSize(uint8 petIndex, uint8 size)
+{
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
+
+	CPetAnimal &animal = _PlayerPets[petIndex];
+	animal.setSize(size);
+}
+
+
+void CCharacter::setAnimalPosition(uint8 petIndex, sint32 x, sint32 y)
+{
+	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
+	{
+		nlwarning("<CCharacter::setAnimalName> Incorect animal index '%d'.", petIndex);
+		return;
+	}
+
+	CPetAnimal &animal = _PlayerPets[petIndex];
+	animal.setPosition(x, y);
+}
+
 void CCharacter::setAnimalName(uint8 petIndex, ucstring customName)
 {
 	if (petIndex < 0 || petIndex >= MAX_INVENTORY_ANIMAL)
@@ -7580,6 +7741,8 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 	if (XpGain == 0.0f)
 		return 0.0;
 
+	
+
 	// get pointer to static skills tree definition
 	CSheetId sheet("skills.skill_tree");
 	const CStaticSkillsTree* SkillsTree = CSheets::getSkillsTreeForm(sheet);
@@ -7602,6 +7765,65 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 	SSkill* skill = _Skills.getSkillStruct(skillName);
 	nlassert(skill);
 	nlassert(skillEnum != SKILLS::unknown);
+
+	string skillInitial = SKILLS::toString(skillEnum).substr(1, 1);
+
+	//// GUILDS POINTS 
+	CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
+	if (EnableGuildPoints.get() && guild)
+	{
+		if (CTickEventHandler::getGameCycle() >= _NextTodayGuildPointsReset)
+		{
+			_NextTodayGuildPointsReset = CTickEventHandler::getGameCycle() + 10*60*60*20;
+			_TodayGuildPoints = 0;
+		}
+
+		if (skill->MaxLvlReached >= 250) // when max level : quantity of points is different for each skill
+		{
+			switch (skillInitial[0])
+			{
+			case 'F': // Fight is x2
+				_GuildPoints += (uint32)(XpGain*2);
+				break;
+
+			case 'M': // Magic is x1
+				_GuildPoints += (uint32)(XpGain*1.5);
+				break;
+
+			case 'C': // Craft is x2
+				_GuildPoints += (uint32)(XpGain*2.5);
+				break;
+
+			case 'H': // Harvest is x0.5
+				_GuildPoints += (uint32)(XpGain*0.5);
+				break;
+			}
+		}
+		else // when not max level : win same quantity than xp
+			_GuildPoints += (uint32)XpGain;
+
+		
+		uint32 wantedPoints = 100; // >Todo remove hardcoded
+		if (_TodayGuildPoints > 10) // First 10 points are easy to win
+		{
+			wantedPoints *= 2*(_TodayGuildPoints - 9);
+		}
+		
+		if (_GuildPoints >= wantedPoints)
+		{
+			_TodayGuildPoints++;
+			guild->addXP(1);
+			_GuildPoints = 0;
+		}
+
+		nlinfo("Skill %u / %u", skill->MaxLvlReached, skill->Base);
+
+		if (skill->MaxLvlReached >= skill->Base)
+			nlinfo("%s : %u XP in MAX Skill %s => _TodayGuildPoints, wantedPoints, _GuildPoints = %u, %u, %u", _Name.toUtf8().c_str(), (uint32)(XpGain), skillInitial.c_str(), _TodayGuildPoints, wantedPoints, _GuildPoints);
+		else
+			nlinfo("%s : %u XP in Skill %s => _TodayGuildPoints, wantedPoints, _GuildPoints = %u, %u, %u", _Name.toUtf8().c_str(), (uint32)(XpGain), skillInitial.c_str(), _TodayGuildPoints, wantedPoints, _GuildPoints);
+	}
+	////
 
 	// treat ring scenarios as a special case...
 	if (IsRingShard)
@@ -7682,7 +7904,7 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			}
 		}
 
-		if (!p->isTrialPlayer())
+		if (!p->isTrialPlayer()) // Ulukyn: premium player have no use of catalyser but all the time x2
 		{
 			xpBonus = XpGain;
 		}
@@ -10866,7 +11088,7 @@ void CCharacter::sellItem(INVENTORIES::TInventory inv, uint32 slot, uint32 quant
 		return;
 	}
 
-	if (inv >= INVENTORIES::pet_animal1 && inv <= INVENTORIES::pet_animal4)
+	if (inv >= INVENTORIES::pet_animal1 && inv < INVENTORIES::max_pet_animal)
 	{
 		if ((_PlayerPets[inv - INVENTORIES::pet_animal1].AnimalStatus & ANIMAL_STATUS::InventoryAvailableFlag)
 				== false)
@@ -10985,6 +11207,10 @@ void CCharacter::sellItem(INVENTORIES::TInventory inv, uint32 slot, uint32 quant
 					  "sell price %d, margin %d), must not permited by client",
 					  _Id.toString().c_str(), sheet.toString().c_str(), ufBasePrice, sellPrice,
 					  uint32(((sellPrice - ufBasePrice) * 100.0f) / ufBasePrice));
+			if(uint32(((sellPrice - ufBasePrice) * 100.0f) / ufBasePrice) > 9999)
+			{
+				return;
+			}
 		}
 
 		if (item->getRefInventory() == _Inventory[INVENTORIES::equipment])
@@ -15798,6 +16024,31 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 	{
 		if (playerFame != NO_FAME)
 		{
+			// Update Marauder fame when < 50 and other fame change
+			uint32 marauderIdx = PVP_CLAN::getFactionIndex(PVP_CLAN::Marauder);
+			sint32	marauderFame = CFameInterface::getInstance().getFameIndexed(_Id, marauderIdx);
+			if (factionIndex != marauderIdx)
+			{
+				sint32 maxOtherfame = -100*6000;
+				for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
+				{
+					if (fameIdx == marauderIdx)
+						continue;
+					
+					sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
+
+					if (fame > maxOtherfame)
+						maxOtherfame = fame;
+				}
+
+				// Marauder fame is when player have negative fame in other clans
+				maxOtherfame = -maxOtherfame;
+
+				if (marauderFame < 50 * 6000 || maxOtherfame < 50 * 6000) {
+					CFameManager::getInstance().setEntityFame(_Id, marauderIdx, maxOtherfame, false);
+				}
+			}
+			
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase),
 			// sint64(float(playerFame)/FameAbsoluteMax*100) );
 			CBankAccessor_PLR::getFAME()
@@ -20134,6 +20385,7 @@ void CPetAnimal::clear()
 	OwnerId = NLMISC::CEntityId::Unknown;
 	SpawnedPets = TDataSetRow();
 	StableId = 0;
+	Size = 0;
 	Landscape_X = 0;
 	Landscape_Y = 0;
 	Landscape_Z = 0;
@@ -20149,7 +20401,7 @@ void CPetAnimal::clear()
 }
 
 //-----------------------------------------------------------------------------
-void CPetAnimal::serial(NLMISC::IStream &f) throw(NLMISC::EStream)
+void CPetAnimal::serial(NLMISC::IStream &f)
 {
 	// ensure we won't save in this format anymore
 	nlassertex(f.isReading(), ("<CPetAnimal::serial> you should not save in old format anymore!!!"));
@@ -20221,6 +20473,7 @@ uint32 CPetAnimal::initLinkAnimalToTicket(CCharacter* c, uint8 index)
 			//			Slot = ItemPtr->getLocSlot();
 			ItemPtr->setPetIndex(index);
 			ItemPtr->setCustomName(CustomName);
+			ItemPtr->quality(Size);
 			Slot = ItemPtr->getInventorySlot();
 			return Slot;
 		}
@@ -20236,6 +20489,7 @@ uint32 CPetAnimal::initLinkAnimalToTicket(CCharacter* c, uint8 index)
 				Slot = ItemPtr->getInventorySlot();
 				ItemPtr->setPetIndex(index);
 				ItemPtr->setCustomName(CustomName);
+				ItemPtr->quality(Size);
 				return Slot;
 			}
 			else
@@ -20260,7 +20514,12 @@ uint32 CPetAnimal::initLinkAnimalToTicket(CCharacter* c, uint8 index)
 //-----------------------------------------------
 uint32 CPetAnimal::getAnimalMaxBulk()
 {
-	const CStaticCreatures* form = CSheets::getCreaturesForm(PetSheetId);
+	// For max bulk use pet sheet from ticket (in case where sheet has changed)
+	const CStaticItem* ticket_form = CSheets::getForm(TicketPetSheetId);
+	CSheetId petSheetId = CSheetId::Unknown;
+	if (ticket_form)
+		petSheetId = ticket_form->PetSheet;
+	const CStaticCreatures* form = CSheets::getCreaturesForm(petSheetId);
 
 	if (form)
 	{
@@ -20280,6 +20539,9 @@ uint32 CPetAnimal::getAnimalMaxBulk()
 
 		if (formBag)
 		{
+			// zig inventories have bulk proportionnal to size (size is 1->250)
+			if (creatureBagSheet == CSheetId("zig_inventory.sitem") && Size > 0)
+				return max((uint32)10, (uint32)ceil((formBag->BulkMax*Size)/100));
 			return formBag->BulkMax;
 		}
 	}
