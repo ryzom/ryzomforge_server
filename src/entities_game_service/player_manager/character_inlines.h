@@ -795,10 +795,18 @@ inline uint16 CCharacter::getBuildingExitZone() const
 
 //------------------------------------------------------------------------------
 
+inline uint8 CCharacter::getHairColor() const
+{
+	return _HairColor;
+}
+
+//------------------------------------------------------------------------------
+
 inline uint8 CCharacter::getHair() const
 {
 	return _HairType; 
 }
+
 
 //------------------------------------------------------------------------------
 
