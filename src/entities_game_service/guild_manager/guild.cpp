@@ -119,26 +119,44 @@ uint8 CGuild::getMembersSession()const
 } 
 
 //----------------------------------------------------------------------------
-//void CGuild::spendXP( uint32 xp )
-//{
+void CGuild::spendXP( uint32 xp )
+{
 //	nlassert( xp <= _XP );
-//	setXP( _XP - xp );
+	if ( xp > _XP )
+	{
+		nlwarning( "spendXP guild %u : xp = %u, max = %u", _Id, xp, _XP);
+		return;
+	}
+	setXP( _XP - xp );
+	CBankAccessor_GUILD::getGUILD().setXP(_DbGroup, _XP);
 //	setClientDBProp( "GUILD:XP", _XP );
-//}
+}
 
 //----------------------------------------------------------------------------
-//void CGuild::addXP( uint32 xp )
-//{
-//	setXP( _XP + xp );
+void CGuild::addXP( uint32 xp )
+{
+	if (_XP < 1000) // TEMPORARY LIMIT : must be removed when added more stuff to pay with guild points
+	{
+		setXP( _XP + xp );
+		CBankAccessor_GUILD::getGUILD().setXP(_DbGroup, _XP);
+	}
 //	setClientDBProp( "GUILD:XP", _XP );
-//}
+}
+
+//----------------------------------------------------------------------------
+void CGuild::setPoints( uint32 points )
+{
+	setXP(points);
+	CBankAccessor_GUILD::getGUILD().setXP(_DbGroup, points);
+}
+
 
 //----------------------------------------------------------------------------
 void CGuild::spendMoney(uint64 money)
 {
 	if ( money > _Money )
 	{
-		nlwarning( "spendMoney guild %u : money = %"NL_I64"u, max = %"NL_I64"u", _Id, money, _Money);
+		nlwarning( "spendMoney guild %u : money = %" NL_I64 "u, max = %" NL_I64 "u", _Id, money, _Money);
 		return;
 	}
 
@@ -464,7 +482,7 @@ void CGuild::dumpGuildInfos( NLMISC::CLog & log )
 		getId()>>20 == IService::getInstance()->getShardId() ? "(Local)" : "(Foreign)",
 		getName().toUtf8().c_str(), getEId().toString().c_str() );
 	log.displayNL("\tDescription: '%s'", getDescription().toUtf8().c_str() );
-	log.displayNL("\tMoney: %"NL_I64"u", getMoney() );
+	log.displayNL("\tMoney: %" NL_I64 "u", getMoney() );
 //	log.displayNL("\tVillage: %hu", getVillage() );
 	log.displayNL("\tCreation date: %u", getCreationDate() );
 //	log.displayNL("\tXP: %u", getXP() );
@@ -472,7 +490,7 @@ void CGuild::dumpGuildInfos( NLMISC::CLog & log )
 	log.displayNL("\tMax bulk: %d", _Inventory->getMaxBulk() );
 //	log.displayNL("\tCharge points: %u", getChargesPoints() );
 	log.displayNL("\tRace: %s", EGSPD::CPeople::toString(getRace()).c_str() );
-	log.displayNL("\tIcon: 0x%016"NL_I64"x", getIcon() );
+	log.displayNL("\tIcon: 0x%016" NL_I64 "x", getIcon() );
 	log.displayNL("\tCiv Allegiance: %s", PVP_CLAN::toString(_DeclaredCiv).c_str());
 	log.displayNL("\tCult Allegiance: %s", PVP_CLAN::toString(_DeclaredCult).c_str());
 
@@ -562,7 +580,7 @@ void CGuild::registerGuild()
 //	setClientDBProp( "GUILD:ICON",_Icon );
 	CBankAccessor_GUILD::getGUILD().setICON(_DbGroup, _Icon);
 //	setClientDBProp( "GUILD:XP",_XP );
-//	CBankAccessor_GUILD::getGUILD().setXP(_DbGroup, _XP);
+	CBankAccessor_GUILD::getGUILD().setXP(_DbGroup, _XP);
 //	setClientDBProp( "GUILD:VILLAGE",_Village );
 //	CBankAccessor_GUILD::getGUILD().setVILLAGE(_DbGroup, _Village);
 //	setClientDBProp( "GUILD:PEOPLE",_Race );
@@ -912,6 +930,10 @@ bool CGuild::canAccessToGuildInventory( CCharacter * user )
 	if( outpost != NULL )
 		if( outpost->getOwnerGuild() == _Id )
 			return true;
+
+	// TODO ULU : add here position check of GH on atys
+
+	
 	return false;
 }
 
@@ -1147,7 +1169,7 @@ void	CGuild::takeMoney( CCharacter * user, uint64 money, uint16 session )
 	
 	if ( money > _Money )
 	{
-		nlwarning( "takeMoney guild %u user %s : money = %"NL_I64"u, max = %"NL_I64"u",_Id,user->getId().toString().c_str(),money,_Money);
+		nlwarning( "takeMoney guild %u user %s : money = %" NL_I64 "u, max = %" NL_I64 "u",_Id,user->getId().toString().c_str(),money,_Money);
 		return;
 	}
 	if ( ! _GuildInventoryView->checkMoneySession( session ) )
@@ -1184,7 +1206,7 @@ void CGuild::putMoney( CCharacter * user, uint64 money, uint16 session )
 	
 	if ( money > user->getMoney() )
 	{
-		nlwarning( "putMoney guild %u user %s : money = %"NL_I64"u, max = %"NL_I64"u",_Id,user->getId().toString().c_str(),money,_Money);
+		nlwarning( "putMoney guild %u user %s : money = %" NL_I64 "u, max = %" NL_I64 "u",_Id,user->getId().toString().c_str(),money,_Money);
 		return;
 	}
 
@@ -1275,7 +1297,7 @@ void CGuild::deleteMember( CGuildMember* member )
 	nlassert( uint(member->getGrade()) < _GradeCounts.size() );
 
 #ifdef HAVE_MONGO
-		CMongo::update("ryzom_users", toString("{'cid':%"NL_I64"u}", member->getIngameEId().getShortId()), "{$set:{'guildId':0}}");
+		CMongo::update("ryzom_users", toString("{'cid':%" NL_I64 "u}", member->getIngameEId().getShortId()), "{$set:{'guildId':0}}");
 #endif
 
 	if (PlayerManager.getChar(member->getIngameEId()) != NULL)
