@@ -1955,7 +1955,7 @@ NLMISC_COMMAND(checkActionFlags,"Check Action Flags","<uid> [pvp_flag, pvp_tag, 
 
 		if (!c->canEntityUseAction(bypassCheckFlags, true))
 		{
-			if (!c->isDead() || (args[3].length() > 9 && args[3][9] == '1')) // Forbid if not dead or dead but not wanted
+			if (!c->isDead() || (args[1].length() > 9 && args[1][9] == '1')) // Forbid if not dead or dead but not wanted
 			{
 			log.displayNL("ERR: OTHER_FLAG");
 			return false;
