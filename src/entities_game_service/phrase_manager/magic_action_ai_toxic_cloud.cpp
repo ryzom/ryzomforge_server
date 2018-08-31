@@ -60,6 +60,9 @@ bool CMagicAiActionToxicCloud::initFromAiAction( const CStaticAiAction *aiAction
 	const TAiArea &areaData = aiAction->getAreaData();
 	_Radius = areaData.AreaRange;
 
+	_Fx = data.Fx;
+	nlinfo("Toxic Cloud FX: %u = %s", data.Fx, _Fx.toString().c_str());
+
 	return true;
 } // initFromAiAction //
 
@@ -121,7 +124,16 @@ void CMagicAiActionToxicCloud::apply( CMagicPhrase * phrase, sint deltaLevel, si
 	}
 
 	// spawn toxic cloud and add it to manager
-	CSheetId sheet( toString( "toxic_cloud_%d.fx", fxRadius ));
+	CSheetId sheet;
+	nlinfo("Toxic Cloud FX: %s", _Fx.toString().c_str());
+	if (_Fx == CSheetId::Unknown)
+	{
+		nlinfo("Toxic Cloud: no valid fx sheet");
+		sheet = CSheetId( toString( "toxic_cloud_%d.fx", fxRadius ));
+	}
+	else
+		sheet = _Fx;
+
 	if ( cloud->spawn( sheet ) )
 	{
 		CEnvironmentalEffectManager::getInstance()->addEntity( cloud );
