@@ -969,7 +969,7 @@ public:
 	void setTimeOfDeath(NLMISC::TGameTime t);
 
 	// character buy a creature
-	bool addCharacterAnimal(const NLMISC::CSheetId &PetTicket, uint32 Price, CGameItemPtr ptr);
+	bool addCharacterAnimal(const NLMISC::CSheetId &PetTicket, uint32 Price, CGameItemPtr ptr, uint8 size = 100, const ucstring &customName = ucstring(""));
 
 	// return free slot for pet spawn or -1 if there are no free slot
 	sint32 getFreePetSlot(uint8 startSlot = 0);
@@ -2336,11 +2336,11 @@ public:
 	void checkSkillTreeForLockedSkill();
 
 	// set the character hair. return true on success
-	bool setHair(uint32 hairValue);
+	bool setHair(uint32 hairValue, bool isWig = false, bool sendMessage = true);
 	// set the character tatoo return true on success
-	bool setTatoo(uint32 tatooValue);
+	bool setTatoo(uint32 tatooValue, bool sendMessage = true);
 	// set the hair color of the user return true on success
-	bool setHairColor(uint32 colorValue);
+	bool setHairColor(uint32 colorValue, bool sendMessage = true);
 
 	typedef std::vector<TBrickParam::IIdPtr> CBrickPropertyValues;
 	typedef std::map<TBrickParam::TValueType, CBrickPropertyValues> CBrickProperties;
@@ -4004,6 +4004,9 @@ private:
 	/// General god flag for persistence
 	bool _GodModeSave;
 
+	bool _UseWig;
+
+
 	/// General flags for powos
 	bool _PowoCanXP;
 	bool _PowoCantDead;
@@ -4130,6 +4133,17 @@ public:
 	void setGodModeSave(bool godMode)
 	{
 		_GodModeSave = godMode;
+	}
+
+	
+	bool getUseWig() const
+	{
+		return _UseWig;
+	}
+
+	void setUseWig(bool use)
+	{
+		_UseWig = use;
 	}
 
 	/// Test the character against mission prerequisits for the specified list of mission giver NPCs

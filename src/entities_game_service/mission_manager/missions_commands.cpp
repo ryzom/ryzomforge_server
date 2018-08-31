@@ -2936,21 +2936,29 @@ NLMISC_COMMAND(resetTodayGuildPoints, "reset the today guild points", "<uid>")
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(addPlayerPet, "add a pet to player", "<uid> <sheetid>")
+NLMISC_COMMAND(addPlayerPet, "add a pet to player", "<uid> <sheetid> [size] [name]")
 {
-	if (args.size() != 2)
+	if (args.size() < 2)
 		return false;
 
 	GET_ACTIVE_CHARACTER
 
 	CSheetId ticket = CSheetId(args[1]);
+
+	uint8 size = 100;
+	if (args.size() == 3)
+		fromString(args[2], size);
+
+	ucstring customName;
+	if (args.size() == 4)
+		customName.fromUtf8(args[3]);
 	
 	if( ticket != CSheetId::Unknown )
 	{
 		CGameItemPtr item = c->createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, ticket);
 		if( item != 0 )
 		{
-			if ( ! c->addCharacterAnimal( ticket, 0, item ))
+			if ( ! c->addCharacterAnimal( ticket, 0, item, size, customName))
 			{
 				item.deleteItem();
 				log.displayNL("ERR: CAN'T ADD ANIMAL");
@@ -3033,7 +3041,7 @@ NLMISC_COMMAND(setPlayerPetName, "change the name of a player pet", "<uid> <inde
 
 //setPlayerVisual 530162 haircut fy_hof_hair_basic02.sitem
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[,<visual_prop1>,...] <args>")
+NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[,<visual_prop1>,...] <arg1>[,<arg2>,...]")
 {
 	if (args.size() < 2)
 		return false;
@@ -3042,15 +3050,21 @@ NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[
 	
 	std::vector< std::string > props;
 	NLMISC::splitString(args[1], ",", props);
+
+	std::vector< std::string > prop_args;
+	if (args.size() == 3)
+		NLMISC::splitString(args[2], ",", prop_args);
+
+
 	uint32 i=0;
 	
 	for (i = 0; i < props.size(); i++)
 	{
-		if (props[i] == "haircut")
+		if (props[i] == "haircut" || props[i] == "wig")
 		{
 			if (args.size() == 3)
 			{
-				CSheetId sheetId(args[2]);
+				CSheetId sheetId(prop_args[i]);
 				if (sheetId == CSheetId::Unknown)
 				{
 					log.displayNL("ERR: sheet unknown '%s'", sheetId.toString().c_str());
@@ -3058,10 +3072,10 @@ NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[
 				}
 				
 				uint32 hairValue = CVisualSlotManager::getInstance()->sheet2Index(sheetId, SLOTTYPE::HEAD_SLOT);
-				if (!c->setHair(hairValue))
+				if (!c->setHair(hairValue, props[i] == "wig", false))
 				{
-					log.displayNL("ERR: same color");
-					return true;
+					log.displayNL("ERR: same haircut");
+					continue;
 				}
 				c->resetHairCutDiscount();
 			}
@@ -3069,30 +3083,39 @@ NLMISC_COMMAND(setPlayerVisual, "get visual of a player", "<uid> <visual_prop1>[
 			{
 				uint8 haircut = c->getHair();
 				CSheetId *sheet = CVisualSlotManager::getInstance()->index2Sheet(haircut, SLOTTYPE::HEAD_SLOT);
+				bool isWig = c->getUseWig();
 				if (sheet)
-					log.displayNL("%s|", sheet->toString().c_str());
+				{
+					if (isWig)
+						log.displayNL("W %s", sheet->toString().c_str());
+					else
+						log.displayNL("H %s", sheet->toString().c_str());
+				}
 				else
 					log.displayNL("ERR: no haircut");
-				return true;
 			}
 		}
-		else if (props[i] == "haircolor")
+		else if (props[i] == "haircolor" || props[i] == "force_haircolor")
 		{
 			if (args.size() == 3)
 			{
 				uint32 color;
-				fromString(args[2], color);
-				if (!c->setHairColor(color))
-				{
+				fromString(prop_args[i], color);
+
+				bool isWig = c->getUseWig();
+				if (props[i] == "force_haircolor") // If force_haircolor the color will be applyed even player use a wig. To do that, remove useWig state and reapply it after
+					c->setUseWig(false);
+
+				if (!c->setHairColor(color, false))
 					log.displayNL("ERR: same color");
-					return true;
-				}
+
+				if (props[i] == "wigcolor")
+					c->setUseWig(isWig);
 			}
 			else
 			{
 				uint32 haircolor = c->getHairColor();
-				log.displayNL("%u|", haircolor);
-				return true;
+				log.displayNL("%u", haircolor);
 			}
 		}
 	}
@@ -3143,7 +3166,9 @@ NLMISC_COMMAND(setPlayerPetSize, "change the name of a player pet", "<uid> <inde
 	fromString(args[1], index);
 	uint8 size;
 	fromString(args[2], size);
+	c->removeAnimalIndex(index, CPetCommandMsg::DESPAWN);
 	c->setAnimalSize(index, size);
+	c->spawnCharacterAnimal(index);
 	log.displayNL("OK");
 	return true;
 }
