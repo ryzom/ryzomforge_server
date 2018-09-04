@@ -336,7 +336,7 @@ void CSpellParams::serial(class NLMISC::IStream &f)
 	f.serial(SpellParamValue2);
 	f.serial(SpellPowerFactor);
 	f.serial(SpellLevel);
-	f.serial(FX);
+	f.serial(Fx);
 	if (f.isReading())
 	{
 		string val;
