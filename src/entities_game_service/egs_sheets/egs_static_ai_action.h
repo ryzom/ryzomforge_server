@@ -204,6 +204,7 @@ struct CSpellParams
 		Behaviour = MBEHAV::UNKNOWN_BEHAVIOUR;
 		Stackable = false;
 		SpellLevel = 0.0f;
+		Fx = 0;
 	}
 
 	/// Serial
@@ -223,7 +224,7 @@ struct CSpellParams
 	float				SpellPowerFactor;
 	bool				Stackable;
 	float				SpellLevel;
-	
+	uint32				Fx;
 	// dmg spell
 	DMGTYPE::EDamageType	DamageType;
 
