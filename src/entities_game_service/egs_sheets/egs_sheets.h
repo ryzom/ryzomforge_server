@@ -201,6 +201,7 @@ public:
 	static void		reloadSPhrase(const std::string &wildcardFilter);
 	static void		reloadSuccessChancesTable(const std::string &wildcardFilter);
 	static void		reloadXPTable(const std::string &wildcardFilter);
+	static void		reloadAiactions(const std::string &wildcardFilter);
 	// @}
 
 public:
