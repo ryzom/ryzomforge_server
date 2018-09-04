@@ -353,6 +353,7 @@ CCharacter::CCharacter()
 	, _Invisibility(false)
 	, _AggroableSave(true)
 	, _GodModeSave(false)
+	, _UseWig(false)
 {
 	// todo : uncomment that when sadge item api is plugged
 	_AggroCount = 0;
@@ -653,6 +654,7 @@ void CCharacter::clear()
 	_ForbidAuraUseEndDate = 0;
 	_Title = CHARACTER_TITLE::Refugee;
 	_NewTitle = "Refugee";
+	_UseWig = false;
 	SET_STRUCT_MEMBER(_VisualPropertyA, PropertySubData.HatModel, 0);
 	SET_STRUCT_MEMBER(_VisualPropertyA, PropertySubData.HatColor, 0);
 	SET_STRUCT_MEMBER(_VisualPropertyC, PropertySubData.CharacterHeight, 0);
@@ -5772,7 +5774,7 @@ void CCharacter::setCurrentContinent(CONTINENT::TContinent continent)
 //-----------------------------------------------
 // CCharacter::addCharacterAnimal buy a creature
 //-----------------------------------------------
-bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGameItemPtr ptr)
+bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGameItemPtr ptr, uint8 size, const ucstring &customName)
 {
 	if (!PackAnimalSystemEnabled)
 		return false;
@@ -5783,6 +5785,7 @@ bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGa
 	pet.Price = Price;
 	pet.ItemPtr = ptr;
 	pet.OwnerId = _Id;
+	pet.Size = size;
 
 	if (checkAnimalCount(PetTicket, true, 1))
 	{
@@ -5806,7 +5809,8 @@ bool CCharacter::addCharacterAnimal(const CSheetId &PetTicket, uint32 Price, CGa
 			{
 				return false;
 			}
-
+			if (!customName.empty())
+				setAnimalName(i, customName);
 			return spawnCharacterAnimal(i);
 		}
 	}
@@ -9033,6 +9037,7 @@ void CCharacter::setStartStatistics(const CCreateCharMsg &createCharMsg)
 	// Players start out as Neutral in their declared clans
 	_DeclaredCult = PVP_CLAN::Neutral;
 	_DeclaredCiv = PVP_CLAN::Neutral;
+	_UseWig = false;
 	// output stats
 	// Bsi.append( StatPath, NLMISC::toString("[CPJ] %s %s %s %d %d %d %d %s", _Id.toString().c_str(),
 	// EGSPD::CPeople::toString(_Race).c_str(), GSGENDER::toString((GSGENDER::EGender)_Gender).c_str(),
@@ -19283,11 +19288,18 @@ void CCharacter::checkSkillTreeForLockedSkill()
 }
 
 //------------------------------------------------------------------------------
-bool CCharacter::setHairColor(uint32 colorValue)
+bool CCharacter::setHairColor(uint32 colorValue, bool sendMessage)
 {
+	if (getUseWig()) {
+		if (sendMessage)
+			CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_USE_WIG");
+		return false;
+	}
+	
 	if (colorValue == _HairColor)
 	{
-		CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_SAME_HAIR_COLOR");
+		if (sendMessage)
+			CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_SAME_HAIR_COLOR");
 		return false;
 	}
 
@@ -19305,11 +19317,14 @@ bool CCharacter::setHairColor(uint32 colorValue)
 }
 
 //------------------------------------------------------------------------------
-bool CCharacter::setHair(uint32 hairValue)
+bool CCharacter::setHair(uint32 hairValue, bool isWig, bool sendMessage)
 {
+	setUseWig(isWig);
+
 	if (hairValue == _HairType)
 	{
-		CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_SAME_HAIR");
+		if (sendMessage)
+			CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_SAME_HAIR");
 		return false;
 	}
 
@@ -19327,11 +19342,12 @@ bool CCharacter::setHair(uint32 hairValue)
 }
 
 //------------------------------------------------------------------------------
-bool CCharacter::setTatoo(uint32 tatooValue)
+bool CCharacter::setTatoo(uint32 tatooValue, bool sendMessage)
 {
 	if (tatooValue == _VisualPropertyC.directAccessForStructMembers().PropertySubData.Tattoo)
 	{
-		CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_SAME_TATOO");
+		if (sendMessage)
+			CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_SAME_TATOO");
 		return false;
 	}
 
