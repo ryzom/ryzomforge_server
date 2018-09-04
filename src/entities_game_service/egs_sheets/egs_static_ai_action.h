@@ -410,6 +410,8 @@ public:
 	/// Serial
 	void serial(class NLMISC::IStream &f);
 
+	void reloadSheet(const CStaticAiAction &o);
+
 	/// Removed
 	void removed() {}
 
