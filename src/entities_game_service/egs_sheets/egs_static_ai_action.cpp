@@ -396,6 +396,8 @@ void CSpellParams::readForm (const UFormElm &root, const NLMISC::CSheetId &sheet
 	if (root.getValueByName( value, "Behaviour" ))
 		Behaviour = MBEHAV::stringToBehaviour(value);
 
+	string fx = ""; 
+	CSheetId fxSheet;
 	// type specialization
 	switch(type)
 	{
@@ -403,6 +405,10 @@ void CSpellParams::readForm (const UFormElm &root, const NLMISC::CSheetId &sheet
 	case AI_ACTION::DoTSpell:
 		root.getValueByName( SpellParamValue2, "DamageVampirismValue" );
 	case AI_ACTION::ToxicCloud:
+		root.getValueByName( fx, "FX" );
+		if (!fx.empty())
+			fxSheet = CSheetId(fx);
+		Fx = fxSheet.asInt();
 		root.getValueByName( SpellParamValue, "DamageValue" );
 		root.getValueByName( SpellPowerFactor, "SpellPowerFactor" );
 		if ( root.getValueByName( value, "DamageType" ) )
@@ -723,3 +729,13 @@ void CStaticAiAction::serial(class NLMISC::IStream &f)
 	_Area.serial(f);	
 	
 } // CStaticAiAction::serial //
+
+
+//--------------------------------------------------------------
+//						reloadSheet
+//--------------------------------------------------------------
+void CStaticAiAction::reloadSheet(const CStaticAiAction &o)
+{
+	// nothing special
+	*this= o;
+}

@@ -157,13 +157,11 @@ void CCharacterShoppingList::mountShoppingList( CONTINENT::TContinent continent 
 					{
 						_CurrentTradeListNpc.push_back(TShopStruct(curItem, shop));
 						setOfNpcItem.insert(curItem);
-						// for debug // 
-						nlinfo("inserted item : %s lvl %d qlt %d", curItem->getSheetId().toString().c_str(), curItem->getLevel(), curItem->getQuality());
+						// for debug nlinfo("inserted item : %s lvl %d qlt %d", curItem->getSheetId().toString().c_str(), curItem->getLevel(), curItem->getQuality());
 					}
 					else
 					{
-						// for debug // 
-						nlinfo("cannot insert item : %s lvl %d qlt %d", curItem->getSheetId().toString().c_str(), curItem->getLevel(), curItem->getQuality());
+						// for debug nlinfo("cannot insert item : %s lvl %d qlt %d", curItem->getSheetId().toString().c_str(), curItem->getLevel(), curItem->getQuality());
 					}
 				}
 			}
