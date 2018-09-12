@@ -730,3 +730,13 @@ void CStaticAiAction::serial(class NLMISC::IStream &f)
 	_Area.serial(f);	
 	
 } // CStaticAiAction::serial //
+
+
+//--------------------------------------------------------------
+//						reloadSheet
+//--------------------------------------------------------------
+void CStaticAiAction::reloadSheet(const CStaticAiAction &o)
+{
+	// nothing special
+	*this= o;
+}
