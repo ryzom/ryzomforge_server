@@ -397,6 +397,7 @@ AdminCommandsInit[] =
 		"eventSetBotFacing",				true,
 		"eventGiveControl",					true,
 		"eventLeaveControl",				true,
+		"eventSpawnDamageLine",				true,
 
 		"setOrganization",					true,
 		"setOrganizationStatus", 			true,
@@ -8577,6 +8578,30 @@ NLMISC_COMMAND(eventSpawnToxic, "Spawn a toxic cloud", "<player eid> <posXm> <po
 	}
 	return true;
 }
+
+//----------------------------------------------------------------------------
+/*
+/a eventSpawnDamageLine test_ulu 40900,-12198|40651,-12148 teanwen_haleine
+ */
+NLMISC_COMMAND(eventSpawnDamageLine, "Spawn a damage line", "<player eid> <name> [<px1,py1|px2,py2|...>] [<dammage>]" )
+{
+	if ( args.size() < 2 )
+		return false;
+
+	GET_CHARACTER
+	string path = "";
+	if (args.size() > 2 )
+		path = args[2];
+
+	string dammage = "";
+	if (args.size() > 3 )
+		dammage = args[3];
+	
+	CZoneManager::getInstance().parseGooBorder( args[1], path, dammage );
+	
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(useCatalyser, "use an xp catalyser", "<eId> [<slot in bag>]")

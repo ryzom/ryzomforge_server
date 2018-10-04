@@ -231,13 +231,17 @@ bool CTpSpawnZone::build(const NLLIGO::CPrimPoint * point)
 //-----------------------------------------------
 // CPlace build
 //-----------------------------------------------
-bool CPlace::build(const NLLIGO::CPrimPath * path, uint16 id)
+bool CPlace::build(const NLLIGO::CPrimPath * path, uint16 id, bool isPrim)
 {
 	_Id = id;
 	if (!path->VPoints.empty())
+	{
+
 		*( (NLLIGO::CPrimZone*)this ) = *(NLLIGO::CPrimZone*) path;
-	
-	if ( !path->getPropertyByName("name",_Name) )
+	}
+
+
+	if ( isPrim && !path->getPropertyByName("name",_Name) )
 	{
 		nlwarning("<CPlace build> : no name for GooPath %u", id);
 		return false;
@@ -255,10 +259,22 @@ bool CPlace::build(const NLLIGO::CPrimPath * path, uint16 id)
 	else
 		_MainPlace = false;
 
-	nlverify (CPrimitivesParser::getAlias(path, _Alias));
+	if (isPrim)
+		nlverify (CPrimitivesParser::getAlias(path, _Alias));
 //	_Alias = NLMISC::fromString( val.c_str() );
 	nlassert( _Alias != CAIAliasTranslator::Invalid );
 
+	updateCenter();
+
+	_GooPath = true;
+	_GooActive = true;
+	_Reported = false;
+
+	return true;
+}
+
+void CPlace::updateCenter()
+{
 	// get the bounding box
 	float minX = VPoints[0].x;
 	float minY = VPoints[0].y;
@@ -274,11 +290,6 @@ bool CPlace::build(const NLLIGO::CPrimPath * path, uint16 id)
 	// get the center of the Box
 	_CenterX = sint32 ( ( minX + maxX ) *1000.0f / 2.0f );
 	_CenterY = sint32 ( ( minY + maxY ) *1000.0f / 2.0f );
-	_GooPath = true;
-	_GooActive = true;
-	_Reported = false;
-
-	return true;
 }
 
 
@@ -324,21 +335,9 @@ bool CPlace::build(const NLLIGO::CPrimZone * zone,uint16 id, bool reportAutorise
 		nlwarning("<CPlace build> :no points in place %u/%s", id, _Name.c_str());
 		return false;
 	}
-	// get the bounding box
-	float minX = VPoints[0].x;
-	float minY = VPoints[0].y;
-	float maxX = VPoints[0].x;
-	float maxY = VPoints[0].y;
-	for ( uint i = 1; i < VPoints.size(); i++)
-	{
-		if ( VPoints[i].x < minX )minX = VPoints[i].x;
-		if ( VPoints[i].y < minY )minY = VPoints[i].y;
-		if ( VPoints[i].x > maxX )maxX = VPoints[i].x;
-		if ( VPoints[i].y > maxY )maxY = VPoints[i].y;
-	}
-	// get the center of the Box
-	_CenterX = sint32 ( ( minX + maxX ) *1000.0f / 2.0f );
-	_CenterY = sint32 ( ( minY + maxY ) *1000.0f / 2.0f );
+	
+	updateCenter();
+	
 	_GooPath = false;
 	_GooActive = false;
 
@@ -1213,7 +1212,7 @@ bool CZoneManager::parseGooBorder( const NLLIGO::IPrimitive* prim )
 			if( path )
 			{
 				CPlace* place = new CPlace();
-				if ( place->build( path,(uint16)_Places.size() ) ) //assume CPrimPath and CPrimZone has the same members, method needed are only in CPrimZone
+				if ( place->build( path, (uint16)_Places.size()) ) //assume CPrimPath and CPrimZone has the same members, method needed are only in CPrimZone
 				{
 					for (uint i = 0; i < _Continents.size(); i++ )
 					{
@@ -1230,6 +1229,11 @@ bool CZoneManager::parseGooBorder( const NLLIGO::IPrimitive* prim )
 						}
 					}
 					_Places.push_back( place );
+					
+					TAIAlias alias = place->getAlias();
+					if (alias > maxGooBorderAlias)
+						maxGooBorderAlias = alias;
+						
 					_PlacesByAlias.insert( make_pair(place->getAlias(), place) );
 				}
 				else
@@ -1249,6 +1253,81 @@ bool CZoneManager::parseGooBorder( const NLLIGO::IPrimitive* prim )
 			ok = parseGooBorder(child) && ok;
 	}
 	return ok;
+}
+
+bool CZoneManager::parseGooBorder( const string &name, const string &params, const string &damages )
+{
+	CPlace* havePlace = getPlaceFromName(name);
+
+	if (havePlace != NULL)
+	{
+		if (params.empty())
+		{
+			havePlace->setGooActive(false);
+		}
+		else
+		{
+			havePlace->setGooActive(true);
+			havePlace->setDamageName(damages);
+		}
+		return true;
+	}
+
+	CPlace* place = new CPlace();
+
+	place->setName(name);
+
+
+	place->setDamageName(damages);
+	place->setAlias(++maxGooBorderAlias);
+	CPrimPath* path = new CPrimPath();
+	if (parsePath(params, path)) {
+		if ( place->build( path, (uint16)_Places.size(), false ) ) //assume CPrimPath and CPrimZone has the same members, method needed are only in CPrimZone
+		{
+			for (uint i = 0; i < _Continents.size(); i++ )
+			{
+				for (uint j = 0; j < _Continents[i].getRegions().size(); j++ )
+				{
+					for ( uint k = 0; k < place->VPoints.size(); k++ )
+					{
+						if ( _Continents[i].getRegions()[j]->contains( place->VPoints[k] ) )
+						{
+							_Continents[i].getRegions()[j]->addPlace( place );
+							break;
+						}
+					}
+				}
+			}
+			_Places.push_back( place );
+			_PlacesByAlias.insert( make_pair(place->getAlias(), place) );
+		}
+		else
+		{
+			delete place;
+		}
+	}
+}
+
+bool CZoneManager::parsePath( const string &params, CPrimPath *path )
+{	
+	vector< string > points;
+	NLMISC::splitString(params, "|", points);
+	for (uint i=0; i<points.size(); i++)
+	{
+		float x, y;
+		vector< string > point_params;
+		NLMISC::splitString(points[i], ",", point_params);
+
+		if (point_params.size() == 2)
+		{
+			fromString(point_params[0], x);
+			fromString(point_params[1], y);
+			path->VPoints.push_back(CPrimVector(NLMISC::CVector(x, y, 0)));
+		} else {
+			return false;
+		}
+	}
+	return true;
 }
 
 //-----------------------------------------------
@@ -1473,7 +1552,7 @@ bool CZoneManager::getRegion( sint32 x, sint32 y, const CRegion ** region, const
 //-----------------------------------------------
 // CZoneManager getPlace
 //-----------------------------------------------
-bool CZoneManager::getPlace( sint32 x, sint32 y, float& gooDistance, const CPlace ** stable, std::vector<const CPlace *>& places, const CRegion ** region , const CContinent ** continent )
+bool CZoneManager::getPlace( sint32 x, sint32 y, float& gooDistance, const CPlace ** stable, std::vector<const CPlace *>& places, const CRegion ** region , const CContinent ** continent, bool withGooActive )
 {
 	nlassert(stable);
 
@@ -1500,13 +1579,13 @@ bool CZoneManager::getPlace( sint32 x, sint32 y, float& gooDistance, const CPlac
 					}
 					for (uint k = 0; k < _Continents[i].getRegions()[j]->getPlaces().size(); k++ )
 					{
-						if(!_Continents[i].getRegions()[j]->getPlaces()[k]->isGooActive())
+						const CPlace * p;
+						p = _Continents[i].getRegions()[j]->getPlaces()[k];
+								
+						if (!p->isGooActive())
 						{
-							if ( _Continents[i].getRegions()[j]->getPlaces()[k]->contains( vect ) )
+							if ( p->contains( vect ) )
 							{
-								const CPlace * p;
-								p = _Continents[i].getRegions()[j]->getPlaces()[k];
-
 								CStable::TStableData stableData;
 								if( CStable::getInstance()->getStableData( p->getId(), stableData ) )
 								{
@@ -1525,6 +1604,8 @@ bool CZoneManager::getPlace( sint32 x, sint32 y, float& gooDistance, const CPlac
 							{
 								nearGooDistance = distance;
 							}
+							if (withGooActive)
+								places.push_back( p );
 						}
 					}
 					gooDistance = nearGooDistance;
@@ -1650,7 +1731,7 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 
 	// if user is in an instance, do not update the places where he is
 	CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, user->getEntityRowId(), DSPropertyCELL );
-	sint32 cell = mirrorCell;	
+	sint32 cell = mirrorCell;
 	if ( cell <= - 2 )
 		return;
 	if ( user->getState().X <= 0 || user->getState().Y >= 0 )
@@ -1665,7 +1746,7 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 	const CRegion * region ;
 	const CContinent * continent;
 	float gooDistance;
-	getPlace( user, gooDistance, &stable, places, &region, &continent);
+	getPlace( user, gooDistance, &stable, places, &region, &continent, true);
 
 	// SOURCE: user->getCurrentContinent()
 	// DESTINATION: continent->getId()
@@ -1792,7 +1873,13 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 				PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(),"EGS_ENTER_NEUTRAL_REGION",params);
 			}
 
+			// Check is region have a trigger to send an url
+			string regionTrigger = getRegionTrigger(region->getName());
+			if (!regionTrigger.empty())
+				user->sendUrl(regionTrigger, "");
+
 			user->setCurrentRegion( region->getId() );
+			
 			((CRegion*)region)->addPlayer( user->getId() );
 			
 			// add new spire effects for Pvp-flagged players
@@ -1803,6 +1890,8 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 			//CMissionEventVisitPlace event(region->getId() );
 			//user->processMissionMultipleEvent(event);
 		}
+
+		string zoneDamage;
 		
 		// get new places
 		const uint newPlacesSize = (uint)places.size();
@@ -1810,6 +1899,12 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 		bool changed = false;
 		for ( uint i = 0; i < newPlacesSize; i++ )
 		{
+			// Setup the damage name of the zone (place)
+			if (!places[i]->getDamageName().empty())
+			{
+				zoneDamage = places[i]->getDamageName();
+			}
+
 			if ( !user->isInPlace( places[i]->getId() ) )
 			{
 				if( places[i]->getReported() )
@@ -1956,7 +2051,7 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 		}
 
 		// apply goo damage if needed
-		user->applyGooDamage( gooDistance );
+		user->applyGooDamage( gooDistance, zoneDamage);
 	//}
 }// CZoneManager updateCharacterPosition
 
@@ -2328,6 +2423,19 @@ NLMISC_COMMAND(dumpTpSpawnZones, "dump the tp spawn zones", "")
 	if (args.size() == 0)
 	{
 		CZoneManager::getInstance().dumpTpSpawnZones(log);
+		return true;
+	}
+	return false;
+}
+
+/*
+addRegionTrigger uiR2_Jungle18 app_arcc action=mScript_Run&script=7624&command=reset_all
+*/
+NLMISC_COMMAND(addRegionTrigger,"add region trigger","<region_name> <app> <params>")
+{
+	if (args.size() == 3)
+	{
+		CZoneManager::getInstance().addRegionTrigger(args[0], args[1]+" "+args[2]);
 		return true;
 	}
 	return false;

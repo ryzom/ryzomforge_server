@@ -626,8 +626,13 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 	if (quantity == 0)
 	{
 		CSheetId sheet = CSheetId(args[3].c_str());
-		uint16 quality;
-		NLMISC::fromString(args[4], quality);
+		uint16 quality = 10;
+
+		std::vector< std::string > quality_params;
+		NLMISC::splitString(args[4], ":", quality_params);
+
+		if (quality_params.size() > 0)
+			NLMISC::fromString(quality_params[0], quality);
 
 		if (sheet == CSheetId::Unknown)
 		{
@@ -645,12 +650,27 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 			}
 			item.deleteItem();
 		}
+
+		if (quality_params.size() > 1)
+		{
+			uint16 recommended;
+			NLMISC::fromString(quality_params[1], recommended);
+			item->recommended(recommended);
+		}
+		
 	}
 	else
 	{
 		CMissionItem item;
+		string params;
 
-		string params = args[3]+":"+args[4]+":"+args[5];
+		std::vector< std::string > quality_params;
+		NLMISC::splitString(args[4], ":", quality_params);
+		if (quality_params.size() > 0)
+			params = args[3]+":"+quality_params[0]+":"+args[5];
+		else
+			params = args[3]+":10:"+args[5];
+
 		if (args.size() == 7)
 			params += ":"+args[6];
 			
@@ -668,6 +688,13 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 			}
 			finalItem.deleteItem();
 		}
+
+		if (quality_params.size() > 1)
+		{
+			uint16 recommended;
+			NLMISC::fromString(quality_params[1], recommended);
+			finalItem->recommended(recommended);
+		}
 	}
 	
 	log.displayNL("ERR: adding item");
@@ -677,7 +704,6 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 
 NLMISC_COMMAND(spawnNamedItem, "Spawn a named Item", "<uid> <inv> <quantity> <named_item>")
 {
-
 	GET_ACTIVE_CHARACTER
 	
 	if (args.size() < 4)
@@ -999,7 +1025,18 @@ NLMISC_COMMAND(getPosition, "get position of entity", "<uid>")
 	CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
 	cell = srcCell;
 
-	log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
+	string contName;
+	string regionName;
+	const CRegion* region = NULL;
+	const CContinent * cont = NULL;
+	CZoneManager::getInstance().getRegion(x,y, &region, &cont);
+	if (region)
+		regionName = region->getName();
+	if (cont)
+		contName = cont->getName();
+
+
+	log.displayNL("%.2f|%.2f|%.2f|%.4f|%d|%s|%s", x, y, z, h, cell, contName.c_str(), regionName.c_str());
 
 	return true;
 }

@@ -18080,7 +18080,7 @@ bool CCharacter::changeCurrentHp(sint32 deltaValue, TDataSetRow responsibleEntit
 //--------------------------------------------------------------
 //	apply goo damage if character is too close than a goo path
 //--------------------------------------------------------------
-void CCharacter::applyGooDamage(float gooDistance)
+void CCharacter::applyGooDamage(float gooDistance, string zoneDamage)
 {
 	uint32 tempTickForGooDamageRate = NBTickForGooDamageRate;
 
@@ -18139,7 +18139,9 @@ void CCharacter::applyGooDamage(float gooDistance)
 							_PhysScores._PhysicalScores[SCORES::hit_points].Current = 0;
 
 							// send message to player for inform is dead by goo or other
-							if (_CurrentContinent == CONTINENT::FYROS)
+							if (!zoneDamage.empty())
+								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_"+toUpper(zoneDamage));
+							else if (_CurrentContinent == CONTINENT::FYROS)
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_FIRE");
 							else if (_CurrentContinent == CONTINENT::TRYKER)
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_STEAM");
@@ -18154,7 +18156,9 @@ void CCharacter::applyGooDamage(float gooDistance)
 								= _PhysScores._PhysicalScores[SCORES::hit_points].Current - hpLost;
 
 							// send message to player for inform is suffer goo damage
-							if (_CurrentContinent == CONTINENT::FYROS)
+							if (!zoneDamage.empty())
+								sendDynamicSystemMessage(_EntityRowId, "SUFFER_"+toUpper(zoneDamage)+"_DAMAGE");
+							else if (_CurrentContinent == CONTINENT::FYROS)
 								sendDynamicSystemMessage(_EntityRowId, "SUFFER_FIRE_DAMAGE");
 							else if (_CurrentContinent == CONTINENT::TRYKER)
 								sendDynamicSystemMessage(_EntityRowId, "SUFFER_STEAM_DAMAGE");
