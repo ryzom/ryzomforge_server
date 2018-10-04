@@ -1642,7 +1642,7 @@ public:
 	void setCurrentStable(uint16 stable, uint16 placeId);
 
 	// apply goo damage if character is too close than a goo path
-	void applyGooDamage(float gooDistance);
+	void applyGooDamage(float gooDistance, std::string zoneDamage);
 
 	/// get the valid state of melee combat
 	bool meleeCombatIsValid() const;
