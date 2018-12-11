@@ -388,21 +388,27 @@ bool CCharacterRespawnPoints::isUsableRegularRespawnPoint(CONTINENT::TContinent 
 	if (zone->getContinent() != continent)
 		return false;
 
-	// check if the player is kami or karavan 	 
+	// check if the player is kami or karavan
+
 	static const uint32 kamiFaction = CStaticFames::getInstance().getFactionIndex("kami");
 	static const uint32 karavanFaction = CStaticFames::getInstance().getFactionIndex("karavan");
 	sint32 kamiFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), kamiFaction);
 	sint32 karavanFame = CFameInterface::getInstance().getFameIndexed(_Char.getId(), karavanFaction);
-	bool isKami = (kamiFame >= karavanFame); 	 
-  	 
-	if (zone->getType() == RESPAWN_POINT::KAMI && !isKami) 	 
+	bool isKami = (kamiFame >= karavanFame);
+
+	if (zone->getType() == RESPAWN_POINT::KAMI && !isKami)
 	{
-		return false; 	 
+		return false;
 	}
-	else if (zone->getType() == RESPAWN_POINT::KARAVAN && isKami) 	 
+	else if (zone->getType() == RESPAWN_POINT::KARAVAN && isKami)
 	{
-		return false; 	 
-    }
+		return false;
+	}
+	else if (zone->getType() == RESPAWN_POINT::RANGER && _Char.getOrganization() != 7)
+	{
+		return false;
+	}
+	
 	return CPVPManager2::getInstance()->isRespawnValid( &_Char, respawnPoint );
 }
 
