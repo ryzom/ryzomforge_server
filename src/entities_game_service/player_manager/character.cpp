@@ -16830,7 +16830,7 @@ void CCharacter::setPowoCell(sint32 cell)
 	_PowoCell = cell;
 }
 
-sint32 CCharacter::getPowoCell()
+sint32 CCharacter::getPowoCell() const
 {
 	return _PowoCell;
 }
