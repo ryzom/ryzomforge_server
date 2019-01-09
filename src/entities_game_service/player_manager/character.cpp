@@ -5857,7 +5857,7 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 	return slot;
 }
 
-// CCharacter::getPets with stringlike M0PPAA (M=Mount, P=Packer, A=Animal, 0=None)
+// CCharacter::getPets with string like M[0-5]X[0-5]P[0-5]P[0-5]A[0-5]A[0-5] (M=Mount, P=Packer, A=Animal, X=None, 0= ot_present, 1=waiting_spawn, 2=landscape, 3=stable, 4=death, 5=tp_continent)
 //-----------------------------------------------
 string CCharacter::getPets()
 {
@@ -5874,10 +5874,16 @@ string CCharacter::getPets()
 				pets += "P";
 			else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
 				pets += "A";
+			
+			CPetAnimal::TStatus status = _PlayerPets[i].PetStatus;
+			if (status !=  CPetAnimal::db_unknown)
+				pets += toString("%d", (uint32)(status));
+			else
+				pets += "0";
 		}
 		else
 		{
-			pets += "0";
+			pets += "X0";
 		}
 	}
 
