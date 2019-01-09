@@ -3216,3 +3216,226 @@ NLMISC_COMMAND(setPlayerPetSize, "change the name of a player pet", "<uid> <inde
 	return true;
 }
 
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setVpx, "change/get the vpx of a player", "<uid> <[vpx1,vpx2,vpx3,...]> <[value1,value2,vlaue3,...]>")
+{
+	if (args.size() < 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	std::vector< std::string > vpx;
+	NLMISC::splitString(args[1], ",", vpx);
+
+	string ret = "";
+	if (args.size() == 2)
+	{ // get the values
+		for (uint32 i=0; i<vpx.size(); i++)
+		{
+			string name = vpx[i];
+			uint32 value = 0;
+			if (name == "Sex")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.Sex;
+			else if (name == "HatModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.HatModel;
+			else if (name == "HatColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.HatColor;
+			else if (name == "JacketModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.JacketModel;
+			else if (name == "JacketColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.JacketColor;
+			else if (name == "TrouserModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.TrouserModel;
+			else if (name == "TrouserColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.TrouserColor;
+			else if (name == "WeaponRightHand")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.WeaponRightHand;
+			else if (name == "WeaponLeftHand")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.WeaponLeftHand;
+			else if (name == "ArmModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.ArmModel;
+			else if (name == "ArmColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.ArmColor;
+			else if (name == "HandsModel")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.HandsModel;
+			else if (name == "HandsColor")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.HandsColor;
+			else if (name == "FeetModel")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.FeetModel;
+			else if (name == "FeetColor")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.FeetColor;
+			else if (name == "MorphTarget1")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget1;
+			else if (name == "MorphTarget2")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget2;
+			else if (name == "MorphTarget3")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget3;
+			else if (name == "MorphTarget4")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget4;
+			else if (name == "MorphTarget5")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget5;
+			else if (name == "MorphTarget6")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget6;
+			else if (name == "MorphTarget7")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget7;
+			else if (name == "MorphTarget8")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget8;
+			else if (name == "EyesColor")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.EyesColor;
+			else if (name == "Tattoo")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.Tattoo;
+			else if (name == "CharacterHeight")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.CharacterHeight;
+			else if (name == "TorsoWidth")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.TorsoWidth;
+			else if (name == "ArmsWidth")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.ArmsWidth;
+			else if (name == "LegsWidth")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.LegsWidth;
+			else if (name == "BreastSize")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.BreastSize;
+			ret += toString("%d,", value);
+		}
+	}
+	else // set the values
+	{
+		std::vector< std::string > values;
+		NLMISC::splitString(args[2], ",", values);
+
+		if (values.size() != vpx.size())
+			return false;
+
+		for (uint32 i=0; i<vpx.size(); i++)
+		{
+			string name = vpx[i];
+			uint32 value;
+			fromString(values[i], value);
+			
+			if (name == "Sex")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.Sex, value );
+			}
+			else if (name == "HatModel")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.HatModel, value );
+			}
+			else if (name == "HatColor")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.HatColor, value );
+			}
+			else if (name == "JacketModel")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.JacketModel, value );
+			}
+			else if (name == "JacketColor")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.JacketColor, value );
+			}
+			else if (name == "TrouserModel")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.TrouserModel, value );
+			}
+			else if (name == "TrouserColor")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.TrouserColor, value );
+			}
+			else if (name == "WeaponRightHand")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.WeaponRightHand, value );
+			}
+			else if (name == "WeaponLeftHand")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.WeaponLeftHand, value );
+			}
+			else if (name == "ArmModel")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.ArmModel, value );
+			}
+			else if (name == "ArmColor")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyA(), PropertySubData.ArmColor, value );
+			}
+			else if (name == "HandsModel")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyB(), PropertySubData.HandsModel, value );
+			}
+			else if (name == "HandsColor")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyB(), PropertySubData.HandsColor, value );
+			}
+			else if (name == "FeetModel")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyB(), PropertySubData.FeetModel, value );
+			}
+			else if (name == "FeetColor")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyB(), PropertySubData.FeetColor, value );
+			}
+			else if (name == "MorphTarget1")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget1, value );
+			}
+			else if (name == "MorphTarget2")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget2, value );
+			}
+			else if (name == "MorphTarget3")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget3, value );
+			}
+			else if (name == "MorphTarget4")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget4, value );
+			}
+			else if (name == "MorphTarget5")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget5, value );
+			}
+			else if (name == "MorphTarget6")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget6, value );
+			}
+			else if (name == "MorphTarget7")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget7, value );
+			}
+			else if (name == "MorphTarget8")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.MorphTarget8, value );
+			}
+			else if (name == "EyesColor")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.EyesColor, value );
+			}
+			else if (name == "Tattoo")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.Tattoo, value );
+			}
+			else if (name == "CharacterHeight")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.CharacterHeight, value );
+			}
+			else if (name == "TorsoWidth")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.TorsoWidth, value );
+			}
+			else if (name == "ArmsWidth")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.ArmsWidth, value );
+			}
+			else if (name == "LegsWidth")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.LegsWidth, value );
+			}
+			else if (name == "BreastSize")
+			{
+				SET_STRUCT_MEMBER( c->getVisualPropertyC(), PropertySubData.BreastSize, value );
+			}
+		}
+	}
+
+	if (!ret.empty())
+		log.displayNL("%s", ret.c_str());
+	return true;
+}
