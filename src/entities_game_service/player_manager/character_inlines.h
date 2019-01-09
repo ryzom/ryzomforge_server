@@ -788,6 +788,14 @@ inline uint32 CCharacter::getTpTicketSlot() const
 
 //------------------------------------------------------------------------------
 
+inline NLMISC::CVector CCharacter::getBuildingExitPos() const
+{
+	return _BuildingExitPos;
+}
+
+
+//------------------------------------------------------------------------------
+
 inline uint16 CCharacter::getBuildingExitZone() const
 {
 	return _BuildingExitZone;

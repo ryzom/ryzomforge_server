@@ -826,6 +826,11 @@ bool CZoneManager::parseZones( const NLLIGO::IPrimitive* prim )
 						}
 					}
 					_Places.push_back( place );
+					
+					TAIAlias alias = place->getAlias();
+					if (alias > maxGooBorderAlias)
+						maxGooBorderAlias = alias;
+						
 					_PlacesByAlias.insert( make_pair(place->getAlias(), place) );
 				}
 				else

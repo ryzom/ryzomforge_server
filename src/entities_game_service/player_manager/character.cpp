@@ -5629,7 +5629,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
 	}
-	else
+	else if (_PowoCell == 0)
 		CBuildingManager::getInstance()->removePlayerFromRoom(this);
 
 
@@ -5857,7 +5857,7 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 	return slot;
 }
 
-// CCharacter::getPets with stringlike M0PPAA (M=Mount, P=Packer, A=Animal, 0=None)
+// CCharacter::getPets with string like M[0-5]X[0-5]P[0-5]P[0-5]A[0-5]A[0-5] (M=Mount, P=Packer, A=Animal, X=None, 0= ot_present, 1=waiting_spawn, 2=landscape, 3=stable, 4=death, 5=tp_continent)
 //-----------------------------------------------
 string CCharacter::getPets()
 {
@@ -5874,10 +5874,16 @@ string CCharacter::getPets()
 				pets += "P";
 			else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
 				pets += "A";
+			
+			CPetAnimal::TStatus status = _PlayerPets[i].PetStatus;
+			if (status !=  CPetAnimal::db_unknown)
+				pets += toString("%d", (uint32)(status));
+			else
+				pets += "0";
 		}
 		else
 		{
-			pets += "0";
+			pets += "X0";
 		}
 	}
 
@@ -16824,7 +16830,7 @@ void CCharacter::setPowoCell(sint32 cell)
 	_PowoCell = cell;
 }
 
-sint32 CCharacter::getPowoCell()
+sint32 CCharacter::getPowoCell() const
 {
 	return _PowoCell;
 }
@@ -17167,14 +17173,23 @@ void CCharacter::removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick)
 		if (!TheDataset.isAccessible(getEntityRowId()))
 			return;
 
-		const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
-
-		if (zone)
+		CVector buildingExitPos = target->getBuildingExitPos();
+		if (buildingExitPos.x != 0 && buildingExitPos.y != 0)
 		{
-			sint32 x, y, z;
-			float heading;
-			zone->getRandomPoint(x, y, z, heading);
-			target->tpWanted(x, y, z, true, heading);
+			target->tpWanted(buildingExitPos.x, buildingExitPos.y, 0);
+			target->setBuildingExitPos(0, 0, 0);
+		}
+		else
+		{
+			const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
+
+			if (zone)
+			{
+				sint32 x, y, z;
+				float heading;
+				zone->getRandomPoint(x, y, z, heading);
+				target->tpWanted(x, y, z, true, heading);
+			}
 		}
 	}
 }
@@ -22295,6 +22310,16 @@ bool CCharacter::isSitting() const
 {
 	return (_Mode.getValue().Mode == MBEHAV::SIT);
 }
+
+//------------------------------------------------------------------------------
+
+void CCharacter::setBuildingExitPos(sint32 x, sint32 y, sint32 cell)
+{
+	_BuildingExitPos.x = x;
+	_BuildingExitPos.y = y;
+	_BuildingExitPos.z = cell;
+}
+
 
 //------------------------------------------------------------------------------
 
