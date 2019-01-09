@@ -645,19 +645,18 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 		{
 			if (c->addItemToInventory(getTInventory(selected_inv), item))
 			{
+				if (quality_params.size() > 1)
+				{
+					uint16 recommended;
+					NLMISC::fromString(quality_params[1], recommended);
+					item->recommended(recommended);
+				}
+
 				log.displayNL("OK");
 				return true;
 			}
 			item.deleteItem();
 		}
-
-		if (quality_params.size() > 1)
-		{
-			uint16 recommended;
-			NLMISC::fromString(quality_params[1], recommended);
-			item->recommended(recommended);
-		}
-		
 	}
 	else
 	{
@@ -683,17 +682,18 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 		{
 			if (c->addItemToInventory(getTInventory(selected_inv), finalItem))
 			{
+
+				if (quality_params.size() > 1)
+				{
+					uint16 recommended;
+					NLMISC::fromString(quality_params[1], recommended);
+					finalItem->recommended(recommended);
+				}
+				
 				log.displayNL("OK");
 				return true;
 			}
 			finalItem.deleteItem();
-		}
-
-		if (quality_params.size() > 1)
-		{
-			uint16 recommended;
-			NLMISC::fromString(quality_params[1], recommended);
-			finalItem->recommended(recommended);
 		}
 	}
 	
