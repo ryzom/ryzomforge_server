@@ -4013,6 +4013,9 @@ private:
 	bool _PowoCanTeleport;
 	bool _PowoCanSpeedUp;
 	bool _PowoCanDP;
+	
+	bool _PowoCanAccesRoomInv;
+	bool _PowoCanAccessGuildInv;
 
 	uint32 _LastTpTick;
 	uint32 _LastOverSpeedTick;
@@ -4087,6 +4090,12 @@ public:
 		if (flag == "dp")
 			return _PowoCanDP;
 
+		if (flag == "guild_inv")
+			return _PowoCanAccessGuildInv;
+
+		if (flag == "room_inv")
+			return _PowoCanAccesRoomInv;
+
 		return false;
 	}
 
@@ -4095,17 +4104,23 @@ public:
 		if (flag == "xp")
 			_PowoCanXP = value;
 
-		if (flag == "dead")
+		else if (flag == "dead")
 			_PowoCantDead = value;
 
-		if (flag == "teleport")
+		else if (flag == "teleport")
 			_PowoCanTeleport = value;
 
-		if (flag == "speed")
+		else if (flag == "speed")
 			_PowoCanSpeedUp = value;
 
-		if (flag == "dp")
+		else if (flag == "dp")
 			_PowoCanDP = value;
+
+		else if (flag == "guild_inv")
+			_PowoCanAccessGuildInv = value;
+
+		else if (flag == "room_inv")
+			_PowoCanAccesRoomInv = value;
 
 		return true;
 	}

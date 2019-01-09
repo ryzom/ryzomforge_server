@@ -931,6 +931,10 @@ bool CGuild::canAccessToGuildInventory( CCharacter * user )
 		if( outpost->getOwnerGuild() == _Id )
 			return true;
 
+	// or in powo with access to guild inv
+	if (user->getPowoFlag("guild_inv") && user->getPowoCell() != 0)
+		return true;
+
 	// TODO ULU : add here position check of GH on atys
 
 	
