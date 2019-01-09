@@ -1574,9 +1574,9 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup]")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup] [access_room_inv,access_guild_room]")
 {
-	if (args.size() != 2)
+	if (args.size() < 2)
 		return false;
 	
 	GET_ACTIVE_CHARACTER
@@ -1590,6 +1590,10 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 	string powoFlags = "0000";
 	if (args.size() > 4)
 		powoFlags = args[4];
+
+	string invFlags = "00";
+	if (args.size() > 5)
+		invFlags = args[5];
 
 	if (building)
 	{
@@ -1606,7 +1610,7 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 				uint16 ownerId = buildingPlayer->getOwnerIdx(playerEid);
 				nlinfo("ownerId = %d", ownerId);
 				sint32 cell;
-				if (buildingPlayer->addUser(c, 0, ownerId, cell))
+				if (buildingPlayer->addUser(c, 0, ownerId, cell, true, false))
 				{
 					nlinfo("Powo Flags : %s", powoFlags.c_str());
 					c->setPowoCell(cell);
@@ -1614,6 +1618,8 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 					c->setPowoFlag("dead", powoFlags[1] == '1');
 					c->setPowoFlag("teleport", powoFlags[2] == '1');
 					c->setPowoFlag("speed", powoFlags[3] == '1');
+					c->setPowoFlag("room_inv", invFlags[0] == '1');
+					c->setPowoFlag("guild_inv", invFlags[1] == '1');
 
 					if (args.size () > 3 && args[3] != "*") // Change the default exit by exit of instance building
 					{
