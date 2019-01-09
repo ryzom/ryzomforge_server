@@ -1029,7 +1029,7 @@ NLMISC_COMMAND(getPosition, "get position of entity", "<uid>")
 	string regionName;
 	const CRegion* region = NULL;
 	const CContinent * cont = NULL;
-	CZoneManager::getInstance().getRegion(x,y, &region, &cont);
+	CZoneManager::getInstance().getRegion(c->getState().X ,c->getState().Y, &region, &cont);
 	if (region)
 		regionName = region->getName();
 	if (cont)
