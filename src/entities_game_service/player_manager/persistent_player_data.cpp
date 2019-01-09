@@ -273,17 +273,26 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	else
 	{
 		CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
-		cell = mirrorCell;			
+		cell = mirrorCell;
 		if ( CBuildingManager::getInstance()->isRoomCell( cell ) )
 		{
-			const CTpSpawnZone * zone = CZoneManager::getInstance().getTpSpawnZone( user.getBuildingExitZone() );
-			if ( zone )
+			CVector buildingExitPos = user.getBuildingExitPos();
+			if (buildingExitPos.x != 0 && buildingExitPos.y != 0)
 			{
-				zone->getRandomPoint( state.X, state.Y,state.Z,state.Heading );
+				state.X = buildingExitPos.x;
+				state.Y = buildingExitPos.y;
 			}
 			else
 			{
-				nlwarning("user %s is not found in a room but cell is %d)", user.getId().toString().c_str(), cell );
+				const CTpSpawnZone * zone = CZoneManager::getInstance().getTpSpawnZone( user.getBuildingExitZone() );
+				if ( zone )
+				{
+					zone->getRandomPoint( state.X, state.Y,state.Z,state.Heading );
+				}
+				else
+				{
+					nlwarning("user %s is not found in a room but cell is %d)", user.getId().toString().c_str(), cell );
+				}
 			}
 		}
 		else if ( cell <= -2 && ( cell & 0x00000001) != 0 && user.getPVPInterface().isValid() )

@@ -2075,7 +2075,7 @@ public:
 	const NLMISC::CEntityId &getInRoomOfPlayer();
 
 	void setPowoCell(sint32 cell);
-	sint32 getPowoCell();
+	sint32 getPowoCell() const;
 
 	/// get if player have acces to room
 	bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
@@ -2325,6 +2325,13 @@ public:
 
 	/// reset used TP ticket slot, necessary to allow user to use another ticket
 	void resetTpTicketSlot();
+
+
+	/// set building exit pos
+	void setBuildingExitPos(sint32 x, sint32 y, sint32 cell);
+
+	/// get building exit pos
+	NLMISC::CVector getBuildingExitPos() const;
 
 	/// set building exit zone
 	void setBuildingExitZone(uint16 zoneIdx);
@@ -3717,6 +3724,7 @@ private:
 	uint32 _MaxPriceFilter;
 
 	uint16 _BuildingExitZone;
+	NLMISC::CVector _BuildingExitPos;
 
 	// used for force respawn player who are in a mainland in town of this mainland
 	bool _RespawnMainLandInTown;

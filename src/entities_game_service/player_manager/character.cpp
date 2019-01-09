@@ -17167,14 +17167,23 @@ void CCharacter::removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick)
 		if (!TheDataset.isAccessible(getEntityRowId()))
 			return;
 
-		const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
-
-		if (zone)
+		CVector buildingExitPos = target->getBuildingExitPos();
+		if (buildingExitPos.x != 0 && buildingExitPos.y != 0)
 		{
-			sint32 x, y, z;
-			float heading;
-			zone->getRandomPoint(x, y, z, heading);
-			target->tpWanted(x, y, z, true, heading);
+			target->tpWanted(buildingExitPos.x, buildingExitPos.y, 0);
+			target->setBuildingExitPos(0, 0, 0);
+		}
+		else
+		{
+			const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
+
+			if (zone)
+			{
+				sint32 x, y, z;
+				float heading;
+				zone->getRandomPoint(x, y, z, heading);
+				target->tpWanted(x, y, z, true, heading);
+			}
 		}
 	}
 }
@@ -22295,6 +22304,16 @@ bool CCharacter::isSitting() const
 {
 	return (_Mode.getValue().Mode == MBEHAV::SIT);
 }
+
+//------------------------------------------------------------------------------
+
+void CCharacter::setBuildingExitPos(sint32 x, sint32 y, sint32 cell)
+{
+	_BuildingExitPos.x = x;
+	_BuildingExitPos.y = y;
+	_BuildingExitPos.z = cell;
+}
+
 
 //------------------------------------------------------------------------------
 
