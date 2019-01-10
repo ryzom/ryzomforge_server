@@ -221,6 +221,10 @@ bool CPlayerRoomInterface::canUseInventory(const CCharacter * owner, const CChar
 	if (owner != user)
 		return false;
 
+	/// if on powo, only if have access to inv
+	if (user->getPowoCell() != 0 && !user->getPowoFlag("room_inv"))
+		return false;
+
 	CPlayer * p = PlayerManager.getPlayer(PlayerManager.getPlayerId( user->getId() ));
 	BOMB_IF(p == NULL, "Failed to find player record for character: " << user->getId().toString(), return true);
 
