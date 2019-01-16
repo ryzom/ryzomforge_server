@@ -552,6 +552,9 @@ CCharacter::CCharacter()
 	_DeathPenaltyTimer.setRemaining(1, new CDeathPenaltiesTimerEvent(this), 1);
 	_BarUpdateTimer.setRemaining(1, new CCharacterBarUpdateTimerEvent(this), 1);
 	_BuildingExitZone = 0xffff;
+	_BuildingExitPos = CVector();
+	_BuildingExitPos.x = 0;
+	_BuildingExitPos.y = 0;
 	_RespawnMainLandInTown = false;
 	_CurrentPVPZone = CAIAliasTranslator::Invalid;
 	_CurrentOutpostZone = CAIAliasTranslator::Invalid;

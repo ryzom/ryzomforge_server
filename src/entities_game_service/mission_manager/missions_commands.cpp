@@ -1562,7 +1562,7 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 	if (args.size() != 2)
 	{
 		log.displayNL("ERR: invalid arg count");
-		return false;
+		return true;
 	}
 	
 	uint32 org;
@@ -1637,11 +1637,11 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 			}
 		} else {
 			log.displayNL("ERR: invalid template");
-			return false;
+			return true;
 		}
 	} else {
 		log.displayNL("ERR: invalid building");
-		return false;
+		return true;
 	}
 	return true;
 }
@@ -3043,7 +3043,11 @@ NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid>
 			c->setAnimalPosition(index, x, y);
 		}
 
-		c->spawnCharacterAnimal(index);
+		if (!c->spawnCharacterAnimal(index))
+		{
+			log.displayNL("ERR: invalid spawn");
+			return true;
+		}
 	}
 	else
 	{
