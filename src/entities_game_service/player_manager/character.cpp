@@ -552,6 +552,9 @@ CCharacter::CCharacter()
 	_DeathPenaltyTimer.setRemaining(1, new CDeathPenaltiesTimerEvent(this), 1);
 	_BarUpdateTimer.setRemaining(1, new CCharacterBarUpdateTimerEvent(this), 1);
 	_BuildingExitZone = 0xffff;
+	_BuildingExitPos = CVector();
+	_BuildingExitPos.x = 0;
+	_BuildingExitPos.y = 0;
 	_RespawnMainLandInTown = false;
 	_CurrentPVPZone = CAIAliasTranslator::Invalid;
 	_CurrentOutpostZone = CAIAliasTranslator::Invalid;
@@ -5629,7 +5632,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
 	}
-	else
+	else if (_PowoCell == 0)
 		CBuildingManager::getInstance()->removePlayerFromRoom(this);
 
 
@@ -5857,7 +5860,7 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 	return slot;
 }
 
-// CCharacter::getPets with stringlike M0PPAA (M=Mount, P=Packer, A=Animal, 0=None)
+// CCharacter::getPets with string like M[0-5]X[0-5]P[0-5]P[0-5]A[0-5]A[0-5] (M=Mount, P=Packer, A=Animal, X=None, 0= ot_present, 1=waiting_spawn, 2=landscape, 3=stable, 4=death, 5=tp_continent)
 //-----------------------------------------------
 string CCharacter::getPets()
 {
@@ -5874,10 +5877,16 @@ string CCharacter::getPets()
 				pets += "P";
 			else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
 				pets += "A";
+			
+			CPetAnimal::TStatus status = _PlayerPets[i].PetStatus;
+			if (status !=  CPetAnimal::db_unknown)
+				pets += toString("%d", (uint32)(status));
+			else
+				pets += "0";
 		}
 		else
 		{
-			pets += "0";
+			pets += "X0";
 		}
 	}
 
@@ -16824,7 +16833,7 @@ void CCharacter::setPowoCell(sint32 cell)
 	_PowoCell = cell;
 }
 
-sint32 CCharacter::getPowoCell()
+sint32 CCharacter::getPowoCell() const
 {
 	return _PowoCell;
 }
@@ -17167,14 +17176,23 @@ void CCharacter::removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick)
 		if (!TheDataset.isAccessible(getEntityRowId()))
 			return;
 
-		const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
-
-		if (zone)
+		CVector buildingExitPos = target->getBuildingExitPos();
+		if (buildingExitPos.x != 0 && buildingExitPos.y != 0)
 		{
-			sint32 x, y, z;
-			float heading;
-			zone->getRandomPoint(x, y, z, heading);
-			target->tpWanted(x, y, z, true, heading);
+			target->tpWanted(buildingExitPos.x, buildingExitPos.y, 0);
+			target->setBuildingExitPos(0, 0, 0);
+		}
+		else
+		{
+			const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
+
+			if (zone)
+			{
+				sint32 x, y, z;
+				float heading;
+				zone->getRandomPoint(x, y, z, heading);
+				target->tpWanted(x, y, z, true, heading);
+			}
 		}
 	}
 }
@@ -18080,7 +18098,7 @@ bool CCharacter::changeCurrentHp(sint32 deltaValue, TDataSetRow responsibleEntit
 //--------------------------------------------------------------
 //	apply goo damage if character is too close than a goo path
 //--------------------------------------------------------------
-void CCharacter::applyGooDamage(float gooDistance)
+void CCharacter::applyGooDamage(float gooDistance, string zoneDamage)
 {
 	uint32 tempTickForGooDamageRate = NBTickForGooDamageRate;
 
@@ -18139,7 +18157,9 @@ void CCharacter::applyGooDamage(float gooDistance)
 							_PhysScores._PhysicalScores[SCORES::hit_points].Current = 0;
 
 							// send message to player for inform is dead by goo or other
-							if (_CurrentContinent == CONTINENT::FYROS)
+							if (!zoneDamage.empty())
+								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_"+toUpper(zoneDamage));
+							else if (_CurrentContinent == CONTINENT::FYROS)
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_FIRE");
 							else if (_CurrentContinent == CONTINENT::TRYKER)
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_STEAM");
@@ -18154,7 +18174,9 @@ void CCharacter::applyGooDamage(float gooDistance)
 								= _PhysScores._PhysicalScores[SCORES::hit_points].Current - hpLost;
 
 							// send message to player for inform is suffer goo damage
-							if (_CurrentContinent == CONTINENT::FYROS)
+							if (!zoneDamage.empty())
+								sendDynamicSystemMessage(_EntityRowId, "SUFFER_"+toUpper(zoneDamage)+"_DAMAGE");
+							else if (_CurrentContinent == CONTINENT::FYROS)
 								sendDynamicSystemMessage(_EntityRowId, "SUFFER_FIRE_DAMAGE");
 							else if (_CurrentContinent == CONTINENT::TRYKER)
 								sendDynamicSystemMessage(_EntityRowId, "SUFFER_STEAM_DAMAGE");
@@ -22291,6 +22313,16 @@ bool CCharacter::isSitting() const
 {
 	return (_Mode.getValue().Mode == MBEHAV::SIT);
 }
+
+//------------------------------------------------------------------------------
+
+void CCharacter::setBuildingExitPos(sint32 x, sint32 y, sint32 cell)
+{
+	_BuildingExitPos.x = x;
+	_BuildingExitPos.y = y;
+	_BuildingExitPos.z = cell;
+}
+
 
 //------------------------------------------------------------------------------
 

@@ -1642,7 +1642,7 @@ public:
 	void setCurrentStable(uint16 stable, uint16 placeId);
 
 	// apply goo damage if character is too close than a goo path
-	void applyGooDamage(float gooDistance);
+	void applyGooDamage(float gooDistance, std::string zoneDamage);
 
 	/// get the valid state of melee combat
 	bool meleeCombatIsValid() const;
@@ -2075,7 +2075,7 @@ public:
 	const NLMISC::CEntityId &getInRoomOfPlayer();
 
 	void setPowoCell(sint32 cell);
-	sint32 getPowoCell();
+	sint32 getPowoCell() const;
 
 	/// get if player have acces to room
 	bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
@@ -2325,6 +2325,13 @@ public:
 
 	/// reset used TP ticket slot, necessary to allow user to use another ticket
 	void resetTpTicketSlot();
+
+
+	/// set building exit pos
+	void setBuildingExitPos(sint32 x, sint32 y, sint32 cell);
+
+	/// get building exit pos
+	NLMISC::CVector getBuildingExitPos() const;
 
 	/// set building exit zone
 	void setBuildingExitZone(uint16 zoneIdx);
@@ -3717,6 +3724,7 @@ private:
 	uint32 _MaxPriceFilter;
 
 	uint16 _BuildingExitZone;
+	NLMISC::CVector _BuildingExitPos;
 
 	// used for force respawn player who are in a mainland in town of this mainland
 	bool _RespawnMainLandInTown;
@@ -4013,6 +4021,9 @@ private:
 	bool _PowoCanTeleport;
 	bool _PowoCanSpeedUp;
 	bool _PowoCanDP;
+	
+	bool _PowoCanAccesRoomInv;
+	bool _PowoCanAccessGuildInv;
 
 	uint32 _LastTpTick;
 	uint32 _LastOverSpeedTick;
@@ -4087,6 +4098,12 @@ public:
 		if (flag == "dp")
 			return _PowoCanDP;
 
+		if (flag == "guild_inv")
+			return _PowoCanAccessGuildInv;
+
+		if (flag == "room_inv")
+			return _PowoCanAccesRoomInv;
+
 		return false;
 	}
 
@@ -4095,17 +4112,23 @@ public:
 		if (flag == "xp")
 			_PowoCanXP = value;
 
-		if (flag == "dead")
+		else if (flag == "dead")
 			_PowoCantDead = value;
 
-		if (flag == "teleport")
+		else if (flag == "teleport")
 			_PowoCanTeleport = value;
 
-		if (flag == "speed")
+		else if (flag == "speed")
 			_PowoCanSpeedUp = value;
 
-		if (flag == "dp")
+		else if (flag == "dp")
 			_PowoCanDP = value;
+
+		else if (flag == "guild_inv")
+			_PowoCanAccessGuildInv = value;
+
+		else if (flag == "room_inv")
+			_PowoCanAccesRoomInv = value;
 
 		return true;
 	}
