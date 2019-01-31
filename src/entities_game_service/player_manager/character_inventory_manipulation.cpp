@@ -922,6 +922,8 @@ void CCharacter::moveItem(
 				return;
 			}
 		}
+		// abort exchange to prevent fill of inv when pet is in exchange window
+		abortExchange();
 	}
 
 	/***  END OF GAME PLAY RULES  ***/
