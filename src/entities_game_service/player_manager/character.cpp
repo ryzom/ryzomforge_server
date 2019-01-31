@@ -7557,6 +7557,7 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 			if (_PlayerPets[petIndex].IsMounted)
 				continue;
 
+			abortExchange();
 			petCommand = CPetCommandMsg::LIBERATE;
 			break;
 
