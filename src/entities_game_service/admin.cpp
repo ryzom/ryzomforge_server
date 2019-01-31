@@ -1225,15 +1225,20 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 	vector<string> res;
 
 	sint32 x = 0, y = 0, z = 0;
-	sint32 cell = 0;
+
+	TDataSetRow dsr = e->getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> playerCell(TheDataset, dsr, DSPropertyCELL);
+	sint32 cell = playerCell;
 
 	if (get)
 	{
 		x = e->getState().X() / 1000;
 		y = e->getState().Y() / 1000;
 		z = e->getState().Z() / 1000;
-
-		value = toString ("%d,%d,%d", x, y, z);
+		if (cell < 0)
+			value = toString ("%d,%d,%d@%d", x, y, z, -cell);
+		else
+			value = toString ("%d,%d,%d", x, y, z);
 	}
 	else
 	{
