@@ -879,6 +879,12 @@ inline TAIAlias CCharacter::getCurrentOutpostZone() const
 	return _CurrentOutpostZone; 
 }
 
+inline OUTPOSTENUMS::TOutpostState CCharacter::getCurrentOutpostState() const
+{
+	return _CurrentOutpostState; 
+}
+
+
 //------------------------------------------------------------------------------
 
 inline uint16 CCharacter::getKilledPvPRegion()

@@ -104,7 +104,6 @@
 #include "modules/client_command_forwarder.h"
 #include "modules/r2_give_item.h"
 #include "modules/shard_unifier_client.h"
-#include "outpost_manager/outpost_manager.h"
 #include "phrase_manager/available_phrases.h"
 #include "phrase_manager/mod_magic_protection_effet.h"
 #include "phrase_manager/phrase_manager.h"
@@ -558,6 +557,7 @@ CCharacter::CCharacter()
 	_RespawnMainLandInTown = false;
 	_CurrentPVPZone = CAIAliasTranslator::Invalid;
 	_CurrentOutpostZone = CAIAliasTranslator::Invalid;
+	_CurrentOutpostState = OUTPOSTENUMS::Peace;
 	resetNextDeathPenaltyFactor();
 	_CurrentDodgeLevel = 1;
 	_BaseDodgeLevel = 1;
@@ -20132,6 +20132,8 @@ void CCharacter::outpostOpenChooseSideDialog(TAIAlias outpostId)
 		return;
 	}
 
+	OUTPOSTENUMS::TOutpostState state = outpost->getState();
+	bool outpostInFire = state == OUTPOSTENUMS::AttackBefore || state == OUTPOSTENUMS::AttackRound || state == OUTPOSTENUMS::DefenseBefore || state == OUTPOSTENUMS::DefenseRound;
 	bool playerGuildIsAttacker = false;
 	bool playerGuildInConflict = isGuildInConflictWithOutpost(outpostId, playerGuildIsAttacker);
 
@@ -20174,6 +20176,7 @@ void CCharacter::outpostOpenChooseSideDialog(TAIAlias outpostId)
 		return;
 	}
 
+	bms.serial(outpostInFire);
 	bms.serial(playerGuildInConflict);
 	bms.serial(playerGuildIsAttacker);
 	// always Display the guild names in the interface
@@ -20242,19 +20245,24 @@ void CCharacter::outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side)
 		return;
 	}
 
-	if (!neutral)
+	CSmartPtr<COutpost> outpost = COutpostManager::getInstance().getOutpostFromAlias(_OutpostIdBeforeUserValidation);
+	if (!outpost)
+		return;
+
+	OUTPOSTENUMS::TOutpostState state = outpost->getState();
+	bool outpostInFire = state == OUTPOSTENUMS::AttackBefore || state == OUTPOSTENUMS::AttackRound || state == OUTPOSTENUMS::DefenseBefore || state == OUTPOSTENUMS::DefenseRound;
+
+	CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
+
+	if (!neutral || outpostInFire)
 	{
 		// validate outpost alias
 		setOutpostAlias(_OutpostIdBeforeUserValidation);
-		CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
 
 		if (guild != NULL)
 		{
 			// he his guild owns the outpost he can only help his guild
-			if (_GuildId
-					== COutpostManager::getInstance()
-					.getOutpostFromAlias(_OutpostIdBeforeUserValidation)
-					->getOwnerGuild())
+			if (_GuildId == outpost->getOwnerGuild())
 			{
 				setOutpostSide(OUTPOSTENUMS::OutpostOwner);
 				_OutpostIdBeforeUserValidation = 0;
@@ -20274,26 +20282,29 @@ void CCharacter::outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side)
 		}
 
 		// check : if outpost belongs to a tribe the choice can only be attacker
-		CSmartPtr<COutpost> outpost
-			= COutpostManager::getInstance().getOutpostFromAlias(_OutpostIdBeforeUserValidation);
-
-		if (outpost)
+		if (outpost->isBelongingToAGuild() == false)
 		{
-			if (outpost->isBelongingToAGuild() == false)
+			if (side != OUTPOSTENUMS::OutpostAttacker)
 			{
-				if (side != OUTPOSTENUMS::OutpostAttacker)
-				{
-					nlwarning("<CCharacter::outpostSideChosen> Outpost %s belongs to a tribe but entity %s wants to "
-							  "help tribe, hack ?",
-							  CPrimitivesParser::aliasToString(_OutpostIdBeforeUserValidation).c_str(),
-							  _Id.toString().c_str());
-					side = OUTPOSTENUMS::OutpostAttacker;
-				}
+				nlwarning("<CCharacter::outpostSideChosen> Outpost %s belongs to a tribe but entity %s wants to "
+						  "help tribe, hack ?",
+						  CPrimitivesParser::aliasToString(_OutpostIdBeforeUserValidation).c_str(),
+						  _Id.toString().c_str());
+				side = OUTPOSTENUMS::OutpostAttacker;
 			}
 		}
 
-		// his guild doesn't participate in outpost conflict so he can choose the side he wants
-		setOutpostSide(side);
+		// his guild doesn't participate in outpost conflict but player don't made a choice when op is under attack => random
+		if (neutral && outpostInFire)
+		{
+			if (uint32(RandomGenerator.rand(1)) == 0)
+				setOutpostSide(OUTPOSTENUMS::OutpostOwner);
+			else
+				setOutpostSide(OUTPOSTENUMS::OutpostAttacker);
+		}
+		else
+			// his guild doesn't participate in outpost conflict so he can choose the side he wants
+			setOutpostSide(side);
 	}
 
 	_OutpostIdBeforeUserValidation = 0;
@@ -22583,6 +22594,9 @@ void CCharacter::setCurrentPVPZone(TAIAlias alias)
 void CCharacter::setCurrentOutpostZone(TAIAlias alias)
 {
 	_CurrentOutpostZone = alias;
+	CSmartPtr<COutpost> outpost = COutpostManager::getInstance().getOutpostFromAlias(alias);
+	if (outpost)
+		_CurrentOutpostState = outpost->getState();
 }
 
 //------------------------------------------------------------------------------

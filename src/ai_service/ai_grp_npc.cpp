@@ -1148,26 +1148,26 @@ void CGroupNpc::setOutpostSide(OUTPOSTENUMS::TPVPSide side)
 	}
 }
 
-void CGroupNpc::setOutpostFactions(OUTPOSTENUMS::TPVPSide side)
+void CGroupNpc::setOutpostFactions(const std::string &alias, OUTPOSTENUMS::TPVPSide side)
 {
 	// Attack only the declared ennemies of the outpost
 	if (side == OUTPOSTENUMS::OutpostOwner)
 	{
 		// Bots factions
-		faction      ().addProperty(NLMISC::toString("outpost:%s:bot_defender", getAliasString().c_str()));
-		friendFaction().addProperty(NLMISC::toString("outpost:%s:bot_defender", getAliasString().c_str()));
-		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:bot_attacker", getAliasString().c_str()));
+		faction      ().addProperty(NLMISC::toString("outpost:%s:bot_defender", alias.c_str()));
+		friendFaction().addProperty(NLMISC::toString("outpost:%s:bot_defender", alias.c_str()));
+		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:bot_attacker", alias.c_str()));
 		// Players faction
-		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:attacker", getAliasString().c_str()));
+		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:attacker", alias.c_str()));
 	}
 	if (side == OUTPOSTENUMS::OutpostAttacker)
 	{
 		// Bots factions
-		faction      ().addProperty(NLMISC::toString("outpost:%s:bot_attacker", getAliasString().c_str()));
-		friendFaction().addProperty(NLMISC::toString("outpost:%s:bot_attacker", getAliasString().c_str()));
-		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:bot_defender", getAliasString().c_str()));
+		faction      ().addProperty(NLMISC::toString("outpost:%s:bot_attacker", alias.c_str()));
+		friendFaction().addProperty(NLMISC::toString("outpost:%s:bot_attacker", alias.c_str()));
+		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:bot_defender", alias.c_str()));
 		// Players faction
-		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:defender", getAliasString().c_str()));
+		ennemyFaction().addProperty(NLMISC::toString("outpost:%s:defender", alias.c_str()));
 	}
 }
 
