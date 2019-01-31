@@ -336,6 +336,7 @@ void CSpellParams::serial(class NLMISC::IStream &f)
 	f.serial(SpellParamValue2);
 	f.serial(SpellPowerFactor);
 	f.serial(SpellLevel);
+	f.serial(Fx);
 	if (f.isReading())
 	{
 		string val;
@@ -398,17 +399,20 @@ void CSpellParams::readForm (const UFormElm &root, const NLMISC::CSheetId &sheet
 
 	string fx = ""; 
 	CSheetId fxSheet;
+	root.getValueByName( fx, "FX" );
+	if (!fx.empty())
+		fxSheet = CSheetId(fx);
+	Fx = fxSheet.asInt();
+	
 	// type specialization
 	switch(type)
 	{
+	
 	case AI_ACTION::DamageSpell:
 	case AI_ACTION::DoTSpell:
 		root.getValueByName( SpellParamValue2, "DamageVampirismValue" );
 	case AI_ACTION::ToxicCloud:
-		root.getValueByName( fx, "FX" );
-		if (!fx.empty())
-			fxSheet = CSheetId(fx);
-		Fx = fxSheet.asInt();
+		
 		root.getValueByName( SpellParamValue, "DamageValue" );
 		root.getValueByName( SpellPowerFactor, "SpellPowerFactor" );
 		if ( root.getValueByName( value, "DamageType" ) )
