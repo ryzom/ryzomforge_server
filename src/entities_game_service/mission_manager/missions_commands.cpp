@@ -1803,7 +1803,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	string value = args[1];
 	
 	vector<string> res;
-	sint32 x = 0, y = 0, z = 0;
+	float x = 0, y = 0, z = 0;
 	float h = 0;
 	sint32 cell;
 	if (value.find(',') != string::npos) // Position x,y,z,a
