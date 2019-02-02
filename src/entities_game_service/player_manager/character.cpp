@@ -5628,9 +5628,12 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 
 	if (_PowoCell != cell) // leave the current Powo
 	{
+		// open url
+		sendUrl(toString("app_ryzhome action=quit_powo&powo=%d", _PowoCell), "");
 		resetPowoFlags();
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
+		getRespawnPoints().setArkRespawnpoint(0, 0, 0);
 	}
 	else if (_PowoCell == 0)
 		CBuildingManager::getInstance()->removePlayerFromRoom(this);
@@ -7557,6 +7560,7 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 			if (_PlayerPets[petIndex].IsMounted)
 				continue;
 
+			abortExchange();
 			petCommand = CPetCommandMsg::LIBERATE;
 			break;
 
