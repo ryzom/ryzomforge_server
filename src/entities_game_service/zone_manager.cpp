@@ -827,6 +827,11 @@ bool CZoneManager::parseZones( const NLLIGO::IPrimitive* prim )
 						}
 					}
 					_Places.push_back( place );
+					
+					TAIAlias alias = place->getAlias();
+					if (alias > maxGooBorderAlias)
+						maxGooBorderAlias = alias;
+						
 					_PlacesByAlias.insert( make_pair(place->getAlias(), place) );
 				}
 				else
@@ -1997,6 +2002,20 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 			if ( outpostAlias != CAIAliasTranslator::Invalid )
 			{
 				COutpostManager::getInstance().enterOutpostZone( user );
+			}
+		}
+		else // Check if outpost have changed from peace state, if yes => player re-enter the pvpzone to ask to choose a side
+		{
+			CSmartPtr<COutpost> outpost = COutpostManager::getInstance().getOutpostFromAlias(outpostAlias);
+			if (outpost)
+			{
+				OUTPOSTENUMS::TOutpostState savedState = user->getCurrentOutpostState();
+				user->setCurrentOutpostZone( outpostAlias );
+				if (savedState != outpost->getState() && (savedState == OUTPOSTENUMS::Peace || savedState == OUTPOSTENUMS::WarDeclaration || savedState == OUTPOSTENUMS::AttackAfter))
+				{
+					if ( pvpZoneAlias != CAIAliasTranslator::Invalid && !user->isDead() )
+						CPVPManager::getInstance()->enterPVPZone( user, pvpZoneAlias );
+				}
 			}
 		}
 		

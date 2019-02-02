@@ -38,6 +38,7 @@
 #include "shop_type/named_items.h"
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
+#include "guild_manager/guild_member_module.h"
 #include "guild_manager/fame_manager.h"
 #include "building_manager/building_manager.h"
 #include "building_manager/building_physical.h"
@@ -55,13 +56,13 @@ using namespace NLMISC;
 using namespace NLNET;
 using namespace std;
 
-NLMISC_COMMAND( forceMissionProgress,"debug command used to trigger debug commands","<user>" )
+NLMISC_COMMAND(forceMissionProgress,"debug command used to trigger debug commands","<user>")
 {
 	if (args.empty() || args.size() > 3)
 		return false;
 	CEntityId id;
-	id.fromString( args[0].c_str() );
-	CCharacter * c = PlayerManager.getChar( id );
+	id.fromString(args[0].c_str());
+	CCharacter * c = PlayerManager.getChar(id);
 	if (!c)
 		return true;
 	CMissionEventDebug event;
@@ -74,33 +75,33 @@ NLMISC_COMMAND( forceMissionProgress,"debug command used to trigger debug comman
 //-----------------------------------------------
 NLMISC_COMMAND(forceJournalUpdate,"force mission journal update","<player id(id:type:crea:dyn)>")
 {
-	if ( args.size() != 1 )
+	if (args.size() != 1)
 		return false;
 	CEntityId id;
 	id.fromString(args[0].c_str());
-	CCharacter * user = PlayerManager.getChar( id );
-	if( !user )
+	CCharacter * user = PlayerManager.getChar(id);
+	if (!user)
 	{
 		log.displayNL("invalid char");
 		return true;
 	}
-	for ( map<TAIAlias,CMission*>::iterator it = user->getMissionsBegin(); it != user->getMissionsEnd(); ++it )
+	for (map<TAIAlias,CMission*>::iterator it = user->getMissionsBegin(); it != user->getMissionsEnd(); ++it)
 	{
 		(*it).second->updateUsersJournalEntry();
 	}
 
-	CTeam * team = TeamManager.getTeam( user->getTeamId() );
-	if ( team )
+	CTeam * team = TeamManager.getTeam(user->getTeamId());
+	if (team)
 	{
-		for ( uint i  = 0; i < team->getMissions().size(); i++ )
+		for (uint i  = 0; i < team->getMissions().size(); i++)
 		{
 			team->getMissions()[i]->updateUsersJournalEntry();
 		}
 	}
-	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( user->getGuildId() );
+	CGuild * guild = CGuildManager::getInstance()->getGuildFromId(user->getGuildId());
 	if (guild)
 	{
-		for ( uint i  = 0; i < guild->getMissions().size(); i++ )
+		for (uint i  = 0; i < guild->getMissions().size(); i++)
 		{
 			guild->getMissions()[i]->updateUsersJournalEntry();
 		}
@@ -117,9 +118,9 @@ NLMISC_COMMAND(forceJournalUpdate,"force mission journal update","<player id(id:
 //-----------------------------------------------
 NLMISC_COMMAND(simMissionEvent,"simulate a mission event","<player> <event type> *[<event param>]")
 {
-	if ( args.empty() )
+	if (args.empty())
 		return false;
-	if ( !CMissionEvent::simMissionEvent( args,log ) )
+	if (!CMissionEvent::simMissionEvent(args,log))
 		log.displayNL("simMissionEvent failed");
 	return true;
 } // simMissionEvent //
@@ -129,27 +130,27 @@ NLMISC_COMMAND(simMissionEvent,"simulate a mission event","<player> <event type>
 //-----------------------------------------------
 NLMISC_COMMAND(reloadMissions,"reload the mission primitives. Picked missions are erased","[bool telling if we have tio reset aliases (default : false)]")
 {
-	if ( args.size() > 1 )
+	if (args.size() > 1)
 		return true;
 	CPlayerManager::TMapPlayers::const_iterator itPlayer = PlayerManager.getPlayers().begin();
 
-	for (; itPlayer != PlayerManager.getPlayers().end(); ++itPlayer )
+	for (; itPlayer != PlayerManager.getPlayers().end(); ++itPlayer)
 	{
-		if ( (*itPlayer).second.Player )
+		if ((*itPlayer).second.Player)
 		{
 			CCharacter * user = (*itPlayer).second.Player->getActiveCharacter();
-			if ( user )
+			if (user)
 			{
-				while ( user->getMissionsBegin() != user->getMissionsEnd()  )
+				while (user->getMissionsBegin() != user->getMissionsEnd() )
 				{
-					user->removeMission( ( *user->getMissionsBegin() ).first, mr_forced);
+					user->removeMission((*user->getMissionsBegin()).first, mr_forced);
 				}
-				CTeam * team = TeamManager.getRealTeam( user->getTeamId() );
-				if ( team )
+				CTeam * team = TeamManager.getRealTeam(user->getTeamId());
+				if (team)
 				{
-					for ( uint i = 0; i < team->getMissions().size(); i++ )
+					for (uint i = 0; i < team->getMissions().size(); i++)
 					{
-						team->removeMission( i, mr_forced);
+						team->removeMission(i, mr_forced);
 					}
 				}
 				/// todo guild mission
@@ -158,18 +159,18 @@ NLMISC_COMMAND(reloadMissions,"reload the mission primitives. Picked missions ar
 	}
 
 	bool reloadAliases = false;
-	if ( args.size() == 1 && ( args[0] == "true" || args[0] == "1" ) )
+	if (args.size() == 1 && (args[0] == "true" || args[0] == "1"))
 		reloadAliases = true;
 	CMissionManager::release();
-	if ( reloadAliases )
+	if (reloadAliases)
 	{
-		log.displayNL( "please restart AI service" );
+		log.displayNL("please restart AI service");
 		CAIAliasTranslator::release();
 	}
-	if ( reloadAliases )
+	if (reloadAliases)
 		CAIAliasTranslator::init();
 	CMissionManager::init();
-	log.displayNL( "missions reloaded" );
+	log.displayNL("missions reloaded");
 	return true;
 } // reloadMissions
 
@@ -177,12 +178,12 @@ NLMISC_COMMAND(reloadMissions,"reload the mission primitives. Picked missions ar
 
 NLMISC_COMMAND(addSuccessfulMission,"add a successful mission to the player","<player > <mission alias>")
 {
-	if ( args.size() != 2 )
+	if (args.size() != 2)
 		return false;
 	
 	CEntityId id;
 	id.fromString(args[0].c_str());
-	CCharacter * user = PlayerManager.getChar( id );
+	CCharacter * user = PlayerManager.getChar(id);
 	if (user)
 	{
 		TAIAlias alias;
@@ -195,7 +196,7 @@ NLMISC_COMMAND(addSuccessfulMission,"add a successful mission to the player","<p
 		}
 		CMissionTemplate *mt = mts.find(alias)->second;
 		if (mt)
-			user->addSuccessfulMissions( *mt );
+			user->addSuccessfulMissions(*mt);
 	}
 	else
 		log.displayNL("Invalid user");
@@ -209,12 +210,12 @@ NLMISC_COMMAND(clearMissionDone,"Clear the list of already done missions.","<cha
 		return false;
 	
 	CEntityId id;
-	id.fromString( args[0].c_str() );
+	id.fromString(args[0].c_str());
 	
 	CCharacter *c = PlayerManager.getChar(id);
-	if( c == 0 )
+	if (c == 0)
 	{
-		log.displayNL("<clearMissionDone> unknown character '%s'", id.toString().c_str() );
+		log.displayNL("<clearMissionDone> unknown character '%s'", id.toString().c_str());
 		return false;
 	}
 	
@@ -301,54 +302,54 @@ NLMISC_COMMAND(displayMissionsPlayerStats, "display the missions statistic data 
 
 NLMISC_COMMAND(simAISMAction, "simulate an AI action.", "<action name> *[params]")
 {
-	if ( args.size() == 2 )
+	if (args.size() == 2)
 	{
-		TAIAlias alias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName( args[1] );
-		if ( alias != CAIAliasTranslator::Invalid )
+		TAIAlias alias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
+		if (alias != CAIAliasTranslator::Invalid)
 		{
 			const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate(alias);
-			if ( templ != NULL )
+			if (templ != NULL)
 			{
-				if ( args[0] == "end_escort" )
+				if (args[0] == "end_escort")
 				{
-					for ( uint i = 0; i < templ->Instances.size() ; i++)
+					for (uint i = 0; i < templ->Instances.size() ; i++)
 					{
-						if ( templ->Instances[i] )
+						if (templ->Instances[i])
 						{
 							vector<TDataSetRow> entities;
-							templ->Instances[i]->getEntities( entities );
-							for ( uint j = 0; j < entities.size() ; j++ )
+							templ->Instances[i]->getEntities(entities);
+							for (uint j = 0; j < entities.size() ; j++)
 							{
-								CCharacter * user = PlayerManager.getChar( entities[j] );
-								if( user)
+								CCharacter * user = PlayerManager.getChar(entities[j]);
+								if (user)
 								{
-									CMissionEventEscort event( alias );
-									user->processMissionEvent( event, alias );
+									CMissionEventEscort event(alias);
+									user->processMissionEvent(event, alias);
 								}
 								else
-									nlwarning( "<CCAisActionMsgImp callback> invalid user %u",entities[j].getIndex() );
+									nlwarning("<CCAisActionMsgImp callback> invalid user %u",entities[j].getIndex());
 							}
 						}
 						else
-							nlwarning( "<CCAisActionMsgImp callback> %s mission %s  has a NULL instance ",args[0].c_str(),args[1].c_str() );
+							nlwarning("<CCAisActionMsgImp callback> %s mission %s  has a NULL instance ",args[0].c_str(),args[1].c_str());
 					}
 				}
-				else if ( args[0] == "fail" )
+				else if (args[0] == "fail")
 				{
 					bool exit = false;
 					
 					// get instance currently in escort step
-					for ( uint i = 0; (i < templ->Instances.size()) && !exit ; ++i)
+					for (uint i = 0; (i < templ->Instances.size()) && !exit ; ++i)
 					{
-						if ( templ->Instances[i] != NULL )
+						if (templ->Instances[i] != NULL)
 						{
 							// check step
-							for ( map<uint32, EGSPD::CActiveStepPD>::const_iterator itStep = templ->Instances[i]->getStepsBegin(); itStep != templ->Instances[i]->getStepsEnd(); ++itStep )
+							for (map<uint32, EGSPD::CActiveStepPD>::const_iterator itStep = templ->Instances[i]->getStepsBegin(); itStep != templ->Instances[i]->getStepsEnd(); ++itStep)
 							{
-								nlassert( uint( (*itStep).second.getIndexInTemplate() - 1 ) < templ->Steps.size() );
+								nlassert(uint((*itStep).second.getIndexInTemplate() - 1) < templ->Steps.size());
 								
 								CMissionStepEscort *escortStep = dynamic_cast<CMissionStepEscort*> (templ->Steps[ (*itStep).second.getIndexInTemplate() - 1 ]);
-								if ( escortStep != NULL )
+								if (escortStep != NULL)
 								{
 									templ->Instances[i]->onFailure(false);
 									
@@ -358,31 +359,31 @@ NLMISC_COMMAND(simAISMAction, "simulate an AI action.", "<action name> *[params]
 							}							
 						}
 						else
-							nlwarning( "<CCAisActionMsgImp callback> *fail* mission %s  has a NULL instance ",args[1].c_str() );
+							nlwarning("<CCAisActionMsgImp callback> *fail* mission %s  has a NULL instance ",args[1].c_str());
 					}
 				}
 				else
 				{
-					for ( uint i = 0; i < templ->Instances.size() ; ++i)
+					for (uint i = 0; i < templ->Instances.size() ; ++i)
 					{
-						if ( templ->Instances[i] )
+						if (templ->Instances[i])
 						{
 							vector<TDataSetRow> entities;
-							templ->Instances[i]->getEntities( entities );
-							for ( uint j = 0 ; j < entities.size() ; ++j )
+							templ->Instances[i]->getEntities(entities);
+							for (uint j = 0 ; j < entities.size() ; ++j)
 							{
-								CCharacter * user = PlayerManager.getChar( entities[j] );
-								if( user)
+								CCharacter * user = PlayerManager.getChar(entities[j]);
+								if (user)
 								{
 									CMissionEventAIMsg event(args[0]);
-									user->processMissionEvent( event, alias );
+									user->processMissionEvent(event, alias);
 								}
 								else
-									nlwarning( "<CCAisActionMsgImp callback> invalid user %u",entities[j].getIndex() );
+									nlwarning("<CCAisActionMsgImp callback> invalid user %u",entities[j].getIndex());
 							}
 						}
 						else
-							nlwarning( "<CCAisActionMsgImp callback> %s mission %s  has a NULL instance ",args[0].c_str(),args[1].c_str() );
+							nlwarning("<CCAisActionMsgImp callback> %s mission %s  has a NULL instance ",args[0].c_str(),args[1].c_str());
 					}
 				}
 			}
@@ -470,7 +471,7 @@ NLMISC_COMMAND(characterMissionDump,"dump character missions","<character_id>")
 
 	std::string text;
 	uint i = 0;
-	for ( map<TAIAlias, CMission*>::iterator it = c->getMissionsBegin(); it != c->getMissionsEnd(); ++it )
+	for (map<TAIAlias, CMission*>::iterator it = c->getMissionsBegin(); it != c->getMissionsEnd(); ++it)
 	{
 		log.displayNL("- %2d: Mission '%s' (alias %10u) Bot Giver Alias: %10u", i++,
 			CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId((*it).first).c_str(),
@@ -525,7 +526,7 @@ NLMISC_COMMAND(addMission,"Add mission to character", "<character_id> <Mission g
 	
 	std::list< CMissionEvent* > eventList;
 	CMissionManager::getInstance()->instanciateMission(c, missionAlias,	giverAlias, eventList);
-	c->processMissionEventList( eventList,true, CAIAliasTranslator::Invalid );
+	c->processMissionEventList(eventList,true, CAIAliasTranslator::Invalid);
 
 	log.displayNL("Mission '%s' \t(alias %10u)  added to character %s",
 		CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId(missionAlias).c_str(),
@@ -645,19 +646,18 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 		{
 			if (c->addItemToInventory(getTInventory(selected_inv), item))
 			{
+				if (quality_params.size() > 1)
+				{
+					uint16 recommended;
+					NLMISC::fromString(quality_params[1], recommended);
+					item->recommended(recommended);
+				}
+
 				log.displayNL("OK");
 				return true;
 			}
 			item.deleteItem();
 		}
-
-		if (quality_params.size() > 1)
-		{
-			uint16 recommended;
-			NLMISC::fromString(quality_params[1], recommended);
-			item->recommended(recommended);
-		}
-		
 	}
 	else
 	{
@@ -683,17 +683,18 @@ NLMISC_COMMAND(spawnItem, "Spawn a new Item", "<uid> <inv> <quantity(0=force)> <
 		{
 			if (c->addItemToInventory(getTInventory(selected_inv), finalItem))
 			{
+
+				if (quality_params.size() > 1)
+				{
+					uint16 recommended;
+					NLMISC::fromString(quality_params[1], recommended);
+					finalItem->recommended(recommended);
+				}
+				
 				log.displayNL("OK");
 				return true;
 			}
 			finalItem.deleteItem();
-		}
-
-		if (quality_params.size() > 1)
-		{
-			uint16 recommended;
-			NLMISC::fromString(quality_params[1], recommended);
-			finalItem->recommended(recommended);
 		}
 	}
 	
@@ -810,7 +811,7 @@ NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<
 			uint32 k = 0;
 			log.displayNL("#%s", INVENTORIES::toString(inventories[i]).c_str());
 
-			for ( uint j = 0; j < childSrc->getSlotCount(); j++ )
+			for (uint j = 0; j < childSrc->getSlotCount(); j++)
 			{
 				CGameItemPtr itemPtr = childSrc->getItem(j);
 				if (itemPtr != NULL)
@@ -905,7 +906,7 @@ NLMISC_COMMAND(getNamedItemList, "get list of named items of character by filter
 			uint32 k = 0;
 			log.displayNL("#%s", INVENTORIES::toString(inventories[i]).c_str());
 
-			for ( uint j = 0; j < childSrc->getSlotCount(); j++ )
+			for (uint j = 0; j < childSrc->getSlotCount(); j++)
 			{
 				CGameItemPtr itemPtr = childSrc->getItem(j);
 				if (itemPtr != NULL)
@@ -968,7 +969,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 	CInventoryPtr inventory = getInventory(c, selected_inv);
 	if (inventory != NULL)
 	{
-		for ( uint32 j = 0; j < inventory->getSlotCount(); j++ )
+		for (uint32 j = 0; j < inventory->getSlotCount(); j++)
 		{
 			CGameItemPtr itemPtr = inventory->getItem(j);
 			if (itemPtr != NULL)
@@ -986,7 +987,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 		}
 
 		// Check if all items has been found
-		for ( itNeedItems = need_items.begin(); itNeedItems != need_items.end(); ++itNeedItems )
+		for (itNeedItems = need_items.begin(); itNeedItems != need_items.end(); ++itNeedItems)
 		{
 			if ((*itNeedItems).second != 0) {
 				log.displayNL("ERR: Not enough items.");
@@ -995,7 +996,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 		}
 
 		//Delete them
-		for ( std::map<uint32, uint32>::iterator it = slots.begin(); it != slots.end(); ++it )
+		for (std::map<uint32, uint32>::iterator it = slots.begin(); it != slots.end(); ++it)
 		{
 			inventory->deleteStackItem((*it).first, (*it).second);
 		}
@@ -1022,14 +1023,14 @@ NLMISC_COMMAND(getPosition, "get position of entity", "<uid>")
 	h = c->getState().Heading;
 
 	TDataSetRow dsr = c->getEntityRowId();
-	CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 	cell = srcCell;
 
 	string contName;
 	string regionName;
 	const CRegion* region = NULL;
 	const CContinent * cont = NULL;
-	CZoneManager::getInstance().getRegion(x,y, &region, &cont);
+	CZoneManager::getInstance().getRegion(c->getState().X ,c->getState().Y, &region, &cont);
 	if (region)
 		regionName = region->getName();
 	if (cont)
@@ -1049,8 +1050,8 @@ NLMISC_COMMAND(getTargetPosition, "get position of entity", "<uid>")
 
 	GET_ACTIVE_CHARACTER
 
-	CCreature * target = CreatureManager.getCreature( c->getTarget() );
-	if(target)
+	CCreature * target = CreatureManager.getCreature(c->getTarget());
+	if (target)
 	{
 		double x = target->getState().X / 1000.;
 		double y = target->getState().Y / 1000.;
@@ -1058,7 +1059,7 @@ NLMISC_COMMAND(getTargetPosition, "get position of entity", "<uid>")
 		double h = target->getState().Heading;
 
 		TDataSetRow dsr = target->getEntityRowId();
-		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+		CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 		sint32 cell = srcCell;
 
 		log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
@@ -1081,22 +1082,22 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 	bool found = false;
 
 
-	if ( args[1].find(".creature") != string::npos )
+	if (args[1].find(".creature") != string::npos)
 	{
 		CSheetId creatureSheetId(args[1]);
-		if( creatureSheetId != CSheetId::Unknown )
+		if (creatureSheetId != CSheetId::Unknown)
 		{
 			double minDistance = -1.;
 			CCreature * creature = NULL;
 
 			TMapCreatures::const_iterator it;
 			const TMapCreatures& creatures = CreatureManager.getCreature();
-			for( it = creatures.begin(); it != creatures.end(); ++it )
+			for(it = creatures.begin(); it != creatures.end(); ++it)
 			{
 				CSheetId sheetId = (*it).second->getType();
-				if( sheetId == creatureSheetId )
+				if (sheetId == creatureSheetId)
 				{
-					double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
+					double distance = PHRASE_UTILITIES::getDistance(c->getEntityRowId(), (*it).second->getEntityRowId());
 					if (!creature || distance < minDistance)
 					{
 						creature = (*it).second;
@@ -1105,7 +1106,7 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 				}
 			}
 
-			if( creature )
+			if (creature)
 			{
 				double x = creature->getState().X() / 1000.;
 				double y = creature->getState().Y() / 1000.;
@@ -1114,7 +1115,7 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 
 
 				TDataSetRow dsr = creature->getEntityRowId();
-				CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+				CMirrorPropValueRO<TYPE_CELL> mirrorCell(TheDataset, dsr, DSPropertyCELL);
 				sint32 cell = mirrorCell;
 				found = true;
 				log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
@@ -1124,15 +1125,15 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 	else 
 	{
 		vector<TAIAlias> aliases;
-		CAIAliasTranslator::getInstance()->getNPCAliasesFromName(args[1], aliases );
-		if ( !aliases.empty() )
+		CAIAliasTranslator::getInstance()->getNPCAliasesFromName(args[1], aliases);
+		if (!aliases.empty())
 		{
 			for (uint i = 0; i < aliases.size(); i++)
 			{
 				TAIAlias alias = aliases[i];
 
 				const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
-				if ( botId != CEntityId::Unknown )
+				if (botId != CEntityId::Unknown)
 				{
 					CEntityBase *entityBase = CreatureManager.getCreature (botId);
 					if (entityBase != NULL)
@@ -1143,7 +1144,7 @@ NLMISC_COMMAND(getBotPosition,"get_bot_position","<uid> <bot_name>")
 						double h = entityBase->getState().Heading;
 
 						TDataSetRow dsr = entityBase->getEntityRowId();
-						CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+						CMirrorPropValueRO<TYPE_CELL> mirrorCell(TheDataset, dsr, DSPropertyCELL);
 						sint32 cell = mirrorCell;
 						found = true;
 						log.displayNL("%.2f|%.2f|%.2f|%.4f|%d", x, y, z, h, cell);
@@ -1300,7 +1301,7 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
 			
 			TDataSetRow dsr = cTarget->getEntityRowId();
-			CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
 
 			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
@@ -1324,7 +1325,7 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 			msg += toString("PET#%d:%s|", petSlot, pets.c_str());
 		}
 
-		if(cTarget)
+		if (cTarget)
 		{
 			double x = cTarget->getState().X / 1000.;
 			double y = cTarget->getState().Y / 1000.;
@@ -1334,7 +1335,7 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
 			
 			TDataSetRow dsr = cTarget->getEntityRowId();
-			CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
 
 			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
@@ -1562,7 +1563,7 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 	if (args.size() != 2)
 	{
 		log.displayNL("ERR: invalid arg count");
-		return false;
+		return true;
 	}
 	
 	uint32 org;
@@ -1574,9 +1575,9 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup]")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_pos] [can_xp,cant_dead,can_teleport,can_speedup] [access_room_inv,access_guild_room]")
 {
-	if (args.size() != 2)
+	if (args.size() < 2)
 		return false;
 	
 	GET_ACTIVE_CHARACTER
@@ -1590,6 +1591,10 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 	string powoFlags = "0000";
 	if (args.size() > 4)
 		powoFlags = args[4];
+
+	string invFlags = "00";
+	if (args.size() > 5)
+		invFlags = args[5];
 
 	if (building)
 	{
@@ -1606,7 +1611,7 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 				uint16 ownerId = buildingPlayer->getOwnerIdx(playerEid);
 				nlinfo("ownerId = %d", ownerId);
 				sint32 cell;
-				if (buildingPlayer->addUser(c, 0, ownerId, cell))
+				if (buildingPlayer->addUser(c, 0, ownerId, cell, true, false))
 				{
 					nlinfo("Powo Flags : %s", powoFlags.c_str());
 					c->setPowoCell(cell);
@@ -1614,15 +1619,49 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 					c->setPowoFlag("dead", powoFlags[1] == '1');
 					c->setPowoFlag("teleport", powoFlags[2] == '1');
 					c->setPowoFlag("speed", powoFlags[3] == '1');
+					c->setPowoFlag("room_inv", invFlags[0] == '1');
+					c->setPowoFlag("guild_inv", invFlags[1] == '1');
 
 					if (args.size () > 3 && args[3] != "*") // Change the default exit by exit of instance building
 					{
-						building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
-						if (building)
+						std::vector< std::string > pos;
+						NLMISC::splitString(args[3], ",", pos);
+						if (pos.size() > 2)
 						{
-							c->setBuildingExitZone( building->getDefaultExitSpawn() );
+							sint32 exitx;
+							sint32 exity;
+							fromString(pos[0], exitx);
+							exitx *= 1000;
+							fromString(pos[1], exity);
+							exity *= 1000;
+							if (pos[2] != "*")
+							{
+								sint32 exitcell;
+								fromString(pos[2], exitcell);
+								c->setBuildingExitPos(exitx, exity, exitcell);
+							}
+							else
+								c->setBuildingExitPos(exitx, exity, cell);
 						}
+						else if (pos.size() > 1)
+						{
+							sint32 exitx;
+							sint32 exity;
+							fromString(pos[0], exitx);
+							exitx *= 1000;
+							fromString(pos[1], exity);
+							exity *= 1000;
+							c->setBuildingExitPos(exitx, exity, 0);
+						}
+						else
+						{
+							building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
+							if (building)
+								c->setBuildingExitZone(building->getDefaultExitSpawn());
+						}
+					
 					}
+					
 					log.displayNL("%d", cell);
 				} else {
 					log.displayNL("ERR: invalid cell");
@@ -1631,11 +1670,11 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 			}
 		} else {
 			log.displayNL("ERR: invalid template");
-			return false;
+			return true;
 		}
 	} else {
 		log.displayNL("ERR: invalid building");
-		return false;
+		return true;
 	}
 	return true;
 }
@@ -1687,12 +1726,12 @@ NLMISC_COMMAND(getPlayersInPowos, "get list of players in a powo", "")
 {
 	CPlayerManager::TMapPlayers::const_iterator itPlayer = PlayerManager.getPlayers().begin();
 
-	for (; itPlayer != PlayerManager.getPlayers().end(); ++itPlayer )
+	for (; itPlayer != PlayerManager.getPlayers().end(); ++itPlayer)
 	{
-		if ( (*itPlayer).second.Player )
+		if ((*itPlayer).second.Player)
 		{
 			CCharacter * player = (*itPlayer).second.Player->getActiveCharacter();
-			if ( player )
+			if (player)
 			{
 				sint32 powo = player->getPowoCell();
 				if (powo != 0)
@@ -1800,7 +1839,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	sint32 x = 0, y = 0, z = 0;
 	float h = 0;
 	sint32 cell;
-	if ( value.find(',') != string::npos ) // Position x,y,z,a
+	if (value.find(',') != string::npos) // Position x,y,z,a
 	{
 		explode (value, string(","), res);
 		if (res.size() >= 2)
@@ -1820,22 +1859,22 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	}
 	else
 	{
-		if ( value.find(".creature") != string::npos )
+		if (value.find(".creature") != string::npos)
 		{
 			CSheetId creatureSheetId(value);
-			if( creatureSheetId != CSheetId::Unknown )
+			if (creatureSheetId != CSheetId::Unknown)
 			{
 				double minDistance = -1.;
 				CCreature * creature = NULL;
 
 				TMapCreatures::const_iterator it;
 				const TMapCreatures& creatures = CreatureManager.getCreature();
-				for( it = creatures.begin(); it != creatures.end(); ++it )
+				for(it = creatures.begin(); it != creatures.end(); ++it)
 				{
 					CSheetId sheetId = (*it).second->getType();
-					if( sheetId == creatureSheetId )
+					if (sheetId == creatureSheetId)
 					{
-						double distance = PHRASE_UTILITIES::getDistance( c->getEntityRowId(), (*it).second->getEntityRowId() );
+						double distance = PHRASE_UTILITIES::getDistance(c->getEntityRowId(), (*it).second->getEntityRowId());
 						if (!creature || distance < minDistance)
 						{
 							creature = (*it).second;
@@ -1843,7 +1882,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 						}
 					}
 				}
-				if( creature )
+				if (creature)
 				{
 					x = creature->getState().X();
 					y = creature->getState().Y();
@@ -1864,8 +1903,8 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 			{
 				// try to find the bot name
 				vector<TAIAlias> aliases;
-				CAIAliasTranslator::getInstance()->getNPCAliasesFromName( value, aliases );
-				if ( aliases.empty() )
+				CAIAliasTranslator::getInstance()->getNPCAliasesFromName(value, aliases);
+				if (aliases.empty())
 				{
 					log.displayNL("ERR: INVALID_BOT");
 					return false;
@@ -1874,7 +1913,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 				TAIAlias alias = aliases[0];
 
 				const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
-				if ( botId != CEntityId::Unknown )
+				if (botId != CEntityId::Unknown)
 				{
 					entityBase = CreatureManager.getCreature (botId);
 				}
@@ -1893,7 +1932,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 				h = entityBase->getState().Heading;
 
 				TDataSetRow dsr = entityBase->getEntityRowId();
-				CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+				CMirrorPropValueRO<TYPE_CELL> mirrorCell(TheDataset, dsr, DSPropertyCELL);
 				cell = mirrorCell;
 			}
 		}
@@ -1928,7 +1967,7 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	if (args.size () > 4 && args[4] == "1")
 	{
 		TDataSetRow dsr = c->getEntityRowId();
-		CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, dsr, DSPropertyCELL );
+		CMirrorPropValueRO<TYPE_CELL> mirrorCell(TheDataset, dsr, DSPropertyCELL);
 		cell = mirrorCell;
 	}
 
@@ -1940,9 +1979,9 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	
 	c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
 
-	if ( cont )
+	if (cont)
 	{
-		c->getRespawnPoints().addDefaultRespawnPoint( CONTINENT::TContinent(cont->getId()) );
+		c->getRespawnPoints().addDefaultRespawnPoint(CONTINENT::TContinent(cont->getId()));
 	}
 
 	log.displayNL("OK");
@@ -2122,10 +2161,10 @@ NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientation groupname x y look cell")
+NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion spawnbot orientation groupname x y z look cell")
 {
 
-	if (args.size () < 10)
+	if (args.size () < 12)
 	{
 		log.displayNL("ERR: invalid arg count");
 		return false;
@@ -2171,43 +2210,51 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 	}
 
 	bool spawnBots = true;
+	fromString(args[4], spawnBots);
 
-	if (isChar && args[4] == "self")
+	if (isChar && args[5] == "self")
 	{
 		orientation = (sint32)(c->getHeading() * 1000.0);
 	}
-	else if (args[4] != "random")
+	else if (args[5] != "random")
 	{
-		NLMISC::fromString(args[4], orientation);
+		NLMISC::fromString(args[5], orientation);
 		orientation = (sint32)((double)orientation / 360.0 * (NLMISC::Pi * 2.0) * 1000.0);
 	}
 
-	string botsName = args[5];
+	string botsName = args[6];
 		
 	float userX;
-	NLMISC::fromString(args[6], userX);
+	NLMISC::fromString(args[7], userX);
 	x = (sint32)(userX * 1000.0);
 
 	float userY;
-	NLMISC::fromString(args[7], userY);
+	NLMISC::fromString(args[8], userY);
 	y = (sint32)(userY * 1000.0);
 
-	string look;
-	if (args[8] != "*")
+	float userZ;
+	if (args[9] != "*")
 	{
-		look = args[8];
+		NLMISC::fromString(args[9], userZ);
+		z = (sint32)(userZ * 1000.0);
+	}
+
+	string look;
+	if (args[10] != "*")
+	{
+		look = args[10];
 		if (look.find(".creature") == string::npos)
 			look += ".creature";
 	}
 
-	if (isChar && args[9] == "*")
+	if (isChar && args[11] == "*")
 	{
 		TDataSetRow dsr = c->getEntityRowId();
-		CMirrorPropValueRO<TYPE_CELL> srcCell( TheDataset, dsr, DSPropertyCELL );
+		CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 		cell = srcCell;
 	}
 	else
-		NLMISC::fromString(args[9], cell);
+		NLMISC::fromString(args[11], cell);
 
 	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
 
@@ -2272,7 +2319,7 @@ NLMISC_COMMAND(grpScript, "executes a script on an event npc group", "<uid> <gro
 	uint32 nbString = (uint32)args.size();
  
 	string botsName = args[1];
-	if (instanceNumber == std::numeric_limits<uint32>::max() && !getAIInstanceFromGroupName(botsName, instanceNumber))
+	if (!getAIInstanceFromGroupName(botsName, instanceNumber) && instanceNumber == std::numeric_limits<uint32>::max())
 	{
 		log.displayNL("ERR: invalid instance");
 		return false;
@@ -2318,7 +2365,7 @@ NLMISC_COMMAND(setUrl, "changes the url of a bot", "<uid> <groupname> [<url>] [<
 	uint32 instanceNumber = c->getInstanceNumber();
  
 	string groupname = args[1];
-	if ( ! getAIInstanceFromGroupName(groupname, instanceNumber))
+	if (! getAIInstanceFromGroupName(groupname, instanceNumber))
 	{
 		log.displayNL("ERR: INVALID_AI_INSTANCE");
 		return false;
@@ -2329,8 +2376,8 @@ NLMISC_COMMAND(setUrl, "changes the url of a bot", "<uid> <groupname> [<url>] [<
 	vector<TAIAlias> aliases;
 
 	log.displayNL("NAME: %s", groupname.c_str());
-	CAIAliasTranslator::getInstance()->getNPCAliasesFromName( groupname, aliases );
-	if ( aliases.empty() )
+	CAIAliasTranslator::getInstance()->getNPCAliasesFromName(groupname, aliases);
+	if (aliases.empty())
 	{
 		log.displayNL("ERR: INVALID_BOT");
 		return false;
@@ -2339,20 +2386,20 @@ NLMISC_COMMAND(setUrl, "changes the url of a bot", "<uid> <groupname> [<url>] [<
 	TAIAlias alias = aliases[0];
 
 	const CEntityId & botId = CAIAliasTranslator::getInstance()->getEntityId (alias);
-	if ( botId != CEntityId::Unknown )
+	if (botId != CEntityId::Unknown)
 	{
 
 		CCreature* creature = CreatureManager.getCreature(botId);
 
 		uint32 program = creature->getBotChatProgram();
-		if(!(program & (1<<BOTCHATTYPE::WebPageFlag)))
+		if (!(program & (1<<BOTCHATTYPE::WebPageFlag)))
 		{
 			program |= 1 << BOTCHATTYPE::WebPageFlag;
 			creature->setBotChatProgram(program);
 		}
 
 		const string &wp = creature->getWebPage();
-		if(args.size() < 3)
+		if (args.size() < 3)
 		{
 			(string &)wp = "";
 			program &= ~(1 << BOTCHATTYPE::WebPageFlag);
@@ -2361,7 +2408,7 @@ NLMISC_COMMAND(setUrl, "changes the url of a bot", "<uid> <groupname> [<url>] [<
 		else
 		{
 			(string &)wp = args[2];
-			if(args.size() > 3)
+			if (args.size() > 3)
 			{
 				const string &wpn = creature->getWebPageName();
 				(string &)wpn = args[3];
@@ -2379,16 +2426,16 @@ NLMISC_COMMAND(setUrl, "changes the url of a bot", "<uid> <groupname> [<url>] [<
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(temporaryRename, "rename a player for the event", "<uid> <new name>" )
+NLMISC_COMMAND(temporaryRename, "rename a player for the event", "<uid> <new name>")
 {
-	if ( args.size() != 2 ) {
+	if (args.size() != 2) {
 		log.displayNL("ERR: invalid arg count");
 		return false;
 	}
 
 	GET_ACTIVE_CHARACTER
 
-	ucstring newName( args[2] );
+	ucstring newName(args[2]);
 	
 	c->registerName(newName);
 
@@ -2405,7 +2452,7 @@ NLMISC_COMMAND(getArkMissions,"dump character ark missions","<uid>")
 
 	string text;
 	uint i = 0;
-	for ( map<TAIAlias, CMission*>::iterator it = c->getMissionsBegin(); it != c->getMissionsEnd(); ++it )
+	for (map<TAIAlias, CMission*>::iterator it = c->getMissionsBegin(); it != c->getMissionsEnd(); ++it)
 	{
 		const string& name = CAIAliasTranslator::getInstance()->getMissionNameFromUniqueId((*it).first);
 		if (name.substr(0, 4) == "ark_")
@@ -2426,7 +2473,7 @@ NLMISC_COMMAND(getPlayerStats,"get player stats","<uid> <stat1,stat2,stat3..>")
 	GET_ACTIVE_CHARACTER
 
 	std::vector< std::string > stats;
-	NLMISC::splitString( args[1],",",stats );
+	NLMISC::splitString(args[1],",",stats);
 	uint32 i=0;
 	
 	const CInventoryPtr & userBag = c->getInventory(INVENTORIES::bag);
@@ -2490,7 +2537,7 @@ NLMISC_COMMAND(getServerStats,"get server stats","<uid> <stat1,stat2,stat3..> [<
 	}
 
 	std::vector< std::string > stats;
-	NLMISC::splitString( args[1],",",stats );
+	NLMISC::splitString(args[1],",",stats);
 	uint32 i=0;
 	
 	for (i = 0; i < stats.size(); i++)
@@ -2515,8 +2562,8 @@ NLMISC_COMMAND(getServerStats,"get server stats","<uid> <stat1,stat2,stat3..> [<
 				fromString(args[3], pos.y);
 			}
 			pos.z = 0;
-			CRyzomTime::EWeather weather = WeatherEverywhere.getWeather( pos, CTimeDateSeasonManager::getRyzomTimeReference() );
-			log.displayNL( "%u", (uint)weather );
+			CRyzomTime::EWeather weather = WeatherEverywhere.getWeather(pos, CTimeDateSeasonManager::getRyzomTimeReference());
+			log.displayNL("%u", (uint)weather);
 		}
 	}
 
@@ -2886,7 +2933,7 @@ NLMISC_COMMAND(sendMessageToUser, "send a message to a user", "<player name> <me
 	SM_STATIC_PARAMS_1(params,STRING_MANAGER::literal);
 	params[0].Literal = args[1];
 
-	CCharacter::sendDynamicSystemMessage(target->getId(), "LITERAL", params );
+	CCharacter::sendDynamicSystemMessage(target->getId(), "LITERAL", params);
 	log.displayNL("OK");
 	return true;
 }
@@ -2915,7 +2962,7 @@ NLMISC_COMMAND(setGuildPoints, "get/set the guild points", "<uid> <value>")
 {
 	GET_ACTIVE_CHARACTER
 
-	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
+	CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
 	if (guild)
 	{
 		uint32 points = guild->getXP();
@@ -2990,12 +3037,12 @@ NLMISC_COMMAND(addPlayerPet, "add a pet to player", "<uid> <sheetid> [size] [nam
 	if (args.size() == 4)
 		customName.fromUtf8(args[3]);
 	
-	if( ticket != CSheetId::Unknown )
+	if (ticket != CSheetId::Unknown)
 	{
 		CGameItemPtr item = c->createItemInInventoryFreeSlot(INVENTORIES::bag, 1, 1, ticket);
-		if( item != 0 )
+		if (item != 0)
 		{
-			if ( ! c->addCharacterAnimal( ticket, 0, item, size, customName))
+			if (! c->addCharacterAnimal(ticket, 0, item, size, customName))
 			{
 				item.deleteItem();
 				log.displayNL("ERR: CAN'T ADD ANIMAL");
@@ -3037,7 +3084,11 @@ NLMISC_COMMAND(setPlayerPetSheetid, "change the sheetid of a player pet", "<uid>
 			c->setAnimalPosition(index, x, y);
 		}
 
-		c->spawnCharacterAnimal(index);
+		if (!c->spawnCharacterAnimal(index))
+		{
+			log.displayNL("ERR: invalid spawn");
+			return true;
+		}
 	}
 	else
 	{
@@ -3185,8 +3236,8 @@ NLMISC_COMMAND(scaleEntity, "change the size of an entity", "<uid> <eid> <scale>
 	if (scale>255)
 		scale = 0;
 		
-	CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, row, DSPropertyVPB );
-	SET_STRUCT_MEMBER( visualPropertyB, PropertySubData.Scale, scale );
+	CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB(TheDataset, row, DSPropertyVPB);
+	SET_STRUCT_MEMBER(visualPropertyB, PropertySubData.Scale, scale);
 
 	log.displayNL("OK");
 	return true;
@@ -3210,3 +3261,255 @@ NLMISC_COMMAND(setPlayerPetSize, "change the name of a player pet", "<uid> <inde
 	return true;
 }
 
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setVpx, "change/get the vpx of a player", "<uid> <[vpx1,vpx2,vpx3,...]> <[value1,value2,vlaue3,...]>")
+{
+	if (args.size() < 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	std::vector< std::string > vpx;
+	NLMISC::splitString(args[1], ",", vpx);
+
+	string ret = "";
+	if (args.size() == 2)
+	{ // get the values
+		for (uint32 i=0; i<vpx.size(); i++)
+		{
+			string name = vpx[i];
+			uint32 value = 0;
+			if (name == "Sex")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.Sex;
+			else if (name == "HatModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.HatModel;
+			else if (name == "HatColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.HatColor;
+			else if (name == "JacketModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.JacketModel;
+			else if (name == "JacketColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.JacketColor;
+			else if (name == "TrouserModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.TrouserModel;
+			else if (name == "TrouserColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.TrouserColor;
+			else if (name == "WeaponRightHand")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.WeaponRightHand;
+			else if (name == "WeaponLeftHand")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.WeaponLeftHand;
+			else if (name == "ArmModel")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.ArmModel;
+			else if (name == "ArmColor")
+				value = c->getVisualPropertyA().directAccessForStructMembers().PropertySubData.ArmColor;
+			else if (name == "HandsModel")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.HandsModel;
+			else if (name == "HandsColor")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.HandsColor;
+			else if (name == "FeetModel")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.FeetModel;
+			else if (name == "FeetColor")
+				value = c->getVisualPropertyB().directAccessForStructMembers().PropertySubData.FeetColor;
+			else if (name == "MorphTarget1")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget1;
+			else if (name == "MorphTarget2")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget2;
+			else if (name == "MorphTarget3")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget3;
+			else if (name == "MorphTarget4")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget4;
+			else if (name == "MorphTarget5")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget5;
+			else if (name == "MorphTarget6")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget6;
+			else if (name == "MorphTarget7")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget7;
+			else if (name == "MorphTarget8")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.MorphTarget8;
+			else if (name == "EyesColor")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.EyesColor;
+			else if (name == "Tattoo")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.Tattoo;
+			else if (name == "CharacterHeight")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.CharacterHeight;
+			else if (name == "TorsoWidth")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.TorsoWidth;
+			else if (name == "ArmsWidth")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.ArmsWidth;
+			else if (name == "LegsWidth")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.LegsWidth;
+			else if (name == "BreastSize")
+				value = c->getVisualPropertyC().directAccessForStructMembers().PropertySubData.BreastSize;
+			ret += toString("%d,", value);
+		}
+	}
+	else // set the values
+	{
+		std::vector< std::string > values;
+		NLMISC::splitString(args[2], ",", values);
+
+		if (values.size() != vpx.size())
+			return false;
+
+		for (uint32 i=0; i<vpx.size(); i++)
+		{
+			string name = vpx[i];
+			uint32 value;
+			fromString(values[i], value);
+			
+			if (name == "Sex")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.Sex, value);
+			}
+			else if (name == "HatModel")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.HatModel, value);
+			}
+			else if (name == "HatColor")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.HatColor, value);
+			}
+			else if (name == "JacketModel")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.JacketModel, value);
+			}
+			else if (name == "JacketColor")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.JacketColor, value);
+			}
+			else if (name == "TrouserModel")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.TrouserModel, value);
+			}
+			else if (name == "TrouserColor")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.TrouserColor, value);
+			}
+			else if (name == "WeaponRightHand")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.WeaponRightHand, value);
+			}
+			else if (name == "WeaponLeftHand")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.WeaponLeftHand, value);
+			}
+			else if (name == "ArmModel")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.ArmModel, value);
+			}
+			else if (name == "ArmColor")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyA(), PropertySubData.ArmColor, value);
+			}
+			else if (name == "HandsModel")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyB(), PropertySubData.HandsModel, value);
+			}
+			else if (name == "HandsColor")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyB(), PropertySubData.HandsColor, value);
+			}
+			else if (name == "FeetModel")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyB(), PropertySubData.FeetModel, value);
+			}
+			else if (name == "FeetColor")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyB(), PropertySubData.FeetColor, value);
+			}
+			else if (name == "MorphTarget1")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget1, value);
+			}
+			else if (name == "MorphTarget2")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget2, value);
+			}
+			else if (name == "MorphTarget3")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget3, value);
+			}
+			else if (name == "MorphTarget4")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget4, value);
+			}
+			else if (name == "MorphTarget5")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget5, value);
+			}
+			else if (name == "MorphTarget6")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget6, value);
+			}
+			else if (name == "MorphTarget7")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget7, value);
+			}
+			else if (name == "MorphTarget8")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.MorphTarget8, value);
+			}
+			else if (name == "EyesColor")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.EyesColor, value);
+			}
+			else if (name == "Tattoo")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.Tattoo, value);
+			}
+			else if (name == "CharacterHeight")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.CharacterHeight, value);
+			}
+			else if (name == "TorsoWidth")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.TorsoWidth, value);
+			}
+			else if (name == "ArmsWidth")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.ArmsWidth, value);
+			}
+			else if (name == "LegsWidth")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.LegsWidth, value);
+			}
+			else if (name == "BreastSize")
+			{
+				SET_STRUCT_MEMBER(c->getVisualPropertyC(), PropertySubData.BreastSize, value);
+			}
+		}
+	}
+
+	if (!ret.empty())
+		
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getPlayerGuild, "get player guild informations", "<uid>")
+{
+	GET_ACTIVE_CHARACTER
+
+	CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
+	if (guild)
+	{
+		CGuildMember* member = guild->getMemberFromEId(c->getId());
+
+		if (member)
+		{
+			if (member->getGrade() == EGSPD::CGuildGrade::Leader)
+				log.displayNL("Leader");
+			else if (member->getGrade() == EGSPD::CGuildGrade::HighOfficer)
+				log.displayNL("HighOfficer");
+			else if (member->getGrade() == EGSPD::CGuildGrade::Officer)
+				log.displayNL("Officer");
+			else
+				log.displayNL("Member");
+
+			return true;
+		}
+	}
+
+	log.displayNL("NoGuild");
+	return true;
+}

@@ -630,12 +630,13 @@ void CBuildingManager::registerPlayer( CCharacter * user )
 }
 
 //----------------------------------------------------------------------------
-void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool needDeleteRoom )
+void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool send_url )
 {
 #ifdef NL_DEBUG
 	nlassert(user);
 #endif
 
+	
 	CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, user->getEntityRowId(), DSPropertyCELL );
 	sint32 cell = mirrorCell;
 	if ( !isRoomCell(cell) )
@@ -652,10 +653,17 @@ void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool needDeleteR
 		return;
 	}
 	// remove a reference from the room
-	_RoomInstances[idx].Ptr->removeUser( user );
+	_RoomInstances[idx].Ptr->removeUser( user, send_url, _RoomInstances[idx].Persistant);
 
-	if (needDeleteRoom)
+	if (!_RoomInstances[idx].Persistant)
+	{
+		nlinfo("remove and delete room");
 		deleteRoom(cell);
+	}
+	else
+	{
+		nlinfo("remove NO delete room");
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -682,12 +690,13 @@ void CBuildingManager::deleteRoom(sint32 cell)
 		delete _RoomInstances[idx].Ptr;
 		_RoomInstances[idx].Ptr = NULL;
 		_RoomInstances[idx].NextFreeId = _FirstFreeRoomId;
+		_RoomInstances[idx].Persistant = false;
 		_FirstFreeRoomId = idx;
 	}
 }
 
 //----------------------------------------------------------------------------
-IRoomInstance *  CBuildingManager::allocateRoom( sint32 & cellRet, BUILDING_TYPES::TBuildingType type)
+IRoomInstance *  CBuildingManager::allocateRoom( sint32 & cellRet, BUILDING_TYPES::TBuildingType type, bool persistant)
 {
 	// update room vector
 	if ( _FirstFreeRoomId >= _RoomInstances.size() )
@@ -706,6 +715,8 @@ IRoomInstance *  CBuildingManager::allocateRoom( sint32 & cellRet, BUILDING_TYPE
 		nlwarning("<BUILDING>invalid room type %d",type);
 		return NULL;
 	}
+	
+	_RoomInstances[idx].Persistant = persistant;
 	return _RoomInstances[idx].Ptr;
 }
 
@@ -727,6 +738,7 @@ inline void  CBuildingManager::reallocRooms()
 			{
 				_RoomInstances[i].NextFreeId =i+1 ;
 				_RoomInstances[i].Ptr = NULL;
+				_RoomInstances[i].Persistant = false;
 				//allocate the cell in GPMS ( here cell values must be > 0 )
 				NLNET::CMessage msgout("CREATE_INDOOR_UNIT");
 				sint32 cellId = -getRoomCellFromIdx(i);
@@ -741,6 +753,7 @@ inline void  CBuildingManager::reallocRooms()
 		{
 			_RoomInstances[i].NextFreeId = i+1;
 			_RoomInstances[i].Ptr = NULL;
+			_RoomInstances[i].Persistant = false;
 		}
 	}
 
@@ -860,7 +873,7 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 		if ( cellId )
 		{
 			user->tpWanted(x,y,z,true,heading,0xFF,cellId);
-			if ( dest->isGuildRoomDestination() )
+			if ( dest->isGuildRoomDestination() || (user->getPowoCell() != 0 && user->getPowoFlag("guild_inv")))
 				PlayerManager.sendImpulseToClient(user->getId(), "GUILD:OPEN_INVENTORY");
 		}
 		else
