@@ -38,6 +38,7 @@
 #include "shop_type/named_items.h"
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
+#include "guild_manager/guild_member_module.h"
 #include "guild_manager/fame_manager.h"
 #include "building_manager/building_manager.h"
 #include "building_manager/building_physical.h"
@@ -1574,7 +1575,7 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_instance] [can_xp,cant_dead,can_teleport,can_speedup] [access_room_inv,access_guild_room]")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_pos] [can_xp,cant_dead,can_teleport,can_speedup] [access_room_inv,access_guild_room]")
 {
 	if (args.size() < 2)
 		return false;
@@ -1623,12 +1624,44 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 
 					if (args.size () > 3 && args[3] != "*") // Change the default exit by exit of instance building
 					{
-						building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
-						if (building)
+						std::vector< std::string > pos;
+						NLMISC::splitString(args[3], ",", pos);
+						if (pos.size() > 2)
 						{
-							c->setBuildingExitZone(building->getDefaultExitSpawn());
+							sint32 exitx;
+							sint32 exity;
+							fromString(pos[0], exitx);
+							exitx *= 1000;
+							fromString(pos[1], exity);
+							exity *= 1000;
+							if (pos[2] != "*")
+							{
+								sint32 exitcell;
+								fromString(pos[2], exitcell);
+								c->setBuildingExitPos(exitx, exity, exitcell);
+							}
+							else
+								c->setBuildingExitPos(exitx, exity, cell);
 						}
+						else if (pos.size() > 1)
+						{
+							sint32 exitx;
+							sint32 exity;
+							fromString(pos[0], exitx);
+							exitx *= 1000;
+							fromString(pos[1], exity);
+							exity *= 1000;
+							c->setBuildingExitPos(exitx, exity, 0);
+						}
+						else
+						{
+							building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[3]);
+							if (building)
+								c->setBuildingExitZone(building->getDefaultExitSpawn());
+						}
+					
 					}
+					
 					log.displayNL("%d", cell);
 				} else {
 					log.displayNL("ERR: invalid cell");
@@ -2128,10 +2161,10 @@ NLMISC_COMMAND(killPlayer,"Kill a player","<uid>")
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientation groupname x y look cell")
+NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion spawnbot orientation groupname x y z look cell")
 {
 
-	if (args.size () < 10)
+	if (args.size () < 12)
 	{
 		log.displayNL("ERR: invalid arg count");
 		return false;
@@ -2177,43 +2210,51 @@ NLMISC_COMMAND(spawn, "spawn entity", "<uid> quantity sheet dispersion orientati
 	}
 
 	bool spawnBots = true;
+	fromString(args[4], spawnBots);
 
-	if (isChar && args[4] == "self")
+	if (isChar && args[5] == "self")
 	{
 		orientation = (sint32)(c->getHeading() * 1000.0);
 	}
-	else if (args[4] != "random")
+	else if (args[5] != "random")
 	{
-		NLMISC::fromString(args[4], orientation);
+		NLMISC::fromString(args[5], orientation);
 		orientation = (sint32)((double)orientation / 360.0 * (NLMISC::Pi * 2.0) * 1000.0);
 	}
 
-	string botsName = args[5];
+	string botsName = args[6];
 		
 	float userX;
-	NLMISC::fromString(args[6], userX);
+	NLMISC::fromString(args[7], userX);
 	x = (sint32)(userX * 1000.0);
 
 	float userY;
-	NLMISC::fromString(args[7], userY);
+	NLMISC::fromString(args[8], userY);
 	y = (sint32)(userY * 1000.0);
 
-	string look;
-	if (args[8] != "*")
+	float userZ;
+	if (args[9] != "*")
 	{
-		look = args[8];
+		NLMISC::fromString(args[9], userZ);
+		z = (sint32)(userZ * 1000.0);
+	}
+
+	string look;
+	if (args[10] != "*")
+	{
+		look = args[10];
 		if (look.find(".creature") == string::npos)
 			look += ".creature";
 	}
 
-	if (isChar && args[9] == "*")
+	if (isChar && args[11] == "*")
 	{
 		TDataSetRow dsr = c->getEntityRowId();
 		CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 		cell = srcCell;
 	}
 	else
-		NLMISC::fromString(args[9], cell);
+		NLMISC::fromString(args[11], cell);
 
 	CContinent * continent = CZoneManager::getInstance().getContinent(x, y);
 
@@ -3440,6 +3481,35 @@ NLMISC_COMMAND(setVpx, "change/get the vpx of a player", "<uid> <[vpx1,vpx2,vpx3
 	}
 
 	if (!ret.empty())
-		log.displayNL("%s", ret.c_str());
+		
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(getPlayerGuild, "get player guild informations", "<uid>")
+{
+	GET_ACTIVE_CHARACTER
+
+	CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
+	if (guild)
+	{
+		CGuildMember* member = guild->getMemberFromEId(c->getId());
+
+		if (member)
+		{
+			if (member->getGrade() == EGSPD::CGuildGrade::Leader)
+				log.displayNL("Leader");
+			else if (member->getGrade() == EGSPD::CGuildGrade::HighOfficer)
+				log.displayNL("HighOfficer");
+			else if (member->getGrade() == EGSPD::CGuildGrade::Officer)
+				log.displayNL("Officer");
+			else
+				log.displayNL("Member");
+
+			return true;
+		}
+	}
+
+	log.displayNL("NoGuild");
 	return true;
 }
