@@ -1248,12 +1248,12 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 				fromString(res[0], fx);
 				x =  sint32(fx*1000);
 				fromString(res[1], fy);
-				y =  sint32(fx*1000);
+				y =  sint32(fy*1000);
 			}
 			if (res.size() >= 3)
 			{
 				fromString(res[2], fz);
-				z =  sint32(fx*1000);
+				z =  sint32(fz*1000);
 			}
 		}
 		else if ( value.find('@') != string::npos )
