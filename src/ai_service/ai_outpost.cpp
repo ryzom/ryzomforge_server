@@ -870,7 +870,7 @@ void COutpost::createSquad(CGroupDesc<COutpostSquadFamily> const* groupDesc, COu
 	}*/
 	
 	grp->setOutpostSide(side);
-	grp->setOutpostFactions(side);
+	grp->setOutpostFactions(getAliasString(), side);
 
 	grp->_AggroRange = 25;
 	grp->_UpdateNbTicks = 10;
@@ -895,6 +895,10 @@ void COutpost::createSquad(CGroupDesc<COutpostSquadFamily> const* groupDesc, COu
 void COutpost::spawnSquad(uint32 groupId)
 {
 	OUTPOST_DBG( "Outpost %s: Spawning squad 0x%08x", getName().c_str(), groupId );
+
+	setAttackerAlliance(_AttackerAllianceId);
+
+	
 	FOREACH(itManager, CAliasCont<COutpostManager>, _Managers)
 	{
 		COutpostManager* manager = *itManager;
