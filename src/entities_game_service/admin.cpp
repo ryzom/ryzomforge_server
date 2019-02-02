@@ -1226,7 +1226,10 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 
 	float fx = 0, fy = 0, fz = 0;
 	sint32 x = 0, y = 0, z = 0;
-	sint32 cell = 0;
+
+	TDataSetRow dsr = e->getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> playerCell(TheDataset, dsr, DSPropertyCELL);
+	sint32 cell = playerCell;
 
 	if (get)
 	{
