@@ -371,6 +371,7 @@ bool CPlace::build(const NLLIGO::CPrimZone * zone,uint16 id, bool reportAutorise
 				// we dont add special respawn points ( outposts,... ) because they are validated separatly from the place where they are
 				else if ( spawn->getType() == RESPAWN_POINT::KAMI ||
 					spawn->getType() == RESPAWN_POINT::KARAVAN ||
+					spawn->getType() == RESPAWN_POINT::RANGER ||
 					spawn->getType() == RESPAWN_POINT::NEWBIELAND ||
 					spawn->getType() == RESPAWN_POINT::RESPAWNABLE )
 				{
@@ -1139,6 +1140,7 @@ bool CZoneManager::parseTpSpawnZones( const NLLIGO::IPrimitive* prim )
 			if ( zone.getType() == RESPAWN_POINT::KAMI ||
 				zone.getType() == RESPAWN_POINT::KARAVAN ||
 				zone.getType() == RESPAWN_POINT::NEWBIELAND ||
+				zone.getType() == RESPAWN_POINT::RANGER ||
 				zone.getType() == RESPAWN_POINT::RESPAWNABLE )
 			{
 				bool found = false;
