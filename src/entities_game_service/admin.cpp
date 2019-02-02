@@ -1224,6 +1224,7 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 
 	vector<string> res;
 
+	float fx = 0, fy = 0, fz = 0;
 	sint32 x = 0, y = 0, z = 0;
 
 	TDataSetRow dsr = e->getEntityRowId();
@@ -1232,13 +1233,13 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 
 	if (get)
 	{
-		x = e->getState().X() / 1000;
-		y = e->getState().Y() / 1000;
-		z = e->getState().Z() / 1000;
+		fx = e->getState().X() / 1000;
+		fy = e->getState().Y() / 1000;
+		fz = e->getState().Z() / 1000;
 		if (cell < 0)
-			value = toString ("%d,%d,%d@%d", x, y, z, -cell);
-		else
-			value = toString ("%d,%d,%d", x, y, z);
+                        value = toString ("%2.f,%2.f,%2.f@%d", fx, fy, fz, -cell);
+                else
+                        value = toString ("%2.f,%2.f,%2.f", fx, fy, fz);
 	}
 	else
 	{
@@ -1247,15 +1248,15 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 			explode (value, string(","), res);
 			if (res.size() >= 2)
 			{
-				fromString(res[0], x);
-				x *= 1000;
-				fromString(res[1], y);
-				y *= 1000;
+				fromString(res[0], fx);
+				x =  sint32(fx*1000);
+				fromString(res[1], fy);
+				y =  sint32(fy*1000);
 			}
 			if (res.size() >= 3)
 			{
-				fromString(res[2], z);
-				z *= 1000;
+				fromString(res[2], fz);
+				z =  sint32(fz*1000);
 			}
 		}
 		else if ( value.find('@') != string::npos )
