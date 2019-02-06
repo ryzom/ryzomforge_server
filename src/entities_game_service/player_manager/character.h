@@ -2079,6 +2079,10 @@ public:
 	void setPowoCell(sint32 cell);
 	sint32 getPowoCell() const;
 
+	void setPowoScope(const std::string &scope);
+	const std::string &getPowoScope() const;
+
+
 	/// get if player have acces to room
 	bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
 
@@ -3611,6 +3615,7 @@ private:
 	std::vector<NLMISC::CEntityId> _RoomersList; // Players who have acces to player's room
 	NLMISC::CEntityId _inRoomOfPlayer;
 	sint32 _PowoCell;
+	std::string _PowoScope;
 
 	// friends list
 	std::vector<CContactId> _FriendsList;
