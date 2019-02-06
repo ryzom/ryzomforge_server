@@ -16837,10 +16837,21 @@ void CCharacter::setPowoCell(sint32 cell)
 	_PowoCell = cell;
 }
 
+void CCharacter::setPowoScope(const string &scope)
+{
+	_PowoScope = scope;
+}
+
 sint32 CCharacter::getPowoCell() const
 {
 	return _PowoCell;
 }
+
+const string& CCharacter::getPowoScope() const
+{
+	return _PowoScope;
+}
+
 
 //--------------------------------------------------------------
 // CCharacter::havePlayerRoomAccess
