@@ -5626,7 +5626,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 	}
 
 
-	if (_PowoCell != cell) // leave the current Powo
+	if (_PowoCell != 0 && _PowoCell != cell) // leave the current Powo
 	{
 		// open url
 		sendUrl(toString("app_ryzhome action=quit_powo&powo=%d", _PowoCell), "");
