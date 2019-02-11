@@ -1575,7 +1575,7 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_pos] [can_xp,cant_dead,can_teleport,can_speedup] [access_room_inv,access_guild_room]")
+NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_pos] [can_xp,cant_dead,can_teleport,can_speedup] [access_room_inv,access_guild_room] [scope]")
 {
 	if (args.size() < 2)
 		return false;
@@ -1615,6 +1615,9 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 				{
 					nlinfo("Powo Flags : %s", powoFlags.c_str());
 					c->setPowoCell(cell);
+					if (args.size() > 6)
+						c->setPowoScope(args[6]);
+					
 					c->setPowoFlag("xp", powoFlags[0] == '1');
 					c->setPowoFlag("dead", powoFlags[1] == '1');
 					c->setPowoFlag("teleport", powoFlags[2] == '1');
@@ -1659,7 +1662,6 @@ NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [insta
 							if (building)
 								c->setBuildingExitZone(building->getDefaultExitSpawn());
 						}
-					
 					}
 					
 					log.displayNL("%d", cell);
@@ -1754,30 +1756,71 @@ NLMISC_COMMAND(kickPlayersFromPowo, "kick players from powo", "<player1,player2,
 		return false;
 	}
 
-	
-	std::vector< std::string > players;
-	NLMISC::splitString(args[0], ",", players);
 	sint32 powo;
 	fromString(args[1], powo);
 	
-	for (uint32 i=0; i < players.size(); i++)
+	if (args[0] == "*")
 	{
-		CCharacter * player = PlayerManager.getCharacterByName(players[i]);
-		if (player && player->getPowoCell() == powo)
+		for (CPlayerManager::TMapPlayers::const_iterator it = PlayerManager.getPlayers().begin(); it != PlayerManager.getPlayers().end(); ++it)
 		{
-			const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(player->getBuildingExitZone());
-			if (zone)
+			if ((*it).second.Player != 0)
 			{
-				sint32 x, y, z;
-				float heading;
-				zone->getRandomPoint(x, y, z, heading);
-				player->tpWanted(x, y, z, true, heading);
+				CCharacter * player = (*it).second.Player->getActiveCharacter();
+				if (player && player->getPowoCell() == powo)
+				{
+					CVector exitPos = player->getBuildingExitPos();
+					if (exitPos.x != 0)
+					{
+						player->tpWanted(exitPos.x, exitPos.y, exitPos.z);
+					}
+					else
+					{
+						const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(player->getBuildingExitZone());
+						if (zone)
+						{
+							sint32 x, y, z;
+							float heading;
+							zone->getRandomPoint(x, y, z, heading);
+							player->tpWanted(x, y, z, true, heading);
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		std::vector< std::string > players;
+		NLMISC::splitString(args[0], ",", players);
+		
+		for (uint32 i=0; i < players.size(); i++)
+		{
+			CCharacter * player = PlayerManager.getCharacterByName(players[i]);
+			if (player && player->getPowoCell() == powo)
+			{
+				CVector exitPos = player->getBuildingExitPos();
+				if (exitPos.x != 0)
+				{
+					player->tpWanted(exitPos.x, exitPos.y, exitPos.z);
+				}
+				else
+				{
+					const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(player->getBuildingExitZone());
+					if (zone)
+					{
+						sint32 x, y, z;
+						float heading;
+						zone->getRandomPoint(x, y, z, heading);
+						player->tpWanted(x, y, z, true, heading);
+					}
+				}
 			}
 		}
 	}
 
 	return true;
 }
+
 
 
 
@@ -3481,7 +3524,7 @@ NLMISC_COMMAND(setVpx, "change/get the vpx of a player", "<uid> <[vpx1,vpx2,vpx3
 	}
 
 	if (!ret.empty())
-		
+		log.displayNL("%s", ret.c_str());
 	return true;
 }
 
