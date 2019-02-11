@@ -35,6 +35,8 @@
 #include "server_share/pet_interface_msg.h"
 #include "server_share/r2_vision.h"
 
+#include "outpost_manager/outpost_manager.h"
+
 // Misc
 #include "nel/misc/string_conversion.h"
 
@@ -2464,6 +2466,9 @@ public:
 	/// get the current outpost zone where the player is
 	/// returns an invalid alias if the player is not in a outpost zone
 	TAIAlias getCurrentOutpostZone() const;
+	/// returns the state of the outpost where player are
+	OUTPOSTENUMS::TOutpostState getCurrentOutpostState() const; 
+	
 	/// player enters in a PVP zone, send appropriate client message
 	void enterPVPZone(uint32 pvpZoneType) const;
 	/// character enter in versus pvp zone, player must choose a clan
@@ -3789,6 +3794,8 @@ private:
 	TAIAlias _CurrentPVPZone;
 	/// the outpost zone where the player is
 	TAIAlias _CurrentOutpostZone;
+	/// state of current outpost
+	OUTPOSTENUMS::TOutpostState _CurrentOutpostState;
 	/// region where player character are killed in PvP situation
 	uint16 _RegionKilledInPvp;
 	//@}

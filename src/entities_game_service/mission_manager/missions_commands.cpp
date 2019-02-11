@@ -3524,7 +3524,7 @@ NLMISC_COMMAND(setVpx, "change/get the vpx of a player", "<uid> <[vpx1,vpx2,vpx3
 	}
 
 	if (!ret.empty())
-		
+		log.displayNL("%s", ret.c_str());
 	return true;
 }
 
