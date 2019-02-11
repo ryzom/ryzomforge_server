@@ -150,7 +150,7 @@ void setOupostMode_ss_(CStateInstance* entity, CScriptStack& stack)
 	}
 	
 	npcGroup->setOutpostSide(side);
-	npcGroup->setOutpostFactions(side);
+	npcGroup->setOutpostFactions(aliasStr, side);
 	FOREACH(botIt, CCont<CBot>, npcGroup->bots())
 	{
 		CBot* bot = *botIt;
@@ -2968,7 +2968,7 @@ Sets and event to execute when event triggers
 Arguments:
 s(event) -> @param[in] The name of the state 
 s(event) -> @param[in] The name of the event
-s(code) -> @param[in] The code tu execute coded in hex
+s(code) -> @param[in] The string to execute code in hex
 
 @code
 ()maxHitRange(50); // Set the max hit range in 50 meters all npc in group

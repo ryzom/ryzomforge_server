@@ -104,7 +104,6 @@
 #include "modules/client_command_forwarder.h"
 #include "modules/r2_give_item.h"
 #include "modules/shard_unifier_client.h"
-#include "outpost_manager/outpost_manager.h"
 #include "phrase_manager/available_phrases.h"
 #include "phrase_manager/mod_magic_protection_effet.h"
 #include "phrase_manager/phrase_manager.h"
@@ -552,9 +551,13 @@ CCharacter::CCharacter()
 	_DeathPenaltyTimer.setRemaining(1, new CDeathPenaltiesTimerEvent(this), 1);
 	_BarUpdateTimer.setRemaining(1, new CCharacterBarUpdateTimerEvent(this), 1);
 	_BuildingExitZone = 0xffff;
+	_BuildingExitPos = CVector();
+	_BuildingExitPos.x = 0;
+	_BuildingExitPos.y = 0;
 	_RespawnMainLandInTown = false;
 	_CurrentPVPZone = CAIAliasTranslator::Invalid;
 	_CurrentOutpostZone = CAIAliasTranslator::Invalid;
+	_CurrentOutpostState = OUTPOSTENUMS::Peace;
 	resetNextDeathPenaltyFactor();
 	_CurrentDodgeLevel = 1;
 	_BaseDodgeLevel = 1;
@@ -5623,13 +5626,16 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 	}
 
 
-	if (_PowoCell != cell) // leave the current Powo
+	if (_PowoCell != 0 && _PowoCell != cell) // leave the current Powo
 	{
+		// open url
+		sendUrl(toString("app_ryzhome action=quit_powo&powo=%d", _PowoCell), "");
 		resetPowoFlags();
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
+		getRespawnPoints().setArkRespawnpoint(0, 0, 0);
 	}
-	else
+	else if (_PowoCell == 0)
 		CBuildingManager::getInstance()->removePlayerFromRoom(this);
 
 
@@ -5857,7 +5863,7 @@ sint32 CCharacter::getMountOrFirstPetSlot()
 	return slot;
 }
 
-// CCharacter::getPets with stringlike M0PPAA (M=Mount, P=Packer, A=Animal, 0=None)
+// CCharacter::getPets with string like M[0-5]X[0-5]P[0-5]P[0-5]A[0-5]A[0-5] (M=Mount, P=Packer, A=Animal, X=None, 0= ot_present, 1=waiting_spawn, 2=landscape, 3=stable, 4=death, 5=tp_continent)
 //-----------------------------------------------
 string CCharacter::getPets()
 {
@@ -5874,10 +5880,16 @@ string CCharacter::getPets()
 				pets += "P";
 			else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
 				pets += "A";
+			
+			CPetAnimal::TStatus status = _PlayerPets[i].PetStatus;
+			if (status !=  CPetAnimal::db_unknown)
+				pets += toString("%d", (uint32)(status));
+			else
+				pets += "0";
 		}
 		else
 		{
-			pets += "0";
+			pets += "X0";
 		}
 	}
 
@@ -7548,6 +7560,7 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 			if (_PlayerPets[petIndex].IsMounted)
 				continue;
 
+			abortExchange();
 			petCommand = CPetCommandMsg::LIBERATE;
 			break;
 
@@ -16824,10 +16837,21 @@ void CCharacter::setPowoCell(sint32 cell)
 	_PowoCell = cell;
 }
 
-sint32 CCharacter::getPowoCell()
+void CCharacter::setPowoScope(const string &scope)
+{
+	_PowoScope = scope;
+}
+
+sint32 CCharacter::getPowoCell() const
 {
 	return _PowoCell;
 }
+
+const string& CCharacter::getPowoScope() const
+{
+	return _PowoScope;
+}
+
 
 //--------------------------------------------------------------
 // CCharacter::havePlayerRoomAccess
@@ -17167,14 +17191,23 @@ void CCharacter::removeRoomAccesToPlayer(const NLMISC::CEntityId &id, bool kick)
 		if (!TheDataset.isAccessible(getEntityRowId()))
 			return;
 
-		const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
-
-		if (zone)
+		CVector buildingExitPos = target->getBuildingExitPos();
+		if (buildingExitPos.x != 0 && buildingExitPos.y != 0)
 		{
-			sint32 x, y, z;
-			float heading;
-			zone->getRandomPoint(x, y, z, heading);
-			target->tpWanted(x, y, z, true, heading);
+			target->tpWanted(buildingExitPos.x, buildingExitPos.y, 0);
+			target->setBuildingExitPos(0, 0, 0);
+		}
+		else
+		{
+			const CTpSpawnZone* zone = CZoneManager::getInstance().getTpSpawnZone(target->getBuildingExitZone());
+
+			if (zone)
+			{
+				sint32 x, y, z;
+				float heading;
+				zone->getRandomPoint(x, y, z, heading);
+				target->tpWanted(x, y, z, true, heading);
+			}
 		}
 	}
 }
@@ -18080,7 +18113,7 @@ bool CCharacter::changeCurrentHp(sint32 deltaValue, TDataSetRow responsibleEntit
 //--------------------------------------------------------------
 //	apply goo damage if character is too close than a goo path
 //--------------------------------------------------------------
-void CCharacter::applyGooDamage(float gooDistance)
+void CCharacter::applyGooDamage(float gooDistance, string zoneDamage)
 {
 	uint32 tempTickForGooDamageRate = NBTickForGooDamageRate;
 
@@ -18139,7 +18172,9 @@ void CCharacter::applyGooDamage(float gooDistance)
 							_PhysScores._PhysicalScores[SCORES::hit_points].Current = 0;
 
 							// send message to player for inform is dead by goo or other
-							if (_CurrentContinent == CONTINENT::FYROS)
+							if (!zoneDamage.empty())
+								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_"+toUpper(zoneDamage));
+							else if (_CurrentContinent == CONTINENT::FYROS)
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_FIRE");
 							else if (_CurrentContinent == CONTINENT::TRYKER)
 								sendDynamicSystemMessage(_EntityRowId, "KILLED_BY_STEAM");
@@ -18154,7 +18189,9 @@ void CCharacter::applyGooDamage(float gooDistance)
 								= _PhysScores._PhysicalScores[SCORES::hit_points].Current - hpLost;
 
 							// send message to player for inform is suffer goo damage
-							if (_CurrentContinent == CONTINENT::FYROS)
+							if (!zoneDamage.empty())
+								sendDynamicSystemMessage(_EntityRowId, "SUFFER_"+toUpper(zoneDamage)+"_DAMAGE");
+							else if (_CurrentContinent == CONTINENT::FYROS)
 								sendDynamicSystemMessage(_EntityRowId, "SUFFER_FIRE_DAMAGE");
 							else if (_CurrentContinent == CONTINENT::TRYKER)
 								sendDynamicSystemMessage(_EntityRowId, "SUFFER_STEAM_DAMAGE");
@@ -20110,6 +20147,8 @@ void CCharacter::outpostOpenChooseSideDialog(TAIAlias outpostId)
 		return;
 	}
 
+	OUTPOSTENUMS::TOutpostState state = outpost->getState();
+	bool outpostInFire = state == OUTPOSTENUMS::AttackBefore || state == OUTPOSTENUMS::AttackRound || state == OUTPOSTENUMS::DefenseBefore || state == OUTPOSTENUMS::DefenseRound;
 	bool playerGuildIsAttacker = false;
 	bool playerGuildInConflict = isGuildInConflictWithOutpost(outpostId, playerGuildIsAttacker);
 
@@ -20152,6 +20191,7 @@ void CCharacter::outpostOpenChooseSideDialog(TAIAlias outpostId)
 		return;
 	}
 
+	bms.serial(outpostInFire);
 	bms.serial(playerGuildInConflict);
 	bms.serial(playerGuildIsAttacker);
 	// always Display the guild names in the interface
@@ -20220,19 +20260,24 @@ void CCharacter::outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side)
 		return;
 	}
 
-	if (!neutral)
+	CSmartPtr<COutpost> outpost = COutpostManager::getInstance().getOutpostFromAlias(_OutpostIdBeforeUserValidation);
+	if (!outpost)
+		return;
+
+	OUTPOSTENUMS::TOutpostState state = outpost->getState();
+	bool outpostInFire = state == OUTPOSTENUMS::AttackBefore || state == OUTPOSTENUMS::AttackRound || state == OUTPOSTENUMS::DefenseBefore || state == OUTPOSTENUMS::DefenseRound;
+
+	CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
+
+	if (!neutral || outpostInFire)
 	{
 		// validate outpost alias
 		setOutpostAlias(_OutpostIdBeforeUserValidation);
-		CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
 
 		if (guild != NULL)
 		{
 			// he his guild owns the outpost he can only help his guild
-			if (_GuildId
-					== COutpostManager::getInstance()
-					.getOutpostFromAlias(_OutpostIdBeforeUserValidation)
-					->getOwnerGuild())
+			if (_GuildId == outpost->getOwnerGuild())
 			{
 				setOutpostSide(OUTPOSTENUMS::OutpostOwner);
 				_OutpostIdBeforeUserValidation = 0;
@@ -20252,26 +20297,29 @@ void CCharacter::outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side)
 		}
 
 		// check : if outpost belongs to a tribe the choice can only be attacker
-		CSmartPtr<COutpost> outpost
-			= COutpostManager::getInstance().getOutpostFromAlias(_OutpostIdBeforeUserValidation);
-
-		if (outpost)
+		if (outpost->isBelongingToAGuild() == false)
 		{
-			if (outpost->isBelongingToAGuild() == false)
+			if (side != OUTPOSTENUMS::OutpostAttacker)
 			{
-				if (side != OUTPOSTENUMS::OutpostAttacker)
-				{
-					nlwarning("<CCharacter::outpostSideChosen> Outpost %s belongs to a tribe but entity %s wants to "
-							  "help tribe, hack ?",
-							  CPrimitivesParser::aliasToString(_OutpostIdBeforeUserValidation).c_str(),
-							  _Id.toString().c_str());
-					side = OUTPOSTENUMS::OutpostAttacker;
-				}
+				nlwarning("<CCharacter::outpostSideChosen> Outpost %s belongs to a tribe but entity %s wants to "
+						  "help tribe, hack ?",
+						  CPrimitivesParser::aliasToString(_OutpostIdBeforeUserValidation).c_str(),
+						  _Id.toString().c_str());
+				side = OUTPOSTENUMS::OutpostAttacker;
 			}
 		}
 
-		// his guild doesn't participate in outpost conflict so he can choose the side he wants
-		setOutpostSide(side);
+		// his guild doesn't participate in outpost conflict but player don't made a choice when op is under attack => random
+		if (neutral && outpostInFire)
+		{
+			if (uint32(RandomGenerator.rand(1)) == 0)
+				setOutpostSide(OUTPOSTENUMS::OutpostOwner);
+			else
+				setOutpostSide(OUTPOSTENUMS::OutpostAttacker);
+		}
+		else
+			// his guild doesn't participate in outpost conflict so he can choose the side he wants
+			setOutpostSide(side);
 	}
 
 	_OutpostIdBeforeUserValidation = 0;
@@ -22294,6 +22342,16 @@ bool CCharacter::isSitting() const
 
 //------------------------------------------------------------------------------
 
+void CCharacter::setBuildingExitPos(sint32 x, sint32 y, sint32 cell)
+{
+	_BuildingExitPos.x = x;
+	_BuildingExitPos.y = y;
+	_BuildingExitPos.z = cell;
+}
+
+
+//------------------------------------------------------------------------------
+
 void CCharacter::setBuildingExitZone(uint16 zoneIdx)
 {
 	_BuildingExitZone = zoneIdx;
@@ -22551,6 +22609,9 @@ void CCharacter::setCurrentPVPZone(TAIAlias alias)
 void CCharacter::setCurrentOutpostZone(TAIAlias alias)
 {
 	_CurrentOutpostZone = alias;
+	CSmartPtr<COutpost> outpost = COutpostManager::getInstance().getOutpostFromAlias(alias);
+	if (outpost)
+		_CurrentOutpostState = outpost->getState();
 }
 
 //------------------------------------------------------------------------------

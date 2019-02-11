@@ -397,6 +397,7 @@ AdminCommandsInit[] =
 		"eventSetBotFacing",				true,
 		"eventGiveControl",					true,
 		"eventLeaveControl",				true,
+		"eventSpawnDamageLine",				true,
 
 		"setOrganization",					true,
 		"setOrganizationStatus", 			true,
@@ -1223,16 +1224,22 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 
 	vector<string> res;
 
+	float fx = 0, fy = 0, fz = 0;
 	sint32 x = 0, y = 0, z = 0;
-	sint32 cell = 0;
+
+	TDataSetRow dsr = e->getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> playerCell(TheDataset, dsr, DSPropertyCELL);
+	sint32 cell = playerCell;
 
 	if (get)
 	{
-		x = e->getState().X() / 1000;
-		y = e->getState().Y() / 1000;
-		z = e->getState().Z() / 1000;
-
-		value = toString ("%d,%d,%d", x, y, z);
+		fx = e->getState().X() / 1000.f;
+		fy = e->getState().Y() / 1000.f;
+		fz = e->getState().Z() / 1000.f;
+		if (cell < 0)
+			value = toString ("%.2f,%.2f,%.2f@%d", fx, fy, fz, -cell);
+		else
+			value = toString ("%.2f,%.2f,%.2f", fx, fy, fz);
 	}
 	else
 	{
@@ -1241,15 +1248,15 @@ ENTITY_VARIABLE(Position, "Position of a player (in meter) <eid> <posx>,<posy>[,
 			explode (value, string(","), res);
 			if (res.size() >= 2)
 			{
-				fromString(res[0], x);
-				x *= 1000;
-				fromString(res[1], y);
-				y *= 1000;
+				fromString(res[0], fx);
+				x =  sint32(fx*1000);
+				fromString(res[1], fy);
+				y =  sint32(fy*1000);
 			}
 			if (res.size() >= 3)
 			{
-				fromString(res[2], z);
-				z *= 1000;
+				fromString(res[2], fz);
+				z =  sint32(fz*1000);
 			}
 		}
 		else if ( value.find('@') != string::npos )
@@ -8577,6 +8584,30 @@ NLMISC_COMMAND(eventSpawnToxic, "Spawn a toxic cloud", "<player eid> <posXm> <po
 	}
 	return true;
 }
+
+//----------------------------------------------------------------------------
+/*
+/a eventSpawnDamageLine test_ulu 40900,-12198|40651,-12148 teanwen_haleine
+ */
+NLMISC_COMMAND(eventSpawnDamageLine, "Spawn a damage line", "<player eid> <name> [<px1,py1|px2,py2|...>] [<dammage>]" )
+{
+	if ( args.size() < 2 )
+		return false;
+
+	GET_CHARACTER
+	string path = "";
+	if (args.size() > 2 )
+		path = args[2];
+
+	string dammage = "";
+	if (args.size() > 3 )
+		dammage = args[3];
+	
+	CZoneManager::getInstance().parseGooBorder( args[1], path, dammage );
+	
+	return true;
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(useCatalyser, "use an xp catalyser", "<eId> [<slot in bag>]")

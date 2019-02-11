@@ -35,6 +35,8 @@
 #include "server_share/pet_interface_msg.h"
 #include "server_share/r2_vision.h"
 
+#include "outpost_manager/outpost_manager.h"
+
 // Misc
 #include "nel/misc/string_conversion.h"
 
@@ -1642,7 +1644,7 @@ public:
 	void setCurrentStable(uint16 stable, uint16 placeId);
 
 	// apply goo damage if character is too close than a goo path
-	void applyGooDamage(float gooDistance);
+	void applyGooDamage(float gooDistance, std::string zoneDamage);
 
 	/// get the valid state of melee combat
 	bool meleeCombatIsValid() const;
@@ -2075,7 +2077,11 @@ public:
 	const NLMISC::CEntityId &getInRoomOfPlayer();
 
 	void setPowoCell(sint32 cell);
-	sint32 getPowoCell();
+	sint32 getPowoCell() const;
+
+	void setPowoScope(const std::string &scope);
+	const std::string &getPowoScope() const;
+
 
 	/// get if player have acces to room
 	bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
@@ -2326,6 +2332,13 @@ public:
 	/// reset used TP ticket slot, necessary to allow user to use another ticket
 	void resetTpTicketSlot();
 
+
+	/// set building exit pos
+	void setBuildingExitPos(sint32 x, sint32 y, sint32 cell);
+
+	/// get building exit pos
+	NLMISC::CVector getBuildingExitPos() const;
+
 	/// set building exit zone
 	void setBuildingExitZone(uint16 zoneIdx);
 
@@ -2453,6 +2466,9 @@ public:
 	/// get the current outpost zone where the player is
 	/// returns an invalid alias if the player is not in a outpost zone
 	TAIAlias getCurrentOutpostZone() const;
+	/// returns the state of the outpost where player are
+	OUTPOSTENUMS::TOutpostState getCurrentOutpostState() const; 
+	
 	/// player enters in a PVP zone, send appropriate client message
 	void enterPVPZone(uint32 pvpZoneType) const;
 	/// character enter in versus pvp zone, player must choose a clan
@@ -3599,6 +3615,7 @@ private:
 	std::vector<NLMISC::CEntityId> _RoomersList; // Players who have acces to player's room
 	NLMISC::CEntityId _inRoomOfPlayer;
 	sint32 _PowoCell;
+	std::string _PowoScope;
 
 	// friends list
 	std::vector<CContactId> _FriendsList;
@@ -3717,6 +3734,7 @@ private:
 	uint32 _MaxPriceFilter;
 
 	uint16 _BuildingExitZone;
+	NLMISC::CVector _BuildingExitPos;
 
 	// used for force respawn player who are in a mainland in town of this mainland
 	bool _RespawnMainLandInTown;
@@ -3776,6 +3794,8 @@ private:
 	TAIAlias _CurrentPVPZone;
 	/// the outpost zone where the player is
 	TAIAlias _CurrentOutpostZone;
+	/// state of current outpost
+	OUTPOSTENUMS::TOutpostState _CurrentOutpostState;
 	/// region where player character are killed in PvP situation
 	uint16 _RegionKilledInPvp;
 	//@}
@@ -4013,6 +4033,9 @@ private:
 	bool _PowoCanTeleport;
 	bool _PowoCanSpeedUp;
 	bool _PowoCanDP;
+	
+	bool _PowoCanAccesRoomInv;
+	bool _PowoCanAccessGuildInv;
 
 	uint32 _LastTpTick;
 	uint32 _LastOverSpeedTick;
@@ -4087,6 +4110,12 @@ public:
 		if (flag == "dp")
 			return _PowoCanDP;
 
+		if (flag == "guild_inv")
+			return _PowoCanAccessGuildInv;
+
+		if (flag == "room_inv")
+			return _PowoCanAccesRoomInv;
+
 		return false;
 	}
 
@@ -4095,17 +4124,23 @@ public:
 		if (flag == "xp")
 			_PowoCanXP = value;
 
-		if (flag == "dead")
+		else if (flag == "dead")
 			_PowoCantDead = value;
 
-		if (flag == "teleport")
+		else if (flag == "teleport")
 			_PowoCanTeleport = value;
 
-		if (flag == "speed")
+		else if (flag == "speed")
 			_PowoCanSpeedUp = value;
 
-		if (flag == "dp")
+		else if (flag == "dp")
 			_PowoCanDP = value;
+
+		else if (flag == "guild_inv")
+			_PowoCanAccessGuildInv = value;
+
+		else if (flag == "room_inv")
+			_PowoCanAccesRoomInv = value;
 
 		return true;
 	}
