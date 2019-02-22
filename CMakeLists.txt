@@ -107,4 +107,21 @@ ENDIF()
 FIND_PACKAGE(NeL REQUIRED)
 INCLUDE_DIRECTORIES(${NEL_INCLUDE_DIRS})
 
-ADD_SUBDIRECTORY(ryzom)
+#-----------------------------------------------------------------------------
+#Platform specifics
+FIND_PACKAGE(RyzomGameShare REQUIRED)
+
+INCLUDE_DIRECTORIES(${RYZOM_GAMESHARE_INCLUDE_DIRS})
+
+SET(RZ_SERVER_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+# Need servershare for build packed collision tool
+# Need aishare for build wmap tool
+FIND_PACKAGE(MySQL REQUIRED)
+FIND_PACKAGE(Mongo)
+
+IF(MONGO_FOUND)
+  SET(MONGO_DEFINITIONS -DHAVE_MONGO)
+ENDIF()
+
+ADD_SUBDIRECTORY(src)
