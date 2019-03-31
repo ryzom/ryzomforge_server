@@ -23,3 +23,5 @@ if (mysqli_num_rows($result) == 0)
 {
 	die("NOD");
 }
+echo "AOK";
+?>

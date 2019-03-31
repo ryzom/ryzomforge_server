@@ -39,6 +39,7 @@ if (mysqli_num_rows($result) != 0)
 		$query = "INSERT INTO `shard` (`ShardId`, `domain_id`, `WsAddr`, `NbPlayers`, `Name`, `WSOnline`, `ClientApplication`, `Version`, `PatchURL`, `DynPatchURL`, `FixedSessionId`, `State`, `MOTD`) VALUES ".
 			"($id, ".$domainInfo['domain_id'].", NULL, 0, '$desc', 0, '$domain', '', '', '', 0, 'ds_open', '');";
 		$result = mysqli_query($link, $query) or die("DBERR: $query");
-		echo "OK";
 	}
+	echo "OK";
 }
+?>
