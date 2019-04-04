@@ -56,14 +56,14 @@ while true
 do
 	# see if the conditions are right to launch the app
 	if [ -e $CTRL_FILE ]
-		then
+	then
 
 		# a control file exists so read it's contents
 		CTRL_COMMAND=_$(cat $CTRL_FILE)_
 
 		# do we have a 'launch' command?
 		if [ $CTRL_COMMAND = _LAUNCH_ ]
-			then
+		then
 
 			# update the start counter
 			START_COUNTER=$(( $START_COUNTER + 1 ))
@@ -87,7 +87,7 @@ do
 				$EXECUTABLE $CTRL_CMDLINE
 			else
 				$EXECUTABLE $CTRL_CMDLINE
-			if
+			fi
 
 			#notify stop
 			"$CWD/notify.sh" ServiceStopped $NAME

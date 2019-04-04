@@ -29,7 +29,7 @@ then
 	fi
 
 
-elif if [[ "$COMMAND" = "ServiceStoped" ]]
+elif [[ "$COMMAND" = "ServiceStoped" ]]
 then
 	echo "ok"
 fi

@@ -37,9 +37,6 @@ bind O login off
 bindkey "^[[1;5D" prev
 bindkey "^[[1;5C" next
 
-# debug
-echo "Started at $(date) in $SHARD_PATH where pwd are $(pwd)" > /tmp/started.run
-
 # egs
 screen -t EGS /bin/bash $SHARD_PATH/tools/service_launcher.sh egs ../sbin/ryzom_entities_game_service -C../cfgs -L../logs --nobreak --writepid
 
