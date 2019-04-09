@@ -51,7 +51,7 @@ then
 		screen -d -r $(screen -list | grep \\\.${DOMAIN}| sed 's/(.*)//') -X quit > /dev/null
 		if [ -f $SHARD_PATH/run/aes_state.txt ]
 		then
-			rm -rv $SHARD_PATH/run/*
+			rm -r $SHARD_PATH/run/*
 		fi
 	fi
 fi
