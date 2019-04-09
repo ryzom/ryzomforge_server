@@ -19,11 +19,11 @@
 AUTO_RESTART=1
 
 # Web url use to notify and manage apps who need know when a service is started
-NOTIFY_URL_SERVICE_RESTARTED=""
-NOTIFY_URL_KEY=""
+NOTIFY_URL_SERVICE_RESTARTED="https://app.ryzom.com/app_arcc/services_started.php"
+NOTIFY_URL_KEY="C6tLpddu8NJjvhyzBLqjw4uQWRXbGRsQ"
 
 # Use gdb
-USE_GDB=0
+USE_GDB=1
 
 # Notification command
 NOTIFY_COMMAND=""
