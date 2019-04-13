@@ -3219,6 +3219,10 @@ public:
 		return (uint8)_FriendVisibility;
 	}
 
+	inline void doPact(bool value) { _doPact = value; }
+	inline bool doPact() { return _doPact; }
+
+
 	//////////////////
 	// Private members
 	//////////////////
@@ -3756,6 +3760,9 @@ private:
 
 	/// to know if item pre-requisits have to be recomputed (as after a skill/charac update)
 	bool _HaveToUpdateItemsPrerequisit;
+
+	/// to refill used pact automatically after a teleportation
+	bool _doPact;
 
 	///\name PVP related members
 	//@{
