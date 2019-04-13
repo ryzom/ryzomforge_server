@@ -1573,6 +1573,34 @@ NLMISC_COMMAND(setOrg, "set the organization of player", "<uid> <org>")
 	return true;
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setFaction, "set the faction of player", "<uid> <faction> [<civ>]")
+{
+	if (args.size() < 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	PVP_CLAN::TPVPClan faction, nation;
+
+	faction = nation = PVP_CLAN::Unknown;
+
+	if (args.size() > 2)
+	{
+		if (args[2][0] != '*')
+			nation = PVP_CLAN::fromString(args[2].c_str());
+	}
+	if (args[1][0] != '*')
+		faction = PVP_CLAN::fromString(args[1].c_str());
+
+	if (nation != PVP_CLAN::Unknown)
+		c->setDeclaredCiv(nation);
+
+	if (faction != PVP_CLAN::Unknown)
+		c->setDeclaredCult(faction);
+
+	return true;
+}
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(accessPowo, "give access to the powo", "<uid> [playername] [instance] [exit_pos] [can_xp,cant_dead,can_teleport,can_speedup] [access_room_inv,access_guild_room] [scope]")
@@ -3287,7 +3315,7 @@ NLMISC_COMMAND(scaleEntity, "change the size of an entity", "<uid> <eid> <scale>
 }
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(setPlayerPetSize, "change the name of a player pet", "<uid> <index> <size>")
+NLMISC_COMMAND(setPlayerPetSize, "change the size of a player pet", "<uid> <index> <size>")
 {
 	if (args.size() != 3)
 		return false;
