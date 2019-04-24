@@ -7314,6 +7314,11 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 			break;
 		}
 
+		if (_PlayerPets[i].IsInBag)
+		{
+			_PlayerPets[i].AnimalStatus |= ANIMAL_STATUS::InBagFlag;
+		}
+
 		if (TheDataset.isAccessible(_PlayerPets[i].SpawnedPets))
 		{
 			CCreature* c = CreatureManager.getCreature(TheDataset.getEntityId(_PlayerPets[i].SpawnedPets));
@@ -7535,20 +7540,36 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 	{
 		// if the player doesn't have a pet at this index then just continue
 		if (_PlayerPets[petIndex].PetStatus == CPetAnimal::not_present)
-		{
 			continue;
-		}
 
 		// make sure that the player is close enough to the pet to perform the requested action
-		if (petCommandDistance(petIndex) == false && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::FREE)
-		{
+		if (petCommandDistance(petIndex) == false && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::FREE && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::LEAVE_BAG)
 			continue;
-		}
 
 		CPetCommandMsg::TCommand petCommand;
 
 		switch ((ANIMALS_ORDERS::EBeastOrder)command)
 		{
+
+		case ANIMALS_ORDERS::ENTER_BAG:
+			if (_PlayerPets[petIndex].IsInBag)
+				continue;
+
+			lockTicketInInventory();
+			petCommand = CPetCommandMsg::DESPAWN;
+			_PlayerPets[petIndex].IsInBag = true;
+			break;
+
+		case ANIMALS_ORDERS::LEAVE_BAG:
+			if (!_PlayerPets[petIndex].IsInBag)
+				continue;
+
+			_PlayerPets[petIndex].PetStatus = CPetAnimal::waiting_spawn;
+			spawnCharacterAnimal(petIndex);
+			_PlayerPets[petIndex].IsInBag = false;
+			// no petCommand setup here so continue instead of break
+			continue;
+			
 		case ANIMALS_ORDERS::ENTER_STABLE:
 			if (_PlayerPets[petIndex].IsMounted)
 				continue;
@@ -16579,7 +16600,17 @@ bool CCharacter::removeSabrinaEffect(CSEffect* effect, bool activateSleepingEffe
 //--------------------------------------------------------------
 uint32 CCharacter::getCarriedWeight()
 {
-	return _Inventory[INVENTORIES::bag]->getInventoryWeight();
+	// CarriedWeight is bag Weight + all pets in bag
+	
+	uint32 total = _Inventory[INVENTORIES::bag]->getInventoryWeight();
+	
+	for (uint i = 0; i != _PlayerPets.size(); ++i)
+	{
+		if (_PlayerPets[i].IsInBag) // Add 5kg + Weight of Inventory
+			total += 5+_Inventory[(INVENTORIES::TInventory)(i + INVENTORIES::pet_animal)]->getInventoryWeight();
+	}
+
+	return total;
 }
 
 //--------------------------------------------------------------
@@ -20462,6 +20493,7 @@ void CPetAnimal::clear()
 	IsMounted = false;
 	IsTpAllowed = false;
 	spawnFlag = false;
+	IsInBag = false;
 }
 
 //-----------------------------------------------------------------------------
