@@ -1,7 +1,7 @@
 <?php
 
 // This file contains all variables needed by other php scripts
-$LogRelativePath = include_once(dirname(__FILE__).'/logs');
+$LogRelativePath = 'logs/';
 
 // ----------------------------------------------------------------------------------------
 // Variables for nel database access
