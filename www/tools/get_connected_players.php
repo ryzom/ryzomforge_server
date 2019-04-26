@@ -1,7 +1,6 @@
 <?php
 
 include_once(dirname(__DIR__).'/libs/admin_modules_itf.php');
-include_once(dirname(__DIR__).'/config.php');
 
 $data = @queryShard('egs', 'displayPlayers', 'displayPlayers');
 
