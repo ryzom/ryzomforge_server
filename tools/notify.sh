@@ -25,11 +25,12 @@ if [[ "$COMMAND" = "ServiceStarted" ]]
 then
 	if [[ -z "$NOTIFY_URL_SERVICE_RESTARTED" ]]
 	then
-		curl "$NOTIFY_URL_SERVICE_RESTARTED?command=started&shard=$(hostname -s)&apikey=$NOTIFY_URL_KEY&service=$2"
+		curl "$NOTIFY_URL_SERVICE_RESTARTED?shard=$(hostname -s)&apikey=$NOTIFY_URL_KEY&service=$2"
 	fi
+
 
 elif [[ "$COMMAND" = "ServiceStoped" ]]
 then
-	curl "$NOTIFY_URL_SERVICE_RESTARTED?command=stoped&shard=$(hostname -s)&apikey=$NOTIFY_URL_KEY&service=$2"
+	echo "ok"
 fi
 
