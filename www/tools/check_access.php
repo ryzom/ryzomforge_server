@@ -1,6 +1,6 @@
 <?php
 
-include_once('../config.php');
+include_once(dirname(__DIR__).'/config.php');
 
 
 $link = mysqli_connect($DBHost, $DBUserName, $DBPassword) or die("DBERR");

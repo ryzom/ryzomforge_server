@@ -25,15 +25,16 @@ hardstatus alwayslastline
 hardstatus string "%{.kW}%-w%{.bW}%t [%n]%{-}%+w %=%{..G} %H %{..Y} %Y/%m/%d %c"
 
 # Remove some stupid / dangerous key bindings
-bind ^k
-#bind L
-bind ^\
+bind "^k"
+bind "^\"
+bindkey "^C" echo 'Blocked. Please use [Ctrl]+[A] + [Ctrl]+[Enter] + [Y]'
+bindkey "^D" echo 'Blocked. Please use [Ctrl]+[A] + [Ctrl]+[Enter] + [Y]'
+
 # Make them better
 bind \\ quit
 bind K kill
 bind I login on
 bind O login off
-
 bindkey "^[[1;5D" prev
 bindkey "^[[1;5C" next
 
