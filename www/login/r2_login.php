@@ -2,12 +2,12 @@
 
 error_reporting(E_ALL);
 
-include_once('config.php');
-include_once('tools/login_translations.php');
-include_once('tools/login_service_itf.php');
-include_once('tools/nel_message.php');
-include_once('tools/domain_info.php');
-include_once('tools/join_shard.php');
+include_once('../../config.php');
+include_once('../../libs/nel_message.php');
+include_once('libs/login_translations.php');
+include_once('libs/login_service_itf.php');
+include_once('libs/domain_info.php');
+include_once('libs/join_shard.php');
 
 include_once('libs/r2_login_db.php');
 include_once('libs/r2_login_logs.php');

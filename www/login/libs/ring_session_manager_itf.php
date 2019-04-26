@@ -1,5 +1,5 @@
 <?php
-	require_once('tools/welcome_service_itf.php');
+	require_once('welcome_service_itf.php');
 ?>
 <?php
 	/////////////////////////////////////////////////////////////////
