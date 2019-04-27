@@ -2,6 +2,8 @@
 
 // This file contains all variables needed by other php scripts
 $LogRelativePath = 'logs/';
+$ShardName = 'MyShard';
+$ShardId = '501';
 
 // ----------------------------------------------------------------------------------------
 // Variables for nel database access
@@ -19,4 +21,7 @@ $RingDBPassword = 'RING_PASS';
 
 $AcceptUnknownUser = true;
 $AutoCreateRingInfo = true;
+
+$RocketChatHook = '';
+$RocketChatServer = '';
 
