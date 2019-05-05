@@ -128,28 +128,36 @@ void CTPTimedAction::applyAction(CTimedActionPhrase *phrase, CEntityBase *actor)
 				if (allegeance.first == PVP_CLAN::Kami || allegeance.first == PVP_CLAN::Karavan)
 				{
 					std::string faction = PVP_CLAN::toString(allegeance.first);
-					uint32 factionIndex = CStaticFames::getInstance().getFactionIndex(faction.c_str());
+					const uint32 factionIndex = CStaticFames::getInstance().getFactionIndex(faction.c_str());
 
 					if (factionIndex != CStaticFames::INVALID_FACTION_INDEX)
 					{
-						if (CFameInterface::getInstance().getFameIndexed(character->getId(), factionIndex) >= 200000) // +33
+						const sint32 fame = CFameInterface::getInstance().getFameIndexed(character->getId(), factionIndex);
+						if (fame >= 33*6000) // 198000
 						{
-							character->spendMoney(cost);
 							destroy = false;
+							if (fame < 60*6000 && item->getStaticForm()->TpEcosystem == 7) // 360000
+								destroy = true;
 
-							SM_STATIC_PARAMS_4(
-								params,
-								STRING_MANAGER::item,
-								STRING_MANAGER::integer,
-								STRING_MANAGER::integer,
-								STRING_MANAGER::integer
-							);
-							params[0].SheetId = item->getSheetId();
-							params[1].Int = 1; // qty
-							params[2].Int = cost;
-							params[3].Int = 0; // fp
+							if (!destroy)
+							{
+								character->spendMoney(cost);
+								SM_STATIC_PARAMS_4(
+									params,
+									STRING_MANAGER::item,
+									STRING_MANAGER::integer,
+									STRING_MANAGER::integer,
+									STRING_MANAGER::integer
+								);
+								params[0].SheetId = item->getSheetId();
+								params[1].Int = 1; // qty
+								params[2].Int = cost;
+								params[3].Int = 0; // fp
 
-							sendDynamicSystemMessage(character->getEntityRowId(), "INVENTORY_BUY_ITEM", params);
+								sendDynamicSystemMessage(character->getEntityRowId(), "INVENTORY_BUY_ITEM", params);
+							}
+							else
+								sendDynamicSystemMessage(character->getEntityRowId(), "ALTAR_RESTRICTION");
 						}
 					}
 				}
