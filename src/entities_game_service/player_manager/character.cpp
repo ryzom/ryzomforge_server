@@ -12360,6 +12360,14 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 
 		vector<CGameItemPtr> vect;
 		vector<CPetAnimal> exchangePlayerPets;
+
+		if (_ExchangeView == NULL)
+		{
+			sendDynamicSystemMessage(getId(), "INVALID_EXCHANGE_IN_RING");
+			nlwarning("CCharacter::acceptExchange : character %s -> no exchangeView", _Id.toString().c_str());
+			return;
+		}
+		
 		removeExchangeItems(vect, exchangePlayerPets);
 
 		if (mission)
