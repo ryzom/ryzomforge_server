@@ -1884,7 +1884,7 @@ void CZoneManager::updateCharacterPosition( CCharacter * user )
 			// Check is region have a trigger to send an url
 			string regionTrigger = getRegionTrigger(region->getName());
 			if (!regionTrigger.empty())
-				user->sendUrl(regionTrigger, "");
+				user->sendUrl(regionTrigger);
 
 			user->setCurrentRegion( region->getId() );
 			

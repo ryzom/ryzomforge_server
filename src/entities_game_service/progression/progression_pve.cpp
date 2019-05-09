@@ -355,7 +355,7 @@ void CCharacterProgressionPVE::creatureDeath(TDataSetRow creature)
 				{
 					CCharacter* player = PlayerManager.getChar(*itPlayer);
 					if (player)
-						player->sendUrl(url, "");
+						player->sendUrl(url);
 				}
 			}
 			
