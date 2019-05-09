@@ -189,7 +189,9 @@ AdminCommandsInit[] =
 		"resetName",						true,
 		"showOnline",						true,
 
-		// Web commands managment
+		"openTargetApp",					true,
+
+		// DEPECRATED !!!
 		"webExecCommand",					true,
 		"webDelCommandsIds",				true,
 		"webAddCommandsIds",				true,
@@ -9065,6 +9067,25 @@ NLMISC_COMMAND(quitDelay, "Inform the player that the shard will be stopped in N
 	}
 
 	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(openTargetApp, "open target app", "<user_id>")
+{
+	if (args.size() < 1)
+		return false;
+
+	GET_CHARACTER
+
+	CCreature* creature = CreatureManager.getCreature(c->getTarget());
+	if (!creature)
+		return false;
+
+	uint32 program = creature->getBotChatProgram();
+	if (program & (1 << BOTCHATTYPE::WebPageFlag))
+	{
+		c->sendUrl(creature->getWebPage());
+	}
 }
 
 //----------------------------------------------------------------------------
