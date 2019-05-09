@@ -1014,30 +1014,7 @@ NLMISC_COMMAND(getPosition, "get position of entity", "<uid>")
 
 	GET_ACTIVE_CHARACTER
 
-	double x = 0, y = 0, z = 0, h = 0;
-	sint32 cell = 0;
-
-	x = c->getState().X / 1000.;
-	y = c->getState().Y / 1000.;
-	z = c->getState().Z / 1000.;
-	h = c->getState().Heading;
-
-	TDataSetRow dsr = c->getEntityRowId();
-	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
-	cell = srcCell;
-
-	string contName;
-	string regionName;
-	const CRegion* region = NULL;
-	const CContinent * cont = NULL;
-	CZoneManager::getInstance().getRegion(c->getState().X ,c->getState().Y, &region, &cont);
-	if (region)
-		regionName = region->getName();
-	if (cont)
-		contName = cont->getName();
-
-
-	log.displayNL("%.2f|%.2f|%.2f|%.4f|%d|%s|%s", x, y, z, h, cell, contName.c_str(), regionName.c_str());
+	log.displayNL("%s", c->getPositionInfos().c_str());
 
 	return true;
 }
@@ -1255,94 +1232,9 @@ NLMISC_COMMAND(getTarget, "get target of player", "<uid>")
 
 	GET_ACTIVE_CHARACTER
 
-	const CEntityId &target = c->getTarget();
-	string msg = target.toString()+"|";
-
-	if (target == CEntityId::Unknown)
-	{
-		log.displayNL("0");
-		return true;
-	}
-
-	if (target.getType() == RYZOMID::creature)
-		msg += "c|";
-	else if (target.getType() == RYZOMID::npc)
-		msg += "n|";
-	else if (target.getType() == RYZOMID::player)
-		msg += "p|";
-	else
-		msg += "0";
-
-	double dist = 0, p_x = 0, p_y = 0;
-	p_x = c->getState().X / 1000.;
-	p_y = c->getState().Y / 1000.;
-
-	if (target.getType() == RYZOMID::player)
-	{
-		CCharacter * cTarget = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
-		if (cTarget) {
-			msg += cTarget->getName().toString()+"|";
-
-			if (c->getGuildId() != 0 && c->getGuildId() == cTarget->getGuildId())
-				msg += "g|";
-			else
-				msg += "0|";
-
-			if (c->getTeamId() != CTEAM::InvalidTeamId && c->getTeamId() == cTarget->getTeamId())
-				msg += "t|";
-			else
-				msg += "0|";
-
-			double x = cTarget->getState().X / 1000.;
-			double y = cTarget->getState().Y / 1000.;
-			double z = cTarget->getState().Z / 1000.;
-			double h = cTarget->getState().Heading;
-
-			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
-			
-			TDataSetRow dsr = cTarget->getEntityRowId();
-			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
-			sint32 cell = srcCell;
-
-			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
-		}
-	}
-	else
-	{
-		string name;
-		CCreature * cTarget = CreatureManager.getCreature(target);
-
-		sint32 petSlot = c->getPlayerPet(cTarget->getEntityRowId());
-
-		if (petSlot == -1)
-		{
-			CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
-			msg += name+"|";
-		}
-		else
-		{
-			string pets = c->getPets();
-			msg += toString("PET#%d:%s|", petSlot, pets.c_str());
-		}
-
-		if (cTarget)
-		{
-			double x = cTarget->getState().X / 1000.;
-			double y = cTarget->getState().Y / 1000.;
-			double z = cTarget->getState().Z / 1000.;
-			double h = cTarget->getState().Heading;
-
-			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
-			
-			TDataSetRow dsr = cTarget->getEntityRowId();
-			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
-			sint32 cell = srcCell;
-
-			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
-		}
-	}
+	string msg = c->getTargetInfos();
 	
-	log.displayNL(msg.c_str());
+	log.displayNL("%s", msg.c_str());
 
 	return true;
 }
