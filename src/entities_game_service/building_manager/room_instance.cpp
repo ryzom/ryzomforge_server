@@ -92,7 +92,7 @@ void CRoomInstanceGuild::removeUser( CCharacter* user, bool send_url, bool keep_
 		return;
 	}
 
-	user->sendUrl("app_ryzhome action=quit_guild_room&room_name="+guildBuilding->getName(), "");
+	user->sendUrl("app_ryzhome action=quit_guild_room&room_name="+guildBuilding->getName());
 
 	--_RefCount;
 	if ( _RefCount == 0 )
@@ -114,7 +114,7 @@ void CRoomInstanceGuild::addUser( CCharacter* user, const NLMISC::CEntityId & ow
 	// open guild inventory window
 	PlayerManager.sendImpulseToClient(user->getId(), "GUILD:OPEN_INVENTORY");
 	
-	user->sendUrl("app_ryzhome action=open_guild_room&owner="+ owner.toString()+"&room_name="+guildBuilding->getName(), "");
+	user->sendUrl("app_ryzhome action=open_guild_room&owner="+ owner.toString()+"&room_name="+guildBuilding->getName());
 
 	++_RefCount;
 }
@@ -151,7 +151,7 @@ void CRoomInstancePlayer::removeUser( CCharacter* user, bool send_url, bool keep
 	}
 
 	if (send_url)
-		user->sendUrl(toString("app_ryzhome action=quit_player_room&room_name=%s&powo=%d", playerBuilding->getName().c_str(), user->getPowoCell()), "");
+		user->sendUrl(toString("app_ryzhome action=quit_player_room&room_name=%s&powo=%d", playerBuilding->getName().c_str(), user->getPowoCell()));
 
 	--_RefCount;
 	if ( _RefCount == 0 )
@@ -188,7 +188,7 @@ void CRoomInstancePlayer::addUser( CCharacter* user, const NLMISC::CEntityId & o
 	}
 
 	if (send_url)
-		user->sendUrl(toString("app_ryzhome action=open_player_room&owner=%s&room_name=%s&powo=%d",  owner.toString().c_str(), playerBuilding->getName().c_str(), user->getPowoCell()), "");
+		user->sendUrl(toString("app_ryzhome action=open_player_room&owner=%s&room_name=%s&powo=%d",  owner.toString().c_str(), playerBuilding->getName().c_str(), user->getPowoCell()));
 
 	++_RefCount;
 }

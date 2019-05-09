@@ -195,6 +195,7 @@ extern SKILLS::ESkills BarehandCombatSkill;
 // Variable to alter the progression factor.
 extern float SkillProgressionFactor;
 
+extern CVariable<string> ArkSalt;
 extern CVariable<string> TeleportWithMektoubPriv;
 extern CVariable<string> NoActionAllowedPriv;
 extern CVariable<string> NoValueCheckingPriv;
@@ -217,10 +218,15 @@ CVariable<uint32> CraftFailureProbaMpLost(
 	"egs", "CraftFailureProbaMpLost", "Probability de destruction de chaque MP en cas d'echec du craft", 50, 0, true);
 
 // Number of login stats kept for a character
-CVariable<uint32> NBLoginStats("egs", "NBLoginStats", "Nb logins stats kept (logon time, logoff time", 50, 0, true);
+CVariable<uint32> NBLoginStats(
+	"egs", "NBLoginStats", "Nb logins stats kept (logon time, logoff time", 50, 0, true);
 
 CVariable<bool> EnableGuildPoints(
 	"egs", "EnableGuildPoints", "Enable guild points", false, 0, true);
+
+CVariable<string>	ArkSalt(
+	"egs", "ArkSalt", "Salt used to hmac callbacks", string("BAE"), 0, true);
+
 
 // Max Bonus/malus/consumable effects displayed by client (database corresponding array must have the same size, and
 // client must process the same size)
@@ -4038,23 +4044,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_TITLE(_PropertyDatabase, text);
 			// send the web page url
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-			string url = c->getWebPage();
-
-			// add ? or & with
-			if (url.find('?') == string::npos)
-				url += NLMISC::toString("?urlidx=%d", getUrlIndex());
-			else
-				url += NLMISC::toString("&urlidx=%d", getUrlIndex());
-
-			setUrlIndex(getUrlIndex() + 1);
-			url += "&player_eid=" + getId().toString();
-			// add cheksum : pnj eid
-			url += "&teid=" + c->getId().toString();
-			string defaultSalt = toString(getLastConnectedDate());
-			string control = "&hmac="
-							 + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
-							 .toString();
-			params[0].Literal = url + control;
+			params[0].Literal = c->getWebPage();
 			text = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", params);
 			//			_PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_URL" , text );
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_URL(_PropertyDatabase, text);
@@ -5629,7 +5619,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 	if (_PowoCell != 0 && _PowoCell != cell) // leave the current Powo
 	{
 		// open url
-		sendUrl(toString("app_ryzhome action=quit_powo&powo=%d", _PowoCell), "");
+		sendUrl(toString("app_ryzhome action=quit_powo&powo=%d", _PowoCell));
 		resetPowoFlags();
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
@@ -15311,26 +15301,17 @@ void CCharacter::sendDynamicMessage(const string &phrase, const string &message)
 	PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, phrase, messageParams);
 }
 
-void CCharacter::sendUrl(const string &url, const string &salt)
+void CCharacter::sendUrl(const string &url)
 {
 	string control;
-
-	if (!salt.empty())
-	{
-		control = "&hmac="
-				  + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
-	}
-	else
-	{
-		string defaultSalt = toString(getLastConnectedDate());
-		control = "&hmac="
-				  + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
-				  .toString();
-	}
+	string salt = toString(getLastConnectedDate())+ArkSalt.get();
+	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+getPositionInfos()+"&target_infos="+getTargetInfos();
+	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
 	uint32 userId = PlayerManager.getPlayerId(getId());
 	SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
-	textParams[0].Literal = "WEB : " + url + control;
+	textParams[0].Literal = "WEB : " + final_url + control;
+	nlinfo("URL: %s", final_url.c_str());
 	TVectorParamCheck titleParams;
 	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "web_transactions", titleParams);
 	uint32 textId = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", textParams);
@@ -15339,7 +15320,7 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 
 void CCharacter::validateDynamicMissionStep(const string &url)
 {
-	sendUrl(url + "&player_eid=" + getId().toString() + "&event=mission_step_finished", getSalt());
+	sendUrl(url + "&player_eid=" + getId().toString() + "&event=mission_step_finished");
 }
 
 /// set custom mission param
@@ -15461,7 +15442,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 				item->setCustomText(ucstring(url));
 				vector<string> infos;
 				NLMISC::splitString(url, "\n", infos);
-				sendUrl(infos[0] + "&player_eid=" + getId().toString() + "&event=command_added", salt);
+				sendUrl(infos[0] + "&player_eid=" + getId().toString() + "&event=command_added");
 			}
 			else
 			{
@@ -15475,9 +15456,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 				}
 
 				item->setCustomText(ucstring(url + "\n" + finalData));
-				sendUrl(
-					url + "&player_eid=" + getId().toString() + "&event=command_added&transaction_id=" + randomString,
-					salt);
+				sendUrl(url + "&player_eid=" + getId().toString() + "&event=command_added&transaction_id=" + randomString);
 			}
 		}
 	}
@@ -15502,9 +15481,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 						NLMISC::splitString(cText, "\n", infos);
 						vector<string> datas;
 						NLMISC::splitString(infos[1], ",", datas);
-						sendUrl(infos[0] + "&player_eid=" + getId().toString()
-								+ "&event=command_added&transaction_id=" + datas[0].substr(0, 8),
-								salt);
+						sendUrl(infos[0] + "&player_eid=" + getId().toString()+ "&event=command_added&transaction_id=" + datas[0].substr(0, 8));
 					}
 				}
 			}

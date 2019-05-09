@@ -1779,7 +1779,7 @@ public:
 	void sendDynamicMessage(const std::string &phrase, const std::string &message);
 
 	/// send custom url
-	void sendUrl(const std::string &url, const std::string &salt);
+	void sendUrl(const std::string &url);
 
 	/// set custom mission param
 	void setCustomMissionParams(const std::string &missionName, const std::string &params);
@@ -4062,14 +4062,10 @@ public:
 	{
 		return _ValideWebCommandIndex.find(index) != _ValideWebCommandIndex.end();
 	}
-
-	void setUrlIndex(uint32 index)
+	
+	uint32 getUrlIndex()
 	{
-		_LastUrlIndex = index;
-	}
-	uint32 getUrlIndex() const
-	{
-		return _LastUrlIndex;
+		return _LastUrlIndex++;
 	}
 
 	bool getInvisibility() const

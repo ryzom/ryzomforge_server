@@ -2994,7 +2994,7 @@ NLMISC_COMMAND(sendUrlToUser, "send an url to a user", "<player name> <app> <par
 		return true;
 	}
 	
-	target->sendUrl(args[1]+" "+args[2], "");
+	target->sendUrl(args[1]+" "+args[2]);
 	log.displayNL("OK");
 	return true;
 }

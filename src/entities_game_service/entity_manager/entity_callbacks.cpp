@@ -3082,7 +3082,7 @@ void cbTriggerWebig(NLNET::CMessage& msgin, const std::string &serviceName, NLNE
 		CCharacter *chr = PlayerManager.getChar(playerId);
 		if (!chr)
 			continue;
-		chr->sendUrl(event, "");
+		chr->sendUrl(event);
 	}
 }
 
