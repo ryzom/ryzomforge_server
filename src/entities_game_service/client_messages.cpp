@@ -815,7 +815,28 @@ void cbClientCombatDodge( NLNET::CMessage& msgin, const std::string &serviceName
 	}
 }
 
+void cbClientAutoPact( NLNET::CMessage& msgin, const std::string &serviceName, NLNET::TServiceId serviceId)
+{
+	H_AUTO(cbClientAutoPact);
 
+	CEntityId charId;
+	msgin.serial(charId);
+
+	bool activate = false;
+
+	CCharacter *character = PlayerManager.getChar(charId);
+	if (character && character->getEnterFlag())
+	{
+		uint8 bval;
+		msgin.serial(bval);
+
+		if (bval)
+			activate = true;
+		character->doPact(activate);
+	}
+	else
+		nlwarning("%s is invalid", charId.toString().c_str());
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3515,6 +3536,7 @@ TUnifiedCallbackItem CbClientArray[]=
 	{ "CLIENT:COMMAND:AFK",					cbClientSendAfk },
 	{ "CLIENT:COMMAND:RANDOM",				cbClientRollDice },
 	{ "CLIENT:COMMAND:GUILDMOTD",			cbClientGuildMotd },
+	{ "CLIENT:COMMAND:AUTOPACT",			cbClientAutoPact },
 
 
 // For all these commented commands, now you have to use the CLIENT:COMMAND:ADMIN message using /a client command

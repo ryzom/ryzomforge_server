@@ -440,6 +440,8 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP2(DeclaredCult,string,PVP_CLAN::toString(_DeclaredCult),_DeclaredCult=PVP_CLAN::fromString(val))\
 	PROP2(DeclaredCiv,string,PVP_CLAN::toString(_DeclaredCiv),_DeclaredCiv=PVP_CLAN::fromString(val))\
 \
+	PROP(bool,_doPact)\
+\
 	PROP(bool,_PVPFlag)\
 	PROP_GAME_CYCLE_COMP(_PVPFlagLastTimeChange)\
 	PROP_GAME_CYCLE_COMP(_PVPRecentActionTime)\

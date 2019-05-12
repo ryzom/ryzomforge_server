@@ -426,6 +426,8 @@ CCharacter::CCharacter()
 	_Organization = 0;
 	_OrganizationStatus = 0;
 	_OrganizationPoints = 0;
+	// refill pact automatically
+	_doPact = false;
 	// do not start berserk
 	_IsBerserk = false;
 	// Contextual properties init
@@ -11473,7 +11475,7 @@ void CCharacter::setMoney(const uint64 &money)
 {
 	if (money != _Money)
 	{
-		log_Item_Money(_Money, money);
+		//log_Item_Money(_Money, money);
 		_Money = money;
 		//		_PropertyDatabase.setProp( "INVENTORY:MONEY", _Money );
 		CBankAccessor_PLR::getINVENTORY().setMONEY(_PropertyDatabase, _Money);
