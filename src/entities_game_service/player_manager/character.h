@@ -332,6 +332,7 @@ struct CPetAnimal
 	bool IsFollowing;
 	bool IsMounted;
 	bool IsTpAllowed;
+	bool IsInBag;
 	bool spawnFlag;
 	ucstring CustomName;
 
