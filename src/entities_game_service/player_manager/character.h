@@ -1600,6 +1600,9 @@ public:
 	/// Register character name in IOS
 	void registerName(const ucstring &newName = std::string(""));
 
+	std::string getTargetInfos();
+	std::string getPositionInfos();
+
 	/// Mount a mount
 	void mount(TDataSetRow PetRowId);
 
