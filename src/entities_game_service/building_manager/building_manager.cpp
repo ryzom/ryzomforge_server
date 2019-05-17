@@ -438,7 +438,7 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 	// Don't teleport when it's a custom trigger, send url instead
 	if (!url.empty())
 	{
-		user->sendUrl(url, "");
+		user->sendUrl(url);
 	}
 	else
 	{

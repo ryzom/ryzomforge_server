@@ -1,7 +1,8 @@
 <?php
-include_once('tools/validate_cookie.php');
-include_once('tools/domain_info.php');
-include_once('tools/ring_session_manager_itf.php');
+
+include_once('validate_cookie.php');
+include_once('domain_info.php');
+include_once('ring_session_manager_itf.php');
 
 class JoinShardCb extends CRingSessionManagerWeb
 {
