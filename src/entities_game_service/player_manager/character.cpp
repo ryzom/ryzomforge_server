@@ -5649,8 +5649,10 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 					getState().getVector2f(characterPos);
 					float squareDistance = (animalPos - characterPos).sqrnorm();
 
-					// Teleport as well pets that are following or mounted and in the neighbourhood
-					if ((isNearPetTpIsAllowed() && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
+					const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+
+					// Teleport as well pets that are following or mounted and in the neighbourhood or are a pet
+					if (((isNearPetTpIsAllowed() || form->Type == ITEM_TYPE::ANIMAL_TICKET) && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
 							&& squareDistance <= 50.0f * 50.0f))
 					{
 						// despawn it
