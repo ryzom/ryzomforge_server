@@ -39,6 +39,7 @@
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
 #include "guild_manager/guild_member_module.h"
+#include "world_instances.h"
 
 #include "egs_sheets/egs_sheets.h"
 
@@ -641,6 +642,9 @@ void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool send_url )
 	sint32 cell = mirrorCell;
 	if ( !isRoomCell(cell) )
 		return;
+
+	CVector buildingExitPos = user->getBuildingExitPos();
+
 	uint idx = getRoomIdxFromCell( cell );
 	if ( idx >= _RoomInstances.size() )
 	{
@@ -664,6 +668,40 @@ void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool send_url )
 	{
 		nlinfo("remove NO delete room");
 	}
+
+	/*// Remove all pets from room
+
+	vector< CPetAnimal > &pets = user->getPlayerPets();
+
+	nlinfo("remove PETS");
+	for (uint16 i = 0; i < (uint16)pets.size(); ++i)
+	{
+		nlinfo("Checking pet %d", i);
+		
+		if (pets[i].PetStatus == CPetAnimal::landscape)
+		{
+			nlinfo("pet in landscape");
+
+			CContinent * cont = CZoneManager::getInstance().getContinent(pets[i].Landscape_X, pets[i].Landscape_Y);
+
+			if (!cont)
+				continue;
+	
+			CONTINENT::TContinent continent = (CONTINENT::TContinent)cont->getId();
+
+			if (continent == CONTINENT::R2_ROOTS ||
+				continent == CONTINENT::R2_FOREST ||
+				continent == CONTINENT::R2_DESERT ||
+				continent == CONTINENT::R2_LAKES ||
+				continent == CONTINENT::R2_JUNGLE ||
+				continent == CONTINENT::INDOORS
+				)
+			{
+				nlinfo("pet in a powo/indoor");
+				pets[i].IsFollowing = true;
+			}
+		}
+	}*/
 }
 
 //----------------------------------------------------------------------------
