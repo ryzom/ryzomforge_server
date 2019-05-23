@@ -5651,9 +5651,30 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 
 					const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
 
-					// Teleport as well pets that are following or mounted and in the neighbourhood or are a pet
-					if (((isNearPetTpIsAllowed() || form->Type == ITEM_TYPE::ANIMAL_TICKET) && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
-							&& squareDistance <= 50.0f * 50.0f))
+
+					CContinent * cont = CZoneManager::getInstance().getContinent(_PlayerPets[i].Landscape_X, _PlayerPets[i].Landscape_Y);
+
+					bool inCell = false;
+					if (cont)
+					{
+						CONTINENT::TContinent continent = (CONTINENT::TContinent)cont->getId();
+
+						if (continent == CONTINENT::R2_ROOTS ||
+							continent == CONTINENT::R2_FOREST ||
+							continent == CONTINENT::R2_DESERT ||
+							continent == CONTINENT::R2_LAKES ||
+							continent == CONTINENT::R2_JUNGLE ||
+							continent == CONTINENT::INDOORS
+							)
+						{
+							nlinfo("pet in a powo/indoor");
+							inCell = true;
+						}
+					}
+					
+					// Teleport as well pets that are following or mounted or a pet and in the neighbourhood or... in a Powo/indoor
+					if ((((isNearPetTpIsAllowed() || form->Type == ITEM_TYPE::ANIMAL_TICKET) && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
+							&& squareDistance <= 50.0f * 50.0f)) || inCell)
 					{
 						// despawn it
 						sendPetCommand(CPetCommandMsg::DESPAWN, i, true);
@@ -6204,6 +6225,9 @@ bool CCharacter::spawnWaitingCharacterAnimalNear(uint index, const SGameCoordina
 	msg.CharacterMirrorRow = _EntityRowId;
 	msg.PetSheetId = _PlayerPets[index].PetSheetId;
 	msg.PetIdx = index;
+	msg.Cell = destination.Cell;
+	_PlayerPets[index].Cell = destination.Cell;
+
 	msg.CustomName = _PlayerPets[index].CustomName;
 	msg.AIInstanceId = (uint16)destAIInstance;
 	CWorldInstances::instance().msgToAIInstance(msg.AIInstanceId, msg);
@@ -6234,6 +6258,12 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 		return returnValue;
 	}
 
+
+	TDataSetRow dsr = getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+	sint32 cell;
+	cell = srcCell;
+
 	if (index < _PlayerPets.size())
 	{
 		if (!TheDataset.isAccessible(_PlayerPets[index].SpawnedPets))
@@ -6247,6 +6277,9 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 				msg.Coordinate_X = getX();
 				msg.Coordinate_Y = getY();
 				msg.Coordinate_H = getZ();
+				msg.Cell = cell;
+				_PlayerPets[index].Cell = cell;
+
 				msg.Heading = 0.0f;
 				break;
 
@@ -14741,22 +14774,21 @@ string CCharacter::getTargetInfos()
 	{
 		string name;
 		CCreature * cTarget = CreatureManager.getCreature(target);
-
-		sint32 petSlot = getPlayerPet(cTarget->getEntityRowId());
-
-		if (petSlot == -1)
-		{
-			CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
-			msg += name+"|";
-		}
-		else
-		{
-			string pets = getPets();
-			msg += toString("PET#%d:%s|", petSlot, pets.c_str());
-		}
-
 		if (cTarget)
 		{
+			sint32 petSlot = getPlayerPet(cTarget->getEntityRowId());
+
+			if (petSlot == -1)
+			{
+				CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+				msg += name+"|";
+			}
+			else
+			{
+				string pets = getPets();
+				msg += toString("PET#%d:%s|", petSlot, pets.c_str());
+			}
+	
 			double x = cTarget->getState().X / 1000.;
 			double y = cTarget->getState().Y / 1000.;
 			double z = cTarget->getState().Z / 1000.;
@@ -20603,6 +20635,7 @@ void CPetAnimal::clear()
 	IsTpAllowed = false;
 	spawnFlag = false;
 	IsInBag = false;
+	Cell = 0;
 }
 
 //-----------------------------------------------------------------------------
