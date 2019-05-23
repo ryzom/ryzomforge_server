@@ -46,9 +46,9 @@ void CMongo::init()
 		if(!res) nlerror("mongo: init failed, cannot connect '%s'", errmsg.c_str());
 		else nlinfo("mongo: connection ok");
 
-		res = conn.auth(dbname, "megacorp", MongoPassword.get(), errmsg);
+		/*res = conn.auth(dbname, "megacorp", MongoPassword.get(), errmsg);
 		if(!res) nlerror("mongo: init failed, cannot auth '%s'", errmsg.c_str());
-		else nlinfo("mongo: auth ok");
+		else nlinfo("mongo: auth ok");*/
 	}
 	catch(const DBException& e)
 	{
