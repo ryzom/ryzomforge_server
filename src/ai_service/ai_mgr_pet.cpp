@@ -230,10 +230,11 @@ void CPetSpawnMsgImp::callback(std::string const& name, NLNET::TServiceId id)
 #endif
 				return;
 			}
-			
+
+			CAIPos position;
+		
 			//	calc a valid spawn position.
 			{
-				CAIPos position;
 				CAIEntityPhysical const* const phys = CAIS::instance().getEntityPhysical(CMirrors::DataSet->getDataSetRow(petOwnerId));
 				
 				//	TSpawnMode
@@ -319,6 +320,26 @@ void CPetSpawnMsgImp::callback(std::string const& name, NLNET::TServiceId id)
 #endif
 				return;
 			}
+
+			CEntityId id = botPet->getSpawn()->getEntityId();
+			float t = 0;
+			uint8 cont = 0;
+			uint8 one = 1;
+			sint32 x = position.x();
+			sint32 y = position.y();
+			sint32 z = position.h();
+			NLMISC::TGameCycle tick = CTickEventHandler::getGameCycle() + 1;
+			CMessage msgout2("ENTITY_TELEPORTATION");
+			msgout2.serial( id   );
+			msgout2.serial( x );
+			msgout2.serial( y );
+			msgout2.serial( z );
+			msgout2.serial( t );
+			msgout2.serial( tick );
+			msgout2.serial( cont );
+			msgout2.serial( Cell );
+			msgout2.serial( one  );
+			sendMessageViaMirror("GPMS", msgout2);
 
 			botPet->getSpawn()->setAIProfile(new CAIPetProfileStand(botPet->getSpawn()));
 			

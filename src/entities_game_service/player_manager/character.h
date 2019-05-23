@@ -335,6 +335,7 @@ struct CPetAnimal
 	bool IsInBag;
 	bool spawnFlag;
 	ucstring CustomName;
+	sint32 Cell;
 
 	// ctor
 	CPetAnimal();
