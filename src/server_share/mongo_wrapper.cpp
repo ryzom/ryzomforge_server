@@ -32,14 +32,10 @@ string CMongo::dbname;
 
 void CMongo::init()
 {
-	if (IService::getInstance()->getShardId() == 301)
-	{
-		dbname = "megacorp_dev";
-	}
-	else
-	{
+	if (IService::getInstance()->getShardId() == 101)
 		dbname = "megacorp_live";
-	}
+	else
+		dbname = "megacorp_dev";
 
 	try
 	{
