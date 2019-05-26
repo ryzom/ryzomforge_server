@@ -16184,7 +16184,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 			// 0);
 			CBankAccessor_PLR::getFAME()
 			.getTRIBE(fameIndexInDatabase - firstTribeDbIndex)
-			.setVALUE(_PropertyDatabase, 0);
+			.setVALUE(_PropertyDatabase, -128);
 			//			_PropertyDatabase.setProp( toString("FAME:TRIBE%d:TREND", fameIndexInDatabase -
 			// firstTribeDbIndex),
 			// 0);
@@ -16242,7 +16242,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 		else
 		{
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase), 0);
-			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setVALUE(_PropertyDatabase, 0);
+			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setVALUE(_PropertyDatabase, -128);
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:TREND", fameIndexInDatabase), 0);
 			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setTREND(_PropertyDatabase, 0);
 		}
