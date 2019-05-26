@@ -12833,7 +12833,12 @@ void CCharacter::addExchangeItems(
 
 	for (uint32 p = 0; p < playerPetsAdded.size(); ++p)
 	{
-		sint32 i = getFreePetSlot();
+		CSheetId PetTicket = playerPetsAdded[p].TicketPetSheetId;
+		const CStaticItem* form = CSheets::getForm(PetTicket);
+		uint8 startSlot = 0;
+		if (form->Type == ITEM_TYPE::ANIMAL_TICKET) // Use only last slots for pets
+			startSlot = MAX_PACK_ANIMAL+MAX_MEKTOUB_MOUNT;
+		sint32 i = getFreePetSlot(startSlot);
 
 		if (i >= 0)
 		{
