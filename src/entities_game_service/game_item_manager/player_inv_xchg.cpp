@@ -313,6 +313,7 @@ void CExchangeView::onInterlocutorSlotChanged(uint32 interlocutorGiveSlot)
 
 	if (item != NULL)
 	{
+		const INVENTORIES::TItemId &itemId = item->getItemId();
 		RM_FABER_STAT_TYPE::TRMStatType itemBestStat = RM_FABER_STAT_TYPE::Unknown;
 		
 		if (item->getCraftParameters() != NULL)
@@ -324,6 +325,8 @@ void CExchangeView::onInterlocutorSlotChanged(uint32 interlocutorGiveSlot)
 		recvItem.setQUALITY(getCharacter()->_PropertyDatabase, item->quality());
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			exchangeQuantity);
 		recvItem.setQUANTITY(getCharacter()->_PropertyDatabase, uint16(exchangeQuantity));
+		recvItem.setSERIAL(getCharacter()->_PropertyDatabase, uint32(itemId.getSerialNumber()));
+		recvItem.setCREATE_TIME(getCharacter()->_PropertyDatabase, uint32(itemId.getCreateTime()));
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",		item->color());
 		recvItem.setUSER_COLOR(getCharacter()->_PropertyDatabase, item->color());
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":WEIGHT",			item->weight() / 10);
@@ -348,6 +351,8 @@ void CExchangeView::onInterlocutorSlotChanged(uint32 interlocutorGiveSlot)
 		recvItem.setQUALITY(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			0);
 		recvItem.setQUANTITY(getCharacter()->_PropertyDatabase, 0);
+		recvItem.setSERIAL(getCharacter()->_PropertyDatabase, 0);
+		recvItem.setCREATE_TIME(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",		0);
 		recvItem.setUSER_COLOR(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":WEIGHT",			0);
@@ -383,6 +388,7 @@ void CExchangeView::updateExchangeSlot(uint32 exchangeSlot)
 
 	if (item != NULL)
 	{
+		const INVENTORIES::TItemId &itemId = item->getItemId();
 		RM_FABER_STAT_TYPE::TRMStatType itemBestStat = RM_FABER_STAT_TYPE::Unknown;
 		
 		if (item->getCraftParameters() != NULL)
@@ -394,6 +400,8 @@ void CExchangeView::updateExchangeSlot(uint32 exchangeSlot)
 		giveItem.setQUALITY(getCharacter()->_PropertyDatabase, item->quality());
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			exchangeQuantity);
 		giveItem.setQUANTITY(getCharacter()->_PropertyDatabase, uint16(exchangeQuantity));
+		giveItem.setSERIAL(getCharacter()->_PropertyDatabase, uint32(itemId.getSerialNumber()));
+		giveItem.setCREATE_TIME(getCharacter()->_PropertyDatabase, uint32(itemId.getCreateTime()));
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",		item->color());
 		giveItem.setUSER_COLOR(getCharacter()->_PropertyDatabase, item->color());
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":WEIGHT",			item->weight() / 10);
@@ -418,6 +426,8 @@ void CExchangeView::updateExchangeSlot(uint32 exchangeSlot)
 		giveItem.setQUALITY(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			0);
 		giveItem.setQUANTITY(getCharacter()->_PropertyDatabase, 0);
+		giveItem.setSERIAL(getCharacter()->_PropertyDatabase, 0);
+		giveItem.setCREATE_TIME(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",		0);
 		giveItem.setUSER_COLOR(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":WEIGHT",			0);
