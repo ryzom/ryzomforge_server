@@ -2656,7 +2656,7 @@ NLMISC_COMMAND(delArkMissionParams,"del Mission Params","<uid> <mission_name>")
 //-----------------------------------------------
 NLMISC_COMMAND(setArkMissionParams,"set Mission Params","<uid> <mission_name> <params> <app_callback> <callback_params>")
 {
-	if (args.size() != 2)
+	if (args.size() != 5)
 		return false;
 
 	GET_ACTIVE_CHARACTER;
