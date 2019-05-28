@@ -332,8 +332,10 @@ struct CPetAnimal
 	bool IsFollowing;
 	bool IsMounted;
 	bool IsTpAllowed;
+	bool IsInBag;
 	bool spawnFlag;
 	ucstring CustomName;
+	sint32 Cell;
 
 	// ctor
 	CPetAnimal();
@@ -1782,7 +1784,7 @@ public:
 	void sendDynamicMessage(const std::string &phrase, const std::string &message);
 
 	/// send custom url
-	void sendUrl(const std::string &url, const std::string &salt);
+	void sendUrl(const std::string &url);
 
 	/// set custom mission param
 	void setCustomMissionParams(const std::string &missionName, const std::string &params);
@@ -3222,6 +3224,10 @@ public:
 		return (uint8)_FriendVisibility;
 	}
 
+	inline void doPact(bool value) { _doPact = value; }
+	inline bool doPact() { return _doPact; }
+
+
 	//////////////////
 	// Private members
 	//////////////////
@@ -3760,6 +3766,9 @@ private:
 	/// to know if item pre-requisits have to be recomputed (as after a skill/charac update)
 	bool _HaveToUpdateItemsPrerequisit;
 
+	/// to refill used pact automatically after a teleportation
+	bool _doPact;
+
 	///\name PVP related members
 	//@{
 	/// interface between player and PVP system
@@ -4065,14 +4074,10 @@ public:
 	{
 		return _ValideWebCommandIndex.find(index) != _ValideWebCommandIndex.end();
 	}
-
-	void setUrlIndex(uint32 index)
+	
+	uint32 getUrlIndex()
 	{
-		_LastUrlIndex = index;
-	}
-	uint32 getUrlIndex() const
-	{
-		return _LastUrlIndex;
+		return _LastUrlIndex++;
 	}
 
 	bool getInvisibility() const

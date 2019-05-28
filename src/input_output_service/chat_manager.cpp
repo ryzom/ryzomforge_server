@@ -37,6 +37,7 @@
 #include "server_share/mongo_wrapper.h"
 
 #include "chat_manager.h"
+#include "string_manager.h"
 #include "input_output_service.h"
 #include "chat_unifier_client.h"
 
@@ -61,6 +62,7 @@ void	logChatDirChanged(IVariable &var)
 CVariable<bool>			VerboseChatManagement("ios","VerboseChatManagement", "Set verbosity for chat management", false, 0, true);
 CVariable<std::string>	LogChatDirectory("ios", "LogChatDirectory", "Log Chat directory (default, unset is SaveFiles service directory", "", 0, true, logChatDirChanged);
 CVariable<bool>			ForceFarChat("ios","ForceFarChat", "Force the use of SU to dispatch chat", false, 0, true);
+CVariable<bool>			EnableDeepL("ios","EnableDeepL", "Enable DeepL auto-translation system", false, 0, true);
 
 double last_mongo_chat_date = 1000.0*(double)CTime::getSecondsSince1970();
 
@@ -608,30 +610,85 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 		case CChatGroup::shout :
 		case CChatGroup::say :
 			{
+				uint nbr_receiver = 0;
+				bool have_fr = false;
+				bool have_de = false;
+				bool have_en = false;
 				CChatGroup::TMemberCont::iterator itA;
+
+				string sender_lang = SM->getLanguageCodeString(ci->Language);
+				if (sender_lang == "en") // 'en' must be converted to 'us' because translation uses :us: code
+					sender_lang = "us";
+
+				
 				for( itA = itCl->second->getAudience().Members.begin();
 						itA != itCl->second->getAudience().Members.end();
 							++itA )
 				{
 					string				receiverName;
 					NLMISC::CEntityId	receiverId = TheDataset.getEntityId(*itA);
-					CCharacterInfos*	ci = IOS->getCharInfos(receiverId);
+					CCharacterInfos*	co = IOS->getCharInfos(receiverId);
 
 					_DestUsers.push_back(receiverId);
-
-					if (ci == NULL)
+					string receiver_lang;
+					if (co == NULL)
 					{
 						receiverName = receiverId.toString();
 					}
 					else
 					{
-						receiverName = ci->Name.toString();
+						receiverName = co->Name.toString();
+						receiver_lang = SM->getLanguageCodeString(co->Language);
+						if (receiver_lang == "en") // en must be converted to us because translation uses :us: code
+							receiver_lang = "us";
 					}
 
-					_Log.displayNL("'%s' to '%s' (%s) : \t\"%s\"", senderName.c_str(), receiverName.c_str(), groupNames[itCl->second->getChatMode()], ucstr.toString().c_str() );
-
-					sendChat( itCl->second->getChatMode(), *itA, ucstr, sender );
+					if (EnableDeepL)
+					{
+						if (ucstr[0] == '>') // Sent directly when prefixed by '>', it's the anti-translation code
+						{
+							if (ucstr.length() > 5 && ucstr[1] == ':' && ucstr[4] == ':') // check lang prefix
+							{
+								string usedlang = ucstr.toString().substr(2, 2);
+								nlinfo("used: %s, user: %s", usedlang.c_str(), receiver_lang.c_str());
+								if (usedlang == receiver_lang)
+									sendChat( itCl->second->getChatMode(), *itA, ucstr.substr(5), sender );
+							}
+							else
+							{
+								sendChat( itCl->second->getChatMode(), *itA, ucstr.substr(1), sender );
+							}
+						}
+						else if (sender_lang == receiver_lang) // Sent directly if sender and receiver uses same lang
+						{
+							sendChat( itCl->second->getChatMode(), *itA, ucstr, sender );
+						}
+						else
+						{
+						
+							if (!have_fr && receiver_lang == "fr")
+								have_fr = true;
+							if (!have_de && receiver_lang == "de")
+								have_de = true;
+							if (!have_en && receiver_lang == "us")
+								have_en = true;
+							nbr_receiver++;
+						}
+					}
+					else
+						sendChat( itCl->second->getChatMode(), *itA, ucstr, sender );
 				}
+				
+				string langs = sender_lang;
+				if (have_fr)
+					langs += "-fr";
+				if (have_de)
+					langs += "-de";
+				if (have_en)
+					langs += "-us";
+
+				if (nbr_receiver > 0)
+					_Log.displayNL("%s (%s:%d:%s) : %s", senderName.c_str(), groupNames[itCl->second->getChatMode()], nbr_receiver, langs.c_str(), ucstr.toUtf8().c_str() );
 			}
 			break;
 		case CChatGroup::region :
@@ -681,7 +738,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				_DestUsers.push_back(grpId);
 
 				double date = 1000.0*(double)CTime::getSecondsSince1970();
-				
+
 				string name;
 				if (!ucSenderName.empty())
 					name = IOS->getRocketName(ucSenderName);
@@ -720,7 +777,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				sGuildId << guildId;
 
 				double date = 1000.0*(double)CTime::getSecondsSince1970();
-				
+
 				string name;
 				if (!ucSenderName.empty())
 					name = IOS->getRocketName(ucSenderName);
@@ -762,13 +819,13 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 
 					nlinfo("CHAT : %s", chatId.c_str());
 					double date = 1000.0*(double)CTime::getSecondsSince1970();
-					
+
 					string name;
 					if (!ucSenderName.empty())
 						name = IOS->getRocketName(ucSenderName);
 					else
 						name = senderName;
-						
+
 					CMongo::insert("ryzom_chats", toString("{ 'username': '%s', 'chat': '%s', 'chatType': 'dynamic', 'chatId': '%s', 'date': %f, 'ig': true }", name.c_str(), CMongo::quote(ucstr.toUtf8()).c_str(), chatId.c_str(), date));
 #endif
 
@@ -844,7 +901,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 		}
 		break;
 			// static group
-			
+
 		default :
 			nlwarning("<CChatManager::chat> client %u chat in %s ! don't know how to handle it.",
 				sender.getIndex(),
