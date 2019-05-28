@@ -195,6 +195,7 @@ extern SKILLS::ESkills BarehandCombatSkill;
 // Variable to alter the progression factor.
 extern float SkillProgressionFactor;
 
+extern CVariable<string> ArkSalt;
 extern CVariable<string> TeleportWithMektoubPriv;
 extern CVariable<string> NoActionAllowedPriv;
 extern CVariable<string> NoValueCheckingPriv;
@@ -217,10 +218,15 @@ CVariable<uint32> CraftFailureProbaMpLost(
 	"egs", "CraftFailureProbaMpLost", "Probability de destruction de chaque MP en cas d'echec du craft", 50, 0, true);
 
 // Number of login stats kept for a character
-CVariable<uint32> NBLoginStats("egs", "NBLoginStats", "Nb logins stats kept (logon time, logoff time", 50, 0, true);
+CVariable<uint32> NBLoginStats(
+	"egs", "NBLoginStats", "Nb logins stats kept (logon time, logoff time", 50, 0, true);
 
 CVariable<bool> EnableGuildPoints(
 	"egs", "EnableGuildPoints", "Enable guild points", false, 0, true);
+
+CVariable<string>	ArkSalt(
+	"egs", "ArkSalt", "Salt used to hmac callbacks", string("BAE"), 0, true);
+
 
 // Max Bonus/malus/consumable effects displayed by client (database corresponding array must have the same size, and
 // client must process the same size)
@@ -426,6 +432,8 @@ CCharacter::CCharacter()
 	_Organization = 0;
 	_OrganizationStatus = 0;
 	_OrganizationPoints = 0;
+	// refill pact automatically
+	_doPact = false;
 	// do not start berserk
 	_IsBerserk = false;
 	// Contextual properties init
@@ -4038,23 +4046,7 @@ void CCharacter::setTargetBotchatProgramm(CEntityBase* target, const CEntityId &
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_TITLE(_PropertyDatabase, text);
 			// send the web page url
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::literal);
-			string url = c->getWebPage();
-
-			// add ? or & with
-			if (url.find('?') == string::npos)
-				url += NLMISC::toString("?urlidx=%d", getUrlIndex());
-			else
-				url += NLMISC::toString("&urlidx=%d", getUrlIndex());
-
-			setUrlIndex(getUrlIndex() + 1);
-			url += "&player_eid=" + getId().toString();
-			// add cheksum : pnj eid
-			url += "&teid=" + c->getId().toString();
-			string defaultSalt = toString(getLastConnectedDate());
-			string control = "&hmac="
-							 + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
-							 .toString();
-			params[0].Literal = url + control;
+			params[0].Literal = c->getWebPage();
 			text = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", params);
 			//			_PropertyDatabase.setProp( "TARGET:CONTEXT_MENU:WEB_PAGE_URL" , text );
 			CBankAccessor_PLR::getTARGET().getCONTEXT_MENU().setWEB_PAGE_URL(_PropertyDatabase, text);
@@ -5629,7 +5621,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 	if (_PowoCell != 0 && _PowoCell != cell) // leave the current Powo
 	{
 		// open url
-		sendUrl(toString("app_ryzhome action=quit_powo&powo=%d", _PowoCell), "");
+		sendUrl(toString("app_ryzhome action=quit_powo&powo=%d", _PowoCell));
 		resetPowoFlags();
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
@@ -5657,9 +5649,32 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 					getState().getVector2f(characterPos);
 					float squareDistance = (animalPos - characterPos).sqrnorm();
 
-					// Teleport as well pets that are following or mounted and in the neighbourhood
-					if ((isNearPetTpIsAllowed() && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
-							&& squareDistance <= 50.0f * 50.0f))
+					const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+
+
+					CContinent * cont = CZoneManager::getInstance().getContinent(_PlayerPets[i].Landscape_X, _PlayerPets[i].Landscape_Y);
+
+					bool inCell = false;
+					if (cont)
+					{
+						CONTINENT::TContinent continent = (CONTINENT::TContinent)cont->getId();
+
+						if (continent == CONTINENT::R2_ROOTS ||
+							continent == CONTINENT::R2_FOREST ||
+							continent == CONTINENT::R2_DESERT ||
+							continent == CONTINENT::R2_LAKES ||
+							continent == CONTINENT::R2_JUNGLE ||
+							continent == CONTINENT::INDOORS
+							)
+						{
+							nlinfo("pet in a powo/indoor");
+							inCell = true;
+						}
+					}
+					
+					// Teleport as well pets that are following or mounted or a pet and in the neighbourhood or... in a Powo/indoor
+					if ((((isNearPetTpIsAllowed() || form->Type == ITEM_TYPE::ANIMAL_TICKET) && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
+							&& squareDistance <= 50.0f * 50.0f)) || inCell)
 					{
 						// despawn it
 						sendPetCommand(CPetCommandMsg::DESPAWN, i, true);
@@ -6210,6 +6225,9 @@ bool CCharacter::spawnWaitingCharacterAnimalNear(uint index, const SGameCoordina
 	msg.CharacterMirrorRow = _EntityRowId;
 	msg.PetSheetId = _PlayerPets[index].PetSheetId;
 	msg.PetIdx = index;
+	msg.Cell = destination.Cell;
+	_PlayerPets[index].Cell = destination.Cell;
+
 	msg.CustomName = _PlayerPets[index].CustomName;
 	msg.AIInstanceId = (uint16)destAIInstance;
 	CWorldInstances::instance().msgToAIInstance(msg.AIInstanceId, msg);
@@ -6240,6 +6258,12 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 		return returnValue;
 	}
 
+
+	TDataSetRow dsr = getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+	sint32 cell;
+	cell = srcCell;
+
 	if (index < _PlayerPets.size())
 	{
 		if (!TheDataset.isAccessible(_PlayerPets[index].SpawnedPets))
@@ -6253,6 +6277,9 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 				msg.Coordinate_X = getX();
 				msg.Coordinate_Y = getY();
 				msg.Coordinate_H = getZ();
+				msg.Cell = cell;
+				_PlayerPets[index].Cell = cell;
+
 				msg.Heading = 0.0f;
 				break;
 
@@ -7314,6 +7341,11 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 			break;
 		}
 
+		if (_PlayerPets[i].IsInBag)
+		{
+			_PlayerPets[i].AnimalStatus |= ANIMAL_STATUS::InBagFlag;
+		}
+
 		if (TheDataset.isAccessible(_PlayerPets[i].SpawnedPets))
 		{
 			CCreature* c = CreatureManager.getCreature(TheDataset.getEntityId(_PlayerPets[i].SpawnedPets));
@@ -7535,20 +7567,36 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 	{
 		// if the player doesn't have a pet at this index then just continue
 		if (_PlayerPets[petIndex].PetStatus == CPetAnimal::not_present)
-		{
 			continue;
-		}
 
 		// make sure that the player is close enough to the pet to perform the requested action
-		if (petCommandDistance(petIndex) == false && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::FREE)
-		{
+		if (petCommandDistance(petIndex) == false && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::FREE && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::LEAVE_BAG)
 			continue;
-		}
 
 		CPetCommandMsg::TCommand petCommand;
 
 		switch ((ANIMALS_ORDERS::EBeastOrder)command)
 		{
+
+		case ANIMALS_ORDERS::ENTER_BAG:
+			if (_PlayerPets[petIndex].IsInBag)
+				continue;
+
+			lockTicketInInventory();
+			petCommand = CPetCommandMsg::DESPAWN;
+			_PlayerPets[petIndex].IsInBag = true;
+			break;
+
+		case ANIMALS_ORDERS::LEAVE_BAG:
+			if (!_PlayerPets[petIndex].IsInBag)
+				continue;
+
+			_PlayerPets[petIndex].PetStatus = CPetAnimal::waiting_spawn;
+			spawnCharacterAnimal(petIndex);
+			_PlayerPets[petIndex].IsInBag = false;
+			// no petCommand setup here so continue instead of break
+			continue;
+			
 		case ANIMALS_ORDERS::ENTER_STABLE:
 			if (_PlayerPets[petIndex].IsMounted)
 				continue;
@@ -11473,7 +11521,7 @@ void CCharacter::setMoney(const uint64 &money)
 {
 	if (money != _Money)
 	{
-		log_Item_Money(_Money, money);
+		//log_Item_Money(_Money, money);
 		_Money = money;
 		//		_PropertyDatabase.setProp( "INVENTORY:MONEY", _Money );
 		CBankAccessor_PLR::getINVENTORY().setMONEY(_PropertyDatabase, _Money);
@@ -12370,6 +12418,14 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 
 		vector<CGameItemPtr> vect;
 		vector<CPetAnimal> exchangePlayerPets;
+
+		if (_ExchangeView == NULL)
+		{
+			sendDynamicSystemMessage(getId(), "INVALID_EXCHANGE_IN_RING");
+			nlwarning("CCharacter::acceptExchange : character %s -> no exchangeView", _Id.toString().c_str());
+			return;
+		}
+		
 		removeExchangeItems(vect, exchangePlayerPets);
 
 		if (mission)
@@ -12777,7 +12833,12 @@ void CCharacter::addExchangeItems(
 
 	for (uint32 p = 0; p < playerPetsAdded.size(); ++p)
 	{
-		sint32 i = getFreePetSlot();
+		CSheetId PetTicket = playerPetsAdded[p].TicketPetSheetId;
+		const CStaticItem* form = CSheets::getForm(PetTicket);
+		uint8 startSlot = 0;
+		if (form->Type == ITEM_TYPE::ANIMAL_TICKET) // Use only last slots for pets
+			startSlot = MAX_PACK_ANIMAL+MAX_MEKTOUB_MOUNT;
+		sint32 i = getFreePetSlot(startSlot);
 
 		if (i >= 0)
 		{
@@ -14633,6 +14694,125 @@ void CCharacter::addBeast(uint16 petIndex)
 	}
 } // addBeast //
 
+
+string CCharacter::getPositionInfos()
+{
+	double x = 0, y = 0, z = 0, h = 0;
+	sint32 cell = 0;
+
+	x = getState().X / 1000.;
+	y = getState().Y / 1000.;
+	z = getState().Z / 1000.;
+	h = getState().Heading;
+
+	TDataSetRow dsr = getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+	cell = srcCell;
+
+	string contName;
+	string regionName;
+	const CRegion* region = NULL;
+	const CContinent * cont = NULL;
+	CZoneManager::getInstance().getRegion(getState().X ,getState().Y, &region, &cont);
+	if (region)
+		regionName = region->getName();
+	if (cont)
+		contName = cont->getName();
+
+
+	return toString("%.2f|%.2f|%.2f|%.4f|%d|%s|%s", x, y, z, h, cell, contName.c_str(), regionName.c_str());
+}
+
+string CCharacter::getTargetInfos()
+{
+
+	const CEntityId &target = getTarget();
+	string msg = target.toString()+"|";
+
+	if (target == CEntityId::Unknown)
+		return "0";
+
+	if (target.getType() == RYZOMID::creature)
+		msg += "c|";
+	else if (target.getType() == RYZOMID::npc)
+		msg += "n|";
+	else if (target.getType() == RYZOMID::player)
+		msg += "p|";
+	else
+		msg += "0";
+
+	double dist = 0, p_x = 0, p_y = 0;
+	p_x = getState().X / 1000.;
+	p_y = getState().Y / 1000.;
+
+	if (target.getType() == RYZOMID::player)
+	{
+		CCharacter * cTarget = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
+		if (cTarget) {
+			msg += cTarget->getName().toString()+"|";
+
+			if (getGuildId() != 0 && getGuildId() == cTarget->getGuildId())
+				msg += "g|";
+			else
+				msg += "0|";
+
+			if (getTeamId() != CTEAM::InvalidTeamId && getTeamId() == cTarget->getTeamId())
+				msg += "t|";
+			else
+				msg += "0|";
+
+			double x = cTarget->getState().X / 1000.;
+			double y = cTarget->getState().Y / 1000.;
+			double z = cTarget->getState().Z / 1000.;
+			double h = cTarget->getState().Heading;
+
+			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
+			
+			TDataSetRow dsr = cTarget->getEntityRowId();
+			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+			sint32 cell = srcCell;
+
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
+		}
+	}
+	else
+	{
+		string name;
+		CCreature * cTarget = CreatureManager.getCreature(target);
+		if (cTarget)
+		{
+			sint32 petSlot = getPlayerPet(cTarget->getEntityRowId());
+
+			if (petSlot == -1)
+			{
+				CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+				msg += name+"|";
+			}
+			else
+			{
+				string pets = getPets();
+				msg += toString("PET#%d:%s|", petSlot, pets.c_str());
+			}
+	
+			double x = cTarget->getState().X / 1000.;
+			double y = cTarget->getState().Y / 1000.;
+			double z = cTarget->getState().Z / 1000.;
+			double h = cTarget->getState().Heading;
+
+			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
+			
+			TDataSetRow dsr = cTarget->getEntityRowId();
+			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+			sint32 cell = srcCell;
+
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
+		}
+	}
+	
+	return msg;
+}
+
+
 //-----------------------------------------------
 //	havePriv
 //-----------------------------------------------
@@ -15311,26 +15491,17 @@ void CCharacter::sendDynamicMessage(const string &phrase, const string &message)
 	PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, phrase, messageParams);
 }
 
-void CCharacter::sendUrl(const string &url, const string &salt)
+void CCharacter::sendUrl(const string &url)
 {
 	string control;
-
-	if (!salt.empty())
-	{
-		control = "&hmac="
-				  + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
-	}
-	else
-	{
-		string defaultSalt = toString(getLastConnectedDate());
-		control = "&hmac="
-				  + getHMacSHA1((uint8*)&url[0], (uint32)url.size(), (uint8*)&defaultSalt[0], (uint32)defaultSalt.size())
-				  .toString();
-	}
+	string salt = toString(getLastConnectedDate())+ArkSalt.get();
+	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+getPositionInfos()+"&target_infos="+getTargetInfos();
+	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
 	uint32 userId = PlayerManager.getPlayerId(getId());
 	SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
-	textParams[0].Literal = "WEB : " + url + control;
+	textParams[0].Literal = "WEB : " + final_url + control;
+	nlinfo("URL: %s", final_url.c_str());
 	TVectorParamCheck titleParams;
 	uint32 titleId = STRING_MANAGER::sendStringToUser(userId, "web_transactions", titleParams);
 	uint32 textId = STRING_MANAGER::sendStringToClient(_EntityRowId, "LITERAL", textParams);
@@ -15339,7 +15510,7 @@ void CCharacter::sendUrl(const string &url, const string &salt)
 
 void CCharacter::validateDynamicMissionStep(const string &url)
 {
-	sendUrl(url + "&player_eid=" + getId().toString() + "&event=mission_step_finished", getSalt());
+	sendUrl(url + "&player_eid=" + getId().toString() + "&event=mission_step_finished");
 }
 
 /// set custom mission param
@@ -15461,7 +15632,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 				item->setCustomText(ucstring(url));
 				vector<string> infos;
 				NLMISC::splitString(url, "\n", infos);
-				sendUrl(infos[0] + "&player_eid=" + getId().toString() + "&event=command_added", salt);
+				sendUrl(infos[0] + "&player_eid=" + getId().toString() + "&event=command_added");
 			}
 			else
 			{
@@ -15475,9 +15646,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 				}
 
 				item->setCustomText(ucstring(url + "\n" + finalData));
-				sendUrl(
-					url + "&player_eid=" + getId().toString() + "&event=command_added&transaction_id=" + randomString,
-					salt);
+				sendUrl(url + "&player_eid=" + getId().toString() + "&event=command_added&transaction_id=" + randomString);
 			}
 		}
 	}
@@ -15502,9 +15671,7 @@ void CCharacter::addWebCommandCheck(const string &url, const string &data, const
 						NLMISC::splitString(cText, "\n", infos);
 						vector<string> datas;
 						NLMISC::splitString(infos[1], ",", datas);
-						sendUrl(infos[0] + "&player_eid=" + getId().toString()
-								+ "&event=command_added&transaction_id=" + datas[0].substr(0, 8),
-								salt);
+						sendUrl(infos[0] + "&player_eid=" + getId().toString()+ "&event=command_added&transaction_id=" + datas[0].substr(0, 8));
 					}
 				}
 			}
@@ -16022,7 +16189,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 			// 0);
 			CBankAccessor_PLR::getFAME()
 			.getTRIBE(fameIndexInDatabase - firstTribeDbIndex)
-			.setVALUE(_PropertyDatabase, 0);
+			.setVALUE(_PropertyDatabase, -128);
 			//			_PropertyDatabase.setProp( toString("FAME:TRIBE%d:TREND", fameIndexInDatabase -
 			// firstTribeDbIndex),
 			// 0);
@@ -16080,7 +16247,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 		else
 		{
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase), 0);
-			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setVALUE(_PropertyDatabase, 0);
+			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setVALUE(_PropertyDatabase, -128);
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:TREND", fameIndexInDatabase), 0);
 			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setTREND(_PropertyDatabase, 0);
 		}
@@ -16579,7 +16746,17 @@ bool CCharacter::removeSabrinaEffect(CSEffect* effect, bool activateSleepingEffe
 //--------------------------------------------------------------
 uint32 CCharacter::getCarriedWeight()
 {
-	return _Inventory[INVENTORIES::bag]->getInventoryWeight();
+	// CarriedWeight is bag Weight + all pets in bag
+	
+	uint32 total = _Inventory[INVENTORIES::bag]->getInventoryWeight();
+	
+	for (uint i = 0; i != _PlayerPets.size(); ++i)
+	{
+		if (_PlayerPets[i].IsInBag) // Add 5kg + Weight of Inventory
+			total += 5+_Inventory[(INVENTORIES::TInventory)(i + INVENTORIES::pet_animal)]->getInventoryWeight();
+	}
+
+	return total;
 }
 
 //--------------------------------------------------------------
@@ -20462,6 +20639,8 @@ void CPetAnimal::clear()
 	IsMounted = false;
 	IsTpAllowed = false;
 	spawnFlag = false;
+	IsInBag = false;
+	Cell = 0;
 }
 
 //-----------------------------------------------------------------------------

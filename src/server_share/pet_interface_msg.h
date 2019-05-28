@@ -42,6 +42,7 @@ public:
 	NLMISC::CSheetId	PetSheetId;
 	uint16				PetIdx;	// must be returned to EGS with CPetSpawnConfirmationMsg class
 	sint32				Coordinate_X, Coordinate_Y, Coordinate_H; //For NEAR_POINT mode
+	sint32				Cell;
 	float				Heading; //For NEAR_POINT mode
 	ucstring			CustomName;
 
@@ -56,6 +57,7 @@ public:
 		property ("Coordinate_X", PropSInt32, (sint32)0, Coordinate_X);
 		property ("Coordinate_Y", PropSInt32, (sint32)0, Coordinate_Y);
 		property ("Coordinate_H", PropSInt32, (sint32)0, Coordinate_H);
+		property ("Cell", PropSInt32, (sint32)0, Cell);
 		property ("Heading", PropFloat, 0.0f, Heading);
 		property ("CustomName", PropUCString, ucstring(""), CustomName);
 	}
