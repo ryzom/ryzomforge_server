@@ -13276,15 +13276,23 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		return;
 	}
 
+	CMissionTemplate* tpl = CMissionManager::getInstance()->getTemplate(mission->getTemplateId());
+	
 	if (mission->getFinished())
 	{
 		if (mission->getMissionSuccess())
 			result = mr_success;
 		else
 			result = mr_fail;
+
+		vector<string> params = getCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK");
+		if (params.size() >= 1)
+		{
+			validateDynamicMissionStep(params[0]+"&result="+MissionResultStatLogTag[result]);
+			setCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK", "");
+		}
 	}
 
-	CMissionTemplate* tpl = CMissionManager::getInstance()->getTemplate(mission->getTemplateId());
 	updateMissionHistories(alias, result);
 
 	if (tpl && !tpl->Tags.NoList)
@@ -13368,6 +13376,13 @@ void CCharacter::abandonMission(uint8 indexClient)
 		MISDBG("user:%s abandonMission", getId().toString().c_str());
 		mission->onFailure(true, false);
 		CCharacter::sendDynamicSystemMessage(_EntityRowId, "ABANDON_MISSION");
+	}
+
+	vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
+	if (params.size() >= 1)
+	{
+		validateDynamicMissionStep(params[0]+"&result=ABD");
+		setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
 	}
 
 	removeMission(mission->getTemplateId(), mr_abandon);
