@@ -3476,3 +3476,56 @@ NLMISC_COMMAND(getPlayerGuild, "get player guild informations", "<uid>")
 	log.displayNL("NoGuild");
 	return true;
 }
+
+NLMISC_COMMAND(addXp, "Gain experience in a given skills", "<uid> <xp> <skill> [<count>]")
+{
+	if (args.size () < 3) return false;
+
+	GET_ACTIVE_CHARACTER
+
+	uint32 xp;
+	NLMISC::fromString(args[1], xp);
+
+	string skill = args[2];
+
+	uint count;
+	if (args.size()==3)
+		count = 1;
+	else
+		NLMISC::fromString(args[3], count);
+
+	count = min(count, (uint)100);
+
+	uint i;
+	for (i=0; i<count; ++i)
+		c->addXpToSkill((double)xp, skill, true);
+
+	return true;
+}
+
+NLMISC_COMMAND(addBricks, "Specified player learns given brick", "<uid> <brick1,brick2>")
+{
+	if (args.size () != 2) return false;
+	GET_ACTIVE_CHARACTER
+
+	std::vector< std::string > bricks;
+	NLMISC::splitString(args[1], ",", bricks);
+	for (uint32 i=0; i<bricks.size(); i++)
+	{
+		CSheetId brickId(bricks[i]);
+		c->addKnownBrick(brickId);
+	}
+	return true;
+}
+
+
+NLMISC_COMMAND(delBrick, "Specified player unlearns given brick", "<uid> <brick1>")
+{
+	if (args.size () != 2) return false;
+	GET_ACTIVE_CHARACTER
+
+	CSheetId brickId(args[1]);
+	c->removeKnownBrick(brickId);
+
+	return true;
+}
