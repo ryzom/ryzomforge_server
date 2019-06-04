@@ -3128,6 +3128,8 @@ private:
 	bool addCatalyserXpBonus(uint32 &slot, SSkill* skill, double xpGain, double &xpBonus, uint32 &stackSizeToRemove,
 							 uint32 &catalyserLvl, uint32 &catalyserCount);
 
+	// add guild points to player who will add xp to guild
+	void addGuildPoints(uint32 points);
 	/**
 	 * addXpToSkillInternal add xpGain to a skill
 	 * \param XpGain is the amount of xp added to a skill / speciality
