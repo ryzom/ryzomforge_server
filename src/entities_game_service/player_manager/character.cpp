@@ -432,6 +432,8 @@ CCharacter::CCharacter()
 	_Organization = 0;
 	_OrganizationStatus = 0;
 	_OrganizationPoints = 0;
+	// refill pact automatically
+	_doPact = false;
 	// do not start berserk
 	_IsBerserk = false;
 	// Contextual properties init
@@ -5647,9 +5649,32 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 					getState().getVector2f(characterPos);
 					float squareDistance = (animalPos - characterPos).sqrnorm();
 
-					// Teleport as well pets that are following or mounted and in the neighbourhood
-					if ((isNearPetTpIsAllowed() && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
-							&& squareDistance <= 50.0f * 50.0f))
+					const CStaticItem* form = CSheets::getForm(_PlayerPets[i].TicketPetSheetId);
+
+
+					CContinent * cont = CZoneManager::getInstance().getContinent(_PlayerPets[i].Landscape_X, _PlayerPets[i].Landscape_Y);
+
+					bool inCell = false;
+					if (cont)
+					{
+						CONTINENT::TContinent continent = (CONTINENT::TContinent)cont->getId();
+
+						if (continent == CONTINENT::R2_ROOTS ||
+							continent == CONTINENT::R2_FOREST ||
+							continent == CONTINENT::R2_DESERT ||
+							continent == CONTINENT::R2_LAKES ||
+							continent == CONTINENT::R2_JUNGLE ||
+							continent == CONTINENT::INDOORS
+							)
+						{
+							nlinfo("pet in a powo/indoor");
+							inCell = true;
+						}
+					}
+					
+					// Teleport as well pets that are following or mounted or a pet and in the neighbourhood or... in a Powo/indoor
+					if ((((isNearPetTpIsAllowed() || form->Type == ITEM_TYPE::ANIMAL_TICKET) && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
+							&& squareDistance <= 50.0f * 50.0f)) || inCell)
 					{
 						// despawn it
 						sendPetCommand(CPetCommandMsg::DESPAWN, i, true);
@@ -6200,6 +6225,9 @@ bool CCharacter::spawnWaitingCharacterAnimalNear(uint index, const SGameCoordina
 	msg.CharacterMirrorRow = _EntityRowId;
 	msg.PetSheetId = _PlayerPets[index].PetSheetId;
 	msg.PetIdx = index;
+	msg.Cell = destination.Cell;
+	_PlayerPets[index].Cell = destination.Cell;
+
 	msg.CustomName = _PlayerPets[index].CustomName;
 	msg.AIInstanceId = (uint16)destAIInstance;
 	CWorldInstances::instance().msgToAIInstance(msg.AIInstanceId, msg);
@@ -6230,6 +6258,12 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 		return returnValue;
 	}
 
+
+	TDataSetRow dsr = getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+	sint32 cell;
+	cell = srcCell;
+
 	if (index < _PlayerPets.size())
 	{
 		if (!TheDataset.isAccessible(_PlayerPets[index].SpawnedPets))
@@ -6243,6 +6277,9 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 				msg.Coordinate_X = getX();
 				msg.Coordinate_Y = getY();
 				msg.Coordinate_H = getZ();
+				msg.Cell = cell;
+				_PlayerPets[index].Cell = cell;
+
 				msg.Heading = 0.0f;
 				break;
 
@@ -7304,6 +7341,11 @@ void CCharacter::updateOnePetDatabase(uint petIndex, bool mustUpdateHungerDb)
 			break;
 		}
 
+		if (_PlayerPets[i].IsInBag)
+		{
+			_PlayerPets[i].AnimalStatus |= ANIMAL_STATUS::InBagFlag;
+		}
+
 		if (TheDataset.isAccessible(_PlayerPets[i].SpawnedPets))
 		{
 			CCreature* c = CreatureManager.getCreature(TheDataset.getEntityId(_PlayerPets[i].SpawnedPets));
@@ -7525,20 +7567,36 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 	{
 		// if the player doesn't have a pet at this index then just continue
 		if (_PlayerPets[petIndex].PetStatus == CPetAnimal::not_present)
-		{
 			continue;
-		}
 
 		// make sure that the player is close enough to the pet to perform the requested action
-		if (petCommandDistance(petIndex) == false && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::FREE)
-		{
+		if (petCommandDistance(petIndex) == false && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::FREE && ((ANIMALS_ORDERS::EBeastOrder)command) != ANIMALS_ORDERS::LEAVE_BAG)
 			continue;
-		}
 
 		CPetCommandMsg::TCommand petCommand;
 
 		switch ((ANIMALS_ORDERS::EBeastOrder)command)
 		{
+
+		case ANIMALS_ORDERS::ENTER_BAG:
+			if (_PlayerPets[petIndex].IsInBag)
+				continue;
+
+			lockTicketInInventory();
+			petCommand = CPetCommandMsg::DESPAWN;
+			_PlayerPets[petIndex].IsInBag = true;
+			break;
+
+		case ANIMALS_ORDERS::LEAVE_BAG:
+			if (!_PlayerPets[petIndex].IsInBag)
+				continue;
+
+			_PlayerPets[petIndex].PetStatus = CPetAnimal::waiting_spawn;
+			spawnCharacterAnimal(petIndex);
+			_PlayerPets[petIndex].IsInBag = false;
+			// no petCommand setup here so continue instead of break
+			continue;
+			
 		case ANIMALS_ORDERS::ENTER_STABLE:
 			if (_PlayerPets[petIndex].IsMounted)
 				continue;
@@ -11463,7 +11521,7 @@ void CCharacter::setMoney(const uint64 &money)
 {
 	if (money != _Money)
 	{
-		log_Item_Money(_Money, money);
+		//log_Item_Money(_Money, money);
 		_Money = money;
 		//		_PropertyDatabase.setProp( "INVENTORY:MONEY", _Money );
 		CBankAccessor_PLR::getINVENTORY().setMONEY(_PropertyDatabase, _Money);
@@ -12775,7 +12833,12 @@ void CCharacter::addExchangeItems(
 
 	for (uint32 p = 0; p < playerPetsAdded.size(); ++p)
 	{
-		sint32 i = getFreePetSlot();
+		CSheetId PetTicket = playerPetsAdded[p].TicketPetSheetId;
+		const CStaticItem* form = CSheets::getForm(PetTicket);
+		uint8 startSlot = 0;
+		if (form->Type == ITEM_TYPE::ANIMAL_TICKET) // Use only last slots for pets
+			startSlot = MAX_PACK_ANIMAL+MAX_MEKTOUB_MOUNT;
+		sint32 i = getFreePetSlot(startSlot);
 
 		if (i >= 0)
 		{
@@ -13213,15 +13276,23 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		return;
 	}
 
+	CMissionTemplate* tpl = CMissionManager::getInstance()->getTemplate(mission->getTemplateId());
+	
 	if (mission->getFinished())
 	{
 		if (mission->getMissionSuccess())
 			result = mr_success;
 		else
 			result = mr_fail;
+
+		vector<string> params = getCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK");
+		if (params.size() >= 1)
+		{
+			validateDynamicMissionStep(params[0]+"&result="+MissionResultStatLogTag[result]);
+			setCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK", "");
+		}
 	}
 
-	CMissionTemplate* tpl = CMissionManager::getInstance()->getTemplate(mission->getTemplateId());
 	updateMissionHistories(alias, result);
 
 	if (tpl && !tpl->Tags.NoList)
@@ -13305,6 +13376,13 @@ void CCharacter::abandonMission(uint8 indexClient)
 		MISDBG("user:%s abandonMission", getId().toString().c_str());
 		mission->onFailure(true, false);
 		CCharacter::sendDynamicSystemMessage(_EntityRowId, "ABANDON_MISSION");
+	}
+
+	vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
+	if (params.size() >= 1)
+	{
+		validateDynamicMissionStep(params[0]+"&result=ABD");
+		setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
 	}
 
 	removeMission(mission->getTemplateId(), mr_abandon);
@@ -14630,6 +14708,125 @@ void CCharacter::addBeast(uint16 petIndex)
 				  _Id.toString().c_str(), (uint32)_PlayerPets[petIndex].SpawnedPets.getIndex(), petIndex);
 	}
 } // addBeast //
+
+
+string CCharacter::getPositionInfos()
+{
+	double x = 0, y = 0, z = 0, h = 0;
+	sint32 cell = 0;
+
+	x = getState().X / 1000.;
+	y = getState().Y / 1000.;
+	z = getState().Z / 1000.;
+	h = getState().Heading;
+
+	TDataSetRow dsr = getEntityRowId();
+	CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+	cell = srcCell;
+
+	string contName;
+	string regionName;
+	const CRegion* region = NULL;
+	const CContinent * cont = NULL;
+	CZoneManager::getInstance().getRegion(getState().X ,getState().Y, &region, &cont);
+	if (region)
+		regionName = region->getName();
+	if (cont)
+		contName = cont->getName();
+
+
+	return toString("%.2f|%.2f|%.2f|%.4f|%d|%s|%s", x, y, z, h, cell, contName.c_str(), regionName.c_str());
+}
+
+string CCharacter::getTargetInfos()
+{
+
+	const CEntityId &target = getTarget();
+	string msg = target.toString()+"|";
+
+	if (target == CEntityId::Unknown)
+		return "0";
+
+	if (target.getType() == RYZOMID::creature)
+		msg += "c|";
+	else if (target.getType() == RYZOMID::npc)
+		msg += "n|";
+	else if (target.getType() == RYZOMID::player)
+		msg += "p|";
+	else
+		msg += "0";
+
+	double dist = 0, p_x = 0, p_y = 0;
+	p_x = getState().X / 1000.;
+	p_y = getState().Y / 1000.;
+
+	if (target.getType() == RYZOMID::player)
+	{
+		CCharacter * cTarget = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(target));
+		if (cTarget) {
+			msg += cTarget->getName().toString()+"|";
+
+			if (getGuildId() != 0 && getGuildId() == cTarget->getGuildId())
+				msg += "g|";
+			else
+				msg += "0|";
+
+			if (getTeamId() != CTEAM::InvalidTeamId && getTeamId() == cTarget->getTeamId())
+				msg += "t|";
+			else
+				msg += "0|";
+
+			double x = cTarget->getState().X / 1000.;
+			double y = cTarget->getState().Y / 1000.;
+			double z = cTarget->getState().Z / 1000.;
+			double h = cTarget->getState().Heading;
+
+			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
+			
+			TDataSetRow dsr = cTarget->getEntityRowId();
+			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+			sint32 cell = srcCell;
+
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
+		}
+	}
+	else
+	{
+		string name;
+		CCreature * cTarget = CreatureManager.getCreature(target);
+		if (cTarget)
+		{
+			sint32 petSlot = getPlayerPet(cTarget->getEntityRowId());
+
+			if (petSlot == -1)
+			{
+				CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+				msg += name+"|";
+			}
+			else
+			{
+				string pets = getPets();
+				msg += toString("PET#%d:%s|", petSlot, pets.c_str());
+			}
+	
+			double x = cTarget->getState().X / 1000.;
+			double y = cTarget->getState().Y / 1000.;
+			double z = cTarget->getState().Z / 1000.;
+			double h = cTarget->getState().Heading;
+
+			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
+			
+			TDataSetRow dsr = cTarget->getEntityRowId();
+			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
+			sint32 cell = srcCell;
+
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
+		}
+	}
+	
+	return msg;
+}
+
 
 //-----------------------------------------------
 //	havePriv
@@ -16007,7 +16204,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 			// 0);
 			CBankAccessor_PLR::getFAME()
 			.getTRIBE(fameIndexInDatabase - firstTribeDbIndex)
-			.setVALUE(_PropertyDatabase, 0);
+			.setVALUE(_PropertyDatabase, -128);
 			//			_PropertyDatabase.setProp( toString("FAME:TRIBE%d:TREND", fameIndexInDatabase -
 			// firstTribeDbIndex),
 			// 0);
@@ -16065,7 +16262,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 		else
 		{
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase), 0);
-			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setVALUE(_PropertyDatabase, 0);
+			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setVALUE(_PropertyDatabase, -128);
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:TREND", fameIndexInDatabase), 0);
 			CBankAccessor_PLR::getFAME().getPLAYER(fameIndexInDatabase).setTREND(_PropertyDatabase, 0);
 		}
@@ -16564,7 +16761,17 @@ bool CCharacter::removeSabrinaEffect(CSEffect* effect, bool activateSleepingEffe
 //--------------------------------------------------------------
 uint32 CCharacter::getCarriedWeight()
 {
-	return _Inventory[INVENTORIES::bag]->getInventoryWeight();
+	// CarriedWeight is bag Weight + all pets in bag
+	
+	uint32 total = _Inventory[INVENTORIES::bag]->getInventoryWeight();
+	
+	for (uint i = 0; i != _PlayerPets.size(); ++i)
+	{
+		if (_PlayerPets[i].IsInBag) // Add 5kg + Weight of Inventory
+			total += 5+_Inventory[(INVENTORIES::TInventory)(i + INVENTORIES::pet_animal)]->getInventoryWeight();
+	}
+
+	return total;
 }
 
 //--------------------------------------------------------------
@@ -20447,6 +20654,8 @@ void CPetAnimal::clear()
 	IsMounted = false;
 	IsTpAllowed = false;
 	spawnFlag = false;
+	IsInBag = false;
+	Cell = 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -803,7 +803,7 @@ void CFameManager::cbFameDelta( NLNET::CMessage& msgin, const std::string &servi
 void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sint32 deltaFame, const std::string &serviceName, bool propagate, TFamePropagation propagationType)
 {
 	// static string manager param table
-	SM_STATIC_PARAMS_2(fameMsgParams, STRING_MANAGER::faction, STRING_MANAGER::integer);
+	SM_STATIC_PARAMS_3(fameMsgParams, STRING_MANAGER::faction, STRING_MANAGER::integer, STRING_MANAGER::integer);
 
 	const TDataSetRow entityIndex = TheFameDataset.getDataSetRow(entityId);
 	TFameContainer::iterator	it(_FamesOwners.find(entityIndex));
@@ -854,15 +854,15 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 	double realDeltaFame = 0.;
 
 	// Non linear fame gain
-    if (deltaFame > 1)
+	if (deltaFame > 1)
 	{
-        // gain de fame : toujours log
-        if (fame > 0)
-            realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
-        else
-            realDeltaFame = ((-FAME_GAIN_FACTOR - fame) / - FameAbsoluteMax) * deltaFame;
+		// gain de fame : toujours log
+		if (fame > 0)
+			realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
+		else
+			realDeltaFame = ((-FAME_GAIN_FACTOR - fame) / - FameAbsoluteMax) * deltaFame;
 	}
-    else
+	else
 	{
 		if (fame < 0)
 			realDeltaFame = ((-FAME_GAIN_FACTOR - fame) / -FameAbsoluteMax) * deltaFame;
@@ -880,6 +880,8 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 		realDeltaFame = -3*6000;
 		
 	fame += realDeltaFame;
+
+	fameMsgParams[2].Int = (uint32)(abs(realDeltaFame));
 
 	// set fame tendance info
 	fow.LastFameChangeDate = CTickEventHandler::getGameCycle();

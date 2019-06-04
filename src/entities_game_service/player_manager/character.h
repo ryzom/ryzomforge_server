@@ -332,8 +332,10 @@ struct CPetAnimal
 	bool IsFollowing;
 	bool IsMounted;
 	bool IsTpAllowed;
+	bool IsInBag;
 	bool spawnFlag;
 	ucstring CustomName;
+	sint32 Cell;
 
 	// ctor
 	CPetAnimal();
@@ -1599,6 +1601,9 @@ public:
 
 	/// Register character name in IOS
 	void registerName(const ucstring &newName = std::string(""));
+
+	std::string getTargetInfos();
+	std::string getPositionInfos();
 
 	/// Mount a mount
 	void mount(TDataSetRow PetRowId);
@@ -3219,6 +3224,10 @@ public:
 		return (uint8)_FriendVisibility;
 	}
 
+	inline void doPact(bool value) { _doPact = value; }
+	inline bool doPact() { return _doPact; }
+
+
 	//////////////////
 	// Private members
 	//////////////////
@@ -3756,6 +3765,9 @@ private:
 
 	/// to know if item pre-requisits have to be recomputed (as after a skill/charac update)
 	bool _HaveToUpdateItemsPrerequisit;
+
+	/// to refill used pact automatically after a teleportation
+	bool _doPact;
 
 	///\name PVP related members
 	//@{
