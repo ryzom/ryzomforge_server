@@ -21715,10 +21715,10 @@ void CCharacter::setProspectionLocateDepositEffect(CSEffectPtr effect)
 
 //------------------------------------------------------------------------------
 
-void CCharacter::addXpToSkill(double XpGain, const std::string &Skill)
+void CCharacter::addXpToSkill(double XpGain, const std::string &Skill, bool silent)
 {
 	std::map<SKILLS::ESkills, CXpProgressInfos> dummy;
-	addXpToSkillInternal(XpGain, Skill, AddXpToSkillSingle, dummy);
+	addXpToSkillInternal(XpGain, Skill, AddXpToSkillSingle, dummy, silent);
 }
 
 //------------------------------------------------------------------------------
