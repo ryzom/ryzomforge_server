@@ -838,9 +838,12 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 	fameMsgParams[1].Int = propagationType;
 
 	double fame = fow.Fames[faction];
+
+	CCharacter* character = PlayerManager.getChar( entityId );
+	bool isMarauder = (character && character->getOrganization() == 5);
+	
 	if (fame == NO_FAME)
 	{
-		CCharacter* character = PlayerManager.getChar( entityId );
 		if (character)
 			fame = CStaticFames::getInstance().getStaticFameIndexed(PVP_CLAN::getFactionIndex(PVP_CLAN::getClanFromPeople(character->getRace())), faction);
 		else
@@ -849,6 +852,7 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 
 	const double FAME_GAIN_FACTOR = (FameAbsoluteMax/25.0)+FameAbsoluteMax;
 	double realDeltaFame = 0.;
+
 	// Non linear fame gain
     if (deltaFame > 1)
 	{
@@ -866,6 +870,15 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 			realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
 	}
 
+	if (!isMarauder && realDeltaFame < 0)
+		realDeltaFame /= 20;
+
+	if (realDeltaFame > 3*6000)
+		realDeltaFame = 3*6000;
+	
+	if (realDeltaFame < -3*6000)
+		realDeltaFame = -3*6000;
+		
 	fame += realDeltaFame;
 
 	// set fame tendance info
