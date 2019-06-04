@@ -739,7 +739,7 @@ NLMISC_COMMAND(spawnNamedItem, "Spawn a named Item", "<uid> <inv> <quantity> <na
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<uid> [bag sheet quantity_min quantity_max quality_min quality_max extra_infos]")
+NLMISC_COMMAND(getItemList, "get list of items of character by filter", "<uid> [bag sheet quantity_min quantity_max quality_min quality_max extra_infos]")
 {
 
 	GET_ACTIVE_CHARACTER
