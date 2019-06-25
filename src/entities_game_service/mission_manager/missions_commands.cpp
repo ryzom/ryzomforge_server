@@ -1357,9 +1357,9 @@ NLMISC_COMMAND(getFactionPoints, "get faction points of player (if quantity, giv
 
 	uint32 points = c->getFactionPoint(clan);
 
-	if (args.size() == 3)
+	if (args.size() >= 3)
 	{
-		string quant = args[1];
+		string quant = args[2];
 		uint32 quantity;
 		if (quant[0] == '+')
 		{
@@ -1394,6 +1394,7 @@ NLMISC_COMMAND(getFactionPoints, "get faction points of player (if quantity, giv
 	}
 
 	log.displayNL("%u", points);
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2622,7 +2623,7 @@ NLMISC_COMMAND(finishArkMission,"finish Mission","<uid> <mission_name>")
 }
 
 //-----------------------------------------------
-NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1> <line2> <line3> ...")
+NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1> <line2> <line3>..")
 {
 	if (args.size() < 3)
 		return false;
