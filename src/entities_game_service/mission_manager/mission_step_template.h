@@ -278,6 +278,7 @@ protected:
 	void			getTextParams(uint & nbSubSteps, TVectorParamCheck& retParams, const std::vector<uint32>& subStepStates);
 
 	std::vector< CSubStep > _SubSteps;
+	std::string _CraftType;
 };
 
 

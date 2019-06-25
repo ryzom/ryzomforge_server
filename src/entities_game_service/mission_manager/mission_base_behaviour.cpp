@@ -485,9 +485,17 @@ CMissionEvent::TResult CMissionBaseBehaviour::processEventForStep( const TDataSe
 			{
 				// the event was processed : update the step state
 				if ( (*it).second.getState() > resultInt )
+				{
+					if (resultInt < 10000 || (*it).second.getState() - resultInt > 0) // Special case for Craft&Give step
+					{
 					(*it).second.setState( (*it).second.getState() - resultInt );
+					}
+				}
 				else
+				{
+					if (resultInt <= 10000) // Special case for Craft&Give step
 					(*it).second.setState( 0 );
+				}
 
 				// if the step is not finished, we bail out
 				map<uint32,EGSPD::CActiveStepStatePD>::iterator itState = step.getStatesBegin();
