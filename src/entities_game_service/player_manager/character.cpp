@@ -15538,7 +15538,12 @@ void CCharacter::sendUrl(const string &url)
 {
 	string control;
 	string salt = toString(getLastConnectedDate())+ArkSalt.get();
-	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+getPositionInfos()+"&target_infos="+getTargetInfos();
+	string playerPos = getPositionInfos();
+	strFindReplace(playerPos, " ", "%20");
+	string targetInfos = getTargetInfos();
+	strFindReplace(targetInfos, " ", "%20");
+	
+	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos;
 	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
 	uint32 userId = PlayerManager.getPlayerId(getId());
