@@ -1158,7 +1158,7 @@ NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<e
 
 	sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
 
-	if (args.size() == 3)
+	if (args.size() >= 3)
 	{
 		string quant = args[2];
 		sint32 quantity;
@@ -1178,7 +1178,7 @@ NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<e
 		CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame, false);
 	}
 
-	if (args.size() == 4 && args[3] == "1")
+	if (args.size() < 4 || args[3] == "1")
 	{
 		CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
 		// set tribe fame threshold and clamp fame if necessary
