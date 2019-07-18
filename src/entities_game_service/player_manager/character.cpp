@@ -13312,7 +13312,7 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		vector<string> params = getCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK");
 		if (params.size() >= 1)
 		{
-			validateDynamicMissionStep(params[0]+"&result="+MissionResultStatLogTag[result]);
+			validateDynamicMissionStep(params[0]+toString("&result=%s", MissionResultStatLogTag[result]));
 			setCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK", "");
 		}
 	}
@@ -13405,7 +13405,10 @@ void CCharacter::abandonMission(uint8 indexClient)
 	vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
 	if (params.size() >= 1)
 	{
+		if (mission->getMissionSuccess() == false)
 		validateDynamicMissionStep(params[0]+"&result=ABD");
+		else
+			validateDynamicMissionStep(params[0]+"&result=SUC");
 		setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
 	}
 
