@@ -13312,7 +13312,7 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 		vector<string> params = getCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK");
 		if (params.size() >= 1)
 		{
-			validateDynamicMissionStep(params[0]+"&result="+MissionResultStatLogTag[result]);
+			validateDynamicMissionStep(params[0]+toString("&result=%s", MissionResultStatLogTag[result]));
 			setCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK", "");
 		}
 	}
@@ -13405,7 +13405,10 @@ void CCharacter::abandonMission(uint8 indexClient)
 	vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
 	if (params.size() >= 1)
 	{
+		if (mission->getMissionSuccess() == false)
 		validateDynamicMissionStep(params[0]+"&result=ABD");
+		else
+			validateDynamicMissionStep(params[0]+"&result=SUC");
 		setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
 	}
 
@@ -18877,6 +18880,14 @@ bool CCharacter::isMissionSuccessfull(const CMissionTemplate &templ)
 		return it->second.Successfull;
 
 	return false;
+}
+
+void CCharacter::resetMissionSuccessfull(TAIAlias alias)
+{
+	std::map<TAIAlias, TMissionHistory>::iterator it(_MissionHistories.find(alias));
+
+	if (it != _MissionHistories.end())
+		it->second.LastSuccessDate = 0;
 }
 
 /// check the last date of trying for a mission (0 if never tryied)

@@ -1421,6 +1421,7 @@ public:
 
 	/// check weither or not a mission has been successfully played
 	bool isMissionSuccessfull(const CMissionTemplate &templ);
+	void resetMissionSuccessfull(TAIAlias alias);
 
 	/// check the last date of trying for a mission (0 if never tryied)
 	NLMISC::TGameCycle getMissionLastSuccess(const CMissionTemplate &templ);
