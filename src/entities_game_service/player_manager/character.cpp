@@ -18882,6 +18882,14 @@ bool CCharacter::isMissionSuccessfull(const CMissionTemplate &templ)
 	return false;
 }
 
+void CCharacter::resetMissionSuccessfull(TAIAlias alias)
+{
+	std::map<TAIAlias, TMissionHistory>::iterator it(_MissionHistories.find(alias));
+
+	if (it != _MissionHistories.end())
+		it->second.LastSuccessDate = 0;
+}
+
 /// check the last date of trying for a mission (0 if never tryied)
 NLMISC::TGameCycle CCharacter::getMissionLastSuccess(const CMissionTemplate &templ)
 {
