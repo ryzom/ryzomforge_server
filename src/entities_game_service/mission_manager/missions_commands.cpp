@@ -2561,7 +2561,7 @@ NLMISC_COMMAND(addCheckPos,"add check pos","<uid> <x> <y> <radius> <mission_name
 //-----------------------------------------------
 NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>")
 {
-	if (args.size() != 3)
+	if (args.size() < 3)
 		return false;
 
 	GET_ACTIVE_CHARACTER;
@@ -2586,8 +2586,14 @@ NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>"
 	c->endBotChat();
 
 	std::list< CMissionEvent* > eventList;
-	CMissionManager::getInstance()->instanciateMission(c, missionAlias,	giverAlias, eventList);
+	uint8 result = CMissionManager::getInstance()->instanciateMission(c, missionAlias, giverAlias, eventList);
+	if (!result)
+	{
 	c->processMissionEventList(eventList,true, CAIAliasTranslator::Invalid);
+		log.displayNL("OK");
+	}
+	else
+		log.displayNL("ERR: %d", result);
 
 	return true;
 }
@@ -2621,6 +2627,21 @@ NLMISC_COMMAND(finishArkMission,"finish Mission","<uid> <mission_name>")
 
 	return true;
 }
+
+//-----------------------------------------------
+NLMISC_COMMAND(resetArkMission,"reset Mission","<uid> <mission_name>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+		
+	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
+	c->resetMissionSuccessfull(missionAlias);
+
+	return true;
+}
+
 
 //-----------------------------------------------
 NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1> <line2> <line3>..")
