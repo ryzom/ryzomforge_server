@@ -271,6 +271,16 @@ inline void sendNaturalEventHitMessages( RYZOMID::TTypeId aggressorType, const T
 }
 
 
+void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const NLMISC::CEntityId &victimId, sint32 amount, sint32 amountWithoutArmor, sint32 avoided=0 );
+
+inline void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const TDataSetRow &victimRowId, sint32 amount, sint32 amountWithoutArmor, sint32 avoided=0 )
+{
+	if (TheDataset.isAccessible(victimRowId))
+	{
+		sendNaturalEventHealMessages( aggressorType, TheDataset.getEntityId( victimRowId ), amount, amountWithoutArmor, avoided );
+	}
+}
+
 /**
  * fumble messages
  * \param aggressorId NLMISC::CEntityId of the acting entity

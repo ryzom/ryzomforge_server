@@ -1148,6 +1148,27 @@ void sendNaturalEventHitMessages( RYZOMID::TTypeId aggressorType, const NLMISC::
 }
 
 
+/**
+ * A natural event heals an entity, send all relevant messages to the entities around.
+ */
+void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const NLMISC::CEntityId &victimId, sint32 amount, sint32 amountWithoutArmor, sint32 avoided )
+{
+	amount = abs(amount);
+
+	// Select msg
+	const char *msgD = "HEAL_CLOUD_HIT";
+
+	// Send msg to hit player
+	if ( victimId.getType() == RYZOMID::player )
+	{
+		SM_STATIC_PARAMS_2(params, STRING_MANAGER::integer, STRING_MANAGER::integer);
+		params[0].Int = amount;
+		params[1].Int = avoided;
+		sendDynamicSystemMessage(TheDataset.getDataSetRow(victimId), msgD, params);
+	}
+}
+
+
 
 //--------------------------------------------------------------
 //					sendCriticalHitMessage()  
