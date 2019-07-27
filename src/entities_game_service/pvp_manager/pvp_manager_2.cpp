@@ -1181,6 +1181,8 @@ void CPVPManager2::onIOSMirrorUp()
 	createExtraFactionChannel("de", true);
 	createExtraFactionChannel("ru", true);
 	createExtraFactionChannel("es", true);
+	createExtraFactionChannel("rf", true);
+	
 #ifdef HAVE_MONGO
 	CUniquePtr<DBClientCursor> cursor = CMongo::query("ryzom_channels", toString("{}"));
 	if (cursor.get())
