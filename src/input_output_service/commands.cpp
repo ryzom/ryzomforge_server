@@ -98,7 +98,7 @@ NLMISC_COMMAND(smTest, "Send a test dyn string to a client (look at first phrase
 	if (ci == NULL)
 	{
 		// try to find a valid client
-		
+
 		log.displayNL("Unknown client '%s' !", args[0].c_str());
 		return false;
 	}
@@ -111,7 +111,7 @@ NLMISC_COMMAND(smTest, "Send a test dyn string to a client (look at first phrase
 	{
 		if (args.size() != 2)
 			return false;
-		
+
 		dynId = sendStringToClient(ci->DataSetIndex, "TEST_SELF", params, &IosLocalSender);
 	}
 	else
@@ -487,7 +487,7 @@ NLMISC_COMMAND(smTest, "Send a test dyn string to a client (look at first phrase
 	}
 
 	log.displayNL("Dyn string send to client %s with ID = %u", args[0].c_str(), dynId);
-	
+
 	return true;
 }
 
@@ -547,7 +547,7 @@ NLMISC_COMMAND(mute,"Mute or unmute a player. the player can be muted for a fixe
 	{
 		nlwarning("(mute) No infos about the character %s",args[0].c_str());
 	}
-		
+
 	return true;
 
 } // mode //
@@ -590,7 +590,7 @@ NLMISC_COMMAND(genImpulsion,"generate a fake impulsion, used to debug the CActio
 	CEntityId id;
 	CMessage msgout( "IMPULSION_ID" );
 	msgout.serial( id );
-	
+
 	CBitMemStream stream;
 
 	uint count;
@@ -667,7 +667,7 @@ NLMISC_COMMAND( displayChatAudience, "Display the current chat dynamic audience 
 NLMISC_COMMAND(showChat,"show or hide chat messages","")
 {
 	ShowChat = !ShowChat;
-	
+
 	return true;
 
 } // showChat //
@@ -677,23 +677,24 @@ NLMISC_COMMAND(chat, "send message chat", "<char_name> <chat_group> <message>")
 {
 	if (args.size() < 3)
 		return false;
-	
+
 	CCharacterInfos *ci = IOS->getCharInfos(args[0]);
 	if (ci == NULL)
 	{
 		log.displayNL("ERR: Unknown %s", args[0].c_str());
 		return false;
 	}
-	
+
 	CChatGroup::TGroupType mode = CChatGroup::stringToGroupType(args[1]);
-	ucstring ucstr = args[2];
+	ucstring ucstr;
+	ucstr.fromUtf8(args[2]);
 	TDataSetRow rowId = ci->DataSetIndex;
 	try
 	{
 		CChatGroup::TGroupType oldMode = IOS->getChatManager().getClient(rowId).getChatMode();
 		if (mode != oldMode)
 			IOS->getChatManager().getClient(rowId).setChatMode(mode);
-		
+
 		IOS->getChatManager().getClient(rowId).updateAudience();
 		IOS->getChatManager().chat(rowId, ucstr);
 
@@ -704,7 +705,7 @@ NLMISC_COMMAND(chat, "send message chat", "<char_name> <chat_group> <message>")
 	{
 		nlwarning("<cbChatMessage> %s",e.what());
 	}
-	
+
 	return true;
 }
 
@@ -712,16 +713,16 @@ NLMISC_COMMAND(getRealName, "getRealName", "<char_name>")
 {
 	if (args.size() != 1)
 		return false;
-	
+
 	CCharacterInfos *ci = IOS->getCharInfos(args[0]);
 	if (ci == NULL)
 	{
 		log.displayNL("ERR: Unknown %s", args[0].c_str());
 		return true;
 	}
-	
+
 	log.displayNL("%s", ci->ShortName.c_str());
-	
+
 	return true;
 }
 

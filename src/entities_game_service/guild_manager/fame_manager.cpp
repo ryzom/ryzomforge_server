@@ -803,7 +803,7 @@ void CFameManager::cbFameDelta( NLNET::CMessage& msgin, const std::string &servi
 void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sint32 deltaFame, const std::string &serviceName, bool propagate, TFamePropagation propagationType)
 {
 	// static string manager param table
-	SM_STATIC_PARAMS_2(fameMsgParams, STRING_MANAGER::faction, STRING_MANAGER::integer);
+	SM_STATIC_PARAMS_3(fameMsgParams, STRING_MANAGER::faction, STRING_MANAGER::integer, STRING_MANAGER::integer);
 
 	const TDataSetRow entityIndex = TheFameDataset.getDataSetRow(entityId);
 	TFameContainer::iterator	it(_FamesOwners.find(entityIndex));
@@ -838,9 +838,12 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 	fameMsgParams[1].Int = propagationType;
 
 	double fame = fow.Fames[faction];
+
+	CCharacter* character = PlayerManager.getChar( entityId );
+	bool isMarauder = (character && character->getOrganization() == 5);
+	
 	if (fame == NO_FAME)
 	{
-		CCharacter* character = PlayerManager.getChar( entityId );
 		if (character)
 			fame = CStaticFames::getInstance().getStaticFameIndexed(PVP_CLAN::getFactionIndex(PVP_CLAN::getClanFromPeople(character->getRace())), faction);
 		else
@@ -849,16 +852,17 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 
 	const double FAME_GAIN_FACTOR = (FameAbsoluteMax/25.0)+FameAbsoluteMax;
 	double realDeltaFame = 0.;
+
 	// Non linear fame gain
-    if (deltaFame > 1)
+	if (deltaFame > 1)
 	{
-        // gain de fame : toujours log
-        if (fame > 0)
-            realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
-        else
-            realDeltaFame = ((-FAME_GAIN_FACTOR - fame) / - FameAbsoluteMax) * deltaFame;
+		// gain de fame : toujours log
+		if (fame > 0)
+			realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
+		else
+			realDeltaFame = ((-FAME_GAIN_FACTOR - fame) / - FameAbsoluteMax) * deltaFame;
 	}
-    else
+	else
 	{
 		if (fame < 0)
 			realDeltaFame = ((-FAME_GAIN_FACTOR - fame) / -FameAbsoluteMax) * deltaFame;
@@ -866,7 +870,18 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 			realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
 	}
 
+	if (realDeltaFame > 3*6000)
+		realDeltaFame = 3*6000;
+	
+	if (realDeltaFame < -3*6000)
+		realDeltaFame = -3*6000;
+		
+	if (!isMarauder && realDeltaFame < 0)
+		realDeltaFame /= 10;
+
 	fame += realDeltaFame;
+
+	fameMsgParams[2].Int = (uint32)(abs(realDeltaFame));
 
 	// set fame tendance info
 	fow.LastFameChangeDate = CTickEventHandler::getGameCycle();
