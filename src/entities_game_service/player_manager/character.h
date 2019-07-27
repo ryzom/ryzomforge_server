@@ -942,7 +942,7 @@ public:
 	 * \param XpGain is the amount of xp added to a skill / speciality
 	 * \param Skill is the name of used skill for action (or associated skill ofr specialized action used)
 	 */
-	void addXpToSkill(double XpGain, const std::string &Skill);
+	void addXpToSkill(double XpGain, const std::string &Skill, bool silent = false);
 
 	/**
 	 * addXpToSkillAndBuffer add xpGain to a skill. Do not send messages to clients, but buffer the messages
@@ -1421,6 +1421,7 @@ public:
 
 	/// check weither or not a mission has been successfully played
 	bool isMissionSuccessfull(const CMissionTemplate &templ);
+	void resetMissionSuccessfull(TAIAlias alias);
 
 	/// check the last date of trying for a mission (0 if never tryied)
 	NLMISC::TGameCycle getMissionLastSuccess(const CMissionTemplate &templ);
@@ -3128,6 +3129,8 @@ private:
 	bool addCatalyserXpBonus(uint32 &slot, SSkill* skill, double xpGain, double &xpBonus, uint32 &stackSizeToRemove,
 							 uint32 &catalyserLvl, uint32 &catalyserCount);
 
+	// add guild points to player who will add xp to guild
+	void addGuildPoints(uint32 points);
 	/**
 	 * addXpToSkillInternal add xpGain to a skill
 	 * \param XpGain is the amount of xp added to a skill / speciality
@@ -3140,7 +3143,7 @@ private:
 	 *	may even be bigger than the original XpGain!
 	 */
 	double addXpToSkillInternal(double XpGain, const std::string &ContSkill, TAddXpToSkillMode addXpMode,
-								std::map<SKILLS::ESkills, CXpProgressInfos> &gainBySkill);
+								std::map<SKILLS::ESkills, CXpProgressInfos> &gainBySkill, bool silent=false);
 
 	/// Initialize the specified pet inventory, if it is valid
 	bool initPetInventory(uint8 index);

@@ -870,15 +870,15 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 			realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
 	}
 
-	if (!isMarauder && realDeltaFame < 0)
-		realDeltaFame /= 20;
-
 	if (realDeltaFame > 3*6000)
 		realDeltaFame = 3*6000;
 	
 	if (realDeltaFame < -3*6000)
 		realDeltaFame = -3*6000;
 		
+	if (!isMarauder && realDeltaFame < 0)
+		realDeltaFame /= 10;
+
 	fame += realDeltaFame;
 
 	fameMsgParams[2].Int = (uint32)(abs(realDeltaFame));

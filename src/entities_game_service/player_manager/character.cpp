@@ -224,6 +224,9 @@ CVariable<uint32> NBLoginStats(
 CVariable<bool> EnableGuildPoints(
 	"egs", "EnableGuildPoints", "Enable guild points", false, 0, true);
 
+CVariable<uint32> NBPointsForGuild(
+	"egs", "NbrPointsForGuild", "Nb points need to add one guild point", 100, 0, true);
+
 CVariable<string>	ArkSalt(
 	"egs", "ArkSalt", "Salt used to hmac callbacks", string("BAE"), 0, true);
 
@@ -7794,19 +7797,47 @@ bool CCharacter::addCatalyserXpBonus(uint32 &slot, SSkill* skill, double xpGain,
 	return false;
 } // addCatalyserXpBonus
 
+void CCharacter::addGuildPoints(uint32 points)
+{
+	CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
+	if (!guild)
+		return;
+
+	// Reset Guild points
+	if (CTickEventHandler::getGameCycle() >= _NextTodayGuildPointsReset)
+	{
+		_NextTodayGuildPointsReset = CTickEventHandler::getGameCycle() + 10*60*60*20;
+		_TodayGuildPoints = 0;
+	}
+
+	uint32 wantedPoints = NBPointsForGuild;
+	if (_TodayGuildPoints > 10) // First 10 points are easy to win
+	{
+		wantedPoints *= 2*(_TodayGuildPoints - 9);
+	}
+
+	_GuildPoints += points;
+	if (_GuildPoints >= wantedPoints)
+	{
+		_TodayGuildPoints++;
+		guild->addXP(1);
+		_GuildPoints = 0;
+	}
+
+	nlinfo("_TodayGuildPoints, wantedPoints, _GuildPoints = %u, %u, %u", _TodayGuildPoints, wantedPoints, _GuildPoints);
+}
+
 //---------------------------------------------------
 // addXpToSkillInternal : Add amount of xp gain to a skill
 //---------------------------------------------------
 double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSkill, TAddXpToSkillMode addXpMode,
-										std::map<SKILLS::ESkills, CXpProgressInfos> &gainBySkill)
+										std::map<SKILLS::ESkills, CXpProgressInfos> &gainBySkill, bool silent)
 {
 	H_AUTO(CCharacter_addXpToSkill);
 
 	// if no remaining XPGain, return
 	if (XpGain == 0.0f)
 		return 0.0;
-
-	
 
 	// get pointer to static skills tree definition
 	CSheetId sheet("skills.skill_tree");
@@ -7837,56 +7868,37 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 	CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
 	if (EnableGuildPoints.get() && guild)
 	{
-		if (CTickEventHandler::getGameCycle() >= _NextTodayGuildPointsReset)
-		{
-			_NextTodayGuildPointsReset = CTickEventHandler::getGameCycle() + 10*60*60*20;
-			_TodayGuildPoints = 0;
-		}
-
+	
+		uint32 guildpoints = 0;
 		if (skill->MaxLvlReached >= 250) // when max level : quantity of points is different for each skill
 		{
 			switch (skillInitial[0])
 			{
 			case 'F': // Fight is x2
-				_GuildPoints += (uint32)(XpGain*2);
+				guildpoints = (uint32)(XpGain*2);
 				break;
 
 			case 'M': // Magic is x1
-				_GuildPoints += (uint32)(XpGain*1.5);
+				guildpoints = (uint32)(XpGain*1.5);
 				break;
 
 			case 'C': // Craft is x2
-				_GuildPoints += (uint32)(XpGain*2.5);
+				guildpoints = (uint32)(XpGain*2.5);
 				break;
 
 			case 'H': // Harvest is x0.5
-				_GuildPoints += (uint32)(XpGain*0.5);
+				guildpoints = (uint32)(XpGain*0.5);
 				break;
 			}
 		}
 		else // when not max level : win same quantity than xp
-			_GuildPoints += (uint32)XpGain;
+			guildpoints = (uint32)XpGain;
 
-		
-		uint32 wantedPoints = 100; // >Todo remove hardcoded
-		if (_TodayGuildPoints > 10) // First 10 points are easy to win
-		{
-			wantedPoints *= 2*(_TodayGuildPoints - 9);
-		}
-		
-		if (_GuildPoints >= wantedPoints)
-		{
-			_TodayGuildPoints++;
-			guild->addXP(1);
-			_GuildPoints = 0;
-		}
+		// max win = 30 guild points
+		addGuildPoints(guildpoints);
 
-		nlinfo("Skill %u / %u", skill->MaxLvlReached, skill->Base);
-
-		if (skill->MaxLvlReached >= skill->Base)
-			nlinfo("%s : %u XP in MAX Skill %s => _TodayGuildPoints, wantedPoints, _GuildPoints = %u, %u, %u", _Name.toUtf8().c_str(), (uint32)(XpGain), skillInitial.c_str(), _TodayGuildPoints, wantedPoints, _GuildPoints);
-		else
-			nlinfo("%s : %u XP in Skill %s => _TodayGuildPoints, wantedPoints, _GuildPoints = %u, %u, %u", _Name.toUtf8().c_str(), (uint32)(XpGain), skillInitial.c_str(), _TodayGuildPoints, wantedPoints, _GuildPoints);
+		if (!silent)
+			nlinfo("%u %u XP in Skill %s : %u / %u", skill->MaxLvlReached, skill->Base, _Name.toUtf8().c_str(), (uint32)(XpGain), skillInitial.c_str());
 	}
 	////
 
@@ -7928,7 +7940,8 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			// account' message to the client
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::skill);
 			params[0].Enum = skillEnum;
-			PHRASE_UTILITIES::sendDynamicSystemMessage(getEntityRowId(), "PROGRESS_FREE_TRIAL_LIMIT", params);
+			if (!silent)
+				PHRASE_UTILITIES::sendDynamicSystemMessage(getEntityRowId(), "PROGRESS_FREE_TRIAL_LIMIT", params);
 			bFreeTrialLimitReached = true;
 		}
 	}
@@ -8100,14 +8113,16 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			paramsP[0].Enum = skillEnum;
 			paramsP[1].Int = max((sint32)1, sint32(100 * XpGain));
 			paramsP[2].Int = max((sint32)1, sint32(100 * (XpGain - xpBonus - ringXpBonus)));
-			PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "XP_CATALYSER_PROGRESS_NORMAL_GAIN", paramsP);
+			if (!silent)
+				PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "XP_CATALYSER_PROGRESS_NORMAL_GAIN", paramsP);
 
 			if (xpBonus > 0)
 			{
 				SM_STATIC_PARAMS_2(paramsC, STRING_MANAGER::integer, STRING_MANAGER::integer);
 				paramsC[0].Int = stackSizeToRemove;
 				paramsC[1].Int = catalyserLvl;
-				PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "XP_CATALYSER_CONSUME", paramsC);
+				if (!silent)
+					PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "XP_CATALYSER_CONSUME", paramsC);
 			}
 
 			if (ringXpBonus > 0)
@@ -8115,7 +8130,8 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 				SM_STATIC_PARAMS_2(paramsC, STRING_MANAGER::integer, STRING_MANAGER::integer);
 				paramsC[0].Int = ringStackSizeToRemove;
 				paramsC[1].Int = ringCatalyserLvl;
-				PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "XP_CATALYSER_CONSUME", paramsC);
+				if (!silent)
+					PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "XP_CATALYSER_CONSUME", paramsC);
 			}
 		}
 		else
@@ -8126,7 +8142,8 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 			// NB: don't need to use XpGainTruncated for Buffer and simple mode (with XpCat) since the Xp gain is
 			// stopped on the current skill
 			params[1].Int = max((sint32)1, sint32(100 * XpGainTruncated));
-			PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "PROGRESS_NORMAL_GAIN", params);
+			if (!silent)
+				PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "PROGRESS_NORMAL_GAIN", params);
 		}
 	}
 
@@ -8377,7 +8394,8 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 						SM_STATIC_PARAMS_2(params, STRING_MANAGER::skill, STRING_MANAGER::integer);
 						params[0].Enum = (*it);
 						params[1].Int = _Skills._Skills[*it].Base;
-						PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "PROGRESS_UNLOCK_SKILL", params);
+						if (!silent)
+							PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "PROGRESS_UNLOCK_SKILL", params);
 						CMissionEventSkillProgress event((*it), _Skills._Skills[*it].Base);
 						processMissionEvent(event);
 					}
@@ -13281,14 +13299,20 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 	if (mission->getFinished())
 	{
 		if (mission->getMissionSuccess())
+		{
 			result = mr_success;
+
+			string icon = tpl->Icon.toString().c_str();
+			if (icon == "generic_craft.mission_icon" || icon == "generic_fight.mission_icon" || icon == "generic_forage.mission_icon" || icon == "generic_travel.mission_icon")
+				addGuildPoints(NBPointsForGuild); // Add 1 XP to guild
+		}
 		else
 			result = mr_fail;
 
 		vector<string> params = getCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK");
 		if (params.size() >= 1)
 		{
-			validateDynamicMissionStep(params[0]+"&result="+MissionResultStatLogTag[result]);
+			validateDynamicMissionStep(params[0]+toString("&result=%s", MissionResultStatLogTag[result]));
 			setCustomMissionParams(toUpper(tpl->getMissionName())+"_CALLBACK", "");
 		}
 	}
@@ -13381,7 +13405,10 @@ void CCharacter::abandonMission(uint8 indexClient)
 	vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
 	if (params.size() >= 1)
 	{
+		if (mission->getMissionSuccess() == false)
 		validateDynamicMissionStep(params[0]+"&result=ABD");
+		else
+			validateDynamicMissionStep(params[0]+"&result=SUC");
 		setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
 	}
 
@@ -15510,7 +15537,12 @@ void CCharacter::sendUrl(const string &url)
 {
 	string control;
 	string salt = toString(getLastConnectedDate())+ArkSalt.get();
-	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+getPositionInfos()+"&target_infos="+getTargetInfos();
+	string playerPos = getPositionInfos();
+	strFindReplace(playerPos, " ", "%20");
+	string targetInfos = getTargetInfos();
+	strFindReplace(targetInfos, " ", "%20");
+	
+	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos;
 	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
 	uint32 userId = PlayerManager.getPlayerId(getId());
@@ -18850,6 +18882,14 @@ bool CCharacter::isMissionSuccessfull(const CMissionTemplate &templ)
 	return false;
 }
 
+void CCharacter::resetMissionSuccessfull(TAIAlias alias)
+{
+	std::map<TAIAlias, TMissionHistory>::iterator it(_MissionHistories.find(alias));
+
+	if (it != _MissionHistories.end())
+		it->second.LastSuccessDate = 0;
+}
+
 /// check the last date of trying for a mission (0 if never tryied)
 NLMISC::TGameCycle CCharacter::getMissionLastSuccess(const CMissionTemplate &templ)
 {
@@ -21715,10 +21755,10 @@ void CCharacter::setProspectionLocateDepositEffect(CSEffectPtr effect)
 
 //------------------------------------------------------------------------------
 
-void CCharacter::addXpToSkill(double XpGain, const std::string &Skill)
+void CCharacter::addXpToSkill(double XpGain, const std::string &Skill, bool silent)
 {
 	std::map<SKILLS::ESkills, CXpProgressInfos> dummy;
-	addXpToSkillInternal(XpGain, Skill, AddXpToSkillSingle, dummy);
+	addXpToSkillInternal(XpGain, Skill, AddXpToSkillSingle, dummy, silent);
 }
 
 //------------------------------------------------------------------------------
