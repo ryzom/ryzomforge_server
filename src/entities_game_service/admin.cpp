@@ -4614,7 +4614,7 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 
 	string action;
 	string lang = args[1];
-	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es")
+	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es" && lang != "rf")
 		return false;
 	bool leave = false;
 	if (args.size() > 2)
