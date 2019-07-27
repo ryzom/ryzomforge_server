@@ -1151,7 +1151,7 @@ void sendNaturalEventHitMessages( RYZOMID::TTypeId aggressorType, const NLMISC::
 /**
  * A natural event heals an entity, send all relevant messages to the entities around.
  */
-void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const NLMISC::CEntityId &victimId, sint32 amount, sint32 amountWithoutArmor, sint32 avoided )
+void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const NLMISC::CEntityId &victimId, sint32 amount, SCORES::TScores score )
 {
 	amount = abs(amount);
 
@@ -1161,9 +1161,9 @@ void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const NLMISC:
 	// Send msg to hit player
 	if ( victimId.getType() == RYZOMID::player )
 	{
-		SM_STATIC_PARAMS_2(params, STRING_MANAGER::integer, STRING_MANAGER::integer);
-		params[0].Int = amount;
-		params[1].Int = avoided;
+		SM_STATIC_PARAMS_2(params, STRING_MANAGER::score, STRING_MANAGER::integer);
+		params[0].Enum = score;
+		params[1].Int = amount;
 		sendDynamicSystemMessage(TheDataset.getDataSetRow(victimId), msgD, params);
 	}
 }

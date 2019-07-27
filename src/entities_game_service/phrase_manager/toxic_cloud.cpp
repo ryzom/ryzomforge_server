@@ -132,7 +132,7 @@ bool CToxicCloud::update()
 					if (_DmgPerHit > 0)
 						PHRASE_UTILITIES::sendNaturalEventHitMessages( RYZOMID::fx_entity, entity->getEntityRowId(), _DmgPerHit, _DmgPerHit );
 					else if (_DmgPerHit < 0)
-						PHRASE_UTILITIES::sendNaturalEventHealMessages( RYZOMID::fx_entity, entity->getEntityRowId(), _DmgPerHit, _DmgPerHit );
+						PHRASE_UTILITIES::sendNaturalEventHealMessages( RYZOMID::fx_entity, entity->getEntityRowId(), _DmgPerHit, _AffectedScore);
 					
 					if (_AffectedScore == SCORES::hit_points)
 					{

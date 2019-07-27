@@ -271,13 +271,13 @@ inline void sendNaturalEventHitMessages( RYZOMID::TTypeId aggressorType, const T
 }
 
 
-void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const NLMISC::CEntityId &victimId, sint32 amount, sint32 amountWithoutArmor, sint32 avoided=0 );
+void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const NLMISC::CEntityId &victimId, sint32 amount, SCORES::TScores score );
 
-inline void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const TDataSetRow &victimRowId, sint32 amount, sint32 amountWithoutArmor, sint32 avoided=0 )
+inline void sendNaturalEventHealMessages( RYZOMID::TTypeId aggressorType, const TDataSetRow &victimRowId, sint32 amount, SCORES::TScores score )
 {
 	if (TheDataset.isAccessible(victimRowId))
 	{
-		sendNaturalEventHealMessages( aggressorType, TheDataset.getEntityId( victimRowId ), amount, amountWithoutArmor, avoided );
+		sendNaturalEventHealMessages( aggressorType, TheDataset.getEntityId( victimRowId ), amount, score );
 	}
 }
 
