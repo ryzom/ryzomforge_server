@@ -1241,13 +1241,17 @@ void CFameManager::setEntityFame(const NLMISC::CEntityId & entityId, uint32 fact
 		sint32 maxFame = getMaxFameByFactionIndex(ch->getAllegiance(), faction);
 		ch->setFameValuePlayer(faction, fame, maxFame, fow.LastFameChangeTrends[faction]);
 
-		SM_STATIC_PARAMS_1(params, STRING_MANAGER::faction);
+		/*
+		SM_STATIC_PARAMS_3(params, STRING_MANAGER::faction, STRING_MANAGER::integer, STRING_MANAGER::integer);
 		params[0].Enum = faction;
+		params[1].Int = 0;
+		params[2].Int = abs(deltaFame);
 
 		if (deltaFame > 0)
 			CCharacter::sendDynamicSystemMessage( ch->getEntityRowId(), "FAME_GAIN_CHAR", params );
 		else
 			CCharacter::sendDynamicSystemMessage( ch->getEntityRowId(), "FAME_LOST_CHAR", params );
+		*/
 	} 
 	else if(gu)
 	{

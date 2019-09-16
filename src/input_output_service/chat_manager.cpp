@@ -698,7 +698,7 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					langs += "-es";
 
 				if (nbr_receiver > 0)
-					_Log.displayNL("%s (%s:%d:%s) : %s", senderName.c_str(), groupNames[itCl->second->getChatMode()], nbr_receiver, langs.c_str(), ucstr.toUtf8().c_str() );
+					_Log.displayNL("|%s|(%s:%d:%s)|%s", IOS->getRocketName(senderName).c_str(), groupNames[itCl->second->getChatMode()], nbr_receiver, langs.c_str(), ucstr.toUtf8().c_str() );
 			}
 			break;
 		case CChatGroup::region :
