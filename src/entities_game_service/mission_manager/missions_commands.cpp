@@ -27,6 +27,7 @@
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"
 #include "phrase_manager/phrase_manager.h"
+#include "phrase_manager/toxic_cloud.h"
 #include "mission_manager/mission_manager.h"
 #include "primitives_parser.h"
 #include "team_manager/team.h"
@@ -3501,7 +3502,7 @@ NLMISC_COMMAND(getPlayerGuild, "get player guild informations", "<uid>")
 
 NLMISC_COMMAND(addXp, "Gain experience in a given skills", "<uid> <xp> <skill> [<count>]")
 {
-	if (args.size () < 3) return false;
+	if (args.size() < 3) return false;
 
 	GET_ACTIVE_CHARACTER
 
@@ -3527,7 +3528,7 @@ NLMISC_COMMAND(addXp, "Gain experience in a given skills", "<uid> <xp> <skill> [
 
 NLMISC_COMMAND(addBricks, "Specified player learns given brick", "<uid> <brick1,brick2>")
 {
-	if (args.size () != 2) return false;
+	if (args.size() != 2) return false;
 	GET_ACTIVE_CHARACTER
 
 	std::vector< std::string > bricks;
@@ -3543,11 +3544,127 @@ NLMISC_COMMAND(addBricks, "Specified player learns given brick", "<uid> <brick1,
 
 NLMISC_COMMAND(delBrick, "Specified player unlearns given brick", "<uid> <brick1>")
 {
-	if (args.size () != 2) return false;
+	if (args.size() != 2) return false;
 	GET_ACTIVE_CHARACTER
 
 	CSheetId brickId(args[1]);
 	c->removeKnownBrick(brickId);
 
+	return true;
+}
+
+
+NLMISC_COMMAND(execAiAction, "Specified player unlearns given brick", "<uid> <brick1> <target?>")
+{
+	if (args.size() < 2) return false;
+
+	GET_ACTIVE_CHARACTER
+
+	CSheetId ActionId(args[1]);
+	TDataSetRow TargetRowId;
+	
+	if (ActionId == CSheetId::Unknown)
+	{
+		log.displayNL("ERR: sheetId is Unknown");
+		return true;
+	}
+
+	if (args.size() > 2)
+	{
+		const CEntityId &target = c->getTarget();
+		
+		string error;
+		if (target == CEntityId::Unknown)
+			error = "unknown";
+		else if (target.getType() == RYZOMID::creature && args[2] != "creature")
+			error = "not a creature";
+		else if (target.getType() == RYZOMID::npc && args[2] != "npc")
+			error = "not a npc";
+		else if (target.getType() == RYZOMID::player && args[2] != "player")
+			error = "not a player";
+
+		if (!error.empty())
+		{
+			log.displayNL("ERR: target %s", error.c_str());
+			return true;
+		}
+
+		TargetRowId = TheDataset.getDataSetRow(target);
+	}
+	else
+	{
+		TargetRowId = c->getEntityRowId();
+	}
+		CPhraseManager::getInstance().executeAiAction(c->getEntityRowId(), TargetRowId, ActionId);
+
+	return true;
+}
+
+
+//spawnToxic 530162 18905 -24318 water_bomb.fx 2 -100 focus 4 4
+NLMISC_COMMAND(spawnToxic, "Spawn a toxic cloud", "<uid> <posX> <posY> <fx> <Radius=1> <dmgPerHit=0> <affectedScore=hit_points> <updateFrequency=ToxicCloudUpdateFrequency> <lifetimeInTicks=ToxicCloudDefaultLifetime>")
+{
+	if ( args.size() < 1 )
+		return false;
+
+	GET_ACTIVE_CHARACTER
+	
+	float x = (float)c->getX() / 1000.f;
+	float y = (float)c->getY() / 1000.f;
+
+	if (args.size() > 1)
+		NLMISC::fromString(args[1], x);
+
+	if (args.size() > 2)
+		NLMISC::fromString(args[2], y);
+
+	string fx = "toxic_cloud_1.fx";
+	if (args.size() > 3)
+		fx = args[3];
+
+	CVector cloudPos( x, y, 0.0f );
+	float radius = 1.f;
+	sint32 dmgPerHit = 100;
+	TGameCycle updateFrequency = ToxicCloudUpdateFrequency;
+	TGameCycle lifetime = CToxicCloud::ToxicCloudDefaultLifetime;
+
+	SCORES::TScores affectedScore = SCORES::hit_points;
+
+	if (args.size() > 4)
+	{
+		NLMISC::fromString(args[4], radius);
+		if (args.size() > 5)
+		{
+			NLMISC::fromString(args[5], dmgPerHit);
+			if (args.size() > 6)
+			{
+				affectedScore = SCORES::toScore(args[6]);
+				
+				if (args.size() > 7)
+				{
+					NLMISC::fromString(args[7], updateFrequency);
+					if (args.size() > 8)
+					{
+						NLMISC::fromString(args[8], lifetime);
+					}
+				}
+			}
+		}
+	}
+	
+	CToxicCloud *tc = new CToxicCloud();
+	tc->init(cloudPos, radius, dmgPerHit, updateFrequency, lifetime, affectedScore);
+
+	CSheetId sheet(fx);
+
+	if (tc->spawn(sheet))
+	{
+		CEnvironmentalEffectManager::getInstance()->addEntity(tc);
+		log.displayNL("OK");
+	}
+	else
+	{
+		log.displayNL("ERR");
+	}
 	return true;
 }
