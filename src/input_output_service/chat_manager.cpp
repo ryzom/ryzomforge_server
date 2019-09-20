@@ -614,6 +614,8 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 				bool have_fr = false;
 				bool have_de = false;
 				bool have_en = false;
+				bool have_ru = false;
+				bool have_es = false;
 				CChatGroup::TMemberCont::iterator itA;
 
 				string sender_lang = SM->getLanguageCodeString(ci->Language);
@@ -672,6 +674,10 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 								have_de = true;
 							if (!have_en && receiver_lang == "us")
 								have_en = true;
+							if (!have_ru && receiver_lang == "ru")
+								have_ru = true;
+							if (!have_es && receiver_lang == "es")
+								have_es = true;
 							nbr_receiver++;
 						}
 					}
@@ -686,9 +692,13 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					langs += "-de";
 				if (have_en)
 					langs += "-us";
+				if (have_ru)
+					langs += "-ru";
+				if (have_es)
+					langs += "-es";
 
 				if (nbr_receiver > 0)
-					_Log.displayNL("%s (%s:%d:%s) : %s", senderName.c_str(), groupNames[itCl->second->getChatMode()], nbr_receiver, langs.c_str(), ucstr.toUtf8().c_str() );
+					_Log.displayNL("|%s|(%s:%d:%s)|%s", IOS->getRocketName(senderName).c_str(), groupNames[itCl->second->getChatMode()], nbr_receiver, langs.c_str(), ucstr.toUtf8().c_str() );
 			}
 			break;
 		case CChatGroup::region :

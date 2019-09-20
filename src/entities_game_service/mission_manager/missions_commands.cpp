@@ -27,6 +27,7 @@
 #include "player_manager/player_manager.h"
 #include "player_manager/player.h"
 #include "phrase_manager/phrase_manager.h"
+#include "phrase_manager/toxic_cloud.h"
 #include "mission_manager/mission_manager.h"
 #include "primitives_parser.h"
 #include "team_manager/team.h"
@@ -739,7 +740,7 @@ NLMISC_COMMAND(spawnNamedItem, "Spawn a named Item", "<uid> <inv> <quantity> <na
 
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(getItemList, "get list of named items of character by filter", "<uid> [bag sheet quantity_min quantity_max quality_min quality_max extra_infos]")
+NLMISC_COMMAND(getItemList, "get list of items of character by filter", "<uid> [bag sheet quantity_min quantity_max quality_min quality_max extra_infos]")
 {
 
 	GET_ACTIVE_CHARACTER
@@ -1158,7 +1159,7 @@ NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<e
 
 	sint32 fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
 
-	if (args.size() == 3)
+	if (args.size() >= 3)
 	{
 		string quant = args[2];
 		sint32 quantity;
@@ -1178,7 +1179,7 @@ NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<e
 		CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame, false);
 	}
 
-	if (args.size() == 4 && args[3] == "1")
+	if (args.size() < 4 || args[3] == "1")
 	{
 		CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
 		// set tribe fame threshold and clamp fame if necessary
@@ -1357,9 +1358,9 @@ NLMISC_COMMAND(getFactionPoints, "get faction points of player (if quantity, giv
 
 	uint32 points = c->getFactionPoint(clan);
 
-	if (args.size() == 3)
+	if (args.size() >= 3)
 	{
-		string quant = args[1];
+		string quant = args[2];
 		uint32 quantity;
 		if (quant[0] == '+')
 		{
@@ -1394,6 +1395,7 @@ NLMISC_COMMAND(getFactionPoints, "get faction points of player (if quantity, giv
 	}
 
 	log.displayNL("%u", points);
+	return true;
 }
 
 //----------------------------------------------------------------------------
@@ -2559,7 +2561,7 @@ NLMISC_COMMAND(addCheckPos,"add check pos","<uid> <x> <y> <radius> <mission_name
 //-----------------------------------------------
 NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>")
 {
-	if (args.size() != 3)
+	if (args.size() < 3)
 		return false;
 
 	GET_ACTIVE_CHARACTER;
@@ -2584,8 +2586,14 @@ NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>"
 	c->endBotChat();
 
 	std::list< CMissionEvent* > eventList;
-	CMissionManager::getInstance()->instanciateMission(c, missionAlias,	giverAlias, eventList);
+	uint8 result = CMissionManager::getInstance()->instanciateMission(c, missionAlias, giverAlias, eventList);
+	if (!result)
+	{
 	c->processMissionEventList(eventList,true, CAIAliasTranslator::Invalid);
+		log.displayNL("OK");
+	}
+	else
+		log.displayNL("ERR: %d", result);
 
 	return true;
 }
@@ -2621,7 +2629,22 @@ NLMISC_COMMAND(finishArkMission,"finish Mission","<uid> <mission_name>")
 }
 
 //-----------------------------------------------
-NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1> <line2> <line3> ...")
+NLMISC_COMMAND(resetArkMission,"reset Mission","<uid> <mission_name>")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER;
+		
+	TAIAlias missionAlias = CAIAliasTranslator::getInstance()->getMissionUniqueIdFromName(args[1]);
+	c->resetMissionSuccessfull(missionAlias);
+
+	return true;
+}
+
+
+//-----------------------------------------------
+NLMISC_COMMAND(setArkMissionText,"set Mission Text","<uid> <mission_name> <line1> <line2> <line3>..")
 {
 	if (args.size() < 3)
 		return false;
@@ -2655,7 +2678,7 @@ NLMISC_COMMAND(delArkMissionParams,"del Mission Params","<uid> <mission_name>")
 //-----------------------------------------------
 NLMISC_COMMAND(setArkMissionParams,"set Mission Params","<uid> <mission_name> <params> <app_callback> <callback_params>")
 {
-	if (args.size() != 2)
+	if (args.size() != 5)
 		return false;
 
 	GET_ACTIVE_CHARACTER;
@@ -3474,5 +3497,174 @@ NLMISC_COMMAND(getPlayerGuild, "get player guild informations", "<uid>")
 	}
 
 	log.displayNL("NoGuild");
+	return true;
+}
+
+NLMISC_COMMAND(addXp, "Gain experience in a given skills", "<uid> <xp> <skill> [<count>]")
+{
+	if (args.size() < 3) return false;
+
+	GET_ACTIVE_CHARACTER
+
+	uint32 xp;
+	NLMISC::fromString(args[1], xp);
+
+	string skill = args[2];
+
+	uint count;
+	if (args.size()==3)
+		count = 1;
+	else
+		NLMISC::fromString(args[3], count);
+
+	count = min(count, (uint)100);
+
+	uint i;
+	for (i=0; i<count; ++i)
+		c->addXpToSkill((double)xp, skill, true);
+
+	return true;
+}
+
+NLMISC_COMMAND(addBricks, "Specified player learns given brick", "<uid> <brick1,brick2>")
+{
+	if (args.size() != 2) return false;
+	GET_ACTIVE_CHARACTER
+
+	std::vector< std::string > bricks;
+	NLMISC::splitString(args[1], ",", bricks);
+	for (uint32 i=0; i<bricks.size(); i++)
+	{
+		CSheetId brickId(bricks[i]);
+		c->addKnownBrick(brickId);
+	}
+	return true;
+}
+
+
+NLMISC_COMMAND(delBrick, "Specified player unlearns given brick", "<uid> <brick1>")
+{
+	if (args.size() != 2) return false;
+	GET_ACTIVE_CHARACTER
+
+	CSheetId brickId(args[1]);
+	c->removeKnownBrick(brickId);
+
+	return true;
+}
+
+
+NLMISC_COMMAND(execAiAction, "Specified player unlearns given brick", "<uid> <brick1> <target?>")
+{
+	if (args.size() < 2) return false;
+
+	GET_ACTIVE_CHARACTER
+
+	CSheetId ActionId(args[1]);
+	TDataSetRow TargetRowId;
+	
+	if (ActionId == CSheetId::Unknown)
+	{
+		log.displayNL("ERR: sheetId is Unknown");
+		return true;
+	}
+
+	if (args.size() > 2)
+	{
+		const CEntityId &target = c->getTarget();
+		
+		string error;
+		if (target == CEntityId::Unknown)
+			error = "unknown";
+		else if (target.getType() == RYZOMID::creature && args[2] != "creature")
+			error = "not a creature";
+		else if (target.getType() == RYZOMID::npc && args[2] != "npc")
+			error = "not a npc";
+		else if (target.getType() == RYZOMID::player && args[2] != "player")
+			error = "not a player";
+
+		if (!error.empty())
+		{
+			log.displayNL("ERR: target %s", error.c_str());
+			return true;
+		}
+
+		TargetRowId = TheDataset.getDataSetRow(target);
+	}
+	else
+	{
+		TargetRowId = c->getEntityRowId();
+	}
+		CPhraseManager::getInstance().executeAiAction(c->getEntityRowId(), TargetRowId, ActionId);
+
+	return true;
+}
+
+
+//spawnToxic 530162 18905 -24318 water_bomb.fx 2 -100 focus 4 4
+NLMISC_COMMAND(spawnToxic, "Spawn a toxic cloud", "<uid> <posX> <posY> <fx> <Radius=1> <dmgPerHit=0> <affectedScore=hit_points> <updateFrequency=ToxicCloudUpdateFrequency> <lifetimeInTicks=ToxicCloudDefaultLifetime>")
+{
+	if ( args.size() < 1 )
+		return false;
+
+	GET_ACTIVE_CHARACTER
+	
+	float x = (float)c->getX() / 1000.f;
+	float y = (float)c->getY() / 1000.f;
+
+	if (args.size() > 1)
+		NLMISC::fromString(args[1], x);
+
+	if (args.size() > 2)
+		NLMISC::fromString(args[2], y);
+
+	string fx = "toxic_cloud_1.fx";
+	if (args.size() > 3)
+		fx = args[3];
+
+	CVector cloudPos( x, y, 0.0f );
+	float radius = 1.f;
+	sint32 dmgPerHit = 100;
+	TGameCycle updateFrequency = ToxicCloudUpdateFrequency;
+	TGameCycle lifetime = CToxicCloud::ToxicCloudDefaultLifetime;
+
+	SCORES::TScores affectedScore = SCORES::hit_points;
+
+	if (args.size() > 4)
+	{
+		NLMISC::fromString(args[4], radius);
+		if (args.size() > 5)
+		{
+			NLMISC::fromString(args[5], dmgPerHit);
+			if (args.size() > 6)
+			{
+				affectedScore = SCORES::toScore(args[6]);
+				
+				if (args.size() > 7)
+				{
+					NLMISC::fromString(args[7], updateFrequency);
+					if (args.size() > 8)
+					{
+						NLMISC::fromString(args[8], lifetime);
+					}
+				}
+			}
+		}
+	}
+	
+	CToxicCloud *tc = new CToxicCloud();
+	tc->init(cloudPos, radius, dmgPerHit, updateFrequency, lifetime, affectedScore);
+
+	CSheetId sheet(fx);
+
+	if (tc->spawn(sheet))
+	{
+		CEnvironmentalEffectManager::getInstance()->addEntity(tc);
+		log.displayNL("OK");
+	}
+	else
+	{
+		log.displayNL("ERR");
+	}
 	return true;
 }
