@@ -10630,6 +10630,8 @@ void CCharacter::fillTradePage(uint16 session, bool enableBuildingLossWarning)
 			itemElem.setSHEET(_PropertyDatabase, trade.SheetId);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:QUALITY",index  ),  0 );
 			itemElem.setQUALITY(_PropertyDatabase, 0);
+			itemElem.setSERIAL(_PropertyDatabase, 0);
+			itemElem.setCREATE_TIME(_PropertyDatabase, 0);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:USER_COLOR",index  ),  1 );
 			itemElem.setUSER_COLOR(_PropertyDatabase, 1);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:WEIGHT",index  ),  0 );
@@ -10675,6 +10677,8 @@ void CCharacter::fillTradePage(uint16 session, bool enableBuildingLossWarning)
 		itemElem.setSHEET(_PropertyDatabase, CSheetId::Unknown);
 		//		_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:QUALITY",index  ), 0);
 		itemElem.setQUALITY(_PropertyDatabase, 0);
+		itemElem.setSERIAL(_PropertyDatabase, 0);
+		itemElem.setCREATE_TIME(_PropertyDatabase, 0);
 		//		_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:USER_COLOR",index  ),  1 );
 		itemElem.setUSER_COLOR(_PropertyDatabase, 1);
 		//		_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:WEIGHT",index  ),  0 );
