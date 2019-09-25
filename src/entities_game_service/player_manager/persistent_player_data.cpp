@@ -600,6 +600,8 @@ static void prepareCharacterPositionForStore ( COfflineEntityState & state, cons
 	PROP2(GodMode, bool, getGodModeSave(), setGodModeSave(val)) \
 	PROP2(UseWig, bool, getUseWig(), setUseWig(val)) \
 	PROP2(FriendVisibility, uint8, getFriendVisibilitySave(), setFriendVisibilitySave(val)) \
+	PROP2(_DontTranslate, string, _DontTranslate, _DontTranslate=val) \
+
 
 
 //#pragma message( PERSISTENT_GENERATION_MESSAGE )

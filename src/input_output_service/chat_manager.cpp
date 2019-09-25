@@ -647,12 +647,16 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 
 					if (EnableDeepL)
 					{
+						CChatClient &client = getClient(*itA);
+						if (ucstr[0] != '>' && client.haveDisabledTranslation(sender_lang))
+							receiver_lang = sender_lang;
+						
 						if (ucstr[0] == '>') // Sent directly when prefixed by '>', it's the anti-translation code
 						{
 							if (ucstr.length() > 5 && ucstr[1] == ':' && ucstr[4] == ':') // check lang prefix
 							{
 								string usedlang = ucstr.toString().substr(2, 2);
-								nlinfo("used: %s, user: %s", usedlang.c_str(), receiver_lang.c_str());
+								//nlinfo("used: %s, user: %s", usedlang.c_str(), receiver_lang.c_str());
 								if (usedlang == receiver_lang)
 									sendChat( itCl->second->getChatMode(), *itA, ucstr.substr(5), sender );
 							}

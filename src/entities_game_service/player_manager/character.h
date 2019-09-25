@@ -2585,6 +2585,9 @@ public:
 	std::string getTagPvPB() const;
 	void setTagPvPB(const std::string &tag);
 
+	std::string getDontTranslate() const;
+	void setDontTranslate(const std::string &langs);
+
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
 	uint32 getLastTpTick() const;
@@ -3298,6 +3301,9 @@ private:
 	std::string _TagPvPB;
 	std::string _TagA;
 	std::string _TagB;
+
+	std::string _DontTranslate;
+
 
 	/// SDB path where player wins HoF points in PvP (if not empty)
 	std::string _SDBPvPPath;

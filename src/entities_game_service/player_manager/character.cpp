@@ -11673,6 +11673,13 @@ void CCharacter::setTagB(const string &tag)
 	_TagB = tag;
 }
 
+
+//-----------------------------------------------------------------------------
+void CCharacter::setDontTranslate(const string &langs)
+{
+	_DontTranslate = langs;
+}
+
 //-----------------------------------------------------------------------------
 void CCharacter::setOrganization(uint32 org)
 {
@@ -17937,6 +17944,16 @@ void CCharacter::online(bool onlineStatus)
 		msgout.serialCont(_IsIgnoredBy);
 		sendMessageViaMirror("IOS", msgout);
 	}
+
+	string langs = getDontTranslate();
+	if (!langs.empty())
+	{
+		CMessage msgout("SET_USER_DONT_TRANSLATE_LANGS");
+		msgout.serial(const_cast<TDataSetRow &>(getEntityRowId()));
+		msgout.serial(langs);
+		CUnifiedNetwork::getInstance()->send("IOS", msgout);
+	}
+	
 } // online //
 
 //--------------------------------------------------------------
