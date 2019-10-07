@@ -10630,6 +10630,8 @@ void CCharacter::fillTradePage(uint16 session, bool enableBuildingLossWarning)
 			itemElem.setSHEET(_PropertyDatabase, trade.SheetId);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:QUALITY",index  ),  0 );
 			itemElem.setQUALITY(_PropertyDatabase, 0);
+			itemElem.setSERIAL(_PropertyDatabase, 0);
+			itemElem.setCREATE_TIME(_PropertyDatabase, 0);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:USER_COLOR",index  ),  1 );
 			itemElem.setUSER_COLOR(_PropertyDatabase, 1);
 			//			_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:WEIGHT",index  ),  0 );
@@ -10675,6 +10677,8 @@ void CCharacter::fillTradePage(uint16 session, bool enableBuildingLossWarning)
 		itemElem.setSHEET(_PropertyDatabase, CSheetId::Unknown);
 		//		_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:QUALITY",index  ), 0);
 		itemElem.setQUALITY(_PropertyDatabase, 0);
+		itemElem.setSERIAL(_PropertyDatabase, 0);
+		itemElem.setCREATE_TIME(_PropertyDatabase, 0);
 		//		_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:USER_COLOR",index  ),  1 );
 		itemElem.setUSER_COLOR(_PropertyDatabase, 1);
 		//		_PropertyDatabase.setProp( NLMISC::toString("TRADING:%u:WEIGHT",index  ),  0 );
@@ -11667,6 +11671,13 @@ void CCharacter::setTagA(const string &tag)
 void CCharacter::setTagB(const string &tag)
 {
 	_TagB = tag;
+}
+
+
+//-----------------------------------------------------------------------------
+void CCharacter::setDontTranslate(const string &langs)
+{
+	_DontTranslate = langs;
 }
 
 //-----------------------------------------------------------------------------
@@ -17933,6 +17944,16 @@ void CCharacter::online(bool onlineStatus)
 		msgout.serialCont(_IsIgnoredBy);
 		sendMessageViaMirror("IOS", msgout);
 	}
+
+	string langs = getDontTranslate();
+	if (!langs.empty())
+	{
+		CMessage msgout("SET_USER_DONT_TRANSLATE_LANGS");
+		msgout.serial(const_cast<TDataSetRow &>(getEntityRowId()));
+		msgout.serial(langs);
+		CUnifiedNetwork::getInstance()->send("IOS", msgout);
+	}
+	
 } // online //
 
 //--------------------------------------------------------------

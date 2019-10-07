@@ -987,6 +987,14 @@ inline std::string CCharacter::getTagPvPB() const
 
 
 //------------------------------------------------------------------------------
+inline std::string CCharacter::getDontTranslate() const
+
+{
+	return _DontTranslate;
+}
+
+
+//------------------------------------------------------------------------------
 inline std::string CCharacter::getFullTitle() const
 {
 	if (!_TagA.empty() || !_TagB.empty() || !_TagPvPA.empty() || !_TagPvPB.empty())

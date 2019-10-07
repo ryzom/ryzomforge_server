@@ -185,6 +185,7 @@ AdminCommandsInit[] =
 		"summonPet",						true,
 		"connectUserChannel",				true,
 		"connectLangChannel",				true,
+		"setDontTranslateLangs",			true,
 		"updateTarget",						true,
 		"resetName",						true,
 		"showOnline",						true,
@@ -4614,7 +4615,7 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 
 	string action;
 	string lang = args[1];
-	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es")
+	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es" && lang != "rf")
 		return false;
 	bool leave = false;
 	if (args.size() > 2)
@@ -4644,6 +4645,28 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 	CCharacter::sendDynamicSystemMessage( eid, "EGS_CHANNEL_INVALID_NAME", params );
 	return false;
 }
+
+
+NLMISC_COMMAND (setDontTranslateLangs, "Set langs that a player dont want to see translated", "<user id> <langs>")
+{
+	if (args.size() != 2) 
+		return false;
+
+	GET_CHARACTER
+
+	TDataSetRow player = c->getEntityRowId();
+
+
+	CMessage msgout("SET_USER_DONT_TRANSLATE_LANGS");
+	msgout.serial(player);
+	string langs = args[1];
+	msgout.serial(langs);
+	CUnifiedNetwork::getInstance()->send("IOS", msgout);
+	c->setDontTranslate(langs);
+
+}
+
+
 
 NLMISC_COMMAND (updateTarget, "Update current target", "<user id>")
 {
