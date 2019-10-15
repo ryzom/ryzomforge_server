@@ -13416,10 +13416,10 @@ void CCharacter::abandonMission(uint8 indexClient)
 	vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
 	if (params.size() >= 1)
 	{
-		if (mission->getMissionSuccess() == false)
-		validateDynamicMissionStep(params[0]+"&result=ABD");
+		if (mission->getFinished() == false)
+			validateDynamicMissionStep(params[0]+"&result=ABD");
 		else
-			validateDynamicMissionStep(params[0]+"&result=SUC");
+			validateDynamicMissionStep(params[0]+"&result=FINABD");
 		setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
 	}
 
