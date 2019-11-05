@@ -1948,6 +1948,9 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 	{
 		c->getRespawnPoints().addDefaultRespawnPoint(CONTINENT::TContinent(cont->getId()));
 	}
+	
+	// cancel any previous static action
+	c->cancelStaticActionInProgress();
 
 	log.displayNL("OK");
 
