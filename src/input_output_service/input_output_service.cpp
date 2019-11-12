@@ -35,7 +35,6 @@
 #include "nel/misc/command.h"
 #include "nel/net/message.h"
 
-#include "news_manager.h"
 #include "string_manager.h"
 #include "messages.h"
 //#include "ios_pd.h"
