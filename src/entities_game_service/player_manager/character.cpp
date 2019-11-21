@@ -22510,7 +22510,7 @@ void CCharacter::setMonitoringCSR(const TDataSetRow &csr)
 
 //------------------------------------------------------------------------------
 
-const CDeathPenalties &CCharacter::getDeathPenalties() const
+CDeathPenalties &CCharacter::getDeathPenalties()
 {
 	return *_DeathPenalties;
 }
