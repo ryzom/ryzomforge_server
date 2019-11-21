@@ -2256,7 +2256,7 @@ public:
 	void setMonitoringCSR(const TDataSetRow &csr);
 
 	/// get death penalties
-	const CDeathPenalties &getDeathPenalties() const;
+	CDeathPenalties &getDeathPenalties();
 
 	float nextDeathPenaltyFactor() const;
 	void resetNextDeathPenaltyFactor();
@@ -2596,6 +2596,8 @@ public:
 	uint32 getLastMountTick() const;
 	uint32 getLastFreeMount() const;
 	uint32 getLastExchangeMount() const;
+	bool getRespawnMainLandInTown() const;
+	void setRespawnMainLandInTown(bool status);
 	
 	const std::list<TCharacterLogTime> &getLastLogStats() const;
 	void updateConnexionStat();
