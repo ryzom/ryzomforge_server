@@ -13414,12 +13414,12 @@ void CCharacter::abandonMission(uint8 indexClient)
 	}
 
 	vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
-	if (params.size() >= 1)
+	if (mission->getFinished() && params.size() >= 1)
 	{
-		if (mission->getFinished() == false)
-			validateDynamicMissionStep(params[0]+"&result=ABD");
+		if (mission->getMissionSuccess())
+			validateDynamicMissionStep(params[0]+"&result=SUCCESS");
 		else
-			validateDynamicMissionStep(params[0]+"&result=FINABD");
+			validateDynamicMissionStep(params[0]+"&result=ABD");
 		setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
 	}
 
@@ -13710,6 +13710,15 @@ bool CCharacter::processMissionStepUserEvent(std::list<CMissionEvent*> &eventLis
 
 		if (!templ->Tags.NoList && !templ->Tags.AutoRemove)
 			sendDynamicSystemMessage(_Id, bChained ? "EGS_MISSION_STEP_SUCCESS" : "EGS_MISSION_SUCCESS");
+
+		if (!bChained) {
+			vector<string> params = getCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK");
+			if (params.size() >= 1)
+			{
+				validateDynamicMissionStep(params[0]+"&result=FINISHED");
+				setCustomMissionParams(toUpper(templ->getMissionName())+"_CALLBACK", "");
+			}
+		}
 
 		CMissionManager::getInstance()->missionDoneOnce(templ);
 		mission->stopChildren();
@@ -22510,7 +22519,7 @@ void CCharacter::setMonitoringCSR(const TDataSetRow &csr)
 
 //------------------------------------------------------------------------------
 
-const CDeathPenalties &CCharacter::getDeathPenalties() const
+CDeathPenalties &CCharacter::getDeathPenalties()
 {
 	return *_DeathPenalties;
 }
