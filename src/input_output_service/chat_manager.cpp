@@ -18,6 +18,7 @@
 #include "stdpch.h"
 
 #include <sstream>
+#include <iostream>
 
 // MongoDB
 
