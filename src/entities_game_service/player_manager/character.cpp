@@ -6113,6 +6113,9 @@ void CCharacter::respawnPet()
 {
 	for (uint i = 0; i < _PlayerPets.size(); ++i)
 	{
+		if (_PlayerPets[i].PetStatus == CPetAnimal::in_bag)
+			continue;
+
 		if (_PlayerPets[i].PetStatus != CPetAnimal::not_present
 				&& (_PlayerPets[i].PetStatus != CPetAnimal::stable || _RespawnMainLandInTown))
 		{
@@ -6304,6 +6307,7 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 				msg.Coordinate_Y = _PlayerPets[index].Landscape_Y;
 				msg.Coordinate_H = _PlayerPets[index].Landscape_Z;
 				msg.Heading = 0.0f;
+				msg.Cell = 0;
 				break;
 
 			case CPetAnimal::stable:
@@ -14792,7 +14796,7 @@ string CCharacter::getTargetInfos()
 	string msg = target.toString()+"|";
 
 	if (target == CEntityId::Unknown)
-		return "0";
+		return "?";
 
 	if (target.getType() == RYZOMID::creature)
 		msg += "c|";
@@ -14834,7 +14838,7 @@ string CCharacter::getTargetInfos()
 			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
 
-			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender());
 		}
 	}
 	else
@@ -14867,7 +14871,7 @@ string CCharacter::getTargetInfos()
 			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
 
-			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d", dist, x, y, z, h, cell);
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender());
 		}
 	}
 	
@@ -15560,9 +15564,10 @@ void CCharacter::sendUrl(const string &url)
 	string playerPos = getPositionInfos();
 	strFindReplace(playerPos, " ", "%20");
 	string targetInfos = getTargetInfos();
+	string serverInfos = getServerInfos(getState().X / 1000., getState().Y / 1000.);
 	strFindReplace(targetInfos, " ", "%20");
 	
-	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos;
+	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos+"&server_infos="+serverInfos;
 	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
 	uint32 userId = PlayerManager.getPlayerId(getId());
