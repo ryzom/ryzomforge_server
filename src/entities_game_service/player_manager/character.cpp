@@ -7586,6 +7586,7 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 		{
 
 		case ANIMALS_ORDERS::ENTER_BAG:
+			_PlayerPets[petIndex].PetStatus = CPetAnimal::in_bag;
 			if (_PlayerPets[petIndex].IsInBag)
 				continue;
 
