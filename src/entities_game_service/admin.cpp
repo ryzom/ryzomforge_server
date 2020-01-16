@@ -192,6 +192,7 @@ AdminCommandsInit[] =
 		"showOnline",						true,
 
 		"openTargetApp",					true,
+		"openTargetUrl",					true,
 
 		// DEPECRATED !!!
 		"webExecCommand",					true,
@@ -9045,6 +9046,18 @@ NLMISC_COMMAND(openTargetApp, "open target app", "<user_id>")
 		c->sendUrl(creature->getWebPage());
 	}
 }
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(openTargetUrl, "Open target url", "<user_id> <url>")
+{
+	if (args.size() < 2)
+		return false;
+
+	GET_CHARACTER
+
+	c->sendUrl(args[1]);
+}
+
 
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(eventSetBotURL, "changes the url of a bot", "<bot eid> [<url>]")
