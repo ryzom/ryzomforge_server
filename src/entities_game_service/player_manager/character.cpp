@@ -6113,6 +6113,9 @@ void CCharacter::respawnPet()
 {
 	for (uint i = 0; i < _PlayerPets.size(); ++i)
 	{
+		if (_PlayerPets[i].PetStatus == CPetAnimal::in_bag)
+			continue;
+
 		if (_PlayerPets[i].PetStatus != CPetAnimal::not_present
 				&& (_PlayerPets[i].PetStatus != CPetAnimal::stable || _RespawnMainLandInTown))
 		{
@@ -6304,6 +6307,7 @@ bool CCharacter::spawnCharacterAnimal(uint index)
 				msg.Coordinate_Y = _PlayerPets[index].Landscape_Y;
 				msg.Coordinate_H = _PlayerPets[index].Landscape_Z;
 				msg.Heading = 0.0f;
+				msg.Cell = 0;
 				break;
 
 			case CPetAnimal::stable:
@@ -7582,6 +7586,7 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 		{
 
 		case ANIMALS_ORDERS::ENTER_BAG:
+			_PlayerPets[petIndex].PetStatus = CPetAnimal::in_bag;
 			if (_PlayerPets[petIndex].IsInBag)
 				continue;
 
