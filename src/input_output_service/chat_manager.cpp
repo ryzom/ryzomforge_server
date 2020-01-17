@@ -648,6 +648,10 @@ void CChatManager::chat( const TDataSetRow& sender, const ucstring& ucstr )
 					if (EnableDeepL)
 					{
 						CChatClient &client = getClient(*itA);
+
+						if (sender_lang == "wk")
+							receiver_lang = sender_lang;
+						
 						if (ucstr[0] != '>' && client.haveDisabledTranslation(sender_lang))
 							receiver_lang = sender_lang;
 						
@@ -974,6 +978,9 @@ void CChatManager::chatInGroup( TGroupId& grpId, const ucstring& ucstr, const TD
 				{
 					CCharacterInfos *senderChar = IOS->getCharInfos(TheDataset.getEntityId(sender));
 					CCharacterInfos *receiverChar = IOS->getCharInfos(TheDataset.getEntityId(*itM));
+
+					if (senderChar == NULL || receiverChar == NULL)
+						continue;
 
 					// set GM mode if either speaker of listener is a GM
 					bool isGM= senderChar->HavePrivilege || receiverChar->HavePrivilege;
