@@ -4117,3 +4117,102 @@ NLMISC_COMMAND(startMoveBot,"start move bot or previous stopped bot","<uid|*> [<
 	CharacterBotChatBeginEnd.BotChatEnd.push_back(TargetRowId);
 	log.displayNL("OK");
 }
+
+
+NLMISC_COMMAND(manageBuilding, "Manage a building", "<uid> <action>")
+{
+	if (args.size() < 2) return false;
+
+	GET_ACTIVE_CHARACTER
+
+	string action = args[1]; // trigger_in, trigger_out, add_guild_room, add_player_room
+		
+	if (action == "trigger_in" && args.size() == 3)
+	{
+		uint32 liftId;
+		NLMISC::fromString(args[2], liftId);
+		CBuildingManager::getInstance()->addTriggerRequest(c->getEntityRowId(), liftId);
+	}
+	else if (action == "trigger_out")
+	{
+		CBuildingManager::getInstance()->removeTriggerRequest(c->getEntityRowId());
+		
+	}
+	else if (action == "add_guild_room" && args.size() == 3)
+	{
+		CBuildingPhysicalGuild * building = dynamic_cast<CBuildingPhysicalGuild *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]));
+		if (building)
+			building->addGuild(c->getGuildId());
+		else
+		{
+			log.displayNL("KO: no building");
+			return true;
+		}
+	}
+	else if (action == "add_player_room"  && args.size () == 3)
+	{
+		CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]));
+		if (building)
+			building->addPlayer(c->getId());
+		else
+		{
+			log.displayNL("KO: no building");
+			return true;
+		}
+	}
+	else if (action == "buy_guild_room"  && args.size () == 3)
+	{
+		CBuildingPhysicalGuild * building = dynamic_cast<CBuildingPhysicalGuild *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]));
+		if (building)
+		{
+			CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
+			if (guild != NULL)
+				guild->setBuilding(building->getAlias());
+			else
+			{
+				log.displayNL("KO: no guild");
+				return true;
+			}
+		}
+	}
+	else if (action == "buy_player_room"  && args.size () == 3)
+	{
+		CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]));
+		if ( building )
+			CBuildingManager::getInstance()->buyBuilding(c->getId(), building->getAlias());
+		else
+		{
+			log.displayNL("KO: no building");
+			return true;
+		}
+	}
+	else if (action == "set_player_room"  && args.size () == 3)
+	{
+	/*	CBuildingPhysicalPlayer * building = dynamic_cast<CBuildingPhysicalPlayer *>(CBuildingManager::getInstance()->getBuildingPhysicalsByName(args[2]));
+		if ( building )
+		{
+			c->getRoomInterface().setBuilding(building);
+			building->addPlayer(c->getId());
+		}
+		else
+		{
+			log.displayNL("KO: no building");
+			return true;
+		}*/
+	}
+	else if (action == "get_access_room" && args.size () == 3)
+	{
+
+		CCharacter *owner = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), args[2]));
+		if (owner)
+			owner->addRoomAccessToPlayer(c->getId());
+		else
+		{
+			log.displayNL("KO: no owner");
+			return true;
+		}
+	}
+
+	log.displayNL("OK");
+	return true;
+}
