@@ -4024,16 +4024,33 @@ NLMISC_COMMAND(stopMoveBot,"stop move of a bot","<uid|*> [<target|eid>]")
 		GET_ACTIVE_CHARACTER2
 
 		if (c)
-			CharacterBotChatBeginEnd.BotChatStart.push_back(c->getEntityRowId());
-		
-		const CEntityId &target = c->getTarget();
-		if (target == CEntityId::Unknown)
 		{
-			log.displayNL("ERR: target");
+			const CEntityId &target = c->getTarget();
+			if (target == CEntityId::Unknown)
+			{
+				log.displayNL("ERR: target");
+				return true;
+			}
+			
+			TargetRowId = TheDataset.getDataSetRow(target);
+			TDataSetRow stoppedNpc = c->getStoppedNpc();
+			if (stoppedNpc == TargetRowId)
+				return true;
+			
+			if (TheDataset.isAccessible(stoppedNpc))
+			{
+				CharacterBotChatBeginEnd.BotChatEnd.push_back(c->getEntityRowId());
+				CharacterBotChatBeginEnd.BotChatEnd.push_back(stoppedNpc);
+			}
+			CharacterBotChatBeginEnd.BotChatStart.push_back(c->getEntityRowId());
+			c->setStoppedNpc(TargetRowId);
+			c->setStoppedNpcTick();
+		}
+		else
+		{
+			log.displayNL("ERR: user");
 			return true;
 		}
-		
-		TargetRowId = TheDataset.getDataSetRow(target);
 	}
 	else
 	{
@@ -4055,7 +4072,7 @@ NLMISC_COMMAND(stopMoveBot,"stop move of a bot","<uid|*> [<target|eid>]")
 }
 
 
-NLMISC_COMMAND(startMoveBot,"start move of a bot","<uid|*> [<target|eid>]")
+NLMISC_COMMAND(startMoveBot,"start move bot or previous stopped bot","<uid|*> [<target|eid>]")
 {
 	if ( args.size() < 1 )
 		return false;
@@ -4070,17 +4087,16 @@ NLMISC_COMMAND(startMoveBot,"start move of a bot","<uid|*> [<target|eid>]")
 		GET_ACTIVE_CHARACTER2
 
 		if (c)
-			CharacterBotChatBeginEnd.BotChatEnd.push_back(c->getEntityRowId());
-		
-		const CEntityId &target = c->getTarget();
-		if (target == CEntityId::Unknown)
 		{
-			log.displayNL("ERR: target");
+			CharacterBotChatBeginEnd.BotChatEnd.push_back(c->getEntityRowId());
+			TargetRowId = c->getStoppedNpc();
+			c->setStoppedNpc(TDataSetRow());
+		}
+		else
+		{
+			log.displayNL("ERR: user");
 			return true;
 		}
-
-		log.displayNL("%s", target.toString().c_str());
-		TargetRowId = TheDataset.getDataSetRow(target);
 	}
 	else
 	{
