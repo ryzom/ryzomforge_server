@@ -16844,7 +16844,7 @@ bool CCharacter::addSabrinaEffect(CSEffect* effect)
 
 		if (sheet != CSheetId::Unknown)
 		{
-			effect->setEffectIndexInDB(addEffectInDB(sheet, EFFECT_FAMILIES::isEffectABonus(effect->getFamily())));
+			effect->setEffectIndexInDB(addEffectInDB(sheet, EFFECT_FAMILIES::isEffectABonus(effect->getFamily()), effect->getEndTime()));
 		}
 
 		return true;
@@ -22496,9 +22496,9 @@ void CCharacter::incParryModifier(sint32 inc)
 
 //------------------------------------------------------------------------------
 
-sint8 CCharacter::addEffectInDB(const NLMISC::CSheetId &sheetId, bool bonus)
+sint8 CCharacter::addEffectInDB(const NLMISC::CSheetId &sheetId, bool bonus, NLMISC::TGameCycle endTime)
 {
-	return _ModifiersInDB.addEffect(sheetId, bonus, _PropertyDatabase);
+	return _ModifiersInDB.addEffect(sheetId, bonus, endTime, _PropertyDatabase);
 }
 
 //------------------------------------------------------------------------------
