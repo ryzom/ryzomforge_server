@@ -12202,7 +12202,7 @@ CCreature* CCharacter::startBotChat(BOTCHATTYPE::TBotChatFlags chatType)
 // endBotChat
 //
 //-----------------------------------------------
-void CCharacter::endBotChat(bool newBotChat, bool closeDynChat)
+void CCharacter::endBotChat(bool newBotChat, bool closeDynChat, bool processMissions)
 {
 	_TradePagesToUpdate.clear();
 
@@ -12239,6 +12239,8 @@ void CCharacter::endBotChat(bool newBotChat, bool closeDynChat)
 
 			if (closeDynChat)
 				CMissionManager::getInstance()->removeAllUserDynChat(this);
+			else if (processMissions)
+				CMissionManager::getInstance()->processMissionsEventEndDynChat(this);
 		}
 
 		// Inform AI about bot chat end
