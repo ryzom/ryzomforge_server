@@ -85,6 +85,7 @@
 #include "entities_game_service/egs_variables.h"
 #include "entity_matrix.h"
 #include "forage_progress.h"
+#include "harvest_source.h"
 #include "game_event_manager.h"
 #include "game_item_manager/player_inv_pet.h"
 #include "game_item_manager/player_inv_temp.h"
@@ -14891,6 +14892,8 @@ string CCharacter::getTargetInfos()
 		msg += "n|";
 	else if (target.getType() == RYZOMID::player)
 		msg += "p|";
+	else if (target.getType() == RYZOMID::forageSource)
+		msg += "s|";
 	else
 		msg += "0";
 
@@ -14927,6 +14930,21 @@ string CCharacter::getTargetInfos()
 
 			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender());
 		}
+	}
+	else if (target.getType() == RYZOMID::forageSource)
+	{
+		TDataSetRow sourceRowId = getTargetDataSetRow();
+		CHarvestSource	*source = CHarvestSourceManager::getInstance()->getEntity( sourceRowId );
+
+		float x = source->pos().x;
+		float y = source->pos().y;
+		double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
+			
+		msg += toString("%.2f|%.2f|%.2f|", dist, x, y)+source->materialSheet().toString()+"|"+toString("%.2f|%.2f|%.2f|%u|", source->quantity(), source->quality(), source->maxQuality(), source->timeToLive());
+		if (source->wasProspected())
+			msg += "1";
+		else
+			msg += "0";
 	}
 	else
 	{
