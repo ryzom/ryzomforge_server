@@ -703,6 +703,12 @@ public:
 	bool getEnterFlag() const;
 
 	/**
+	 * Get the online status
+	 * \return true if the player are in the game, false if he left
+	 */
+	bool getOnLineStatus() const;
+
+	/**
 	 * wrapper to CEntityBase
 	 */
 	//	CEntityState& getState();
@@ -2419,7 +2425,7 @@ public:
 	void updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills skill);
 
 	// Jewel enchants used for Tags
-	void updateJewelsTags(bool remove);
+	void updateJewelsTags(bool remove, bool update=true);
 	
 	// Jewel equipment or skill or region are changed, recompute protection and resistances
 	void updateMagicProtectionAndResistance();
@@ -3583,6 +3589,8 @@ private:
 	std::map<std::string, std::string> _CustomMissionsParams;
 
 	std::vector<SCheckPosCoordinate> _CheckPos;
+
+	bool _AreOnline;
 
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange
