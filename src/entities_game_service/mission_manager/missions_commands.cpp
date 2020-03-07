@@ -1037,6 +1037,7 @@ NLMISC_COMMAND(enchantEquipedItem, "enchantEquipedItem", "<uid> <slotname> <shee
 	if (itemPtr != NULL)
 	{
 		itemPtr->applyEnchantment(sheets);
+		c->updateJewelsTags(false);
 		log.displayNL("OK");
 		return true;
 	}
