@@ -79,6 +79,11 @@ inline bool CCharacter::getEnterFlag() const
 	return _Enter; 
 }
 
+inline bool CCharacter::getOnLineStatus() const
+{
+	return _AreOnline; 
+}
+
 //------------------------------------------------------------------------------
 
 //inline CEntityState& CCharacter::getState()
