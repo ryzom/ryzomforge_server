@@ -4,3 +4,5 @@ __pycache__/
 
 
 src/game_share
+
+www/config.php
