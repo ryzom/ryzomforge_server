@@ -1,0 +1,8 @@
+tools/config.sh
+__pycache__/
+*.pyc
+
+
+src/game_share
+
+www/config.php
