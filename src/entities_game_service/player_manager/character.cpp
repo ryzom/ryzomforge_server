@@ -1627,7 +1627,7 @@ uint32 CCharacter::tickUpdate()
 		_LastTickNpcStopped = 0;
 		setStoppedNpc(TDataSetRow());
 	}
-	
+
 	return nextUpdate;
 } // tickUpdate //
 
@@ -2026,7 +2026,7 @@ void CCharacter::applyRespawnEffects(bool applyDP)
 
 		resetNextDeathPenaltyFactor();
 	}
-	
+
 	_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base / 10;
 	_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base / 10;
 	_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base / 10;
@@ -5689,7 +5689,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 							inCell = true;
 						}
 					}
-					
+
 					// Teleport as well pets that are following or mounted or a pet and in the neighbourhood or... in a Powo/indoor
 					if ((((isNearPetTpIsAllowed() || form->Type == ITEM_TYPE::ANIMAL_TICKET) && (_PlayerPets[i].IsFollowing || _PlayerPets[i].IsMounted)
 							&& squareDistance <= 50.0f * 50.0f)) || inCell)
@@ -5711,7 +5711,7 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 
 	if (_IntangibleEndDate != ~0 && !fromVortex) // Don't save Last Tp Tick if player respawns or teleport from Vortex
 		_LastTpTick = CTickEventHandler::getGameCycle();
-	
+
 	_TpCoordinate.X = x;
 	_TpCoordinate.Y = y;
 	_TpCoordinate.Z = z;
@@ -5913,7 +5913,7 @@ string CCharacter::getPets()
 				pets += "P";
 			else if (form->Type == ITEM_TYPE::ANIMAL_TICKET)
 				pets += "A";
-			
+
 			CPetAnimal::TStatus status = _PlayerPets[i].PetStatus;
 			if (status !=  CPetAnimal::db_unknown)
 				pets += toString("%d", (uint32)(status));
@@ -6447,7 +6447,7 @@ void CCharacter::onAnimalSpawned(CPetSpawnConfirmationMsg::TSpawnError SpawnStat
 						CMirrorPropValue< SAltLookProp2, CPropLocationPacked<2> > visualPropertyB( TheDataset, PetMirrorRow, DSPropertyVPB );
 						SET_STRUCT_MEMBER( visualPropertyB, PropertySubData.Scale, animal.Size );
 					}
-					
+
 				}
 
 				if (animal.PetStatus != CPetAnimal::death)
@@ -7242,7 +7242,7 @@ void CCharacter::removePetCharacterAfterDeath(uint32 index)
 		const CStaticItem* form = _PlayerPets[index].ItemPtr->getStaticForm();
 		if (form && form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
 			_LastFreeMount = CTickEventHandler::getGameCycle();
-		
+
 		uint32 slot = _PlayerPets[index].ItemPtr->getInventorySlot();
 		// release our ref before we destroy the item
 		_PlayerPets[index].ItemPtr = 0;
@@ -7619,7 +7619,7 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 			_PlayerPets[petIndex].IsInBag = false;
 			// no petCommand setup here so continue instead of break
 			continue;
-			
+
 		case ANIMALS_ORDERS::ENTER_STABLE:
 			if (_PlayerPets[petIndex].IsMounted)
 				continue;
@@ -7884,11 +7884,11 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 
 	string skillInitial = SKILLS::toString(skillEnum).substr(1, 1);
 
-	//// GUILDS POINTS 
+	//// GUILDS POINTS
 	CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
 	if (EnableGuildPoints.get() && guild)
 	{
-	
+
 		uint32 guildpoints = 0;
 		if (skill->MaxLvlReached >= 250) // when max level : quantity of points is different for each skill
 		{
@@ -8308,7 +8308,7 @@ double CCharacter::addXpToSkillInternal(double XpGain, const std::string &ContSk
 				_BaseParryLevel = skill->Base;
 				if (p->isTrialPlayer() && _BaseParryLevel > 125)
 					_BaseParryLevel = 125;
-				
+
 				_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 				//				_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase,
 				//_BaseParryLevel);
@@ -11670,6 +11670,18 @@ void CCharacter::setNewTitle(const string &title)
 }
 
 //-----------------------------------------------------------------------------
+void CCharacter::setTagA(const string &tag)
+{
+	_TagA = tag;
+}
+
+//-----------------------------------------------------------------------------
+void CCharacter::setTagB(const string &tag)
+{
+	_TagB = tag;
+}
+
+//-----------------------------------------------------------------------------
 void CCharacter::setTagPvPA(const string &tag)
 {
 	_TagPvPA = tag;
@@ -11682,19 +11694,6 @@ void CCharacter::setTagPvPB(const string &tag)
 }
 
 //-----------------------------------------------------------------------------
-void CCharacter::setTagA(const string &tag)
-{
-	_TagA = tag;
-}
-
-//-----------------------------------------------------------------------------
-void CCharacter::setTagB(const string &tag)
-{
-	_TagB = tag;
-}
-
-
-//-----------------------------------------------------------------------------
 void CCharacter::setDontTranslate(const string &langs)
 {
 	_DontTranslate = langs;
@@ -11704,7 +11703,7 @@ void CCharacter::setDontTranslate(const string &langs)
 //-----------------------------------------------------------------------------
 CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot)
 {
-	
+
 	CInventoryPtr inv = getInventory(INVENTORIES::equipment);
 	if (inv)
 	{
@@ -11727,8 +11726,14 @@ CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_
 								CSBrickParamJewelAttrs *sbrickParam = (CSBrickParamJewelAttrs*)param;
 								if (param->id() == TBrickParam::JEWEL_ATTRS && sbrickParam->Attribute == attribute)
 								{
-									if (checkRequiredFaction(sbrickParam->RequiredFaction)) {
-										return sbrickParam;
+									// Check required fame (if no required faction, check are ok)
+									if (checkRequiredFame(sbrickParam->RequiredFaction, sbrickParam->RequiredFame))
+									{
+										// Require a faction/nation/org only for fame up to 30
+										if (sbrickParam->RequiredFame < 30 || checkRequiredFaction(sbrickParam->RequiredFaction))
+										{
+											return sbrickParam;
+										}
 									}
 								}
 							}
@@ -11754,8 +11759,14 @@ CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_
 							CSBrickParamJewelAttrs *sbrickParam = (CSBrickParamJewelAttrs*)param;
 							if (param->id() == TBrickParam::JEWEL_ATTRS && sbrickParam->Attribute == attribute)
 							{
-								if (checkRequiredFaction(sbrickParam->RequiredFaction)) {
-									return sbrickParam;
+								// Check required fame (if no required faction, check are ok)
+								if (checkRequiredFame(sbrickParam->RequiredFaction, sbrickParam->RequiredFame))
+								{
+									// Require a faction/nation/org only for fame up to 30
+									if (sbrickParam->RequiredFame < 30 || checkRequiredFaction(sbrickParam->RequiredFaction))
+									{
+										return sbrickParam;
+									}
 								}
 							}
 						}
@@ -11764,7 +11775,7 @@ CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_
 			}
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -12546,7 +12557,7 @@ void CCharacter::acceptExchange(uint8 exchangeId)
 			nlwarning("CCharacter::acceptExchange : character %s -> no exchangeView", _Id.toString().c_str());
 			return;
 		}
-		
+
 		removeExchangeItems(vect, exchangePlayerPets);
 
 		if (mission)
@@ -12915,7 +12926,7 @@ void CCharacter::removeExchangeItems(vector<CGameItemPtr> &itemRemoved, vector<C
 		{
 			if (form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
 				_LastExchangeMount = CTickEventHandler::getGameCycle();
-				
+
 			for (uint p = 0; p < _PlayerPets.size(); p++)
 			{
 				if (_PlayerPets[p].ItemPtr == item)
@@ -12999,11 +13010,11 @@ void CCharacter::addExchangeItems(
 
 		if (item == NULL)
 			continue;
-		
+
 		const CStaticItem* form = CSheets::getForm(item->getSheetId());
 		if (form && form->Type == ITEM_TYPE::MEKTOUB_MOUNT_TICKET)
 			_LastExchangeMount = CTickEventHandler::getGameCycle();
-				
+
 		if (!addItemToInventory(INVENTORIES::bag, itemToAdd[i])
 				&& !addItemToInventory(INVENTORIES::temporary, itemToAdd[i]))
 		{
@@ -13398,7 +13409,7 @@ void CCharacter::removeMission(TAIAlias alias, /*TMissionResult*/ uint32 result,
 	}
 
 	CMissionTemplate* tpl = CMissionManager::getInstance()->getTemplate(mission->getTemplateId());
-	
+
 	if (mission->getFinished())
 	{
 		if (mission->getMissionSuccess())
@@ -14923,7 +14934,7 @@ string CCharacter::getTargetInfos()
 			double h = cTarget->getState().Heading;
 
 			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
-			
+
 			TDataSetRow dsr = cTarget->getEntityRowId();
 			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
@@ -14939,7 +14950,7 @@ string CCharacter::getTargetInfos()
 		float x = source->pos().x;
 		float y = source->pos().y;
 		double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
-			
+
 		msg += toString("%.2f|%.2f|%.2f|", dist, x, y)+source->materialSheet().toString()+"|"+toString("%.2f|%.2f|%.2f|%u|", source->quantity(), source->quality(), source->maxQuality(), source->timeToLive());
 		if (source->wasProspected())
 			msg += "1";
@@ -14964,14 +14975,14 @@ string CCharacter::getTargetInfos()
 				string pets = getPets();
 				msg += toString("PET#%d:%s|", petSlot, pets.c_str());
 			}
-	
+
 			double x = cTarget->getState().X / 1000.;
 			double y = cTarget->getState().Y / 1000.;
 			double z = cTarget->getState().Z / 1000.;
 			double h = cTarget->getState().Heading;
 
 			double dist = sqrt((p_x-x)*(p_x-x)+(p_y-y)*(p_y-y));
-			
+
 			TDataSetRow dsr = cTarget->getEntityRowId();
 			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
@@ -14979,7 +14990,7 @@ string CCharacter::getTargetInfos()
 			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender());
 		}
 	}
-	
+
 	return msg;
 }
 
@@ -15671,8 +15682,23 @@ void CCharacter::sendUrl(const string &url)
 	string targetInfos = getTargetInfos();
 	string serverInfos = getServerInfos(getState().X / 1000., getState().Y / 1000.);
 	strFindReplace(targetInfos, " ", "%20");
-	
-	string final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos+"&server_infos="+serverInfos;
+	string final_url;
+
+	if (url.find("$(") != string::npos )
+	{
+		final_url = url;
+		strFindReplace(final_url, "$(pos)", playerPos);
+		strFindReplace(final_url, "$(target)", targetInfos);
+		strFindReplace(final_url, "$(server)", serverInfos);
+		strFindReplace(final_url, "$(hands)", getEquipementInfos(INVENTORIES::handling));
+		strFindReplace(final_url, "$(equiped)", getEquipementInfos(INVENTORIES::equipment));
+		final_url += toString("&urlidx=%d", getUrlIndex());
+	}
+	else
+	{
+		final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos+"&server_infos="+serverInfos;
+	}
+
 	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
 	uint32 userId = PlayerManager.getPlayerId(getId());
@@ -16396,7 +16422,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 				{
 					if (fameIdx == marauderIdx)
 						continue;
-					
+
 					sint32 fame = CFameInterface::getInstance().getFameIndexed(_Id, fameIdx);
 
 					if (fame > maxOtherfame)
@@ -16410,7 +16436,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 					CFameManager::getInstance().setEntityFame(_Id, marauderIdx, maxOtherfame, false);
 				}
 			}
-			
+
 			//			_PropertyDatabase.setProp( toString("FAME:PLAYER%d:VALUE", fameIndexInDatabase),
 			// sint64(float(playerFame)/FameAbsoluteMax*100) );
 			CBankAccessor_PLR::getFAME()
@@ -16924,9 +16950,9 @@ bool CCharacter::removeSabrinaEffect(CSEffect* effect, bool activateSleepingEffe
 uint32 CCharacter::getCarriedWeight()
 {
 	// CarriedWeight is bag Weight + all pets in bag
-	
+
 	uint32 total = _Inventory[INVENTORIES::bag]->getInventoryWeight();
-	
+
 	for (uint i = 0; i != _PlayerPets.size(); ++i)
 	{
 		if (_PlayerPets[i].IsInBag) // Add 5kg + Weight of Inventory
@@ -18013,7 +18039,7 @@ void CCharacter::clearIgnoreList()
 void CCharacter::online(bool onlineStatus)
 {
 	_AreOnline = onlineStatus;
-	
+
 	// send contact list init if goind online
 	if (onlineStatus)
 		sendContactListInit();
@@ -18074,7 +18100,7 @@ void CCharacter::online(bool onlineStatus)
 		msgout.serial(langs);
 		CUnifiedNetwork::getInstance()->send("IOS", msgout);
 	}
-	
+
 } // online //
 
 //--------------------------------------------------------------
@@ -19284,7 +19310,7 @@ void CCharacter::checkCharacAndScoresValues()
 			}
 		}
 	}
-	
+
 	{
 		H_AUTO(CheckCharacteristics);
 		// check caracs
@@ -19304,7 +19330,7 @@ void CCharacter::checkCharacAndScoresValues()
 
 			if (player != NULL && player->isTrialPlayer() && bvalue > 140)
 				bvalue = 140;
-				
+
 			// compare
 			if (_PhysCharacs._PhysicalCharacteristics[charac].Base != tvalue)
 			{
@@ -19326,7 +19352,7 @@ void CCharacter::checkCharacAndScoresValues()
 			}
 		}
 	}
-	
+
 	{
 		H_AUTO(CheckScores);
 		// Check Scores
@@ -19706,7 +19732,7 @@ bool CCharacter::setHairColor(uint32 colorValue, bool sendMessage)
 			CCharacter::sendDynamicSystemMessage(_Id, "EGS_COSMETIC_USE_WIG");
 		return false;
 	}
-	
+
 	if (colorValue == _HairColor)
 	{
 		if (sendMessage)
@@ -21219,31 +21245,41 @@ void CCharacter::updateJewelsTags(bool remove, bool update)
 
 	string tagA = getTagA();
 	string tagB = getTagB();
+	string tagPvPA = getTagPvPA();
+	string tagPvPB = getTagPvPB();
 
 	setTagA("");
 	setTagB("");
+	setTagPvPA("");
+	setTagPvPB("");
 
 	if (remove)
 		return;
 
 	CSBrickParamJewelAttrs *sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::HEADDRESS);
 	if (sbrickParam)
-	{
 		setTagA(sbrickParam->Value);
-	}
 
 	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::NECKLACE);
 	if (sbrickParam)
-	{
 		setTagB(sbrickParam->Value);
-	}
+
+	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::EARL);
+	if (sbrickParam)
+		setTagPvPA(sbrickParam->Value);
+
+	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::EARR);
+	if (sbrickParam)
+		setTagPvPB(sbrickParam->Value);
+
 
 	if (!update)
 		return;
 
-	if (getTagA() != tagA || getTagB() != tagB) {
+	if (getTagA() != tagA || getTagB() != tagB || getTagPvPA() != tagPvPA || getTagPvPB() != tagPvPB)
+	{
 		registerName();
-}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -23407,5 +23443,5 @@ bool CCharacter::initPetInventory(uint8 index)
 
 void CCharacter::killMe()
 {
-	kill(_EntityRowId); 
+	kill(_EntityRowId);
 }
