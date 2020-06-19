@@ -1987,6 +1987,48 @@ void cbRequestDsr(CMessage& msgin, const string &serviceName, TServiceId service
 	}
 }
 
+
+void cbUserDontTranslateLanguages( CMessage& msgin, const string &serviceName, TServiceId serviceId )
+{
+	TDataSetRow player;
+	msgin.serial(player);
+
+	string langs;
+	try
+	{
+		msgin.serial(langs);
+	}
+	catch(const Exception &e)
+	{
+		nlwarning("<impulsionTell> %s",e.what());
+		return;
+	}
+
+	if (player == INVALID_DATASET_ROW)
+	{
+		nlwarning("cbUserTranslateLanguage : ignoring chat because Player %s:%x Invalid", 
+			TheDataset.getEntityId(player).toString().c_str(),
+			player.getIndex());
+		return;
+	}
+
+	CChatManager &cm = IOS->getChatManager();
+
+	if (!cm.checkClient(player))
+		IOS->getChatManager().addClient(player);
+
+	CChatClient &client = cm.getClient(player);
+
+	vector<string> vlangs;
+	NLMISC::splitString(langs, "|", vlangs);
+	client.resetDisabledTranslations();
+	for (uint i=0; i<vlangs.size(); i++)
+	{
+		client.disableTranslation(vlangs[i]);
+	}
+}
+
+
 //void cbAddDM(CMessage& msgin, const string &serviceName, TServiceId serviceId)
 //{
 //	uint32 charId;
@@ -2075,6 +2117,7 @@ TUnifiedCallbackItem CbIOSArray[]=
 	{ "RETR_ENTITY_NAMES", cbRetrieveEntityNames },
 	{ "USER_LANGUAGE", cbUserLanguage },	// receive an association between a userId and a language
 	{ "REMOVE_USER_LANGUAGE", cbRemoveUserLanguage },
+	{ "SET_USER_DONT_TRANSLATE_LANGS", cbUserDontTranslateLanguages },
 
 	{ "IGNORE_TELL_MODE", cbIgnoreTellMode }, // receive an ignore tell mode command from EGS
 	{ "IGNORE", cbImpulsionIgnore },

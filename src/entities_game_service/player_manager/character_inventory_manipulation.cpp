@@ -2473,6 +2473,7 @@ void CCharacter::sendItemInfos(uint16 slotId)
 		}
 		else if (inventory == INVENTORIES::guild)
 		{
+			/*
 			CMirrorPropValueRO<TYPE_CELL> mirrorValue(TheDataset, getEntityRowId(), DSPropertyCELL);
 			const sint32 cell = mirrorValue;
 
@@ -2492,10 +2493,19 @@ void CCharacter::sendItemInfos(uint16 slotId)
 			}
 
 			CGuild* guild = CGuildManager::getInstance()->getGuildFromId(room->getGuildId());
+			*/
+			if (_GuildId == 0)
+			{
+				nlwarning("<sendItemInfos> user %s not in guild !", _Id.toString().c_str());
+				return;
+			}
+
+			CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
 
 			if (!guild)
 			{
-				nlwarning("<sendItemInfos> user %s cellId %d is not a guild room !", _Id.toString().c_str(), cell);
+				//nlwarning("<sendItemInfos> user %s cellId %d is not a guild room !", _Id.toString().c_str(), cell);
+				nlwarning("<sendItemInfos> user %s guild %d unknown !", _Id.toString().c_str(), toString(_GuildId).c_str());
 				return;
 			}
 
