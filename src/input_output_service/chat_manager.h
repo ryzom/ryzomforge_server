@@ -382,6 +382,7 @@ public:
 	/**
 	 * Send a far chat message
 	 */
+	void sendFarChat(const std::string &name, const ucstring& ucstr, const std::string &chan);
 	void sendFarChat( CChatGroup::TGroupType senderChatMode, const TDataSetRow &receiver, const ucstring& ucstr, const ucstring &senderName, TChanID chanID = NLMISC::CEntityId::Unknown);
 
 	/**
@@ -414,6 +415,8 @@ public:
 	void sendChatCustomEmote( const TDataSetRow &sender, const TDataSetRow &receiver, const ucstring& ucstr );
 
 	void update();
+
+	TChanID getChanId(const std::string name);
 };
 
 
