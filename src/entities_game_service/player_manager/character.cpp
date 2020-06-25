@@ -641,7 +641,7 @@ CCharacter::CCharacter()
 	_LastUrlIndex = 0;
 	_CustomMissionsParams.clear();
 	_FriendVisibility = VisibleToAll;
-	_LangChannel = "en";
+	_LangChannel = "rf";
 	_NewTitle = "Refugee";
 	initDatabase();
 
