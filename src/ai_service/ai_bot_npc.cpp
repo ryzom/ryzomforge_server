@@ -39,6 +39,8 @@ using namespace RYAI_MAP_CRUNCH;
 static bool VerboseLog = false;
 #define LOG if (!VerboseLog) { } else nlinfo
 
+extern CAIVector randomPos(double dispersionRadius);
+
 //////////////////////////////////////////////////////////////////////////////
 // CSpawnBotNpc                                                             //
 //////////////////////////////////////////////////////////////////////////////
@@ -61,14 +63,14 @@ void CSpawnBotNpc::sendInfoToEGS() const
 {
 	if (!EGSHasMirrorReady)
 		return;
-	
+
 	CSpawnBot::sendInfoToEGS();
 
 	TGenNpcDescMsgImp msg;
 	msg.setEntityIndex(dataSetRow());
-	
+
 	getPersistent().fillDescriptionMsg(msg);
-	
+
 	msg.setChat(_CurrentChatProfile);
 	msg.send("EGS");
 }
@@ -83,7 +85,7 @@ void CSpawnBotNpc::processEvent(CCombatInterface::CEvent const& event)
 	// no self aggro.
 	if (event._targetRow==event._originatorRow)
 		return;
-	
+
 	if ((event._nature==ACTNATURE::FIGHT || event._nature==ACTNATURE::OFFENSIVE_MAGIC) && !getPersistent().ignoreOffensiveActions())
 	{
 		float aggro = event._weight;
@@ -113,7 +115,7 @@ void CSpawnBotNpc::processEvent(CCombatInterface::CEvent const& event)
 {
 	++AISStat::BotTotalUpdCtr;
 	++AISStat::BotNpcUpdCtr;
-	
+
 	{
 		H_AUTO(AIHpTrig);
 		// Fix for HP triggers
@@ -133,7 +135,7 @@ void CSpawnBotNpc::processEvent(CCombatInterface::CEvent const& event)
 			_OldHpPercentage = getPhysical().hpPercentage();
 		}
 	}
-	
+
 	// Bot chat and dyn chat override AI profile unless fighting
 	// The directing adjustment is done client-slide (each player sees the NPC facing him)
 	if (!getActiveChats().empty())
@@ -153,10 +155,10 @@ void CSpawnBotNpc::processEvent(CCombatInterface::CEvent const& event)
 		if (sp)
 		{
 			sp->getPersistent().notifyStopNpcControl();
-		}		
+		}
 
-		_PlayerController = NULL;		
-		
+		_PlayerController = NULL;
+
 	}
 
 	if (_PlayerController == NULL)
@@ -183,16 +185,16 @@ void CSpawnBotNpc::processEvent(CCombatInterface::CEvent const& event)
 	// If sit and move then stand up
 
 	if (IsRingShard)
-	{	
+	{
 		if (getMode() == MBEHAV::SIT
 			&& (x().asInt() != startPos.x().asInt() || y().asInt() != startPos.y().asInt()) )
 		{
    			setMode(MBEHAV::NORMAL);
 		}
 
-		
+
 		if (_FacingTick != 0)
-		{	
+		{
 			uint32 tick = CTimeInterface::gameCycle();
 			if ( (tick - _FacingTick) > 40)
 			{
@@ -210,7 +212,7 @@ void CSpawnBotNpc::setFacing(CAngle theta)
 	{
 		_FacingTheta = pos().theta();
 	}
-	
+
 	setTheta(theta);
 	_FacingTick = CTimeInterface::gameCycle();
 }
@@ -235,12 +237,12 @@ void CSpawnBotNpc::updateChat(CAIState const* state)
 	if (!state)
 		return;
 	CBotNpc const& botNpc = getPersistent();
-	
+
 	FOREACHC(itChat, CCont<CAIStateChat>, state->chats())
 	{
 		if (!itChat->testCompatibility(botNpc))
 			continue;
-		
+
 		// update chat information if any
 		CNpcChatProfileImp const* const chatProfile = botNpc.getChat();
 		if (!chatProfile)
@@ -257,8 +259,8 @@ std::vector<std::string> CSpawnBotNpc::getMultiLineInfoString() const
 {
 	std::vector<std::string> container;
 	std::vector<std::string> strings;
-	
-	
+
+
 	pushTitle(container, "CSpawnBotNpc");
 	strings.clear();
 	strings = CSpawnBot::getMultiLineInfoString();
@@ -284,8 +286,8 @@ std::vector<std::string> CSpawnBotNpc::getMultiLineInfoString() const
 		}
 	}
 	pushFooter(container);
-	
-	
+
+
 	return container;
 }
 
@@ -298,7 +300,7 @@ void CSpawnBotNpc::beginBotChat(CBotPlayer* plr)
 			nlwarning("Chat pair added more than once!!!");
 	}
 #endif
-	
+
 	// add an entry to the bot chat vector
 	_ActiveChats.push_back(plr);
 }
@@ -310,11 +312,11 @@ void CSpawnBotNpc::endBotChat(CBotPlayer* plr)
 	{
 		if	(_ActiveChats[i]!=plr)
 			continue;
-		
+
 		// we've found a match for the player so remove the entry from the _aciveChats vector and return
 		_ActiveChats[i]	= _ActiveChats[_ActiveChats.size()-1];
 		_ActiveChats.pop_back();
-		
+
 #ifdef NL_DEBUG
 		for (size_t j=i;j<_ActiveChats.size();++j)
 		{
@@ -339,14 +341,14 @@ void CSpawnBotNpc::propagateAggro() const
 	CDynGrpBase* myDgb = pGroup->getGrpDynBase();
 	nlassert(myDgb);
 	CFamilyBehavior* myfb = myDgb->getFamilyBehavior();
-	
+
 	CAIVision<CPersistentOfPhysical> vision;
 	// look for bots around
 	vision.updateBotsAndPlayers(pGroup->getAIInstance(), CAIVector(pos()), 0, (uint32)getAggroPropagationRadius());
-	
+
 	typedef map<CSpawnBot*, float> TCandidatesCont;
 	TCandidatesCont	candidates;
-	
+
 	if (myfb!=NULL)
 	{
 		FOREACH(it, CAIVision<CPersistentOfPhysical>, vision)
@@ -355,32 +357,32 @@ void CSpawnBotNpc::propagateAggro() const
 			CSpawnBot* otherSpBot = otherPBot.getSpawnObj();
 			CGroup* otherPGroup = otherPBot.getOwner();
 			CSpawnGroup* otherSpGroup = otherPGroup->getSpawnObj();
-			
+
 			// If bot is in our group skip it
 			if (otherSpGroup==spGroup)
 				continue;
-			
+
 			// If bot is not in a dynamic system skip it
 			CDynGrpBase* otherDGB = otherPGroup->getGrpDynBase();
 			if (!otherDGB)
 				continue;
-			
+
 			// If bot is not in our family skip it
 			CFamilyBehavior* otherFB = otherDGB->getFamilyBehavior();
 			if (otherFB!=myfb)
 				continue;
-			
+
 			// ok, this group should help us !
-			
+
 			// TODO : take only groups with the 'activity_figth' property
 			// filter out if the group is already in combat mode
-			
+
 			// If group is not spawned skip it (???) (:TODO: See why this test)
 			if (!otherPGroup->isSpawned())
 				continue;
-			
+
 			CProfilePtr& otherFightProfile = otherSpGroup->fightProfile();
-			
+
 			if (!otherFightProfile.getAIProfile() || otherFightProfile.getAIProfileType()!=AITYPES::FIGHT_NORMAL || !(static_cast<CGrpProfileFight*>(otherFightProfile.getAIProfile())->stillHaveEnnemy()))
 			{
 				float dist = (float)CAIVector(otherSpBot->pos()).quickDistTo(pos());
@@ -389,10 +391,10 @@ void CSpawnBotNpc::propagateAggro() const
 			}
 		}
 	}
-	
+
 	if (!candidates.empty())
 		nldebug("Tick %u, prop aggro from %p to %u bots", CTickEventHandler::getGameCycle(), this, candidates.size());
-	
+
 	FOREACH (it, TCandidatesCont, candidates)
 	{
 		float propFactor = 1.0f - (it->second / getAggroPropagationRadius());
@@ -432,7 +434,7 @@ void CSpawnBotNpc::setCurrentChatProfile(CNpcChatProfileImp* chatProfile)
 {
 	if (chatProfile)
 		_CurrentChatProfile = *chatProfile;
-	else			
+	else
 		_CurrentChatProfile.clear();	// clear the chat profile
 }
 
@@ -463,7 +465,7 @@ CBotNpc::CBotNpc(CGroup* owner, uint32 alias, std::string const& name)
 	init();
 }
 
-CBotNpc::~CBotNpc() 
+CBotNpc::~CBotNpc()
 {
 	if (isSpawned())
 	{
@@ -476,12 +478,12 @@ void CBotNpc::calcSpawnPos(RYAI_MAP_CRUNCH::CWorldMap const& worldMap)
 	CAIStatePositional const* const state = static_cast<CAIStatePositional*>(grp().getStartState());
 	RYAI_MAP_CRUNCH::CWorldPosition	wp;
 	uint32 maxTries = 100;
-	
+
 	breakable
 	{
 		if (!state)
 			break;
-		
+
 		if (state->shape().hasPatat() && state->shape().getRandomPosCount())
 		{
 			do
@@ -494,11 +496,11 @@ void CBotNpc::calcSpawnPos(RYAI_MAP_CRUNCH::CWorldMap const& worldMap)
 			_StartPos.setTheta(0); // to initialise among vertices deltas (no?).
 			break;
 		}
-		
+
 		if (!state->shape().hasPoints())
 			break;
-		
-		std::vector<CShape::TPosition> const& posList = state->shape().getGeometry();		
+
+		std::vector<CShape::TPosition> const& posList = state->shape().getGeometry();
 		do
 		{
 			const	uint32 a=CAIS::rand16((uint32)posList.size());
@@ -557,15 +559,15 @@ std::string CBotNpc::getCustomLootTableId()
 	return _CustomLootTableId;
 }
 
-void CBotNpc::setPrimAlias(uint32 alias) 
-{ 
+void CBotNpc::setPrimAlias(uint32 alias)
+{
 	_PrimAlias = alias;
 }
 
 
-uint32 CBotNpc::getPrimAlias() const 
-{ 
-	return _PrimAlias; 
+uint32 CBotNpc::getPrimAlias() const
+{
+	return _PrimAlias;
 }
 
 
@@ -575,18 +577,18 @@ void CBotNpc::fillDescriptionMsg(RYMSG::TGenNpcDescMsg& msg) const
 	msg.setBotAttackable(grp().getBotAttackable());
 	msg.setAlias(getAlias());
 	msg.setGrpAlias(grp().getAlias());
-	
+
 	msg.setSheet(getSheet()->SheetId());
-	
+
 	msg.setRightHandItem(getSheet()->RightItem());
 	msg.setRightHandItemQuality(1);
-	
+
 	msg.setLeftHandItem(getSheet()->LeftItem());
 	msg.setLeftHandItemQuality(1);
-	
+
 	msg.setDontFollow(isStuck());
 	msg.setBuildingBot(isBuildingBot());
-	
+
 	for	(size_t i=0; i<_LootList.size(); ++i)
 	{
 		NLMISC::CSheetId const& sheetRef = _LootList[i];
@@ -626,12 +628,12 @@ bool CBotNpc::finalizeSpawnNpc()
 		getSpawn()->setOutpostAlias(ownerOutpost->getAlias());
 		getSpawn()->setOutpostSide(_OutpostSide);
 	}
-	
+
 	CMirrors::initSheetServer(getSpawn()->dataSetRow(), getSheet()->SheetId());
-	
+
 	getSpawn()->setCurrentChatProfile(_ChatProfile);
 	getSpawn()->sendInfoToEGS();
-	
+
 	if (_useVisualProperties)	// use VisualPropertyA, B, C
 	{
 		sendVisualProperties();
@@ -640,9 +642,9 @@ bool CBotNpc::finalizeSpawnNpc()
 	{
 		sendVPA	();
 	}
-	
+
 	getSpawn()->spawnGrp().botHaveSpawn(this);
-	
+
 	return true;
 }
 
@@ -668,10 +670,10 @@ bool CBotNpc::spawn()
 		nlwarning("spawn() Aborted for bot '%s' due to bad sheet", getFullName().c_str());
 		return false;
 	}
-	
+
 	if (!CBot::spawn())
 		return false;
-	
+
 	// :KLUDGE: Last part calls a tricky method also called by sheetChanged
 	// :TODO: Clean that mess
 	return finalizeSpawnNpc();
@@ -685,12 +687,12 @@ void CBotNpc::sendVPA()	// alternate VPA
 		CVisualSlotManager* visualSlotManager = CVisualSlotManager::getInstance();
 		NLMISC::CSheetId rightSheet = getSheet()->RightItem();
 		NLMISC::CSheetId leftSheet = getSheet()->LeftItem();
-		
+
 		visProp.Element.WeaponRightHand = visualSlotManager->rightItem2Index(rightSheet);
 		visProp.Element.WeaponLeftHand = visualSlotManager->leftItem2Index(leftSheet);
 	}
-	
-	// setting up the visual property A mirror record	
+
+	// setting up the visual property A mirror record
 	visProp.Element.ColorTop   = getSheet()->ColorBody();
 	visProp.Element.ColorBot   = getSheet()->ColorLegs();
 	visProp.Element.ColorHair  = getSheet()->ColorHead();
@@ -711,7 +713,7 @@ void CBotNpc::sendVPA()	// alternate VPA
 		visProp.Element.ColorBoot,
 		visProp.Element.ColorArm,
 		visProp.Element.Seed);
-	
+
 	CMirrors::setVPA(getSpawn()->dataSetRow(), visProp);
 }
 
@@ -729,7 +731,7 @@ bool CBotNpc::reSpawn(bool sendMessage)
 {
 	if (!spawn())
 		return false;
-	
+
 	getSpawn()->updateChat(grp().getCAIState());
 	return true;
 }
@@ -743,7 +745,7 @@ void CBotNpc::despawnBot()
 	}
 }
 
-void CBotNpc::equipmentInit()					
+void CBotNpc::equipmentInit()
 {
 	_Sheet->reset();
 	_Hat = false;
@@ -759,7 +761,7 @@ void CBotNpc::equipmentAdd(std::string const& input)
 	// if string is empty just return without making a fuss
 	if (input.empty())
 		return;
-	
+
 	// split string into keyword and tail
 	std::string keyword, tail;
 	if (!AI_SHARE::stringToKeywordAndTail(input,keyword,tail))
@@ -770,7 +772,7 @@ void CBotNpc::equipmentAdd(std::string const& input)
 			input.c_str());
 		return;
 	}
-	
+
 	// do something depending on keyword
 	if (NLMISC::nlstricmp(keyword,"ri")==0)
 	{
@@ -833,7 +835,7 @@ void CBotNpc::equipmentAdd(std::string const& input)
 	else if ( NLMISC::nlstricmp(keyword,"CLIENT_SHEET")==0  )
 	{
 		setClientSheet(tail + ".creature");
-	}	
+	}
 	else if (NLMISC::nlstricmp(keyword,"loot")==0)
 	{
         if (tail.empty())
@@ -851,14 +853,14 @@ void CBotNpc::equipmentAdd(std::string const& input)
 	}
 	else if (NLMISC::nlstricmp(keyword, "USER_MODEL") == 0)
 	{
-		
+
 		uint32 primAlias = getAlias() >> LigoConfig.getDynamicAliasSize();
 		nldebug("Parsing userModelId '%s' with primAlias: '%u'", tail.c_str(), primAlias);
 		setPrimAlias(primAlias);
 		setUserModelId(tail);
 	}
 	else if (NLMISC::nlstricmp(keyword, "CUSTOM_LOOT_TABLE") == 0)
-	{	
+	{
 		uint32 primAlias = getAlias() >> LigoConfig.getDynamicAliasSize();
 		nldebug("Parsing customLootTableId '%s' with primAlias: '%u'", tail.c_str(), primAlias);
 		setPrimAlias(primAlias);
@@ -875,14 +877,14 @@ void CBotNpc::equipmentAdd(std::string const& input)
 
 /*
 Colors are something like that:
-	3D				INTERFACE			MP 
-0:	ROUGE			ROUGE				RED 
-1:	BEIGE			ORANGE				BEIGE 
-2:	VERT CITRON		VERT CITRON			GREEN 
-3:	VERT			VERT				TURQUOISE 
-4:	BLEU			BLEU				BLUE 
-5:	ROUGE dark		ROUGE (normal)		CRIMSON 
-6:	BLANC			JAUNE				WHITE 
+	3D				INTERFACE			MP
+0:	ROUGE			ROUGE				RED
+1:	BEIGE			ORANGE				BEIGE
+2:	VERT CITRON		VERT CITRON			GREEN
+3:	VERT			VERT				TURQUOISE
+4:	BLEU			BLEU				BLUE
+5:	ROUGE dark		ROUGE (normal)		CRIMSON
+6:	BLANC			JAUNE				WHITE
 7:	NOIR			BLEU very dark		BLACK
 
 3D column is (probably) used for equipment
@@ -891,7 +893,7 @@ void CBotNpc::setColour(uint8 colour)
 {
 	_Sheet->setColorHead(colour);
 	_Sheet->setColorArms(colour);
-	_Sheet->setColorHands(colour);	
+	_Sheet->setColorHands(colour);
 	_Sheet->setColorBody(colour);
 	_Sheet->setColorLegs(colour);
 	_Sheet->setColorFeets(colour);
@@ -903,11 +905,11 @@ void CBotNpc::setColours(std::string input)
 	int const numColours = 8;
 	static std::vector <std::string> colourNames[numColours];
 	static bool	init = false;
-	
+
 	// if string is empty just return without making a fuss
 	if (input.empty())
 		return;
-	
+
 	if (!init)
 	{
 		// lookup 'ColourNames' in config file (should be a multi-line field)
@@ -917,7 +919,7 @@ void CBotNpc::setColours(std::string input)
 			// for each line in config file var try to add an alternative name for one of the colour slots
 			for (uint i=0; i<varPtr->size(); ++i)
 			{
-				// split line into name and idx (line example: 'red: 5') 
+				// split line into name and idx (line example: 'red: 5')
 				std::string name, idxStr;
 				if (AI_SHARE::stringToKeywordAndTail(varPtr->asString(i),name,idxStr))
 				{
@@ -991,12 +993,12 @@ void CBotNpc::setColours(std::string input)
 						}
 					}
 				}
-				
+
 				if (i==numColours)
 					nlwarning("Failed to identify colour: '%s' in line: '%s'",colour.c_str(),input.c_str());
 			}
 		}
-		
+
 		// assuming that we found more than	0 results pick one at random
 		if (results.empty())
 		{
@@ -1148,9 +1150,10 @@ void CBotNpc::init()
 {
 	_ChatProfile = NULL;
 	_MaxHitRangeForPC = -1.0f;
+	_DispersionRadius = 0;
 //	_MissionIconFlags.IsMissionStepIconDisplayable = true;
 //	_MissionIconFlags.IsMissionGiverIconDisplayable = true;
-	
+
 	equipmentInit();
 }
 
@@ -1166,21 +1169,38 @@ CSpawnBotNpc const* CBotNpc::getSpawn() const
 
 void CBotNpc::getSpawnPos(CAIVector& triedPos, RYAI_MAP_CRUNCH::CWorldPosition& pos, RYAI_MAP_CRUNCH::CWorldMap const& worldMap, CAngle& spawnTheta)
 {
-	if (_StartPos.isNull())
+	if (_DispersionRadius > 0)
+	{
+		RYAI_MAP_CRUNCH::CWorldPosition	wp;
+		CAIVector rpos = _FirstPosition;
+		uint32 maxTries = 100;
+		do
+		{
+			rpos = _FirstPosition;
+			rpos += randomPos(_DispersionRadius);
+			--maxTries;
+		}
+		while (!worldMap.setWorldPosition(AITYPES::vp_auto, wp, rpos) && maxTries>0);
+		if (maxTries > 0 ) {
+			nlinfo("set pos %f,%f", rpos.x().asDouble(), rpos.x().asDouble());
+			_StartPos.setXY(rpos);
+		}
+	}
+	else if (_StartPos.isNull())
 		calcSpawnPos(worldMap);
-	
+
 	if (isStuck() || IsRingShard)
 		worldMap.setWorldPosition(_VerticalPos, pos, _StartPos);
 	else
 		CWorldContainer::calcNearestWPosFromPosAnRadius(_VerticalPos, worldMap, pos, _StartPos, 10, 200, CWorldContainer::CPosValidatorDefault());
-	
+
 #ifdef NL_DEBUG
 	if (!pos.isValid() && !isStuck())
 	{
 		nlwarning("Npc Spawn Pos Error %s", pos.toString().c_str());
 	}
 #endif
-	
+
 	spawnTheta = _StartPos.theta();
 	triedPos = _StartPos;
 }
@@ -1217,20 +1237,20 @@ void CBotNpc::sheetChanged()
 		CAngle spawnTheta = getSpawnObj()->theta();
 		float botMeterSize = getSheet()->Scale()*getSheet()->Radius();
 		// :TODO: Save profile info
-		
+
 		// If stuck bot position may be outside collision and must be recomputed
 		if (isStuck() || IsRingShard)
 			getSpawnPos(lastTriedPos, botWPos, CWorldContainer::getWorldMap(), spawnTheta);
-		
+
 		// Delete old bot
 		CMirrors::removeEntity(getSpawnObj()->getEntityId());
 		setSpawn(NULL); // automatic smart pointer deletion
 		notifyBotDespawn();
-		
+
 		// Finalize spawn object creation
 		if (!finalizeSpawn(botWPos, spawnTheta, botMeterSize))
 			return;
-		
+
 		// :KLUDGE: Both finalizeSpawn and finalizeSpawnNpc are called,
 		// sheetChanged has a strange herited meaning and may confuse future
 		// coders
@@ -1249,16 +1269,16 @@ NLMISC_COMMAND(verboseNPCBotProfiles, "Turn on or off or check the state of verb
 {
 	if (args.size()>1)
 		return false;
-	
+
 	if (args.size()==1)
 		NLMISC::fromString(args[0], VerboseLog);
-	
+
 	nlinfo("VerboseLogging is %s",VerboseLog?"ON":"OFF");
 	return	true;
 }
 // virtual function so do not need to be inlined
 bool CBotNpc::getFaunaBotUseBotName() const
-{ 
-	return _FaunaBotUseBotName; 
+{
+	return _FaunaBotUseBotName;
 }
 
