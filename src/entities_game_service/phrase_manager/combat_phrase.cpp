@@ -118,7 +118,7 @@ uint8 getActionDuration( TGameCycle length )
 		return 1; // 1.5s
 	if (s <= 2.5f)
 		return 2; // 2s
-	// 
+	//
 	return 3; // 2.5s
 }
 
@@ -133,12 +133,12 @@ INTENSITY_TYPE::TImpactIntensity getImpactIntensity(uint16 refLevel)
 
 
 //--------------------------------------------------------------
-//			CDamageFactor::entityMatchRequirements  
+//			CDamageFactor::entityMatchRequirements
 //--------------------------------------------------------------
 bool CDamageFactor::entityMatchRequirements(CEntityBase *entity)
 {
 	H_AUTO(CDamageFactor_entityMatchRequirements);
-	
+
 	if (!entity) return false;
 	if (Race != EGSPD::CPeople::EndPeople && Race != entity->getRace())
 		return false;
@@ -149,7 +149,7 @@ bool CDamageFactor::entityMatchRequirements(CEntityBase *entity)
 		if (entity->getId().getType() != RYZOMID::player)
 		{
 			const CStaticCreatures * form = entity->getForm();
-			if (!form || form->getEcosystem() != Ecosystem) 
+			if (!form || form->getEcosystem() != Ecosystem)
 				return false;
 		}
 	}
@@ -161,12 +161,12 @@ bool CDamageFactor::entityMatchRequirements(CEntityBase *entity)
 
 
 //--------------------------------------------------------------
-//					build  
+//					build
 //--------------------------------------------------------------
 bool CCombatPhrase::build( const TDataSetRow & actorRowId, const std::vector< const CStaticBrick* >& bricks, bool buildToExecute )
 {
 	H_AUTO(CCombatPhrase_build);
-	
+
 	if (TheDataset.isAccessible(actorRowId) )
 	{
 		// create attacker structure
@@ -211,7 +211,7 @@ bool CCombatPhrase::build( const TDataSetRow & actorRowId, const std::vector< co
 bool CCombatPhrase::initPhraseFromAiAction( const TDataSetRow & actorRowId, const CStaticAiAction *aiAction, float damageCoeff, float speedCoeff )
 {
 	H_AUTO(CCombatPhrase_initPhraseFromAiAction);
-	
+
 	if ( !TheDataset.isAccessible(actorRowId) )
 	{
 		return false;
@@ -245,12 +245,12 @@ bool CCombatPhrase::initPhraseFromAiAction( const TDataSetRow & actorRowId, cons
 	{
 		_Attacker = new CCombatAttackerAI(actorRowId, aiAction);
 	}
-	
+
 	if (!_Attacker)
 		return false;
-		
 
-	// simple modifiers and factor 
+
+	// simple modifiers and factor
 	_DamageFactor = (1.0f + data.Combat.DamageFactor) * damageCoeff;
 	_DamageModifier = data.Combat.DamageModifier;
 	if (data.Combat.ArmorFactor != 1.0f)
@@ -281,7 +281,7 @@ bool CCombatPhrase::initPhraseFromAiAction( const TDataSetRow & actorRowId, cons
 		_CriticalHitChancesModifier.MaxValue = 100 - CriticalHitChances;
 		_CriticalHitChancesModifier.MinValue = 100 - CriticalHitChances;
 	}
-	
+
 
 	// set behaviour if !=  unknown
 	if (data.Combat.Behaviour != MBEHAV::UNKNOWN_BEHAVIOUR)
@@ -328,14 +328,14 @@ bool CCombatPhrase::initPhraseFromAiAction( const TDataSetRow & actorRowId, cons
 } // initPhraseFromAiAction //
 
 //--------------------------------------------------------------
-//					destructor  
+//					destructor
 //--------------------------------------------------------------
 CCombatPhrase::~CCombatPhrase()
 {
 	H_AUTO(CCombatPhraseDestructor);
-	
+
 	clearTargets();
-	
+
 	const uint size = (uint)_CombatActions.size();
 	for (uint i = 0 ; i < size ; ++i)
 	{
@@ -348,15 +348,15 @@ CCombatPhrase::~CCombatPhrase()
 };
 
 //--------------------------------------------------------------
-//					init()  
+//					init()
 //--------------------------------------------------------------
 void CCombatPhrase::init()
 {
 	setState(CSPhrase::New);
-	
+
 	_Behaviour					= MBEHAV::DEFAULT_ATTACK;
 	_BehaviourWeight				= 0;
-	
+
 	_RootSheetId					= CSheetId::Unknown;
 
 	_PhraseType						= BRICK_TYPE::COMBAT;
@@ -377,10 +377,10 @@ void CCombatPhrase::init()
 	_BadOrientationMsg				= false;
 	_CurrentTargetIsValid			= false;
 	_SpecialHit						= false;
-	_MeleeCombat					= true;	
+	_MeleeCombat					= true;
 	_HitAllMeleeAggressors			= false;
 	_CriticalHit					= false;
-	
+
 	_ExecutionEndDate				= 0;
 	_LatencyEndDate					= 0.0;
 
@@ -404,7 +404,7 @@ void CCombatPhrase::init()
 
 	_LatencyFactor					= 1.0f;
 	_PhraseSuccessDamageFactor		= 1.0f;
-	
+
 	_AggroMultiplier				= 1.0f;
 	_AggroModifier					= 0;
 
@@ -425,12 +425,12 @@ void CCombatPhrase::init()
 } // init //
 
 //--------------------------------------------------------------
-//					addBrick()  
+//					addBrick()
 //--------------------------------------------------------------
 void CCombatPhrase::addBrick( const CStaticBrick &brick )
 {
 	H_AUTO(CCombatPhrase_addBrick);
-	
+
 	// check attacker is still valid
 	if (!_Attacker || !_Attacker->isValid())
 	{
@@ -469,7 +469,7 @@ void CCombatPhrase::addBrick( const CStaticBrick &brick )
 	{
 		_SabrinaRelativeCost += brick.SabrinaRelativeValue;
 	}
-	
+
 	// process params
 	unsigned i;
 	for (i=0 ; i<brick.Params.size() ; ++i)
@@ -582,20 +582,20 @@ void CCombatPhrase::addBrick( const CStaticBrick &brick )
 			_LatencyFactorDyn.MinValue = ((CSBrickParamLatencyFactor *)param)->MinLatencyFactor;
 			_LatencyFactorDyn.MaxValue = ((CSBrickParamLatencyFactor *)param)->MaxLatencyFactor;
 			break;
-			
+
 		case TBrickParam::STA_LOSS_FACTOR:
 			_StaminaLossDynFactor.PowerValue = brick.PowerValue;
 			_StaminaLossDynFactor.MinValue = ((CSBrickParamStaLossFactor *)param)->MinFactor;
 			_StaminaLossDynFactor.MaxValue = ((CSBrickParamStaLossFactor *)param)->MaxFactor;
 			break;
-					
+
 		case TBrickParam::SAP_LOSS_FACTOR:
 			_SapLossDynFactor.PowerValue = brick.PowerValue;
 			_SapLossDynFactor.MinValue = ((CSBrickParamSapLossFactor *)param)->MinFactor;
 			_SapLossDynFactor.MaxValue = ((CSBrickParamSapLossFactor *)param)->MaxFactor;
 			break;
 
-		case TBrickParam::ATT_SKILL_MOD:			
+		case TBrickParam::ATT_SKILL_MOD:
 			_AttackSkillModifier.PowerValue = brick.PowerValue;
 			_AttackSkillModifier.MinValue = ((CSBrickParamAttackSkillModifier *)param)->MinModifier;
 			_AttackSkillModifier.MaxValue = ((CSBrickParamAttackSkillModifier *)param)->MaxModifier;
@@ -672,7 +672,7 @@ void CCombatPhrase::addBrick( const CStaticBrick &brick )
 
 //		case TBrickParam::COMBAT_SLOW_MOVE:
 			//			{
-			
+
 			// $*STRUCT CSBrickParamCombatSlowMove: public TBrickParam::CId <TBrickParam::COMBAT_SLOW_MOVE>
 			// $*-f float Duration	// duration of the effect in seconds
 			// $*-i sint32 MinFactor  // min factor on move speed (both walk and run, -20 = -20%)
@@ -714,7 +714,7 @@ void CCombatPhrase::addBrick( const CStaticBrick &brick )
 			// $*STRUCT CSBrickParamBleedFactor: public TBrickParam::CId <TBrickParam::BLEED_FACTOR>
 			// $*-f float Duration		// duration of the effect in seconds
 			// $*-f float MinFactor	// max factor of dealt damage also lost in bleed
-			// $*-f float MaxFactor	// max factor of dealt damage also lost in bleed			
+			// $*-f float MaxFactor	// max factor of dealt damage also lost in bleed
 			NLMISC::TGameCycle duration = NLMISC::TGameCycle( ((CSBrickParamBleedFactor *)param)->Duration / CTickEventHandler::getGameTimeStep() );
 			NLMISC::TGameCycle cycle = NLMISC::TGameCycle( 2.0f / CTickEventHandler::getGameTimeStep() );
 			if (cycle && duration)
@@ -785,7 +785,7 @@ void CCombatPhrase::addBrick( const CStaticBrick &brick )
 			}
 			}
 			break;
-	
+
 		case TBrickParam::ARMOR_MOD:
 			{
 			// $*STRUCT CSBrickParamArmorMod: public TBrickParam::CId <TBrickParam::ARMOR_MOD>
@@ -827,7 +827,7 @@ void CCombatPhrase::addBrick( const CStaticBrick &brick )
 			{
 				// $*STRUCT CSBrickParamThrowOffBalance: public TBrickParam::CId <TBrickParam::THROW_OFF_BALANCE>
 				// $*-f float	MinDuration = 0.0f	// effect min duration
-				// $*-f float	MaxDuration = 5.0f	// effect max duration 
+				// $*-f float	MaxDuration = 5.0f	// effect max duration
 
 				//////////////////////////////////////////////////////////////////////////
 				// TODO
@@ -873,14 +873,14 @@ void CCombatPhrase::addBrick( const CStaticBrick &brick )
 			_CriticalHitChancesModifier.MaxValue = ((CSBrickParamCriticalHitMod *)param)->MaxModifier;
 			_CriticalHitChancesModifier.PowerValue = brick.PowerValue;
 			break;
-			
+
 		}
 	}
 } // addBrick //
 
 
 //--------------------------------------------------------------
-//					evaluate()  
+//					evaluate()
 //--------------------------------------------------------------
 bool CCombatPhrase::evaluate()
 {
@@ -900,12 +900,12 @@ bool CCombatPhrase::evaluate()
 
 
 //--------------------------------------------------------------
-//					validate()  
+//					validate()
 //--------------------------------------------------------------
 bool CCombatPhrase::validate()
 {
 	H_AUTO(CCombatPhrase_validate);
-	
+
 	if (_Attacker == NULL || !_Attacker->isValid())
 	{
 		nlwarning("COMBAT Found NULL  or Invalid attacker.");
@@ -927,7 +927,7 @@ bool CCombatPhrase::validate()
 
 	//////////////////////////////////////////////////////////////////////////
 	// Looking for a memory problem
-	//check types consistency 
+	//check types consistency
 	switch( actingEntity->getId().getType() )
 	{
 	case RYZOMID::player:
@@ -952,7 +952,7 @@ bool CCombatPhrase::validate()
 		}
 	};
 	//////////////////////////////////////////////////////////////////////////
-	
+
 
 	_Idle = false;
 
@@ -1000,7 +1000,7 @@ bool CCombatPhrase::validate()
 			else
 			{
 				engaged = false;
-			}		
+			}
 		}
 
 		defender = combatDefender->getEntity();
@@ -1017,7 +1017,7 @@ bool CCombatPhrase::validate()
 				if (!checkOpening())
 					return false;
 			}
-			
+
 			_CurrentTargetIsValid = checkTargetValidity( combatDefender->getEntityRowId(), errorCode);
 		}
 	}
@@ -1045,12 +1045,12 @@ bool CCombatPhrase::validate()
 			}
 		}
 	}
-	
+
 	// get the weapon used by the acting entity and check it
 	_RightWeapon = CCombatWeapon();
 	_LeftWeapon = CCombatWeapon();
 	_Ammo = CCombatWeapon();
-	
+
 	if ( _Attacker->getItem( CCombatAttacker::RightHandItem, _RightWeapon) )
 	{
 
@@ -1069,7 +1069,7 @@ bool CCombatPhrase::validate()
 		{
 			_AttackSkill = _RightWeapon.Skill;
 			_MeleeCombat = false;
-			// test ammo			
+			// test ammo
 			if ( _Attacker->getItem( CCombatAttacker::Ammo, _Ammo) )
 			{
 				// check ammo qty
@@ -1115,7 +1115,7 @@ bool CCombatPhrase::validate()
 	if (_CurrentTargetIsValid && defender != NULL)
 	{
 		if ( defender->isDead() )
-		{						
+		{
 			DEBUGLOG("COMBAT : Entity %s is dead", TheDataset.getEntityId(combatDefender->getEntityRowId()).toString().c_str());
 
 			if (actingEntity->getId().getType() == RYZOMID::player)
@@ -1125,7 +1125,7 @@ bool CCombatPhrase::validate()
 			else
 			{
 //				nldebug("Bot %s had a invalid target for it's combat action", actingEntity->getId().toString().c_str());
-			}			
+			}
 
 			return false;
 		}
@@ -1151,7 +1151,7 @@ bool CCombatPhrase::validate()
 			}
 			else
 				range = 6000;
-				
+
 			if ((character && !character->meleeCombatIsValid()) ||  ! PHRASE_UTILITIES::testRange(*actingEntity, *defender, range ))
 			{
 				if (!_TargetTooFarMsg && (character && !character->meleeCombatIsValid()))
@@ -1219,13 +1219,13 @@ bool CCombatPhrase::validate()
 			return false;
 		}
 	}
-	
+
 	// Test entity can use an action right now
 	if (actingEntity->getId().getType() == RYZOMID::player)
 	{
 		CCharacter *character = dynamic_cast<CCharacter *> (actingEntity);
 		if (character && character->dateOfNextAllowedAction() > CTickEventHandler::getGameCycle() )
-		{		
+		{
 			//errorCode = "EGS_CANNOT_ENGAGE_COMBAT_YET";
 			//PHRASE_UTILITIES::sendSimpleMessage( actingEntity->getId(), "EGS_CANNOT_ENGAGE_COMBAT_YET");
 			PHRASE_UTILITIES::sendDynamicSystemMessage( actingEntity->getEntityRowId(), "COMBAT_CANNOT_USE_ACTION_YET");
@@ -1242,15 +1242,15 @@ bool CCombatPhrase::validate()
 			// send message to attacker
 			if ( actingEntity->getId().getType() == RYZOMID::player)
 			{
-				SM_STATIC_PARAMS_1(params, STRING_MANAGER::entity);	
+				SM_STATIC_PARAMS_1(params, STRING_MANAGER::entity);
 				NLMISC::CEntityId eId(TheDataset.getEntityId(combatDefender->getEntityRowId()));
 				params[0].setEIdAIAlias( eId, CAIAliasTranslator::getInstance()->getAIAlias( eId ) );
-				PHRASE_UTILITIES::sendDynamicSystemMessage(actingEntity->getEntityRowId(), "COMBAT_FEINT_INVALID", params);	
+				PHRASE_UTILITIES::sendDynamicSystemMessage(actingEntity->getEntityRowId(), "COMBAT_FEINT_INVALID", params);
 			}
 			return false;
 		}
 	}
-	
+
 	// check the player has engaged a target if not auto engage the target
 	if  (!engaged && _CurrentTargetIsValid)
 	{
@@ -1293,7 +1293,7 @@ bool CCombatPhrase::validate()
 
 	if(!checkPhraseCost(errorCode))
 	{
-		if (!_NotEnoughStaminaMsg && errorCode == "EGS_TOO_EXPENSIVE_STAMINA") 
+		if (!_NotEnoughStaminaMsg && errorCode == "EGS_TOO_EXPENSIVE_STAMINA")
 		{
 			_NotEnoughStaminaMsg = true;
 			PHRASE_UTILITIES::sendSimpleMessage( _Attacker->getEntityRowId(), errorCode );
@@ -1303,7 +1303,7 @@ bool CCombatPhrase::validate()
 			_NotEnoughHpMsg = true;
 			PHRASE_UTILITIES::sendSimpleMessage( _Attacker->getEntityRowId(), errorCode );
 		}
-	
+
 		if (_CyclicPhrase)
 		{
 			idle( true );
@@ -1336,19 +1336,19 @@ bool CCombatPhrase::validate()
 			}
 		}
 	}
-	
+
 	_Validated = true;
 
 	return true;
 } // validate //
 
 //--------------------------------------------------------------
-//					update()  
+//					update()
 //--------------------------------------------------------------
 bool  CCombatPhrase::update()
 {
 	H_AUTO(CCombatPhrase_update);
-	
+
 	uint debugStep = 0;
 	try
 	{
@@ -1381,7 +1381,7 @@ bool  CCombatPhrase::update()
 				{
 					return false;
 				}
-			}		
+			}
 			debugStep = 4;
 
 			// get main target
@@ -1392,18 +1392,18 @@ bool  CCombatPhrase::update()
 					combatDefender = _Targets[0].Target;
 			}
 			debugStep = 5;
-			
+
 			// check target validity
 			TDataSetRow target = actor->getTargetDataSetRow();
 			debugStep = 6;
-			if	( TheDataset.isAccessible(target) 
-				&& (!combatDefender || !combatDefender->isValid() || target != combatDefender->getEntityRowId()) 
+			if	( TheDataset.isAccessible(target)
+				&& (!combatDefender || !combatDefender->isValid() || target != combatDefender->getEntityRowId())
 				)
 			{
 				debugStep = 7;
 				combatDefender = createDefender(target);
 				debugStep = 8;
-				
+
 				if (!combatDefender)
 				{
 					_CurrentTargetIsValid =false;
@@ -1509,7 +1509,7 @@ bool  CCombatPhrase::update()
 
 					CCharacter *character = dynamic_cast<CCharacter *> (actor);
 					CCharacter *defender = dynamic_cast<CCharacter *> (combatDefender->getEntity());
-					if ( combatDefender->getEntity()->getId().getType() == RYZOMID::player )
+					if ( defender && defender->getId().getType() == RYZOMID::player )
 					{
 						if (character && character->hasMoved() && defender && defender->hasMoved() )
 							range = 10000;
@@ -1518,7 +1518,7 @@ bool  CCombatPhrase::update()
 					}
 					else
 						range = 6000;
-					
+
 					if ((character && !character->meleeCombatIsValid()) || !PHRASE_UTILITIES::testRange(*actor, *combatDefender->getEntity(), range))
 					{
 						debugStep = 19;
@@ -1542,7 +1542,7 @@ bool  CCombatPhrase::update()
 					debugStep = 20;
 					if (!combatDefender || !combatDefender->getEntity())
 						return false;
-					
+
 					// test range in mm
 					debugStep = 21;
 					const uint32 range = uint32(_RightWeapon.Range + _Ammo.Range);
@@ -1620,7 +1620,7 @@ bool  CCombatPhrase::update()
 			for (uint i=0; i!=_Targets.size(); ++i)
 			{
 				nldebug("DBGRING: _Targets[%u]=%s", i, _Targets[i].Target->getEntityRowId().toString().c_str());
-				
+
 			}
 			nldebug("DBGRING: _CyclicPhrase=%u _MeleeCombat=%u", (uint)_CyclicPhrase, (uint)_MeleeCombat);
 			nldebug("DBGRING: _Attacker:%s", _Attacker->getEntity()->getId().toString().c_str());
@@ -1628,7 +1628,7 @@ bool  CCombatPhrase::update()
 			for (uint i=0; i!=_Targets.size(); ++i)
 			{
 				nldebug("DBGRING: _Targets[%u]:%s", i, _Targets[i].Target->getEntity()->getId().toString().c_str());
-				
+
 			}
 		}
 		catch (...)
@@ -1642,12 +1642,12 @@ bool  CCombatPhrase::update()
 } // update //
 
 //--------------------------------------------------------------
-//					execute()  
+//					execute()
 //--------------------------------------------------------------
 void  CCombatPhrase::execute()
 {
 	H_AUTO(CCombatPhrase_execute);
-	
+
 	// check attacker is still valid
 	if (!_Attacker || !_Attacker->isValid())
 	{
@@ -1675,7 +1675,7 @@ void  CCombatPhrase::execute()
 			{
 				// if player has any static action in progress, cancel it
 				// cancel entity static action
-				player->cancelStaticActionInProgress();			
+				player->cancelStaticActionInProgress();
 
 				player->setCurrentAction(CLIENT_ACTION_TYPE::Combat,_ExecutionEndDate);
 				if (_RootSheetId != CSheetId::Unknown)
@@ -1696,16 +1696,16 @@ void  CCombatPhrase::execute()
 
 
 //--------------------------------------------------------------
-//					launch()  
+//					launch()
 //--------------------------------------------------------------
 bool CCombatPhrase::launch()
 {
 	H_AUTO(CCombatPhrase_launch);
-	
+
 	_LatencyEndDate = 0.0;
 	_ApplyDate = 0;
 
-	if ( !_Attacker ) 
+	if ( !_Attacker )
 	{
 		nlwarning("<CCombatPhrase::launch> found NULL attacker or defender.");
 		return false;
@@ -1743,7 +1743,7 @@ bool CCombatPhrase::launch()
 		return false;
 	}
 
-	_TargetTooFarMsg = false;	
+	_TargetTooFarMsg = false;
 	_Behaviour.Data = 0;
 	_Behaviour.Data2 = 0;
 	_Behaviour.DeltaHP = 0;
@@ -1764,7 +1764,7 @@ bool CCombatPhrase::launch()
 	{
 		// acting entity should not be able to kill itself
 		const sint32 lostHp = min( _TotalHPCost, sint32(actingEntity->currentHp() - 1) );
-		
+
 		if ( actingEntity->changeCurrentHp( (lostHp) * (-1) ) )
 		{
 			PHRASE_UTILITIES::sendDeathMessages( actingEntity->getEntityRowId(), actingEntity->getEntityRowId() );
@@ -1802,9 +1802,9 @@ bool CCombatPhrase::launch()
 					_Behaviour.Range.Time = CTickEventHandler::getGameCycle()>>2;
 					_Behaviour.Behaviour = MBEHAV::RANGE_ATTACK;
 					// tmp nico : stats about projectiles
-					projStatsIncrement();					
+					projStatsIncrement();
 				}
-				
+
 				// unlock ammos
 				_Attacker->unlockAmmos(1);
 				// consume ammos
@@ -1814,7 +1814,7 @@ bool CCombatPhrase::launch()
 			{
 				PHRASE_UTILITIES::sendSimpleMessage( _Attacker->getEntityRowId(), "BS_NO_AMMO");
 				return false;
-			}  
+			}
 		}
 		else
 		{
@@ -1832,7 +1832,7 @@ bool CCombatPhrase::launch()
 		_RightWeapon.Quality = (uint16)_Attacker->getSkillValue(BarehandCombatSkill, targetRace);
 		_RightWeapon.Skill = BarehandCombatSkill;
 	}
-	
+
 	_WeaponSabrinaValue = getWeaponSabrinaValue(_RightWeapon, _Attacker->getSkillValue(_RightWeapon.Skill, targetRace));
 
 	// apply weapon wear if needed
@@ -1841,7 +1841,7 @@ bool CCombatPhrase::launch()
 		// use total sabrina credit as reference for this modifier
 		_Attacker->damageItem(_WeaponWearModifier.applyValue((uint16)(_SabrinaCredit * _SabrinaRelativeCredit)), true);
 	}
-	
+
 	// get weapon latency
 	double latency;
 	if(_LeftWeapon.LatencyInTicks != 0)
@@ -1866,7 +1866,7 @@ bool CCombatPhrase::launch()
 	{
 		family = EFFECT_FAMILIES::MadnessRange;
 	}
-	
+
 	const CSEffectPtr madness = actingEntity->lookForActiveEffect(family);
 	if ( madness )
 	{
@@ -1946,7 +1946,7 @@ bool CCombatPhrase::launch()
 		{
 			CEntityBase *target = _Targets[0].Target->getEntity();
 			if (target)
-			{		
+			{
 				TVectorParamCheck params;
 				if ( actingEntity->getId().getType() == RYZOMID::player)
 				{
@@ -1955,11 +1955,11 @@ bool CCombatPhrase::launch()
 					params[0].setEIdAIAlias( target->getId(), CAIAliasTranslator::getInstance()->getAIAlias( target->getId() ) );
 					PHRASE_UTILITIES::sendDynamicSystemMessage(actingEntity->getEntityRowId(), "COMBAT_FEINT_ACTOR", params);
 				}
-				
+
 				if ( target->getId().getType() == RYZOMID::player)
 				{
 					params.resize(1);
-					params[0].Type = STRING_MANAGER::entity;					
+					params[0].Type = STRING_MANAGER::entity;
 					params[0].setEIdAIAlias( actingEntity->getId(), CAIAliasTranslator::getInstance()->getAIAlias( actingEntity->getId() ) );
 					PHRASE_UTILITIES::sendDynamicSystemMessage(target->getEntityRowId(), "COMBAT_FEINT_TARGET", params);
 				}
@@ -2024,7 +2024,7 @@ bool CCombatPhrase::launch()
 				}
 			}
 		}
-		
+
 		// build target lists - used for both hands if dual wield
 		buildTargetList(true, _IsMad);
 
@@ -2105,11 +2105,11 @@ bool CCombatPhrase::launch()
 	// apply latency factor
 	latency *= _LatencyFactor;
 	latency *= _LatencyFactorDyn.applyValue(_WeaponSabrinaValue);
-	
+
 	// look for attack slow effects and add it to latency
 	sint32 combatAttackSlowMod = 0;
 	sint32 slowMeleeMod = 0;
-		
+
 	sint32 latencyMod = 0;
 	// do not use smart pointers for local use only
 	const CSEffect *effect = actingEntity->lookForActiveEffect( EFFECT_FAMILIES::CombatAttackSlow );
@@ -2142,7 +2142,7 @@ bool CCombatPhrase::launch()
 	{
 		effect = actingEntity->lookForActiveEffect( EFFECT_FAMILIES::SlowRange );
 	}
-	
+
 	if ( effect )
 		latencyMod += effect->getParamValue();
 
@@ -2155,7 +2155,7 @@ bool CCombatPhrase::launch()
 			latencyMod -= pEffect->getParamValue();
 		}
 	}
-	
+
 	latency *= (1.0f + latencyMod / 100.0f);
 
 #if !FINAL_VERSION
@@ -2171,13 +2171,13 @@ bool CCombatPhrase::launch()
 		nlwarning("\t\t_HitRateModifier : %u",_HitRateModifier);
 		nlwarning("\t\tcombatAttackSlow effect mod value : %d",combatAttackSlowMod);
 		nlwarning("\t\tslowMelee effect value : %d",slowMeleeMod);
-					
+
 		latency = 30.0f;
 	}
-	
+
 	// set latency end date
 	const NLMISC::TGameCycle time = CTickEventHandler::getGameCycle();
-	if(_LatencyEndDate > 0) 
+	if(_LatencyEndDate > 0)
 	{
 		_LatencyEndDate += latency;
 	}
@@ -2278,7 +2278,7 @@ bool CCombatPhrase::launch()
 	{
 		CSheetId hl, hr;
 		uint32 qualityl, qualityr;
-		
+
 		CGameItemPtr item = c->getItem( INVENTORIES::handling, INVENTORIES::left );
 		if( item == 0 )
 		{
@@ -2308,12 +2308,12 @@ bool CCombatPhrase::launch()
 
 
 //--------------------------------------------------------------
-//					launchAttack()  
+//					launchAttack()
 //--------------------------------------------------------------
 bool CCombatPhrase::launchAttack(CEntityBase * actingEntity, bool rightHand, bool isMad, TDataSetRow madnessCaster)
 {
 	H_AUTO(CCombatPhrase_launchAttack);
-	
+
 #ifdef NL_DEBUG
 	nlassert(actingEntity);
 #endif
@@ -2325,12 +2325,12 @@ bool CCombatPhrase::launchAttack(CEntityBase * actingEntity, bool rightHand, boo
 		CCharacter *playerChar = dynamic_cast<CCharacter*> (actingEntity);
 		if (playerChar != NULL)
 		{
-			// now we use the weapon speed factor as a divisor of wear per action 
+			// now we use the weapon speed factor as a divisor of wear per action
 			// (a weapon twice as fast will wear twice as slow)
 			nlassert(ReferenceWeaponLatencyForWear > 0);
 			const float latency = (rightHand ? _RightWeapon.LatencyInTicks : _LeftWeapon.LatencyInTicks);
 			const float wearFactor = latency / (float)ReferenceWeaponLatencyForWear;
-			
+
 			if (rightHand)
 			{
 				playerChar->wearRightHandItem(wearFactor);
@@ -2339,7 +2339,7 @@ bool CCombatPhrase::launchAttack(CEntityBase * actingEntity, bool rightHand, boo
 			{
 				playerChar->wearLeftHandItem(wearFactor);
 			}
-			
+
 			// wear armor, shield and jewels
 			playerChar->wearArmor(wearFactor);
 			playerChar->wearShield(wearFactor);
@@ -2378,7 +2378,7 @@ bool CCombatPhrase::launchAttack(CEntityBase * actingEntity, bool rightHand, boo
 			// in case of miss ranged attack, missile/bullets are even not launched => display a special message now
 			PHRASE_UTILITIES::sendCombatFailedMessages( _Attacker->getEntityRowId(), targetRowId, PHRASE_UTILITIES::FailRange );
 		}
-		
+
 		// send an ai event report for main target
 		_AiEventReport.init();
 		_AiEventReport.Originator = _Attacker->getEntityRowId();
@@ -2428,7 +2428,7 @@ bool CCombatPhrase::launchAttack(CEntityBase * actingEntity, bool rightHand, boo
 void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool isMad, bool needComputeBaseDamage)
 {
 	H_AUTO(CCombatPhrase_launchAttackOnTarget);
-	
+
 	const bool mainTarget = (targetIndex == 0);
 
 	if (targetIndex >= _Targets.size())
@@ -2450,7 +2450,7 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 		nlwarning("<CCombatPhrase::launchAttackOnTarget> cannot get entity base pointer");
 		return;
 	}
-	
+
 	// if defender is dead return doing nothing (can happen when using dual strikes or two weapons)
 	if (defender->isDead())
 		return;
@@ -2478,7 +2478,7 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 
 	bool killTarget = false;
 
-	// get shield 
+	// get shield
 	CCombatShield shield;
 	combatDefender->getShield(shield);
 
@@ -2487,7 +2487,7 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 
 	// dmg type
 	DMGTYPE::EDamageType dmgType = (_Ammo.Damage != 0) ? _Ammo.DmgType : weapon.DmgType;
-	
+
 	// determine localisation, only for main target, secondary targets use same localisation
 	PHRASE_UTILITIES::TPairSlotShield localisation;
 	if ( mainTarget )
@@ -2506,7 +2506,7 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 	if ( actingEntity->getId().getType() == RYZOMID::player )
 	{
 		CCharacter * c = dynamic_cast<CCharacter*>(actingEntity);
-		if( _MeleeCombat )	
+		if( _MeleeCombat )
 		{
 			fightSkillBonus = c->meleeSuccessModifier();
 		}
@@ -2538,11 +2538,11 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 			if ( _Behaviour.isCreatureAttack() )
 			{
 				_Behaviour.CreatureAttack.ImpactIntensity = 0;
-				_Behaviour.CreatureAttack2.HitType = HITTYPE::Failed;					
+				_Behaviour.CreatureAttack2.HitType = HITTYPE::Failed;
 				_Behaviour.CreatureAttack2.DamageType = dmgType;
 			}
 			else
-			{	
+			{
 				if ( _MeleeCombat )
 				{
 					_Behaviour.Combat.HitType = HITTYPE::Failed;
@@ -2654,7 +2654,7 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 				factor *= ( 1.0f + pEffect->getParamValue() / 100.0f );
 			}
 		}
-		
+
 		damage = sint32( (_BaseDamage * factor) * (1.0f - dodgeFactor) * GlobalDebugDamageFactor.get());
 
 		CCreature * npc = dynamic_cast<CCreature*>(defender);
@@ -2665,8 +2665,8 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 		}
 
 		sint32 damageBeforeArmor = damage;
-		
-		DEBUGLOG("<CCombatPhrase::launchAttackOnTarget> (%s) Attacker %s, Defender %s, dodge factor = %f, _PhraseSuccessDamageFactor = %f, Total Damage before armor = %d", 
+
+		DEBUGLOG("<CCombatPhrase::launchAttackOnTarget> (%s) Attacker %s, Defender %s, dodge factor = %f, _PhraseSuccessDamageFactor = %f, Total Damage before armor = %d",
 		(rightHand?"RightHand":"LeftHand"),
 		_Attacker->getEntity()->getId().toString().c_str(),
 		defender->getId().toString().c_str(),
@@ -2688,7 +2688,7 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 		}
 
 		// apply armor and shield protections
-		BODY::TBodyPart hitBodyPart = BODY::getBodyPart(EGSPD::getBodyType(defender->getRace()), localisation.first);		
+		BODY::TBodyPart hitBodyPart = BODY::getBodyPart(EGSPD::getBodyType(defender->getRace()), localisation.first);
 
 		bool shieldIsEffective = testShieldEfficiency(combatDefender, shield);
 
@@ -2805,12 +2805,12 @@ void CCombatPhrase::launchAttackOnTarget(uint8 targetIndex, bool rightHand, bool
 
 
 //--------------------------------------------------------------
-//					apply()  
+//					apply()
 //--------------------------------------------------------------
 void CCombatPhrase::apply()
 {
 	H_AUTO(CCombatPhrase_apply);
-	
+
 	if (!_Attacker)
 	{
 		nlwarning("<CCombatPhrase::apply> found NULL attacker.");
@@ -2832,14 +2832,14 @@ void CCombatPhrase::apply()
 
 	// apply any special events now
 	flushDelayedEvents();
-	
+
 	// ??? must be done after flushDelayedEvents
 	_Behaviour.DeltaHP -= 10;
 
 	// first apply right hand attack, then left
 	applyAttack(actingEntity, true);
 	applyAttack(actingEntity, false);
-	
+
 	// clear all actions
 	_RightApplyActions.clear();
 	_LeftApplyActions.clear();
@@ -2856,7 +2856,7 @@ void CCombatPhrase::apply()
 void CCombatPhrase::applyAttack(CEntityBase * actingEntity, bool rightHand)
 {
 	H_AUTO(CCombatPhrase_applyAttack);
-	
+
 	std::vector<TApplyAction> & actions = rightHand ? _RightApplyActions : _LeftApplyActions;
 
 	const uint nbActions = (uint)actions.size();
@@ -2937,7 +2937,7 @@ void CCombatPhrase::applyAttack(CEntityBase * actingEntity, bool rightHand)
 void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction> & actionReports, bool rightHand)
 {
 	H_AUTO(CCombatPhrase_applyAction);
-	
+
 	CCombatDefenderPtr & combatDefender = action.Target;
 	if (combatDefender == NULL)
 	{
@@ -3032,7 +3032,7 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 			applyBounceEffect(actingEntity, attackerLevel, effect, damage, dmgType);
 		}
 	}
-	
+
 	if( targetId.getType() == RYZOMID::player )
 	{
 		damage = defender->applyDamageOnArmor( dmgType, damage );
@@ -3061,21 +3061,21 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 			{
 				lostStamina += (sint32)( damage * _StaminaLossDynFactor.applyValue(_WeaponSabrinaValue) );
 			}
-			
+
 			if (_SapLossDynFactor.PowerValue > 0 )
 			{
 				lostSap += (sint32)( damage * _SapLossDynFactor.applyValue(_WeaponSabrinaValue) );
 			}
-			
+
 			if ( lostStamina != 0 )
 			{
 				INFOLOG("<CCombatPhrase::applyAction> entity %s lose %d stamina", TheDataset.getEntityId(defender->getEntityRowId()).toString().c_str(),lostStamina );
 				defender->getPhysScores()._PhysicalScores[SCORES::stamina].Current = defender->getPhysScores()._PhysicalScores[SCORES::stamina].Current - lostStamina;
-				
+
 				// clip score to 0
 				if ( defender->getPhysScores()._PhysicalScores[SCORES::stamina].Current < 0 )
 					defender->getPhysScores()._PhysicalScores[SCORES::stamina].Current = 0;
-				
+
 				// add modifier to sentence AI event reports
 				_AiEventReport.addDelta(AI_EVENT_REPORT::Stamina, (-1)*lostStamina);
 			}
@@ -3084,15 +3084,15 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 				//value = toString( _BaseSapAbsorption[i] );
 				INFOLOG("<CCombatPhrase::applyAction> entity %s lose %d sap", TheDataset.getEntityId(defender->getEntityRowId()).toString().c_str(), lostSap );
 				defender->getPhysScores()._PhysicalScores[SCORES::sap].Current = defender->getPhysScores()._PhysicalScores[SCORES::sap].Current - lostSap;
-				
+
 				// clip score to 0
 				if ( defender->getPhysScores()._PhysicalScores[SCORES::sap].Current < 0 )
 					defender->getPhysScores()._PhysicalScores[SCORES::sap].Current = 0;
-				
+
 				// add modifier to sentence AI event reports
 				_AiEventReport.addDelta(AI_EVENT_REPORT::Sap, (-1)*lostSap);
 			}
-			
+
 			// send hit message
 			PHRASE_UTILITIES::sendHitMessages(actingEntity->getId(),targetId, _IsMad, damage, damageBeforeArmor, lostStamina, lostSap, hitBodyPart);
 		}
@@ -3125,12 +3125,12 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 	INFOLOG("<CCombatPhrase::applyAction> %s Entity %s hits entity %s does %u damage",
 			(rightHand?"RightHand":"LeftHand"),
 			actingEntity->getId().toString().c_str(),
-			defender->getId().toString().c_str(), 
-			damage 
+			defender->getId().toString().c_str(),
+			damage
 			);
 
 	// manage combat event flags for players
-	if ( actingEntity->getId().getType() == RYZOMID::player && action.MainTarget && !killTarget ) 
+	if ( actingEntity->getId().getType() == RYZOMID::player && action.MainTarget && !killTarget )
 	{
 		CCharacter * player = dynamic_cast<CCharacter *>(actingEntity);
 		if (player)
@@ -3187,8 +3187,8 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 				PHRASE_UTILITIES::sendHitMessages(defender->getId(),actingEntity->getId(), false, damage, damage, 0, 0);
 			}
 		}
-		
-	
+
+
 		// THORN WALL
 		effect = defender->lookForActiveEffect( EFFECT_FAMILIES::PowerThornWall );
 		if( effect )
@@ -3202,31 +3202,31 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 				CSimpleEffect * _attackerEffect = dynamic_cast<CSimpleEffect *> (& (*attackerEffect));
 				_attackerEffect->setEndDate( CTickEventHandler::getGameCycle() + duration );
 			}
-			else				
+			else
 			{
 				CCombatActionSimpleEffect attackSlow( defender->getEntityRowId(), this, duration, EFFECT_FAMILIES::CombatAttackSlow, slowAttackFactor, (uint8)(abs(slowAttackFactor)) );
 				attackSlow.applyOnEntity(actingEntity,1.0f);
-			}		
+			}
 		}
-		
+
 		// LIGHTNING WALL
 		effect = defender->lookForActiveEffect( EFFECT_FAMILIES::PowerLightningWall );
 		if( effect )
 		{
 			sint32 debuffCombatSkillValue = effect->getParamValue();
 			NLMISC::TGameCycle duration = NLMISC::TGameCycle( HitHandsDebuffDuration / CTickEventHandler::getGameTimeStep() );
-			
+
 			const CSEffectPtr attackerEffect = actingEntity->lookForActiveEffect( EFFECT_FAMILIES::CombatDebuffCombatSkills );
 			if( attackerEffect )
 			{
 				CSimpleEffect * _attackerEffect = dynamic_cast<CSimpleEffect *> (& (*attackerEffect));
 				_attackerEffect->setEndDate( CTickEventHandler::getGameCycle() + duration );
 			}
-			else				
+			else
 			{
 				CCombatActionSimpleEffect debuffCombatSkills( defender->getEntityRowId(), this, duration, EFFECT_FAMILIES::CombatDebuffCombatSkills, debuffCombatSkillValue, (uint8)(abs(debuffCombatSkillValue)) );
 				debuffCombatSkills.applyOnEntity(actingEntity,1.0f);
-			}		
+			}
 		}
 
 		// Weapon enchantment/auras
@@ -3234,7 +3234,7 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 		if (effect)
 		{
 			CEnchantWeaponEffect const* enchant = static_cast<CEnchantWeaponEffect const*>((CSEffect*)effect);
-			
+
 			CMagicActionBasicDamage::CTargetInfos targetInfos;
 			targetInfos.RowId = defender->getEntityRowId();
 			targetInfos.MainTarget = /*mainTarget*/true;
@@ -3253,7 +3253,7 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 			targetInfos.ReportAction.Sta = 0;
 			targetInfos.ReportAction.Sap = 0;
 			targetInfos.ReportAction.Focus = 0;
-			
+
 			// computeMagicResistance returns true if the spell has been resisted
 			if (!CMagicActionBasicDamage::computeMagicResistance(defender, targetInfos, attackerLevel, enchant->getDmgType(), (sint32)enchant->getDmgBonus(), actingEntity, /*rangeFactor*/1.f, /*powerFactor*/0.f))
 			{
@@ -3264,7 +3264,7 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 					/*vamp*/0,
 					/*vampRatio*/0,
 					targetInfos,
-					
+
 					enchant->getDmgType(),
 					(sint32)enchant->getDmgBonus(),
 					/*_DmgSap*/0,
@@ -3283,7 +3283,7 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 			}
 		}
 	}
-	
+
 	// Procs
 	if( damage > 0 )
 	{
@@ -3320,12 +3320,12 @@ void CCombatPhrase::applyAction(TApplyAction & action, std::vector<TReportAction
 
 
 //--------------------------------------------------------------
-//					end()  
+//					end()
 //--------------------------------------------------------------
 void CCombatPhrase::end()
 {
 	H_AUTO(CCombatPhrase_end);
-	
+
 	if (!_Attacker) return;
 
 	CEntityBase *attacker = _Attacker->getEntity();
@@ -3333,7 +3333,7 @@ void CCombatPhrase::end()
 		return;
 
 	_Attacker->unlockRightItem();
-	
+
 	// set the attacks flag of the acting entity
 	attacker->setActionFlag( RYZOMACTIONFLAGS::Attacks, false );
 	attacker->clearCurrentAction();
@@ -3353,16 +3353,16 @@ void CCombatPhrase::end()
 	if (_DisengageOnEnd || !targetValid)
 	{
 		CPhraseManager::getInstance().disengage( _Attacker->getEntityRowId(), false, true);
-	}	
+	}
 } // end //
 
 //--------------------------------------------------------------
-//					stop()  
+//					stop()
 //--------------------------------------------------------------
 void CCombatPhrase::stop()
 {
 	H_AUTO(CCombatPhrase_stop);
-	
+
 	if (!_Attacker) return;
 
 	// only set latency end date if it has been set
@@ -3380,19 +3380,19 @@ void CCombatPhrase::stop()
 
 
 //--------------------------------------------------------------
-//					computeDeltaLevel()  
+//					computeDeltaLevel()
 //--------------------------------------------------------------
 sint16 CCombatPhrase::computeDeltaLevel(CCombatDefenderPtr &combatDefender, bool rightHand)
 {
 	H_AUTO(CCombatPhrase_computeDeltaLevel);
-	
+
 	if (combatDefender.isNull()) return 0;
-	
-	CEntityBase *attacker = _Attacker->getEntity(); 
+
+	CEntityBase *attacker = _Attacker->getEntity();
 	if ( !attacker )
 		return 0;
-	
-	CEntityBase *defender = combatDefender->getEntity(); 
+
+	CEntityBase *defender = combatDefender->getEntity();
 	if ( !defender )
 		return 0;
 
@@ -3432,19 +3432,19 @@ sint16 CCombatPhrase::computeDeltaLevel(CCombatDefenderPtr &combatDefender, bool
 } // computeDeltaLevel //
 
 //--------------------------------------------------------------
-//					testOpponentDefense()  
+//					testOpponentDefense()
 //--------------------------------------------------------------
 float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, bool useRightHand, SLOT_EQUIPMENT::TSlotEquipment slot, sint16 deltaLevel, sint32	&nbParryDodgeFlyingTextRequired)
 {
 	H_AUTO(CCombatPhrase_testOpponentDefense);
-	
+
 	if (combatDefender.isNull()) return 1.0f;
-	
-	CEntityBase *attacker = _Attacker->getEntity(); 
+
+	CEntityBase *attacker = _Attacker->getEntity();
 	if ( !attacker )
 		return 1.0f;
 
-	CEntityBase *defender = combatDefender->getEntity(); 
+	CEntityBase *defender = combatDefender->getEntity();
 	if ( !defender )
 		return 1.0f;
 
@@ -3455,7 +3455,7 @@ float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, boo
 	// test defender can defend
 	if (!defender->canEntityDefend())
 		return 0.0f;
-	
+
 	const TDataSetRow targetRowId = defender->getEntityRowId();
 	const EGSPD::CPeople::TPeople targetRace = defender->getRace();
 	const EGSPD::CPeople::TPeople attackerRace = attacker->getRace();
@@ -3478,7 +3478,7 @@ float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, boo
 
 		effect = attacker->lookForActiveEffect( EFFECT_FAMILIES::CombatDebuffCombatSkills );
 		if ( effect )
-			attackMod +=  effect->getParamValue(); // effect value must be <0 on a debuff		
+			attackMod +=  effect->getParamValue(); // effect value must be <0 on a debuff
 
 		effect = attacker->lookForActiveEffect( EFFECT_FAMILIES::OutpostCombat );
 		if ( effect )
@@ -3499,9 +3499,9 @@ float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, boo
 		effect = attacker->lookForActiveEffect( EFFECT_FAMILIES::OutpostCombat );
 		if ( effect )
 			attackMod += effect->getParamValue();
-		
+
 	}
-	
+
 	attackerLevel = attackerSkillBeforeMod + attackMod;
 
 	if (useRightHand)
@@ -3570,7 +3570,7 @@ float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, boo
 	{
 		defenseModifier = (nb - NbOpponentsBeforeMalus) * ModPerSupernumeraryOpponent;
 	}
-	
+
 	// take protected slot into account for defense skills modifier
 	defenseModifier += PHRASE_UTILITIES::getDefenseLocalisationModifier( slot, defender->protectedSlot() );
 
@@ -3587,8 +3587,8 @@ float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, boo
 		defenderLevel += _Attacker->adversaryParryModifier();
 //		defenderLevel += combatDefender->parryModifier();
 	}
-	
-	if (defenderLevel < 0) 
+
+	if (defenderLevel < 0)
 		defenderLevel = 0;
 
 	// oposition test
@@ -3623,24 +3623,24 @@ float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, boo
 		if ( pEffect != NULL )
 		{
 			chanceBonus += ( chances * pEffect->getParamValue() / 100 );
-		} 
+		}
 	}
 
 	chances += chanceBonus;
-	
+
 	// XP LOG
 	if (PlayerManager.logXPGain(attacker->getEntityRowId()))
 	{
 		if (dodgeFactor < 1.0f)
 		{
-			nlinfo("[XPLOG] Combat action Player %s, target %s, skill %s, delta %d, Dodge chances %u, tirage %u, damage factor = %f",attacker->getId().toString().c_str(), 
+			nlinfo("[XPLOG] Combat action Player %s, target %s, skill %s, delta %d, Dodge chances %u, tirage %u, damage factor = %f",attacker->getId().toString().c_str(),
 				defender->getId().toString().c_str(), SKILLS::toString(weapon.Skill).c_str(), defenderLevel - attackerLevel, chances,test,1.0f-dodgeFactor );
 		}
 		else
 		{
-			nlinfo("[XPLOG] Combat action Player %s, target %s, skill %s, delta %d, Dodge chances %u, tirage %u -> Attack Dodged ",attacker->getId().toString().c_str(), 
+			nlinfo("[XPLOG] Combat action Player %s, target %s, skill %s, delta %d, Dodge chances %u, tirage %u -> Attack Dodged ",attacker->getId().toString().c_str(),
 				defender->getId().toString().c_str(), SKILLS::toString(weapon.Skill).c_str(), defenderLevel - attackerLevel, chances,test);
-		}		
+		}
 	}
 
 	if ( dodgeFactor >= 1.0f )
@@ -3659,25 +3659,25 @@ float CCombatPhrase::testOpponentDefense(CCombatDefenderPtr &combatDefender, boo
 
 
 //--------------------------------------------------------------
-//					testShieldEfficiency()  
+//					testShieldEfficiency()
 //--------------------------------------------------------------
 bool CCombatPhrase::testShieldEfficiency(CCombatDefenderPtr &combatDefender, CCombatShield &shield)
 {
 	H_AUTO(CCombatPhrase_testShieldEfficiency);
-	
+
 	nlassert(_Attacker != NULL);
 
-	if (combatDefender.isNull()) 
+	if (combatDefender.isNull())
 		return false;
 
 	if (shield.ShieldType == SHIELDTYPE::NONE)
 		return false;
-	
-	CEntityBase *attacker = _Attacker->getEntity(); 
+
+	CEntityBase *attacker = _Attacker->getEntity();
 	if ( !attacker )
 		return true;
 
-	CEntityBase *defender = combatDefender->getEntity(); 
+	CEntityBase *defender = combatDefender->getEntity();
 	if ( !defender )
 		return true;
 
@@ -3685,13 +3685,13 @@ bool CCombatPhrase::testShieldEfficiency(CCombatDefenderPtr &combatDefender, CCo
 	if (!defender->canEntityDefend())
 	{
 		return false;
-	}	
+	}
 
 	TDataSetRow targetRowId = defender->getEntityRowId();
 	EGSPD::CPeople::TPeople targetRace = defender->getRace();
 
 	sint32 attackerLevel = 0;
-	
+
 	// get skill debuff effect on melee/range
 	sint32 attackMod = 0;
 	if (_MeleeCombat)
@@ -3703,7 +3703,7 @@ bool CCombatPhrase::testShieldEfficiency(CCombatDefenderPtr &combatDefender, CCo
 
 		effect = attacker->lookForActiveEffect( EFFECT_FAMILIES::CombatDebuffCombatSkills );
 		if ( effect )
-			attackMod +=  effect->getParamValue(); // effect value must be <0 on a debuff		
+			attackMod +=  effect->getParamValue(); // effect value must be <0 on a debuff
 
 		effect = attacker->lookForActiveEffect( EFFECT_FAMILIES::OutpostCombat );
 		if ( effect )
@@ -3722,9 +3722,9 @@ bool CCombatPhrase::testShieldEfficiency(CCombatDefenderPtr &combatDefender, CCo
 
 		effect = attacker->lookForActiveEffect( EFFECT_FAMILIES::OutpostCombat );
 		if ( effect )
-			attackMod += effect->getParamValue();		
+			attackMod += effect->getParamValue();
 	}
-	
+
 	attackerLevel = _Attacker->getSkillValue(_RightWeapon.Skill, targetRace) + _AttackSkillModifier.applyValue(_WeaponSabrinaValue) + attackMod;
 
 	if (attackerLevel<0)
@@ -3780,7 +3780,7 @@ bool CCombatPhrase::testShieldEfficiency(CCombatDefenderPtr &combatDefender, CCo
 		{
 			report.ItemUsed = NULL;
 		}
-		
+
 		report.factor = report.factor = CStaticSuccessTable::getSuccessFactor( SUCCESS_TABLE_TYPE::ShieldUse, chances, test );
 		PROGRESSIONPVE::CCharacterProgressionPVE::getInstance()->actionReport( report );
 		PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->reportAction(report);
@@ -3793,14 +3793,14 @@ bool CCombatPhrase::testShieldEfficiency(CCombatDefenderPtr &combatDefender, CCo
 
 
 //--------------------------------------------------------------
-//					testPhraseSuccess()  
+//					testPhraseSuccess()
 //--------------------------------------------------------------
 bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 {
 	H_AUTO(CCombatPhrase_testPhraseSuccess);
-	
+
 	_CriticalHit = false;
-	
+
 	CEntityBase *attacker = _Attacker->getEntity();
 	if (!attacker)
 		return false;
@@ -3826,7 +3826,7 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 				if( creatureSheet != 0 )
 				{
 					nbPlayers = creatureSheet->getNbPlayers();
-				}			
+				}
 			}
 		}
 	}
@@ -3847,7 +3847,7 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 		effect = attacker->lookForActiveEffect( EFFECT_FAMILIES::OutpostCombat );
 		if ( effect )
 			skillModifier += effect->getParamValue();
-		
+
 	}
 	else
 	{
@@ -3864,7 +3864,7 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 		if ( effect )
 			skillModifier += effect->getParamValue();
 	}
-	
+
 	// get skill value
 	SKILLS::ESkills skillUsed;
 	sint32 skillValue;
@@ -3887,7 +3887,7 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 	if ( _Attacker->getEntity()->getId().getType() == RYZOMID::player )
 	{
 		CCharacter * c = dynamic_cast<CCharacter*>(_Attacker->getEntity());
-		if( _MeleeCombat )	
+		if( _MeleeCombat )
 		{
 			skillValue += c->meleeSuccessModifier();
 		}
@@ -3911,9 +3911,9 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 			tirage= 0;
 	#endif
 	// get succes factor
-		
+
 	_PhraseSuccessDamageFactor = CStaticSuccessTable::getSuccessFactor(SUCCESS_TABLE_TYPE::FightPhrase, relativeLevel, tirage);
-	
+
 	// XP LOG for range combat
 	if (!_MeleeCombat && attacker->getId().getType() == RYZOMID::player && !_Targets.empty())
 	{
@@ -3922,12 +3922,12 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 		{
 			if (PlayerManager.logXPGain(attacker->getEntityRowId()))
 			{
-				nlinfo("[XPLOG] Combat action Player %s, target %s, skill %s, delta %d, chances %u, tirage %u, factor = %f",attacker->getId().toString().c_str(), 
+				nlinfo("[XPLOG] Combat action Player %s, target %s, skill %s, delta %d, chances %u, tirage %u, factor = %f",attacker->getId().toString().c_str(),
 					target->getId().toString().c_str(), SKILLS::toString(skillUsed).c_str(), relativeLevel, chances,tirage,_PhraseSuccessDamageFactor );
 			}
 		}
 	}
-	
+
 	// test critical hit
 	if (tirage < chances )
 	{
@@ -3939,7 +3939,7 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 			const CSEffect* pEffect = _Attacker->getEntity()->lookForActiveEffect( EFFECT_FAMILIES::TotemCombatCri );
 			if ( pEffect != NULL )
 				criticalChances += (uint8)pEffect->getParamValue();
-		} 
+		}
 		// Add item effect (only take into account the used item for the moment)
 		{
 			std::vector<SItemSpecialEffect> effects;
@@ -3984,12 +3984,12 @@ bool CCombatPhrase::testPhraseSuccess(bool useRightHand)
 
 
 //--------------------------------------------------------------
-//					checkTargetValidity()  
+//					checkTargetValidity()
 //--------------------------------------------------------------
 bool CCombatPhrase::checkTargetValidity( const TDataSetRow &targetRowId, string &errorCode )
 {
 	H_AUTO(CCombatPhrase_checkTargetValidity);
-	
+
 	// already tested before
 	TDataSetRow attacker = _Attacker->getEntityRowId();
 	if( TheDataset.isAccessible( attacker ) )
@@ -4009,7 +4009,7 @@ bool CCombatPhrase::checkTargetValidity( const TDataSetRow &targetRowId, string 
 		errorCode = "INVALID_TARGET";
 		return false;
 	}
-	
+
 	if (targetRowId == _Attacker->getEntityRowId())
 	{
 		errorCode = "INVALID_TARGET";
@@ -4024,14 +4024,14 @@ bool CCombatPhrase::checkTargetValidity( const TDataSetRow &targetRowId, string 
 	return true;
 } // checkTargetValidity //
 
-	
+
 //--------------------------------------------------------------
 //					checkPhraseCost()
 //--------------------------------------------------------------
 bool CCombatPhrase::checkPhraseCost( string &errorCode )
 {
 	H_AUTO(CCombatPhrase_checkPhraseCost);
-	
+
 	if (!_Attacker || !_Attacker->getEntity()) return false;
 	if (!TheDataset.isAccessible(_Attacker->getEntityRowId()) ) return false;
 
@@ -4058,12 +4058,12 @@ bool CCombatPhrase::checkPhraseCost( string &errorCode )
 
 
 //--------------------------------------------------------------
-//					createDefender()  
+//					createDefender()
 //--------------------------------------------------------------
 CCombatDefenderPtr CCombatPhrase::createDefender( const TDataSetRow &targetRowId )
 {
 	H_AUTO(CCombatPhrase_createDefender);
-	
+
 	if ( !TheDataset.isAccessible(targetRowId) )
 		return NULL;
 
@@ -4080,7 +4080,7 @@ CCombatDefenderPtr CCombatPhrase::createDefender( const TDataSetRow &targetRowId
 
 
 //--------------------------------------------------------------
-//					validateCombatActions()  
+//					validateCombatActions()
 //--------------------------------------------------------------
 bool CCombatPhrase::validateCombatActions( string &errorCode )
 {
@@ -4100,12 +4100,12 @@ bool CCombatPhrase::validateCombatActions( string &errorCode )
 } // validateCombatActions //
 
 //--------------------------------------------------------------
-//					applyCombatActions()  
+//					applyCombatActions()
 //--------------------------------------------------------------
 void CCombatPhrase::applyCombatActions()
 {
 	H_AUTO(CCombatPhrase_applyCombatActions);
-	
+
 //	if (!_Defender) return;
 
 	const uint size = (uint)_CombatActions.size();
@@ -4119,16 +4119,16 @@ void CCombatPhrase::applyCombatActions()
 } // applyCombatActions //
 
 //--------------------------------------------------------------
-//					getHitLocalisation()  
+//					getHitLocalisation()
 //--------------------------------------------------------------
 PHRASE_UTILITIES::TPairSlotShield CCombatPhrase::getHitLocalisation(CCombatDefenderPtr &defender, const CCombatShield &shield, DMGTYPE::EDamageType dmgType)
-{	
+{
 	H_AUTO(CCombatPhrase_getHitLocalisation);
-	
+
 	PHRASE_UTILITIES::TPairSlotShield localisation = make_pair(SLOT_EQUIPMENT::UNDEFINED,false);
 	if (defender.isNull())
 		return localisation;
-	
+
 	CEntityBase *defenderEntity = defender->getEntity();
 	if (!defenderEntity)
 		return localisation;
@@ -4143,7 +4143,7 @@ PHRASE_UTILITIES::TPairSlotShield CCombatPhrase::getHitLocalisation(CCombatDefen
 		if ( _AimedSlot.BodyType != BODY::UnknownBodyType )
 			bodyType = EGSPD::getBodyType(defenderEntity->getRace());
 		else
-			bodyType = BODY::UnknownBodyType;		
+			bodyType = BODY::UnknownBodyType;
 
 		// check if the aimed slot is hit (if any)(and thus bypass normal localisation)
 		if ( _AimedSlot.Slot != SLOT_EQUIPMENT::UNDEFINED && _AimedSlot.BodyType == bodyType )
@@ -4174,24 +4174,24 @@ PHRASE_UTILITIES::TPairSlotShield CCombatPhrase::getHitLocalisation(CCombatDefen
 		default:
 			slot = AI_AIMING_TYPE::toSlot(_AiAimingType);
 		};
-		
+
 		localisation = PHRASE_UTILITIES::getLocalisation( shield.ShieldType, adjustment, slot );
 		return localisation;
 	}
-	
+
 	// default localisation
 	localisation = PHRASE_UTILITIES::getLocalisation( shield.ShieldType, adjustment );
-	
+
 	return localisation;
 } // getHitLocalisation //
 
 //--------------------------------------------------------------
-//					applyLocalisationSpecialEffect()  
+//					applyLocalisationSpecialEffect()
 //--------------------------------------------------------------
 void CCombatPhrase::applyLocalisationSpecialEffect( CCombatDefenderPtr &defender, SLOT_EQUIPMENT::TSlotEquipment slot, sint32 damage, sint32 &lostStamina)
 {
 	H_AUTO(CCombatPhrase_applyLocalisationSpecialEffect);
-	
+
 	// for the moment, only apply such effects on critical success
 	if (!_CriticalHit) return;
 
@@ -4260,7 +4260,7 @@ void CCombatPhrase::applyLocalisationSpecialEffect( CCombatDefenderPtr &defender
 			DEBUGLOG("Entity %s, hit to feet, debuff dodge length = %f, debuff value = %d", entity->getId().toString().c_str(), HitFeetDebuffDuration.get(), HitFeetDebuffValue.get());
 		}
 		break;
-	
+
 		default:// unknown slot ?
 		;
 	};
@@ -4268,12 +4268,12 @@ void CCombatPhrase::applyLocalisationSpecialEffect( CCombatDefenderPtr &defender
 
 
 //--------------------------------------------------------------
-//					applyArmorProtections()  
+//					applyArmorProtections()
 //--------------------------------------------------------------
 sint32 CCombatPhrase::applyArmorProtections(CCombatDefenderPtr &defender, sint32 damage, DMGTYPE::EDamageType dmgType, SLOT_EQUIPMENT::TSlotEquipment slot, bool shieldIsEffective)
 {
 	H_AUTO(CCombatPhrase_applyArmorProtections);
-	
+
 	if (defender.isNull())
 		return 0;
 
@@ -4399,7 +4399,7 @@ sint32 CCombatPhrase::applyArmorProtections(CCombatDefenderPtr &defender, sint32
 				dmgPreventedByArmor += ( dmgPreventedByArmor * pEffect->getParamValue() / 100 );
 				if ( dmgPreventedByArmor < 0 )
 					dmgPreventedByArmor = 0;
-			} 
+			}
 		}
 
 		damage -= dmgPreventedByArmor;
@@ -4414,7 +4414,7 @@ sint32 CCombatPhrase::applyArmorProtections(CCombatDefenderPtr &defender, sint32
 	}
 
 	if ( dmgPreventedByArmor != 0)
-	{		
+	{
 //		defender->damageOnArmor(slot, dmgPreventedByArmor );
 		INFOLOG("COMBAT : Entity %u (attacked by %u) Damage prevented by armor = %u",defender->getEntityRowId().getIndex(), _Attacker->getEntityRowId().getIndex(), dmgPreventedByArmor);
 	}
@@ -4426,12 +4426,12 @@ sint32 CCombatPhrase::applyArmorProtections(CCombatDefenderPtr &defender, sint32
 } // applyArmorProtections //
 
 //--------------------------------------------------------------
-//					checkOpening()  
+//					checkOpening()
 //--------------------------------------------------------------
 bool CCombatPhrase::checkOpening()
 {
 	H_AUTO(CCombatPhrase_checkOpening);
-	
+
 	if (!_Attacker) return false;
 
 	CCharacter *player = PlayerManager.getChar(_Attacker->getEntityRowId());
@@ -4455,7 +4455,7 @@ bool CCombatPhrase::checkOpening()
 	if (!success)
 	{
 		// either player trying to cheat or error because of lag
-		// TODO : send message for other failure 
+		// TODO : send message for other failure
 	}
 	else
 	{
@@ -4464,7 +4464,7 @@ bool CCombatPhrase::checkOpening()
 		{
 			player->resetCombatEventFlag(_OpeningNeededFlags[i]);
 		}
-		
+
 		// send message to indicate a success
 		PHRASE_UTILITIES::sendSimpleMessage( _Attacker->getEntityRowId(), "EGS_OPENING_SUCCESS");
 	}
@@ -4478,7 +4478,7 @@ bool CCombatPhrase::checkOpening()
 void CCombatPhrase::buildTargetList(bool rightHand, bool isMad)
 {
 	H_AUTO(CCombatPhrase_buildTargetList);
-	
+
 	if (_Targets.empty())
 		return;
 
@@ -4535,7 +4535,7 @@ void CCombatPhrase::buildTargetList(bool rightHand, bool isMad)
 		string dummy;
 
 		const uint previousNbTargets = (uint)_Targets.size();
-	
+
 		const set<TDataSetRow> &aggressors = CPhraseManager::getInstance().getMeleeAggressors(_Attacker->getEntityRowId());
 		set<TDataSetRow>::const_iterator it;
 		set<TDataSetRow>::const_iterator itEnd = aggressors.end();
@@ -4543,7 +4543,7 @@ void CCombatPhrase::buildTargetList(bool rightHand, bool isMad)
 		uint targetIndex = previousNbTargets;
 		for (it = aggressors.begin(); it != itEnd; ++it)
 		{
-			// skip main target as it's already a ... target 
+			// skip main target as it's already a ... target
 			if ( (*it) == mainTargetRowId )
 				continue;
 
@@ -4583,11 +4583,11 @@ void CCombatPhrase::buildTargetList(bool rightHand, bool isMad)
 sint32 CCombatPhrase::applyDamageOnBodyguard(CEntityBase *actingEntity, TDataSetRow defenderRowId, sint32 attackerLevel, CSEffectPtr effect, sint32 damage, DMGTYPE::EDamageType dmgType)
 {
 	H_AUTO(CCombatPhrase_applyDamageOnBodyguard);
-	
+
 #ifdef NL_DEBUG
 	nlassert(effect);
 	nlassert(actingEntity);
-	
+
 	CShieldingEffect *seffect = dynamic_cast<CShieldingEffect *> (& (*effect));
 	nlassert(seffect);
 #else
@@ -4607,9 +4607,9 @@ sint32 CCombatPhrase::applyDamageOnBodyguard(CEntityBase *actingEntity, TDataSet
 		//defender->removeSabrinaEffect(effect);
 		return damage;
 	}
-	
+
 	CEntityBase *entity = bodyguard->getEntity();
-	
+
 	// check distance between the bodyguard and the defender
 	double distance = PHRASE_UTILITIES::getDistance(defenderRowId, entity->getEntityRowId());
 	if (distance < ShieldingRadius)
@@ -4618,19 +4618,19 @@ sint32 CCombatPhrase::applyDamageOnBodyguard(CEntityBase *actingEntity, TDataSet
 		uint16 max;
 		seffect->getProtectionParams(bodyguard, factor, max);
 		sint32 damageOnBodyguard = min( sint32(damage * factor), sint32(max) );
-		
+
 		damage -= damageOnBodyguard;
 
 		const sint32 damageOnBodyguardBeforeArmor = damageOnBodyguard;
-		
+
 		BODY::TBodyPart hitBodyPart = BODY::getBodyPart(EGSPD::getBodyType(entity->getRace()), _HitLocalisation);
-		
+
 		CCombatShield shield;
 		bodyguard->getShield(shield);
-		
+
 		bool shieldIsEffective = testShieldEfficiency(bodyguard, shield);
 		damageOnBodyguard = applyArmorProtections(bodyguard, damageOnBodyguard, dmgType, _HitLocalisation, shieldIsEffective);
-		
+
 		if ( entity->changeCurrentHp( (-1)*damageOnBodyguard, actingEntity->getEntityRowId() ) )
 		{
 			PHRASE_UTILITIES::sendHitMessages(actingEntity->getId(),entity->getId(), false, damageOnBodyguard, damageOnBodyguardBeforeArmor, 0, 0, hitBodyPart);
@@ -4653,7 +4653,7 @@ sint32 CCombatPhrase::applyDamageOnBodyguard(CEntityBase *actingEntity, TDataSet
 void CCombatPhrase::applyBounceEffect(CEntityBase *actingEntity, sint32 attackerLevel, CSEffectPtr effect, sint32 damage, DMGTYPE::EDamageType dmgType)
 {
 	H_AUTO(CCombatPhrase_applyBounceEffect);
-	
+
 #ifdef NL_DEBUG
 	nlassert(effect);
 	nlassert(actingEntity);
@@ -4681,11 +4681,11 @@ void CCombatPhrase::applyBounceEffect(CEntityBase *actingEntity, sint32 attacker
 	combatTarget->getShield(shield);
 
 	BODY::TBodyPart hitBodyPart = BODY::getBodyPart(EGSPD::getBodyType(bounceTarget->getRace()), _HitLocalisation);
-	
+
 	const sint32 damageBeforeArmor = damage;
 	bool shieldIsEffective = testShieldEfficiency(combatTarget, shield);
 	damage = applyArmorProtections(combatTarget, damage, dmgType, _HitLocalisation, shieldIsEffective);
-	
+
 	if ( bounceTarget->changeCurrentHp( (-1)*damage, actingEntity->getEntityRowId() ) )
 	{
 		PHRASE_UTILITIES::sendHitMessages(actingEntity->getId(),bounceTarget->getId(), false, damage, damageBeforeArmor, 0, 0, hitBodyPart);
@@ -4697,7 +4697,7 @@ void CCombatPhrase::applyBounceEffect(CEntityBase *actingEntity, sint32 attacker
 		// send hit message
 		PHRASE_UTILITIES::sendHitMessages(actingEntity->getId(),bounceTarget->getId(), false, damage, damageBeforeArmor, 0, 0, hitBodyPart);
 	}
-	
+
 	// compute aggro
 	CAiEventReport	aiEventReport;
 	aiEventReport.Originator = actingEntity->getEntityRowId();
@@ -4714,7 +4714,7 @@ void CCombatPhrase::applyBounceEffect(CEntityBase *actingEntity, sint32 attacker
 void CCombatPhrase::computeAggro(CAiEventReport &aiEventReport, CEntityBase *target, sint32 hpDamage, sint32 staDamage, sint32 sapDamage )
 {
 	H_AUTO(CCombatPhrase_computeAggro);
-	
+
 #ifdef NL_DEBUG
 	nlassert(target);
 #endif
@@ -4750,17 +4750,17 @@ void CCombatPhrase::computeAggro(CAiEventReport &aiEventReport, CEntityBase *tar
 		}
 		aiEventReport.addDelta(AI_EVENT_REPORT::Stamina, -staDamage);
 	}
-	
+
 	const float aggro =  - min( 1.0f, _AggroMultiplier * (1.0f - (1.0f-aggroHp)*(1.0f-aggroSap)*(1.0f-aggroSta)) );
-	
+
 	// update the ai event report
 	aiEventReport.AggroAdd = aggro;
 	aiEventReport.Target = target->getEntityRowId();
-	
+
 	// TEMP FIX force aggro to be <0
 	if (aiEventReport.AggroAdd == 0)
 		aiEventReport.AggroAdd = -0.02f;
-		
+
 	CPhraseManager::getInstance().addAiEventReport(aiEventReport);
 } // computeAggro //
 
@@ -4771,7 +4771,7 @@ void CCombatPhrase::computeAggro(CAiEventReport &aiEventReport, CEntityBase *tar
 void CCombatPhrase::computeBaseDamage(bool rightHand, EGSPD::CPeople::TPeople targetRace)
 {
 	H_AUTO(CCombatPhrase_computeBaseDamage);
-	
+
 #if !FINAL_VERSION
 	nlassert(_Attacker);
 #endif
@@ -4787,7 +4787,7 @@ void CCombatPhrase::computeBaseDamage(bool rightHand, EGSPD::CPeople::TPeople ta
 	// Compute damage
 	sint32 attackerLevel = _Attacker->getSkillValue(weapon.Skill, targetRace);
 	uint16 itemQuality = _MeleeCombat? weapon.Quality : std::min(_Ammo.Quality,weapon.Quality);
-	
+
 	float weaponDamage = _MeleeCombat? weapon.Damage : (_Ammo.Damage + weapon.Damage);
 
 	/// Effects affecting the damage (modifiers)
@@ -4798,15 +4798,15 @@ void CCombatPhrase::computeBaseDamage(bool rightHand, EGSPD::CPeople::TPeople ta
 //		CEnchantWeaponEffect* enchant = static_cast<CEnchantWeaponEffect*>((CSEffect*)effect3);
 //		weaponDamage += enchant->getDpsBonus();
 	}
-	
+
 	// if attacker is not a player, the _RightWeapon damage is direclty the value to use, otherwise we need the CWeaponDamageTable
 	if (actingEntity->getId().getType() == RYZOMID::player)
 	{
 		// add fight skill bonus given by consumable effect
 		CCharacter * c = dynamic_cast<CCharacter*>(actingEntity);
-		if(c) 
+		if(c)
 		{
-			if( _MeleeCombat )	
+			if( _MeleeCombat )
 			{
 				attackerLevel += c->meleeSuccessModifier();
 			}
@@ -4818,10 +4818,10 @@ void CCombatPhrase::computeBaseDamage(bool rightHand, EGSPD::CPeople::TPeople ta
 
 		weaponDamage *= CWeaponDamageTable::getInstance().getRefenceDamage(itemQuality, attackerLevel);
 	}
-	
+
 	_NaturalDamage = (sint32)weaponDamage;
 
-	float factor = _DamageFactor; 
+	float factor = _DamageFactor;
 
 	/// Effects affecting the damage factor
 	// check for war cry aura
@@ -4830,7 +4830,7 @@ void CCombatPhrase::computeBaseDamage(bool rightHand, EGSPD::CPeople::TPeople ta
 	{
 		factor += effect->getParamValue() / 100.0f;
 	}
-	
+
 	_BaseDamage = (weaponDamage * factor) + _DamageModifier;
 
 	/// Effects affecting the damage (modifiers)
@@ -4840,8 +4840,8 @@ void CCombatPhrase::computeBaseDamage(bool rightHand, EGSPD::CPeople::TPeople ta
 	{
 		_BaseDamage += effect2->getParamValue();
 	}
-	
-	DEBUGLOG("COMBAT : (%s) Attacker : Entity %s, weaponDamage = %f (skill %s, quality %u), attackerLevel = %d, _DamageModifier= %d", 
+
+	DEBUGLOG("COMBAT : (%s) Attacker : Entity %s, weaponDamage = %f (skill %s, quality %u), attackerLevel = %d, _DamageModifier= %d",
 		(rightHand ? "RightHand":"LeftHand"),
 		_Attacker->getEntity()->getId().toString().c_str(),
 		weaponDamage,
@@ -4936,7 +4936,7 @@ void CCombatPhrase::flushDelayedEvents()
 
 					switch(ae.EventType)
 					{
-					case EventEvade: PHRASE_UTILITIES::sendCombatFailedMessages( _Attacker->getEntityRowId(), ae.DefenderRowId, 
+					case EventEvade: PHRASE_UTILITIES::sendCombatFailedMessages( _Attacker->getEntityRowId(), ae.DefenderRowId,
 						sendFlyingText?PHRASE_UTILITIES::FailMelee:PHRASE_UTILITIES::FailNoFlyingText); break;
 					case EventDodge: PHRASE_UTILITIES::sendDodgeMessages( _Attacker->getEntityRowId(), ae.DefenderRowId, sendFlyingText); break;
 					case EventParry: PHRASE_UTILITIES::sendParryMessages( _Attacker->getEntityRowId(), ae.DefenderRowId, sendFlyingText); break;

@@ -445,7 +445,7 @@ bool checkBannerPriv(const string &sheetName, CEntityId eid)
 		// Not a banner
 		return true;
 	}
-	
+
 	CPlayer* player = PlayerManager.getPlayer( PlayerManager.getPlayerId(eid) );
 
 	if (player == NULL)
@@ -479,28 +479,28 @@ bool checkBannerPriv(const string &sheetName, CEntityId eid)
 			return true;
 		}
 		// VG uses SG banner for now
-		if (player->havePriv(":VG:")) 
+		if (player->havePriv(":VG:"))
 		{
 			return true;
 		}
 	}
 	else if (sheetName.find("_vgu") != string::npos)
 	{
-		if (player->havePriv(":VG:")) 
+		if (player->havePriv(":VG:"))
 		{
 			return true;
 		}
 	}
 	else if (sheetName.find("_gm") != string::npos)
 	{
-		if (player->havePriv(":GM:")) 
+		if (player->havePriv(":GM:"))
 		{
 			return true;
 		}
 	}
 	else if (sheetName.find("_sgm") != string::npos)
 	{
-		if (player->havePriv(":SGM:")) 
+		if (player->havePriv(":SGM:"))
 		{
 			return true;
 		}
@@ -694,7 +694,7 @@ string getStringFromHash(const string &hash)
 {
 	ucstring finaltext;
 	getUCstringFromHash(hash, finaltext);
-	
+
 	return finaltext.toUtf8();
 }
 
@@ -717,7 +717,7 @@ void getUCstringFromHash(const string &hash, ucstring &finaltext)
 			// Unexpected string format
 			break;
 		}
-		
+
 		finaltext.push_back((ucchar)ch);
 	}
 }
@@ -4573,14 +4573,20 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 
 	CPVPManager2 *inst = CPVPManager2::getInstance();
 
-	string action;
 	string lang = args[1];
-	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es" && lang != "rf")
+	if (lang != "en" && lang != "fr" && lang != "de" && lang != "ru" && lang != "es" && lang != "rf" && !c->havePriv(":DEV:"))
 		return false;
+
 	bool leave = false;
 	if (args.size() > 2)
 		leave = args[2] == "1";
-	TChanID channel = inst->getFactionDynChannel(lang);
+
+	string channelName = lang;
+	// Convert langs to usr lang channels
+	if (lang == "en" || lang == "fr" || lang == "de" || lang == "ru" || lang == "es")
+		channelName = "usr_"+lang;
+
+	TChanID channel = inst->getFactionDynChannel(channelName);
 
 	if (channel != DYN_CHAT_INVALID_CHAN)
 	{
@@ -4609,7 +4615,7 @@ NLMISC_COMMAND (connectLangChannel, "Connect to lang channel", "<user id> <lang>
 
 NLMISC_COMMAND (setDontTranslateLangs, "Set langs that a player dont want to see translated", "<user id> <langs>")
 {
-	if (args.size() != 2) 
+	if (args.size() != 2)
 		return false;
 
 	GET_CHARACTER
@@ -4871,7 +4877,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			{
 				if ( (itemPtr->getSheetId() == sheetId) )
 				{
-					if (itemPtr->quality() == quality) 
+					if (itemPtr->quality() == quality)
 						numberEqualItem += itemPtr->getStackSize();
 					if (itemPtr->quality() >= quality)
 						numberItem += itemPtr->getStackSize();
@@ -5086,7 +5092,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 
 	}
-	
+
 	//*************************************************
 	//***************** set_fame (need x6000 to change 1 point)
 	//*************************************************
@@ -5110,7 +5116,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		else if (command_args[2] == "del")
 		{
 			CFameManager::getInstance().setEntityFame(c->getId(), factionIndex, fame-value, false);
-			nlinfo("fame : %d => %d", fame, fame-value);			
+			nlinfo("fame : %d => %d", fame, fame-value);
 		}
 		else if (command_args[2] == "set")
 		{
@@ -5129,12 +5135,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}
 
 	//*************************************************
-	//***************** check_target	
+	//***************** check_target
 	//*************************************************
 	else if (command_args[0] == "check_target")
 	{
 		const CEntityId &target = c->getTarget();
-		
+
 		if (command_args.size () < 2) return false;
 
 		if (command_args[1] == "leaguemate")
@@ -5185,7 +5191,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				return false;
 			}
 		}
-		
+
 		if (command_args.size () < 3) return false;
 
 		if (command_args[1] == "sheet")
@@ -5247,7 +5253,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}
 
 	//*************************************************
-	//***************** check_brick	
+	//***************** check_brick
 	//*************************************************
 	else if (command_args[0] == "check_brick")
 	{
@@ -5262,7 +5268,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	}
 
 	//*************************************************
-	//***************** set_brick 	
+	//***************** set_brick
 	//*************************************************
 	else if (command_args[0] == "set_brick")
 	{
@@ -5377,12 +5383,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			CSheetId outpostSheet(command_args[1]);
 			outpost = COutpostManager::getInstance().getOutpostFromSheet(outpostSheet);
 		}
-		
+
 		if (outpost == NULL)
 		{
 			return false;
 		}
-		
+
 		if ((command_args[2] != "attacker") && (command_args[2] != "defender") && (command_args[2] != "attack") && (command_args[2] != "defend"))
 			return false;
 
@@ -5455,7 +5461,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		if (command_args.size() > 7)
 		{
-			
+
 			if (command_args[6] != "*") {
 				float userX;
 				NLMISC::fromString(command_args[6], userX);
@@ -5487,7 +5493,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			}
 		}
 
-		 //[[inVillage=0/1][inOutpost=0/1][inStable=0/1][InAtys=0/1]] 
+		 //[[inVillage=0/1][inOutpost=0/1][inStable=0/1][InAtys=0/1]]
 		std::string validation;
 		if (command_args.size() > 10)
 		{
@@ -5498,7 +5504,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				bool inOutpost = validation[1] == '1';
 				bool inStable = validation[2] == '1';
 				bool inAtys = validation[3] == '1';
-				
+
 				if (!c->isSpawnValid(inVillage, inOutpost, inStable, inAtys))
 					return false;
 			}
@@ -5539,14 +5545,14 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	//***************** group_script
 	//*************************************************
-	
+
 	else if (command_args[0] == "group_script")
 	{
 		if (command_args.size () < 3) return false;
 
-		uint32 instanceNumber = c->getInstanceNumber(); 
+		uint32 instanceNumber = c->getInstanceNumber();
 		uint32 nbString = (uint32)command_args.size();
-	 
+
 		// See if it needs another AI instance
 		string botsName = command_args[1];
 		if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
@@ -5641,15 +5647,15 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	//***************** change_vpx
 	//*************************************************
-	
+
 	else if (command_args[0] == "change_vpx")
 	{
 		if (command_args.size () != 4) return false;
-	
+
 		CCharacter *target = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), command_args[1]));
 
 		string name = command_args[2];
-		
+
 		uint32 value;
 		fromString(command_args[3], value);
 
@@ -5850,12 +5856,12 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		// Checks : PvP Flag, PvP Tag, Sitting, Water, Mount, Fear, Sleep, Invu, Stun
 		if (command_args.size () > 3)
 		{
-			bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);	
+			bool pvpFlagValid = (c->getPvPRecentActionFlag() == false || c->getPVPFlag() == false);
 			if (command_args[3][0] == '1' && !pvpFlagValid) {
 				CCharacter::sendDynamicSystemMessage(c->getEntityRowId(), "PVP_TP_FORBIDEN");
 				return true;
 			}
-	
+
 			bool pvpTagValid =  c->getPVPFlag() == false;
 			if (command_args[3].length() > 1 && command_args[3][1] == '1' && !pvpTagValid)
 			{
@@ -5880,7 +5886,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		}
 
 		string value = command_args[1];
-		
+
 		vector<string> res;
 		sint32 x = 0, y = 0, z = 0;
 		float h = 0;
@@ -5999,7 +6005,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (allowPetTp)
 			c->allowNearPetTp();
 		else
-			c->forbidNearPetTp(); 
+			c->forbidNearPetTp();
 
 		// Respawn player if dead
 		if (c->isDead())
@@ -6066,7 +6072,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (allowPetTp)
 			c->allowNearPetTp();
 		else
-			c->forbidNearPetTp(); 
+			c->forbidNearPetTp();
 
 		IBuildingPhysical * building = CBuildingManager::getInstance()->getBuildingPhysicalsByName(command_args[2]);
 		if ( building )
@@ -6112,7 +6118,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		ucstring customName = ucstring(command_args[2]);
 		c->setAnimalName(petIndex, customName);
 	}
-	
+
 	//*************************************************
 	//***************** organization
 	//*************************************************
@@ -6123,7 +6129,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		string action = command_args[1]; // change, add_points, set_status, add_status
 		sint32 value;
 		fromString(command_args[2], value);
-		
+
 		if (action == "change" && value >= 0)
 			c->setOrganization((uint32)value);
 		else if (action == "add_points")
@@ -6133,7 +6139,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		else if (action == "add_status")
 			c->changeOrganizationStatus(value);
 	}
-		
+
 	//*************************************************
 	//***************** buildings
 	// /a webExecCommand debug 1 building!set_player_room!building_instance_ARCC_player_320 hmac 0
@@ -6143,16 +6149,16 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		if (command_args.size() < 2) return false;
 
 		string action = command_args[1]; // trigger_in, trigger_out, add_guild_room, add_player_room
-		
+
 		if (action == "trigger_in" && command_args.size () == 3)
 		{
-			uint32 liftId = atoi(command_args[2].c_str());		
+			uint32 liftId = atoi(command_args[2].c_str());
 			CBuildingManager::getInstance()->addTriggerRequest(c->getEntityRowId(), liftId);
 		}
 		else if (action == "trigger_out")
 		{
 			CBuildingManager::getInstance()->removeTriggerRequest(c->getEntityRowId());
-			
+
 		}
 		else if (action == "add_guild_room" && command_args.size () == 3)
 		{
@@ -6206,24 +6212,24 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			if (owner)
 				owner->addRoomAccessToPlayer(c->getId());
 		}
-	}	
-	
+	}
+
 	//*************************************************
 	//***************** Skill
 	//*************************************************
-	
+
 	else if (command_args[0] == "skill")
 	{
 		if (command_args.size() < 4) return false;
-		
+
 		string action = command_args[1]; // check, best, add_xp
-		
+
 		if (action == "check")
 		{
 			SKILLS::ESkills skillEnum = SKILLS::toSkill( command_args[2] );
 			uint32 wantedValue;
 			fromString(command_args[3], wantedValue);
-			
+
 			if (c->getSkillValue(skillEnum) < wantedValue) {
 				if (send_url)
 					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_enough_skill");
@@ -6235,7 +6241,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			SKILLS::ESkills skillEnum = SKILLS::toSkill( command_args[2] );
 			uint32 wantedValue;
 			fromString(command_args[3], wantedValue);
-			
+
 			if (c->getBestChildSkillValue(skillEnum) < wantedValue) {
 				if (send_url)
 					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_best_skill");
@@ -6249,17 +6255,17 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			c->addXpToSkill(xp, command_args[2]);
 		}
 	}
-	
+
 	//*************************************************
 	//***************** Dead
 	//*************************************************
-	
+
 	else if (command_args[0] == "check_state")
 	{
 		if (command_args.size() < 3) return false;
-		
+
 		string action = command_args[1]; // dead, alive, tag, flag
-		
+
 		if (action == "dead")
 		{
 			if (!c->isDead()) {
@@ -6293,17 +6299,17 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			}
 		}
 	}
-	
+
 	//*************************************************
 	//***************** Money
 	//*************************************************
-	
+
 	else if (command_args[0] == "money")
 	{
 		if (command_args.size() < 3) return false;
-		
+
 		string action = command_args[1]; // check, give, spend
-		
+
 		if (action == "check")
 		{
 			uint64 wantedMoney;
@@ -6335,7 +6341,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	else if (command_args[0] == "guild")
 	{
 		if (command_args.size() < 3) return false;
-		
+
 		CGuild * guild = CGuildManager::getInstance()->getGuildFromId(c->getGuildId());
 		if (guild == NULL)
 		{
@@ -6343,9 +6349,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 					c->sendUrl(web_app_url+"&player_eid="+c->getId().toString()+"&event=failed&desc=no_guild");
 			return true;
 		}
-		
+
 		string action = command_args[1]; // check, give, spend
-		
+
 		if (action == "check_money")
 		{
 			uint64 wantedMoney;
@@ -6388,7 +6394,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				return true;
 			}
 		}
-		
+
 	}
 
 	//*************************************************
@@ -6398,9 +6404,9 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	else if (command_args[0] == "reset")
 	{
 		if (command_args.size() < 2) return false;
-		
+
 		string action = command_args[1]; // pvp, powers
-		
+
 		if (action == "pvp")
 		{
 			c->resetPVPTimers();
@@ -6418,10 +6424,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	else if (command_args[0] == "faction_points")
 	{
 		if (command_args.size() < 4) return false;
-		
+
 		string action = command_args[1]; // check, set, add, remove
-		
-		
+
+
 		PVP_CLAN::TPVPClan clan = PVP_CLAN::fromString(command_args[2]);
 		if ((clan < PVP_CLAN::BeginClans) || (clan > PVP_CLAN::EndClans))
 		{
@@ -6430,7 +6436,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 
 		uint32 value;
 		fromString(command_args[3], value);
-		
+
 		if (action=="check")
 		{
 			if (c->getFactionPoint(clan) < value)
@@ -6454,7 +6460,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 				c->setFactionPoint(clan, 0, true);
 			else
 				c->setFactionPoint(clan, c->getFactionPoint(clan)-value, true);
-		} 
+		}
 	}
 
 	//*************************************************
@@ -6496,15 +6502,15 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	//***************** ios
 	//*************************************************
-	
+
 	else if (command_args[0] == "ios")
 	{
-				
+
 		if (command_args.size() < 4)
 			return false;
 
 		string action = command_args[1]; // single_phrase
-		
+
 		if (action == "single_phrase")
 		{
 			string phraseName = command_args[2];
@@ -6514,7 +6520,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			phraseContent += "(){[";
 			phraseContent += phraseText;
 			phraseContent += "]}";
-			
+
 			string msgname = "SET_PHRASE";
 			bool withLang = false;
 			string lang = "";
@@ -6541,10 +6547,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//*************************************************
 	//***************** sendurl
 	//*************************************************
-	
+
 	else if (command_args[0] == "sendurl")
 	{
-				
+
 		if (command_args.size() != 4)
 			return false;
 
@@ -6552,7 +6558,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		string app = command_args[2]; // app
 		string params = command_args[3]; // params
 		CCharacter *destPlayer;
-		
+
 		if (player != "_target_") {
 			CEntityBase *entityBase = PlayerManager.getCharacterByName(CShardNames::getInstance().makeFullNameFromRelative(c->getHomeMainlandSessionId(), player));
 			destPlayer = dynamic_cast<CCharacter*>(CEntityBaseManager::getEntityBasePtr(entityBase->getId()));
@@ -6569,10 +6575,10 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 	//***************** dt_bot
 	// /a webExecCommand debug 1 dt_bot!bejc hmac 0
 	//*************************************************
-	
+
 /*	else if (command_args[0] == "dt_bot")
 	{
-				
+
 		if (command_args.size() != 2)
 			return false;
 
@@ -6608,7 +6614,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 			nlwarning ("'%s' has no eId. Is it Spawned???", botname.c_str());
 			return true;
 		}
-		
+
 	}*/
 
 	//*************************************************
@@ -6705,7 +6711,7 @@ NLMISC_COMMAND (webExecCommand, "Execute a web command", "<user id> <web_app_url
 		{
 			uint32 nbString = (uint32)command_args.size();
 			string text = getStringFromHash(command_args[3]);
-		
+
 			for (uint32 i=4; i<nbString; ++i)
 				text +=  "\n"+getStringFromHash(command_args[i]);
 			c->setCustomMissionParams(command_args[2], text);
@@ -7915,7 +7921,7 @@ NLMISC_COMMAND(setFamePlayer, "set the fame value of a player in the given facti
 
 	uint32 factionIndex	=CStaticFames::getInstance().getFactionIndex(args[1]);
 	if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
-			return false;	
+			return false;
 
 	sint32 fame;
 	NLMISC::fromString(args[2], fame);
@@ -7957,7 +7963,7 @@ NLMISC_COMMAND(setOrganization, "set the organization of a player to the given f
 
 	uint32 factionIndex	= CStaticFames::getInstance().getFactionIndex(args[1]);
 	if (factionIndex == CStaticFames::INVALID_FACTION_INDEX)
-			return false;	
+			return false;
 
 	c->setOrganization(factionIndex);
 
@@ -8164,7 +8170,7 @@ NLMISC_COMMAND(eScript, "executes a script on an event npc group", "<player eid>
 	uint32 instanceNumber = c->getInstanceNumber();
 
 	uint32 nbString = (uint32)args.size();
- 
+
 	string botsName = args[1];
 	if ( ! getAIInstanceFromGroupName(botsName, instanceNumber))
 	{
@@ -8502,7 +8508,7 @@ NLMISC_COMMAND(eventSpawnToxic, "Spawn a toxic cloud", "<player eid> <posXm> <po
 		return false;
 
 	GET_CHARACTER
-	
+
 	float x = (float)c->getX();
 	float y = (float)c->getY();
 
@@ -8534,7 +8540,7 @@ NLMISC_COMMAND(eventSpawnToxic, "Spawn a toxic cloud", "<player eid> <posXm> <po
 			}
 		}
 	}
-	
+
 	CToxicCloud *tc = new CToxicCloud();
 	float radius = (float)(iRadius*2 + 1); // {1, 3, 5} corresponding to the 3 sheets
 	tc->init( cloudPos, radius, dmgPerHit, updateFrequency, lifetime );
@@ -8568,9 +8574,9 @@ NLMISC_COMMAND(eventSpawnDamageLine, "Spawn a damage line", "<player eid> <name>
 	string dammage = "";
 	if (args.size() > 3 )
 		dammage = args[3];
-	
+
 	CZoneManager::getInstance().parseGooBorder( args[1], path, dammage );
-	
+
 	return true;
 }
 
@@ -8942,17 +8948,17 @@ NLMISC_COMMAND(leagueKick, "kick a player character from league", "<eid> <member
 
 	// Kick
 	user->setAfkState(false);
-	
+
 	CTeam * team = TeamManager.getTeam( user->getTeamId() );
 	if (!team)
 		return true;
-	
+
 	if (team->getLeader() != eId )
 		return true;
-	
+
 	if (user->getLeagueId() != invitedCharacter->getLeagueId())
 		return true;
-	
+
 	team = TeamManager.getTeam( invitedCharacter->getTeamId() );
 	if (!team) {
 		invitedCharacter->setLeagueId(DYN_CHAT_INVALID_CHAN);
@@ -8960,7 +8966,7 @@ NLMISC_COMMAND(leagueKick, "kick a player character from league", "<eid> <member
 		team->setLeagueId(DYN_CHAT_INVALID_CHAN);
 		team->updateLeague();
 	}
-	
+
 	return true;
 }
 
@@ -9054,7 +9060,7 @@ NLMISC_COMMAND(openTargetApp, "open target app", "<user_id>")
 
 //----------------------------------------------------------------------------
 // (ulukyn) Very special case to use with ARK.
-// !!! Never let user call openTargetUrl with a custom url or player 
+// !!! Never let user call openTargetUrl with a custom url or player
 //   will able to sign any url with server salt.
 // It's why the url are hardcoded here
 NLMISC_COMMAND(openTargetUrl, "Open target url", "<user_id> [bullying]")
@@ -9260,8 +9266,8 @@ NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <
 			string sheet = itemPtr->getSheetId().toString();
 			uint32 quality = itemPtr->quality();
 			uint32 stacksize = itemPtr->getStackSize();
-			
-			msg += NLMISC::toString("- Slot %3d: SHEETID: %s    QUALITY: %d   QUANTITY: %d\n", 
+
+			msg += NLMISC::toString("- Slot %3d: SHEETID: %s    QUALITY: %d   QUANTITY: %d\n",
 				i,
 				sheet.c_str(),
 				quality,
@@ -9269,7 +9275,7 @@ NLMISC_COMMAND(characterInventoryDump, "Dump character inventory info", "<eid> <
 
 			++j;
 			if ( ! (j % 3)) {
-				log.displayNL(msg.c_str());	
+				log.displayNL(msg.c_str());
 				msg = "";
 				j = 0;
 			}
@@ -9336,7 +9342,7 @@ NLMISC_COMMAND(deleteInventoryItem, "Delete an item from a characters inventory"
 			itemPtr->quality() == quality &&
 			itemPtr->getStackSize() >= quantity)
 		{
-			log.displayNL("Deleted item '%s' in slot %d of inventory '%s'", 
+			log.displayNL("Deleted item '%s' in slot %d of inventory '%s'",
 				itemPtr->getSheetId().toString().c_str(),
 				slot,
 				INVENTORIES::toString(inventory->getInventoryId()).c_str()
@@ -9450,7 +9456,7 @@ NLMISC_COMMAND (setLeague, "Set the League of the team", "<user id> [<name>]")
 			CCharacter::sendDynamicSystemMessage( c->getId(),"LEAGUE_INVITOR_NOT_LEADER" );
 		return true;
 	}
-	
+
 	if (team->getLeader() != c->getId())
 	{
 		CCharacter::sendDynamicSystemMessage( c->getId(),"LEAGUE_INVITOR_NOT_LEADER" );
@@ -9468,10 +9474,10 @@ NLMISC_COMMAND (setLeague, "Set the League of the team", "<user id> [<name>]")
 NLMISC_COMMAND(eventGiveControl, "Give control of entity A to entity B", "<eid> <master eid> <slave eid>")
 {
 	if (args.size() != 3) return false;
- 
+
 	CEntityId masterEid(args[1]);
 	CEntityId slaveEid(args[2]);
-	
+
 	nlinfo("%s takes control of %s", args[1].c_str(), args[2].c_str());
 
 	CMessage msgout("ACQUIRE_CONTROL");
@@ -9490,9 +9496,9 @@ NLMISC_COMMAND(eventGiveControl, "Give control of entity A to entity B", "<eid> 
 NLMISC_COMMAND(eventLeaveControl, "Leave control of entity", "<eid> <master eid>")
 {
 	if (args.size() != 2) return false;
- 
+
 	CEntityId masterEid(args[1]);
-	
+
 	nlinfo("%s leaves control", args[1].c_str());
 
 	CMessage msgout("LEAVE_CONTROL");
@@ -9517,7 +9523,7 @@ NLMISC_COMMAND(setSimplePhrase, "Set an IOS phrase", "<id> <phrase> [<language c
 	string msgname = "SET_PHRASE";
 	bool withLang = false;
 	string lang = "";
-	if (args.size() == 3) 
+	if (args.size() == 3)
 	{
 		lang = args[2];
 		if (lang != "all")
