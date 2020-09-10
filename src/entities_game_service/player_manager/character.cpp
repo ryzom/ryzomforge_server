@@ -14257,7 +14257,16 @@ bool CCharacter::autoFillExchangeView()
 		if (!exchangeEmpty)
 			break;
 
+		// build the list of need item by substracting the template step with the current step state
+		// TODO : verify that activeStep is correct.
 		validateSteps = missionTemplate->Steps[*itSet - 1]->getSubSteps();
+		const CActiveStepPD &activeStep = currentMission->getStepsBegin()->second;
+		for (uint i=0; i<validateSteps.size(); ++i)
+		{
+			const CActiveStepStatePD *activeStepState = activeStep.getStates(i+1);
+			if (activeStepState != NULL)
+				validateSteps[i].Quantity = activeStepState->getState();
+		}
 		// the exchange temp inventory thingy has only 8 slots, so very benign failures to put items into it
 		// are possible. Hence merely breaking (doing no further work) as opposed to aborting work done,
 		// and still returning "true". (exchangeWorked == false does not necessarily represent a failure of the whole
