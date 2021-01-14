@@ -101,7 +101,7 @@ public :
 	 *	Get the client infos
 	 * \param id is the client character id
 	 */
-	CChatClient& getClient( const TDataSetRow& id ); //throw (EChatClient);
+	CChatClient& getClient( const TDataSetRow& id );
 
 	/**
 	 * Return a reference on the static database
@@ -145,7 +145,7 @@ public :
 	 * \param gId is the group's id
 	 * \return the group
 	 */
-	CChatGroup& getGroup( const TGroupId& gId );// throw (EChatGroup);
+	CChatGroup& getGroup( const TGroupId& gId );
 
 	/**
 	 * Transmit a chat message
@@ -382,6 +382,7 @@ public:
 	/**
 	 * Send a far chat message
 	 */
+	void sendFarChat(const std::string &name, const ucstring& ucstr, const std::string &chan);
 	void sendFarChat( CChatGroup::TGroupType senderChatMode, const TDataSetRow &receiver, const ucstring& ucstr, const ucstring &senderName, TChanID chanID = NLMISC::CEntityId::Unknown);
 
 	/**
@@ -414,6 +415,8 @@ public:
 	void sendChatCustomEmote( const TDataSetRow &sender, const TDataSetRow &receiver, const ucstring& ucstr );
 
 	void update();
+
+	TChanID getChanId(const std::string name);
 };
 
 

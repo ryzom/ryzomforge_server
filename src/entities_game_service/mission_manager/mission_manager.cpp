@@ -721,7 +721,16 @@ void CMissionManager::instanciateChargeMission(TAIAlias  alias, TAIAlias giver, 
 	*/
 }
 
-void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAlias giver, std::list< CMissionEvent * > & eventList, TAIAlias mainMission)
+bool CMissionManager::isMissionSuccessfull(CCharacter* user,TAIAlias  alias)
+{
+	CMissionTemplate * templ = getTemplate( alias );
+	if ( !templ )
+		return false;
+
+	return user->isMissionSuccessfull(*templ);
+}
+
+uint8 CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAlias giver, std::list< CMissionEvent * > & eventList, TAIAlias mainMission)
 {
 	nlassert(user);
 
@@ -732,7 +741,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 	if ( !templ )
 	{
 		MISDBG("%s ERROR instanciateMission : invalid mission template can't get template from alias", sDebugPrefix.c_str());
-		return;
+		return 1;
 	}
 	sDebugPrefix += ",'" + templ->getMissionName() + "' instanciateMission :";
 	MISDBG("%s begin", sDebugPrefix.c_str());
@@ -740,7 +749,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 	if ( templ->testPrerequisits(user, true) != MISSION_DESC::PreReqSuccess )
 	{
 		MISDBG("%s test prerequisits fails", sDebugPrefix.c_str());
-		return;
+		return 2;
 	}
 
 	CMission* inst;
@@ -750,13 +759,13 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 		if ( !templ->Tags.NoList && user->getMissionsCount() >= MaxSoloMissionCount )
 		{
 			CCharacter::sendDynamicSystemMessage(user->getId(), "MISSION_MAX_SOLO_REACHED" );
-			return;
+			return 3;
 		}
 		CMissionSolo * soloMission = EGS_PD_CAST<CMissionSolo*>( EGSPD::CMissionSoloPD::create( templ->Alias ) );
 		if ( !soloMission )
 		{
 			MISDBG("%s could not create solo mission", sDebugPrefix.c_str());
-			return;
+			return 4;
 		}
 
 		soloMission->onCreation( giver );
@@ -803,14 +812,14 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 			if ( !templ->Tags.NoList && team->getMissions().size() >= MaxGroupMissionCount )
 			{
 				CCharacter::sendDynamicSystemMessage(user->getId(), "MISSION_MAX_GROUP_REACHED" );
-				return;
+				return 5;
 			}
 
 			CMissionTeam * teamMission = EGS_PD_CAST<CMissionTeam*>( EGSPD::CMissionTeamPD::create( templ->Alias ) );
 			if ( !teamMission )
 			{
 				MISDBG("%s could not create team mission", sDebugPrefix.c_str());
-				return;
+				return 6;
 			}
 			teamMission->onCreation( giver );
 			teamMission->setTeam( user->getTeamId() );
@@ -838,7 +847,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 		else
 		{
 			MISDBG("%s invalid team %d", sDebugPrefix.c_str(), user->getTeamId());
-			return;
+			return 7;
 		}
 	}
 	else if ( templ->Type  == MISSION_DESC::Guild )
@@ -848,7 +857,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 		if ( !user->getModuleParent().getModule( module ) )
 		{
 			MISDBG("%s user not in a guild", sDebugPrefix.c_str());
-			return;
+			return 8;
 		}
 		/* /// This is already checked in the prerequisites 
 		if (!module->pickMission( templ->Alias ))
@@ -861,19 +870,19 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 		if (!guild)
 		{
 			nlwarning( "<MISSIONS>cant find guild ID : %d", user->getGuildId() );
-			return;
+			return 9;
 		}
 		if ( !templ->Tags.NoList && guild->getMissions().size() >= MaxGuildMissionCount)
 		{
 			CCharacter::sendDynamicSystemMessage(user->getId(), "MISSION_MAX_GUILD_REACHED" );
-			return;
+			return 10;
 		}
 
 		CMissionGuild * guildMission = EGS_PD_CAST<CMissionGuild*>( EGSPD::CMissionGuildPD::create( templ->Alias ) );
 		if ( !guildMission )
 		{
 			MISDBG("%s could not create guild mission", sDebugPrefix.c_str());
-			return;
+			return 11;
 		}
 		guildMission->onCreation( giver );
 		guildMission->setGuild(user->getGuildId());
@@ -935,7 +944,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 	else
 	{
 		MISDBG("%s unimplemented mission type %u", sDebugPrefix.c_str(), templ->Type);
-		return;
+		return 12;
 	}
 	inst->setGiver( giver );
 	inst->setMainMissionTemplateId(mainMission);
@@ -943,6 +952,7 @@ void CMissionManager::instanciateMission(CCharacter* user,TAIAlias  alias, TAIAl
 	STL_ALLOC_TEST
 	initInstanciatedMission(inst, eventList);
 	MISDBG("%s end (ok)", sDebugPrefix.c_str());
+	return 0;
 }// CMissionManager::instanciateMission
 
 void CMissionManager::deInstanciateMission(CMission * mission)
@@ -1392,6 +1402,28 @@ void CMissionManager::removeAllUserDynChat(CCharacter * user)
 		user->processMissionEvent(event,aliases[i] );
 }
 
+void CMissionManager::processMissionsEventEndDynChat(CCharacter * user)
+{
+	// we first close all the concerned dyn chat interface on the client,then send EndDynchat event and finally remove the concerned entries from the map
+	// we have to do it in three passes because processMissionEvent can remove dyn chat entries. And we'd better avoid dereferencement on invalid iterators...
+	nlassert(user);
+	vector<TAIAlias> aliases;
+	// close all interfaces
+	CHashMultiMap<TDataSetRow,CDynChat,TDataSetRow::CHashCode>::iterator it = _DynChats.find( user->getEntityRowId() );
+	for (; it!= _DynChats.end() && (*it).first == user->getEntityRowId(); ++it )
+	{
+		aliases.push_back((*it).second.Mission->getTemplateId());
+	}
+
+	// For each concerned mission, send an end dyn chat event to the player, specifying the mission
+	// This must be after _DynChats.erase(user->getEntityRowId()), otherwise the event (e.g. jump
+	// back) can trigger a openDynChat() on the same bot that would lead to a reentrance bug.
+	CMissionEventEndDynChat event;
+	const uint eventCount = (uint)aliases.size();
+	for ( uint i = 0; i < eventCount; ++i )
+		user->processMissionEvent(event,aliases[i] );
+}
+
 void CMissionManager::removeMissionDynChat(CCharacter * user, CMission * instance)
 {
 	nlassert(user);
@@ -1482,6 +1514,7 @@ void CMissionManager::dynChatChoice( CCharacter * user, const TDataSetRow & botR
             uint i = 0;
             uint nbJumpPoints = (uint)templ->JumpPoints.size();
             bool updateJournal = false;
+            nlinfo("nbJumpPoints = %d", nbJumpPoints);
             for (; i < nbJumpPoints; i++ )
             {
                 if ( templ->JumpPoints[i].Name == jump )
@@ -1490,6 +1523,7 @@ void CMissionManager::dynChatChoice( CCharacter * user, const TDataSetRow & botR
                     closeDynChat( user, botRow );
 
 					std::list< CMissionEvent * > eventList;
+					nlinfo("Jump to %d", i);
                     inst->jump( templ->JumpPoints[i].Step,templ->JumpPoints[i].Action,eventList );
 
 					// Send to AIS (to stop the bot). Important: there must be the same number of items pushed in DynChatEnd that in DynChatStart for the bot to resume.

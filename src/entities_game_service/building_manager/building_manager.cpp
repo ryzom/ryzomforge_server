@@ -39,6 +39,7 @@
 #include "guild_manager/guild_manager.h"
 #include "guild_manager/guild.h"
 #include "guild_manager/guild_member_module.h"
+#include "world_instances.h"
 
 #include "egs_sheets/egs_sheets.h"
 
@@ -438,7 +439,7 @@ void CBuildingManager::addTriggerRequest( const TDataSetRow & rowId, sint32 trig
 	// Don't teleport when it's a custom trigger, send url instead
 	if (!url.empty())
 	{
-		user->sendUrl(url, "");
+		user->sendUrl(url);
 	}
 	else
 	{
@@ -630,16 +631,20 @@ void CBuildingManager::registerPlayer( CCharacter * user )
 }
 
 //----------------------------------------------------------------------------
-void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool needDeleteRoom )
+void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool send_url )
 {
 #ifdef NL_DEBUG
 	nlassert(user);
 #endif
 
+	
 	CMirrorPropValueRO<TYPE_CELL> mirrorCell( TheDataset, user->getEntityRowId(), DSPropertyCELL );
 	sint32 cell = mirrorCell;
 	if ( !isRoomCell(cell) )
 		return;
+
+	CVector buildingExitPos = user->getBuildingExitPos();
+
 	uint idx = getRoomIdxFromCell( cell );
 	if ( idx >= _RoomInstances.size() )
 	{
@@ -652,10 +657,51 @@ void CBuildingManager::removePlayerFromRoom( CCharacter * user, bool needDeleteR
 		return;
 	}
 	// remove a reference from the room
-	_RoomInstances[idx].Ptr->removeUser( user );
+	_RoomInstances[idx].Ptr->removeUser( user, send_url, _RoomInstances[idx].Persistant);
 
-	if (needDeleteRoom)
+	if (!_RoomInstances[idx].Persistant)
+	{
+		nlinfo("remove and delete room");
 		deleteRoom(cell);
+	}
+	else
+	{
+		nlinfo("remove NO delete room");
+	}
+
+	/*// Remove all pets from room
+
+	vector< CPetAnimal > &pets = user->getPlayerPets();
+
+	nlinfo("remove PETS");
+	for (uint16 i = 0; i < (uint16)pets.size(); ++i)
+	{
+		nlinfo("Checking pet %d", i);
+		
+		if (pets[i].PetStatus == CPetAnimal::landscape)
+		{
+			nlinfo("pet in landscape");
+
+			CContinent * cont = CZoneManager::getInstance().getContinent(pets[i].Landscape_X, pets[i].Landscape_Y);
+
+			if (!cont)
+				continue;
+	
+			CONTINENT::TContinent continent = (CONTINENT::TContinent)cont->getId();
+
+			if (continent == CONTINENT::R2_ROOTS ||
+				continent == CONTINENT::R2_FOREST ||
+				continent == CONTINENT::R2_DESERT ||
+				continent == CONTINENT::R2_LAKES ||
+				continent == CONTINENT::R2_JUNGLE ||
+				continent == CONTINENT::INDOORS
+				)
+			{
+				nlinfo("pet in a powo/indoor");
+				pets[i].IsFollowing = true;
+			}
+		}
+	}*/
 }
 
 //----------------------------------------------------------------------------
@@ -682,12 +728,13 @@ void CBuildingManager::deleteRoom(sint32 cell)
 		delete _RoomInstances[idx].Ptr;
 		_RoomInstances[idx].Ptr = NULL;
 		_RoomInstances[idx].NextFreeId = _FirstFreeRoomId;
+		_RoomInstances[idx].Persistant = false;
 		_FirstFreeRoomId = idx;
 	}
 }
 
 //----------------------------------------------------------------------------
-IRoomInstance *  CBuildingManager::allocateRoom( sint32 & cellRet, BUILDING_TYPES::TBuildingType type)
+IRoomInstance *  CBuildingManager::allocateRoom( sint32 & cellRet, BUILDING_TYPES::TBuildingType type, bool persistant)
 {
 	// update room vector
 	if ( _FirstFreeRoomId >= _RoomInstances.size() )
@@ -706,6 +753,8 @@ IRoomInstance *  CBuildingManager::allocateRoom( sint32 & cellRet, BUILDING_TYPE
 		nlwarning("<BUILDING>invalid room type %d",type);
 		return NULL;
 	}
+	
+	_RoomInstances[idx].Persistant = persistant;
 	return _RoomInstances[idx].Ptr;
 }
 
@@ -727,6 +776,7 @@ inline void  CBuildingManager::reallocRooms()
 			{
 				_RoomInstances[i].NextFreeId =i+1 ;
 				_RoomInstances[i].Ptr = NULL;
+				_RoomInstances[i].Persistant = false;
 				//allocate the cell in GPMS ( here cell values must be > 0 )
 				NLNET::CMessage msgout("CREATE_INDOOR_UNIT");
 				sint32 cellId = -getRoomCellFromIdx(i);
@@ -741,6 +791,7 @@ inline void  CBuildingManager::reallocRooms()
 		{
 			_RoomInstances[i].NextFreeId = i+1;
 			_RoomInstances[i].Ptr = NULL;
+			_RoomInstances[i].Persistant = false;
 		}
 	}
 
@@ -860,7 +911,7 @@ void CBuildingManager::triggerTeleport(CCharacter * user, uint16 index)
 		if ( cellId )
 		{
 			user->tpWanted(x,y,z,true,heading,0xFF,cellId);
-			if ( dest->isGuildRoomDestination() )
+			if ( dest->isGuildRoomDestination() || (user->getPowoCell() != 0 && user->getPowoFlag("guild_inv")))
 				PlayerManager.sendImpulseToClient(user->getId(), "GUILD:OPEN_INVENTORY");
 		}
 		else

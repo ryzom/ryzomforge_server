@@ -62,6 +62,7 @@
 #include "player_manager/gear_latency.h"
 #include "progression/progression_pvp.h"
 #include "shop_type/character_shopping_list.h"
+#include "shop_type/shop_type_manager.h"
 #include "team_manager/team_manager.h"
 #include "world_instances.h"
 #include "zone_manager.h"
@@ -922,6 +923,8 @@ void CCharacter::moveItem(
 				return;
 			}
 		}
+		// abort exchange to prevent fill of inv when pet is in exchange window
+		abortExchange();
 	}
 
 	/***  END OF GAME PLAY RULES  ***/
@@ -2470,6 +2473,7 @@ void CCharacter::sendItemInfos(uint16 slotId)
 		}
 		else if (inventory == INVENTORIES::guild)
 		{
+			/*
 			CMirrorPropValueRO<TYPE_CELL> mirrorValue(TheDataset, getEntityRowId(), DSPropertyCELL);
 			const sint32 cell = mirrorValue;
 
@@ -2489,10 +2493,19 @@ void CCharacter::sendItemInfos(uint16 slotId)
 			}
 
 			CGuild* guild = CGuildManager::getInstance()->getGuildFromId(room->getGuildId());
+			*/
+			if (_GuildId == 0)
+			{
+				nlwarning("<sendItemInfos> user %s not in guild !", _Id.toString().c_str());
+				return;
+			}
+
+			CGuild* guild = CGuildManager::getInstance()->getGuildFromId(_GuildId);
 
 			if (!guild)
 			{
-				nlwarning("<sendItemInfos> user %s cellId %d is not a guild room !", _Id.toString().c_str(), cell);
+				//nlwarning("<sendItemInfos> user %s cellId %d is not a guild room !", _Id.toString().c_str(), cell);
+				nlwarning("<sendItemInfos> user %s guild %d unknown !", _Id.toString().c_str(), toString(_GuildId).c_str());
 				return;
 			}
 
@@ -3225,13 +3238,54 @@ void CCharacter::useItem(uint32 slot)
 			// teleport dont work in the same way if the user is dead or alive
 			if (_IsDead)
 			{
+				const uint64 cost = CShopTypeManager::computeBasePrice(item, (uint16)1);
+				bool destroy = true;
+
 				PROGRESSIONPVP::CCharacterProgressionPVP::getInstance()->playerRespawn(this);
 				// apply respawn effects because user is dead
 				applyRespawnEffects();
 				// simply teleport the user
 				useTeleport(*form);
-				// destroy 1 tp ticket
-				_Inventory[INVENTORIES::bag]->removeItem(slot, 1);
+				// is auto pact on?
+				if (doPact() && getMoney() >= cost)
+				{
+					std::string faction = PVP_CLAN::toString(allegeance.first);
+					const uint32 factionIndex = CStaticFames::getInstance().getFactionIndex(faction.c_str());
+
+					if (factionIndex != CStaticFames::INVALID_FACTION_INDEX)
+					{
+						const sint32 fame = CFameInterface::getInstance().getFameIndexed(getId(), factionIndex);
+						if (fame >= 33*6000) // 198000
+						{
+							destroy = false;
+							if (fame < 60*6000 && item->getStaticForm()->TpEcosystem == 7) // 360000
+								destroy = true;
+
+							if (!destroy)
+							{
+								spendMoney(cost);
+								SM_STATIC_PARAMS_4(
+									params,
+									STRING_MANAGER::item,
+									STRING_MANAGER::integer,
+									STRING_MANAGER::integer,
+									STRING_MANAGER::integer
+								);
+								params[0].SheetId = item->getSheetId();
+								params[1].Int = 1; // qty
+								params[2].Int = cost;
+								params[3].Int = 0; // fp
+
+								sendDynamicSystemMessage(getEntityRowId(), "INVENTORY_BUY_ITEM", params);
+							}
+							else
+								sendDynamicSystemMessage(getEntityRowId(), "ALTAR_RESTRICTION");
+						}
+					}
+				}
+				// destroy tp ticket
+				if (destroy)
+					_Inventory[INVENTORIES::bag]->removeItem(slot, 1);
 			}
 			else
 			{

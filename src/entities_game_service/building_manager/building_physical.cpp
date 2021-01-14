@@ -75,7 +75,7 @@ bool IBuildingPhysical::build( const NLLIGO::IPrimitive* prim, CBuildingParseDat
 }
 
 //----------------------------------------------------------------------------
-bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerIdx, sint32 & cellId)
+bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerIdx, sint32 & cellId, bool persistant, bool send_url)
 {
 	/// simply get the cell matching the parameters
 	if ( roomIdx >= _Rooms.size() )
@@ -103,31 +103,45 @@ bool IBuildingPhysical::addUser(CCharacter * user, uint16 roomIdx, uint16 ownerI
 	else
 		owner = user->getId();
 
+	nlinfo("<BUILDING>owner are %s", owner.toString().c_str());
 
 	IRoomInstance * roomInstance;
 	
-	if (_Rooms[roomIdx].Cells[ownerIdx] != 0)
+	if (_Rooms[roomIdx].Cells[ownerIdx] != 0) {
 		roomInstance = CBuildingManager::getInstance()->getRoomInstanceFromCell(_Rooms[roomIdx].Cells[ownerIdx]);
+		nlinfo("ok");
+	}
 
 	// if the room is not already instanciated, we have to do it
 	if ( _Rooms[roomIdx].Cells[ownerIdx] == 0 || roomInstance == NULL)
 	{
-		// create a new room of the appropriate type
-		roomInstance =  CBuildingManager::getInstance()->allocateRoom(_Rooms[roomIdx].Cells[ownerIdx],_Template->Type);
+		if (persistant)
+			nlinfo("create persistant");
+		else
+			nlinfo("create temp");
+		// create a new room of the appropriate type,
+		roomInstance =  CBuildingManager::getInstance()->allocateRoom(_Rooms[roomIdx].Cells[ownerIdx],_Template->Type, persistant);
 		if ( roomIdx >= _Template->Rooms.size() )
 		{
 			nlwarning("<BUILDING>Invalid room idx %u count is %u. Mismatch between template and instance?",ownerIdx,_Template->Rooms.size());
 			return false;
 		}
+
+		nlinfo("created room : %i", _Rooms[roomIdx].Cells[ownerIdx]);
 		// init the room
-		if( !roomInstance->create(this,roomIdx,ownerIdx, _Rooms[roomIdx].Cells[ownerIdx]) )
+		if( !roomInstance->create(this,roomIdx,ownerIdx, _Rooms[roomIdx].Cells[ownerIdx]) ) {
+			nlinfo("error...");
 			return false;
+		}
 	}
-	
-	roomInstance->addUser(user, owner);
+
+	nlinfo("add user");
+	roomInstance->addUser(user, owner, send_url);
 
 	user->setBuildingExitZone( _DefaultExitSpawn );
 	_UsersInside.push_back( user->getEntityRowId() );
+	nlinfo("Cell are from roomIdx/ownerIdx = %d/%d", roomIdx, ownerIdx);
+
 	cellId = _Rooms[roomIdx].Cells[ownerIdx];
 
 	return true;

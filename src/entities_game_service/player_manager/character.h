@@ -35,6 +35,8 @@
 #include "server_share/pet_interface_msg.h"
 #include "server_share/r2_vision.h"
 
+#include "outpost_manager/outpost_manager.h"
+
 // Misc
 #include "nel/misc/string_conversion.h"
 
@@ -307,7 +309,7 @@ struct CPetAnimal
 
 	DECLARE_PERSISTENCE_METHODS
 
-	enum TStatus { db_unknown = -1, not_present = 0, waiting_spawn, landscape, stable, death, tp_continent };
+	enum TStatus { db_unknown = -1, not_present = 0, waiting_spawn, landscape, stable, death, tp_continent, in_bag };
 
 	TStatus PetStatus;
 	NLMISC::CSheetId TicketPetSheetId;
@@ -330,8 +332,10 @@ struct CPetAnimal
 	bool IsFollowing;
 	bool IsMounted;
 	bool IsTpAllowed;
+	bool IsInBag;
 	bool spawnFlag;
 	ucstring CustomName;
+	sint32 Cell;
 
 	// ctor
 	CPetAnimal();
@@ -348,6 +352,11 @@ struct CPetAnimal
 	void setCustomName(const ucstring &customName)
 	{
 		CustomName = customName;
+	}
+
+	ucstring getCustomName()
+	{
+		return CustomName;
 	}
 
 	void setSheetId(NLMISC::CSheetId sheetId)
@@ -699,6 +708,12 @@ public:
 	bool getEnterFlag() const;
 
 	/**
+	 * Get the online status
+	 * \return true if the player are in the game, false if he left
+	 */
+	bool getOnLineStatus() const;
+
+	/**
 	 * wrapper to CEntityBase
 	 */
 	//	CEntityState& getState();
@@ -938,7 +953,7 @@ public:
 	 * \param XpGain is the amount of xp added to a skill / speciality
 	 * \param Skill is the name of used skill for action (or associated skill ofr specialized action used)
 	 */
-	void addXpToSkill(double XpGain, const std::string &Skill);
+	void addXpToSkill(double XpGain, const std::string &Skill, bool silent = false);
 
 	/**
 	 * addXpToSkillAndBuffer add xpGain to a skill. Do not send messages to clients, but buffer the messages
@@ -969,7 +984,7 @@ public:
 	void setTimeOfDeath(NLMISC::TGameTime t);
 
 	// character buy a creature
-	bool addCharacterAnimal(const NLMISC::CSheetId &PetTicket, uint32 Price, CGameItemPtr ptr);
+	bool addCharacterAnimal(const NLMISC::CSheetId &PetTicket, uint32 Price, CGameItemPtr ptr, uint8 size = 100, const ucstring &customName = ucstring(""));
 
 	// return free slot for pet spawn or -1 if there are no free slot
 	sint32 getFreePetSlot(uint8 startSlot = 0);
@@ -978,7 +993,10 @@ public:
 	sint32 getMountOrFirstPetSlot();
 
 	// return a list of pets in text format (M=Mount, P=Packer, A=Animal, 0=None)
-	std::string getPets(); 
+	std::string getPets();
+
+	// return a list of pets informations (Sheet, Size, State, Position, Volume, Weight)
+	std::string getPetsInfos();
 
 	// return true if can add 'delta' pets to current player pets
 	bool checkAnimalCount(const NLMISC::CSheetId &PetTicket, bool sendMessage, sint32 delta);
@@ -1063,7 +1081,7 @@ public:
 	void removeAnimal(CGameItemPtr item, CPetCommandMsg::TCommand command);
 
 	// remove pet from player corresponding to index and despawn it
-	void removeAnimalIndex(uint32 beastIndex, CPetCommandMsg::TCommand command);
+	void removeAnimalIndex(uint32 beastIndex, CPetCommandMsg::TCommand command, bool keepInventory=false);
 
 	// update coordinate for spawned pets
 	void updatePetCoordinateAndDatabase();
@@ -1072,7 +1090,7 @@ public:
 	void updateAnimalDespawnDb(uint petIndex);
 
 	// remove Pet Character after his death
-	void removePetCharacterAfterDeath(uint32 index);
+	void removePetCharacterAfterDeath(uint32 index, bool keepInventory = false);
 
 	// Update database for spawned pets
 	void updatePetDatabase();
@@ -1094,6 +1112,7 @@ public:
 
 	// Set the name of the animal
 	void setAnimalName(uint8 petIndex, ucstring customName);
+	void setAnimalTitle(uint8 petIndex, std::string title);
 
 	void sendPetCustomNameToClient(uint8 petIndex);
 
@@ -1167,7 +1186,7 @@ public:
 
 	/// end the bot chat. newBotChat must be set to true if the chat is canceled because of another bot chat.
 	/// closeDynChat must be true to close the current dynChat
-	void endBotChat(bool newBotChat = false, bool closeDynChat = false);
+	void endBotChat(bool newBotChat = false, bool closeDynChat = false, bool processMissions = false);
 
 	/// return the current bot chat type
 	uint8 getBotChatType() const;
@@ -1417,6 +1436,7 @@ public:
 
 	/// check weither or not a mission has been successfully played
 	bool isMissionSuccessfull(const CMissionTemplate &templ);
+	void resetMissionSuccessfull(TAIAlias alias);
 
 	/// check the last date of trying for a mission (0 if never tryied)
 	NLMISC::TGameCycle getMissionLastSuccess(const CMissionTemplate &templ);
@@ -1598,6 +1618,10 @@ public:
 	/// Register character name in IOS
 	void registerName(const ucstring &newName = std::string(""));
 
+	std::string getTargetInfos();
+	std::string getPositionInfos();
+	std::string getEquipementInfos(INVENTORIES::TInventory invId);
+
 	/// Mount a mount
 	void mount(TDataSetRow PetRowId);
 
@@ -1642,7 +1666,7 @@ public:
 	void setCurrentStable(uint16 stable, uint16 placeId);
 
 	// apply goo damage if character is too close than a goo path
-	void applyGooDamage(float gooDistance);
+	void applyGooDamage(float gooDistance, std::string zoneDamage);
 
 	/// get the valid state of melee combat
 	bool meleeCombatIsValid() const;
@@ -1777,7 +1801,7 @@ public:
 	void sendDynamicMessage(const std::string &phrase, const std::string &message);
 
 	/// send custom url
-	void sendUrl(const std::string &url, const std::string &salt);
+	void sendUrl(const std::string &url);
 
 	/// set custom mission param
 	void setCustomMissionParams(const std::string &missionName, const std::string &params);
@@ -2075,7 +2099,11 @@ public:
 	const NLMISC::CEntityId &getInRoomOfPlayer();
 
 	void setPowoCell(sint32 cell);
-	sint32 getPowoCell();
+	sint32 getPowoCell() const;
+
+	void setPowoScope(const std::string &scope);
+	const std::string &getPowoScope() const;
+
 
 	/// get if player have acces to room
 	bool playerHaveRoomAccess(const NLMISC::CEntityId &id);
@@ -2243,8 +2271,13 @@ public:
 	const TDataSetRow &getMonitoringCSR();
 	void setMonitoringCSR(const TDataSetRow &csr);
 
+	/// accessors to the stopped npc
+	const TDataSetRow &getStoppedNpc();
+	void setStoppedNpc(const TDataSetRow &npc);
+	void setStoppedNpcTick();
+
 	/// get death penalties
-	const CDeathPenalties &getDeathPenalties() const;
+	CDeathPenalties &getDeathPenalties();
 
 	float nextDeathPenaltyFactor() const;
 	void resetNextDeathPenaltyFactor();
@@ -2326,6 +2359,13 @@ public:
 	/// reset used TP ticket slot, necessary to allow user to use another ticket
 	void resetTpTicketSlot();
 
+
+	/// set building exit pos
+	void setBuildingExitPos(sint32 x, sint32 y, sint32 cell);
+
+	/// get building exit pos
+	NLMISC::CVector getBuildingExitPos() const;
+
 	/// set building exit zone
 	void setBuildingExitZone(uint16 zoneIdx);
 
@@ -2336,11 +2376,11 @@ public:
 	void checkSkillTreeForLockedSkill();
 
 	// set the character hair. return true on success
-	bool setHair(uint32 hairValue);
+	bool setHair(uint32 hairValue, bool isWig = false, bool sendMessage = true);
 	// set the character tatoo return true on success
-	bool setTatoo(uint32 tatooValue);
+	bool setTatoo(uint32 tatooValue, bool sendMessage = true);
 	// set the hair color of the user return true on success
-	bool setHairColor(uint32 colorValue);
+	bool setHairColor(uint32 colorValue, bool sendMessage = true);
 
 	typedef std::vector<TBrickParam::IIdPtr> CBrickPropertyValues;
 	typedef std::map<TBrickParam::TValueType, CBrickPropertyValues> CBrickProperties;
@@ -2356,7 +2396,7 @@ public:
 	void setSpawnPetFlag(uint32 index);
 
 	uint8 getHairColor() const;
-	
+
 	uint8 getHair() const;
 
 	// return if hair cute price discount apply
@@ -2393,6 +2433,9 @@ public:
 
 	/// update parry skill and level
 	void updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills skill);
+
+	// Jewel enchants used for Tags
+	void updateJewelsTags(bool remove, bool update=true);
 
 	// Jewel equipment or skill or region are changed, recompute protection and resistances
 	void updateMagicProtectionAndResistance();
@@ -2453,6 +2496,9 @@ public:
 	/// get the current outpost zone where the player is
 	/// returns an invalid alias if the player is not in a outpost zone
 	TAIAlias getCurrentOutpostZone() const;
+	/// returns the state of the outpost where player are
+	OUTPOSTENUMS::TOutpostState getCurrentOutpostState() const;
+
 	/// player enters in a PVP zone, send appropriate client message
 	void enterPVPZone(uint32 pvpZoneType) const;
 	/// character enter in versus pvp zone, player must choose a clan
@@ -2551,6 +2597,9 @@ public:
 
 	std::string getFullTitle() const;
 
+	bool checkRequiredFaction(std::string faction) const;
+	bool checkRequiredFame(std::string faction, sint32 fame) const;
+
 	std::string getTagA() const;
 	void setTagA(const std::string &tag);
 
@@ -2563,6 +2612,11 @@ public:
 	std::string getTagPvPB() const;
 	void setTagPvPB(const std::string &tag);
 
+	std::string getDontTranslate() const;
+	void setDontTranslate(const std::string &langs);
+
+	CSBrickParamJewelAttrs *getJewelAttrs(const std::string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot);
+
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
 	uint32 getLastTpTick() const;
@@ -2571,7 +2625,9 @@ public:
 	uint32 getLastMountTick() const;
 	uint32 getLastFreeMount() const;
 	uint32 getLastExchangeMount() const;
-	
+	bool getRespawnMainLandInTown() const;
+	void setRespawnMainLandInTown(bool status);
+
 	const std::list<TCharacterLogTime> &getLastLogStats() const;
 	void updateConnexionStat();
 	void setDisconnexionTime();
@@ -3107,6 +3163,8 @@ private:
 	bool addCatalyserXpBonus(uint32 &slot, SSkill* skill, double xpGain, double &xpBonus, uint32 &stackSizeToRemove,
 							 uint32 &catalyserLvl, uint32 &catalyserCount);
 
+	// add guild points to player who will add xp to guild
+	void addGuildPoints(uint32 points);
 	/**
 	 * addXpToSkillInternal add xpGain to a skill
 	 * \param XpGain is the amount of xp added to a skill / speciality
@@ -3119,7 +3177,7 @@ private:
 	 *	may even be bigger than the original XpGain!
 	 */
 	double addXpToSkillInternal(double XpGain, const std::string &ContSkill, TAddXpToSkillMode addXpMode,
-								std::map<SKILLS::ESkills, CXpProgressInfos> &gainBySkill);
+								std::map<SKILLS::ESkills, CXpProgressInfos> &gainBySkill, bool silent=false);
 
 	/// Initialize the specified pet inventory, if it is valid
 	bool initPetInventory(uint8 index);
@@ -3203,6 +3261,10 @@ public:
 		return (uint8)_FriendVisibility;
 	}
 
+	inline void doPact(bool value) { _doPact = value; }
+	inline bool doPact() { return _doPact; }
+
+
 	//////////////////
 	// Private members
 	//////////////////
@@ -3271,6 +3333,9 @@ private:
 	std::string _TagA;
 	std::string _TagB;
 
+	std::string _DontTranslate;
+
+
 	/// SDB path where player wins HoF points in PvP (if not empty)
 	std::string _SDBPvPPath;
 
@@ -3304,6 +3369,7 @@ private:
 
 	NLMISC::TGameCycle _LastTickSaved;
 	NLMISC::TGameCycle _LastTickCompassUpdated;
+	NLMISC::TGameCycle _LastTickNpcStopped;
 
 	/// permanent score modifiers (given by bricks)
 	sint32 _ScorePermanentModifiers[SCORES::NUM_SCORES];
@@ -3535,6 +3601,8 @@ private:
 
 	std::vector<SCheckPosCoordinate> _CheckPos;
 
+	bool _AreOnline;
+
 	// for a power/combat event, stores start and end ticks
 	struct CFlagTickRange
 	{
@@ -3599,6 +3667,7 @@ private:
 	std::vector<NLMISC::CEntityId> _RoomersList; // Players who have acces to player's room
 	NLMISC::CEntityId _inRoomOfPlayer;
 	sint32 _PowoCell;
+	std::string _PowoScope;
 
 	// friends list
 	std::vector<CContactId> _FriendsList;
@@ -3654,6 +3723,8 @@ private:
 
 	/// number of creatures attacking the player
 	uint8 _AggroCount;
+
+	TDataSetRow _StoppedNpc;
 
 	/// guild id of the player
 	uint32 _GuildId;
@@ -3717,6 +3788,7 @@ private:
 	uint32 _MaxPriceFilter;
 
 	uint16 _BuildingExitZone;
+	NLMISC::CVector _BuildingExitPos;
 
 	// used for force respawn player who are in a mainland in town of this mainland
 	bool _RespawnMainLandInTown;
@@ -3738,6 +3810,9 @@ private:
 
 	/// to know if item pre-requisits have to be recomputed (as after a skill/charac update)
 	bool _HaveToUpdateItemsPrerequisit;
+
+	/// to refill used pact automatically after a teleportation
+	bool _doPact;
 
 	///\name PVP related members
 	//@{
@@ -3776,6 +3851,8 @@ private:
 	TAIAlias _CurrentPVPZone;
 	/// the outpost zone where the player is
 	TAIAlias _CurrentOutpostZone;
+	/// state of current outpost
+	OUTPOSTENUMS::TOutpostState _CurrentOutpostState;
 	/// region where player character are killed in PvP situation
 	uint16 _RegionKilledInPvp;
 	//@}
@@ -4004,6 +4081,9 @@ private:
 	/// General god flag for persistence
 	bool _GodModeSave;
 
+	bool _UseWig;
+
+
 	/// General flags for powos
 	bool _PowoCanXP;
 	bool _PowoCantDead;
@@ -4011,13 +4091,16 @@ private:
 	bool _PowoCanSpeedUp;
 	bool _PowoCanDP;
 
+	bool _PowoCanAccesRoomInv;
+	bool _PowoCanAccessGuildInv;
+
 	uint32 _LastTpTick;
 	uint32 _LastOverSpeedTick;
 	uint32 _LastMountTick;
 	uint32 _LastUnMountTick;
 	uint32 _LastFreeMount;
 	uint32 _LastExchangeMount;
-	
+
 public:
 	void setWebCommandIndex(uint32 index)
 	{
@@ -4037,13 +4120,9 @@ public:
 		return _ValideWebCommandIndex.find(index) != _ValideWebCommandIndex.end();
 	}
 
-	void setUrlIndex(uint32 index)
+	uint32 getUrlIndex()
 	{
-		_LastUrlIndex = index;
-	}
-	uint32 getUrlIndex() const
-	{
-		return _LastUrlIndex;
+		return _LastUrlIndex++;
 	}
 
 	bool getInvisibility() const
@@ -4084,6 +4163,12 @@ public:
 		if (flag == "dp")
 			return _PowoCanDP;
 
+		if (flag == "guild_inv")
+			return _PowoCanAccessGuildInv;
+
+		if (flag == "room_inv")
+			return _PowoCanAccesRoomInv;
+
 		return false;
 	}
 
@@ -4092,17 +4177,23 @@ public:
 		if (flag == "xp")
 			_PowoCanXP = value;
 
-		if (flag == "dead")
+		else if (flag == "dead")
 			_PowoCantDead = value;
 
-		if (flag == "teleport")
+		else if (flag == "teleport")
 			_PowoCanTeleport = value;
 
-		if (flag == "speed")
+		else if (flag == "speed")
 			_PowoCanSpeedUp = value;
 
-		if (flag == "dp")
+		else if (flag == "dp")
 			_PowoCanDP = value;
+
+		else if (flag == "guild_inv")
+			_PowoCanAccessGuildInv = value;
+
+		else if (flag == "room_inv")
+			_PowoCanAccesRoomInv = value;
 
 		return true;
 	}
@@ -4130,6 +4221,17 @@ public:
 	void setGodModeSave(bool godMode)
 	{
 		_GodModeSave = godMode;
+	}
+
+
+	bool getUseWig() const
+	{
+		return _UseWig;
+	}
+
+	void setUseWig(bool use)
+	{
+		_UseWig = use;
 	}
 
 	/// Test the character against mission prerequisits for the specified list of mission giver NPCs

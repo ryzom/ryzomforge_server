@@ -117,6 +117,8 @@ void CTempInventory::clearDisp(uint32 slot)
 	tempEntry.setQUALITY(_Char->_PropertyDatabase, 0);
 //	_Char->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			0);
 	tempEntry.setQUANTITY(_Char->_PropertyDatabase, 0);
+	tempEntry.setSERIAL(_Char->_PropertyDatabase, 0);
+	tempEntry.setCREATE_TIME(_Char->_PropertyDatabase, 0);
 //	_Char->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",			0);
 	tempEntry.setUSER_COLOR(_Char->_PropertyDatabase, 0);
 //	_Char->_PropertyDatabase.setProp(sDBPath+":WEIGHT",				0);
@@ -259,6 +261,7 @@ void CTempInvView::updateClientSlot(uint32 clientSlot, const CGameItemPtr item)
 
 	if (item != NULL)
 	{
+		const INVENTORIES::TItemId &itemId = item->getItemId();
 		RM_FABER_STAT_TYPE::TRMStatType itemBestStat = RM_FABER_STAT_TYPE::Unknown;
 		
 		if (item->getCraftParameters() != NULL)
@@ -270,6 +273,8 @@ void CTempInvView::updateClientSlot(uint32 clientSlot, const CGameItemPtr item)
 		tempItem.setQUALITY(getCharacter()->_PropertyDatabase, item->quality());
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			item->getStackSize());
 		tempItem.setQUANTITY(getCharacter()->_PropertyDatabase, uint16(item->getStackSize()));
+		tempItem.setSERIAL(getCharacter()->_PropertyDatabase, uint32(itemId.getSerialNumber()));
+		tempItem.setCREATE_TIME(getCharacter()->_PropertyDatabase, uint32(itemId.getCreateTime()));
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",		item->color());
 		tempItem.setUSER_COLOR(getCharacter()->_PropertyDatabase, item->color());
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":WEIGHT",			item->weight() / 10);
@@ -294,6 +299,8 @@ void CTempInvView::updateClientSlot(uint32 clientSlot, const CGameItemPtr item)
 		tempItem.setQUALITY(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			0);
 		tempItem.setQUANTITY(getCharacter()->_PropertyDatabase, 0);
+		tempItem.setSERIAL(getCharacter()->_PropertyDatabase, 0);
+		tempItem.setCREATE_TIME(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",		0);
 		tempItem.setUSER_COLOR(getCharacter()->_PropertyDatabase, 0);
 //		getCharacter()->_PropertyDatabase.setProp(sDBPath+":WEIGHT",			0);

@@ -25,6 +25,8 @@ using namespace NLMISC;
 using namespace NLNET;
 
 CVariable<string> MongoPassword("mongo", "MongoPassword", "Set the password to access mongo", string(""), 0, true);
+CVariable<string> ChatDbName("mongo", "ChatDbName", "Set the mongo db", string(""), 0, true);
+CVariable<string> ChatServer("mongo", "ChatServer", "Set the server host", string(""), 0, true);
 
 DBClientConnection CMongo::conn(true);
 string CMongo::dbname;
@@ -32,27 +34,22 @@ string CMongo::dbname;
 
 void CMongo::init()
 {
-	if (IService::getInstance()->getShardId() == 301)
-	{
-		dbname = "megacorp_dev";
-	}
-	else
-	{
-		dbname = "megacorp_live";
-	}
-
+	dbname = ChatDbName.get();
+	
 	try
 	{
 		bool res;
 		string errmsg;
 
-		res = conn.connect("chat.ryzom.com:22110", errmsg);
-		if(!res) nlerror("mongo: init failed, cannot connect '%s'", errmsg.c_str());
-		else nlinfo("mongo: connection ok");
+		res = conn.connect(ChatServer.get(), errmsg);
+		if (!res)
+			nlerror("mongo: init failed, cannot connect '%s'", errmsg.c_str());
+		else
+			nlinfo("mongo: connection ok");
 
-		res = conn.auth(dbname, "megacorp", MongoPassword.get(), errmsg);
+		/*res = conn.auth(dbname, "megacorp", MongoPassword.get(), errmsg);
 		if(!res) nlerror("mongo: init failed, cannot auth '%s'", errmsg.c_str());
-		else nlinfo("mongo: auth ok");
+		else nlinfo("mongo: auth ok");*/
 	}
 	catch(const DBException& e)
 	{
