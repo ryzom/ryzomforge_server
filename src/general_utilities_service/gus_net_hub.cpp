@@ -136,7 +136,7 @@ namespace GUSNET
 
 	bool CHubModule::initialiseModule(const NLMISC::CSString& rawArgs)
 	{
-		static NLNET::TCallbackItem cbArray[] = 
+		static NLNET::TCallbackItem cbArray[] =
 		{
 			{	REGISTER_MODULE_TO_HUB,		cbRegisterModuleToHub,	},
 			{	UNREGISTER_MODULE_TO_HUB,	cbUnregisterModuleToHub,	},
@@ -229,11 +229,11 @@ namespace GUSNET
 //		InfoLog->displayNL("");
 //		InfoLog->displayNL("ReceiveQueueStat");
 //		_CbServer->displayReceiveQueueStat();
-  
+
 //		InfoLog->displayNL("");
 //		InfoLog->displayNL("SendQueueStat");
 //		_CbServer->displaySendQueueStat();
-		
+
 //		InfoLog->displayNL("");
 //		InfoLog->displayNL("ThreadStat");
 //		_CbServer->displayThreadStat();
@@ -243,7 +243,7 @@ namespace GUSNET
 	{
 		// make sure the module isn't already registered
 		for (TRemoteModules::iterator it=_RemoteModules.begin();it!=_RemoteModules.end();++it)
-			BOMB_IF((*it).second==module,"Attempt to add the same module to a hub more than once",return)
+			BOMB_IF((*it).second==module,"Attempt to add the same module to a hub more than once",return);
 
 		// add the module to the _RemoteModules map
 		_RemoteModules[module->getUniqueId()]=module;
