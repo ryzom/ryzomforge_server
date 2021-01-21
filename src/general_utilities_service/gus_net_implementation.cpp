@@ -64,7 +64,7 @@ namespace GUSNET
 	{
 		// make sure the hub wasn't already registered
 		for (uint32 i=0;i<_Hubs.size();++i)
-			BOMB_IF(_Hubs[i]==hub,"Attempt to add the same hub to the CGusNetImplementation singleton more than once",return)
+			BOMB_IF(_Hubs[i]==hub,"Attempt to add the same hub to the CGusNetImplementation singleton more than once",return);
 
 		// add the new hub
 		nldebug("GUSNET: Registering new hub: %d",hub->getPort());
@@ -75,7 +75,7 @@ namespace GUSNET
 	{
 		// make sure the connection wasn't already registered
 		for (uint32 i=0;i<_Connections.size();++i)
-			BOMB_IF(_Connections[i]==connection,"Attempt to add the same connection to the CGusNetImplementation singleton more than once",return)
+			BOMB_IF(_Connections[i]==connection,"Attempt to add the same connection to the CGusNetImplementation singleton more than once",return);
 
 		// add the new connection
 		nldebug("GUSNET: Registering new connection: %s",connection->getConnectionAddress().c_str());
