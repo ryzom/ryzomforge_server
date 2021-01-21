@@ -721,7 +721,7 @@ void CBot::triggerSetSheet(AISHEETS::ICreatureCPtr const& sheet)
 		return;
 	}
 	
-	NLMISC::CSheetId sheetId= (BotRepopFx.get().empty()? NLMISC::CSheetId::Unknown: NLMISC::CSheetId(BotRepopFx));
+	NLMISC::CSheetId sheetId= (BotRepopFx.get().empty()? NLMISC::CSheetId::Unknown: NLMISC::CSheetId(BotRepopFx.get()));
 	if (getSpawnObj() && sheetId!=NLMISC::CSheetId::Unknown)
 	{
 		_SetSheetData = new CSetSheetData();
