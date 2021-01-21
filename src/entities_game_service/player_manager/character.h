@@ -354,6 +354,11 @@ struct CPetAnimal
 		CustomName = customName;
 	}
 
+	ucstring getCustomName()
+	{
+		return CustomName;
+	}
+
 	void setSheetId(NLMISC::CSheetId sheetId)
 	{
 		PetSheetId = sheetId;
@@ -1107,6 +1112,7 @@ public:
 
 	// Set the name of the animal
 	void setAnimalName(uint8 petIndex, ucstring customName);
+	void setAnimalTitle(uint8 petIndex, std::string title);
 
 	void sendPetCustomNameToClient(uint8 petIndex);
 
