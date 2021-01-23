@@ -1023,6 +1023,28 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 	return true;
 }
 
+
+
+string getJewelEnchantAttr(CSheetId sbrick)
+{
+	const CStaticBrick * brick = CSheets::getSBrickForm(sbrick);
+	if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
+	{
+		if (brick->Params.size() > 0)
+		{
+			const TBrickParam::IId* param = brick->Params[0];
+			CSBrickParamJewelAttrs *sbrickParam = (CSBrickParamJewelAttrs*)param;
+			if (param->id() == TBrickParam::JEWEL_ATTRS)
+				return sbrickParam->Attribute;
+		}
+	}
+	return "";
+}
+
+
+//enchantEquipedItem 530162 WristR jmod_focus_tryker_1.sbrick
+//enchantEquipedItem 530162 Neck tag_fyros_3.sbrick
+//enchantEquipedItem 530162 Neck jrez_fulllife_tryker.sbrick
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(enchantEquipedItem, "enchantEquipedItem", "<uid> <slotname> <sheet1>,[<sheet2> ...] [<maxSpaLoad>]")
 {
@@ -1036,20 +1058,31 @@ NLMISC_COMMAND(enchantEquipedItem, "enchantEquipedItem", "<uid> <slotname> <shee
 
 	string selected_slot = args[1];
 
+	bool isTag = false;
+
 	std::vector<CSheetId> sheets;
 	if (args[2] != "*")
 	{
 		std::vector<string> sheet_names;
 		NLMISC::splitString(args[2], ",", sheet_names);
 		for (uint32 i=0; i<sheet_names.size(); i++)
-			sheets.push_back(CSheetId(sheet_names[i]));
+		{
+			CSheetId sheet = CSheetId(sheet_names[i]);
+			if (getJewelEnchantAttr(sheet) == "tag")
+				isTag = true;
+			sheets.push_back(sheet);
+		}
 	}
 
 	CGameItemPtr itemPtr = c->getItem(INVENTORIES::equipment, SLOT_EQUIPMENT::stringToSlotEquipment(selected_slot));
 	if (itemPtr != NULL)
 	{
+		if (isTag)
+			itemPtr->getJewelNonTagsEnchantments(sheets);
+		else
+			itemPtr->getJewelTagsEnchantments(sheets);
+
 		itemPtr->applyEnchantment(sheets);
-		c->updateJewelsTags(false);
 
 		if (args.size() > 3)
 		{
@@ -1305,9 +1338,9 @@ NLMISC_COMMAND(getFame, "get/set fame of player", "<uid> <faction> [<value>] [<e
 
 	if (args.size() < 4 || args[3] == "1")
 	{
-		CFameManager::getInstance().enforceFameCaps(c->getId(), c->getAllegiance());
+		CFameManager::getInstance().enforceFameCaps(c->getId(), c->getOrganization(), c->getAllegiance());
 		// set tribe fame threshold and clamp fame if necessary
-		CFameManager::getInstance().setAndEnforceTribeFameCap(c->getId(), c->getAllegiance());
+		CFameManager::getInstance().setAndEnforceTribeFameCap(c->getId(), c->getOrganization(), c->getAllegiance());
 		fame = CFameInterface::getInstance().getFameIndexed(c->getId(), factionIndex);
 	}
 
