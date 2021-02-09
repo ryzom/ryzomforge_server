@@ -3327,10 +3327,6 @@ void CCharacter::useItem(uint32 slot)
 						fx.Aura = MAGICFX::NoAura;
 					}
 				}
-				else if (getOrganization() == 5 && CFameInterface::getInstance().getFameIndexed(_Id, PVP_CLAN::getFactionIndex(PVP_CLAN::Marauder))>= 100*kFameMultipler)
-				{
-					fx.Aura = MAGICFX::TeleportMarauder;
-				}
 				else
 				{
 					fx.Aura = MAGICFX::NoAura;
