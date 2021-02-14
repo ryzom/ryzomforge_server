@@ -88,7 +88,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 						return false;
 					}
 					missionData.ChatParams.push_back( make_pair(args[0],STRING_MANAGER::creature_model) );
-				
+
 					subStep.Dynamic = "";
 					subStep.Sheet = CSheetId( args[0] + ".creature");
 					if ( subStep.Sheet == CSheetId::Unknown )
@@ -137,7 +137,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			{
 				vector<string> params = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic);
 				status = _User->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic+"_STATUS");
-				
+
 
 				if (params.size() < 2)
 				{
@@ -172,7 +172,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				}
 				////
 			}
-			
+
 			if ( !c )
 			{
 				LOGMISSIONSTEPERROR("kill_fauna : invalid creature " + toString(event.TargetEntity.getIndex()));
@@ -180,7 +180,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 			}
 			else if ( faunaSheet == c->getType() )
 			{
-				
+
 				if ( _Place != 0xFFFF )
 				{
 					float gooDistance;
@@ -211,7 +211,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 						LOGMISSIONSTEPSUCCESS("kill_fauna");
 						return 1;
 					}
-					
+
 					for ( uint i = 0; i < places.size(); i++ )
 					{
 						if ( places[i] && places[i]->getId() == _Place )
@@ -280,7 +280,7 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 
 		CSheetId faunaSheet = CSheetId::Unknown;
 		uint32 quantity = 1;
-		
+
 		for ( uint i  = 0; i < subStepStates.size(); i++ )
 		{
 			if( subStepStates[i] != 0 )
@@ -292,17 +292,17 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 				}
 				else
 				{
-					
+
 					//// Dynamic Mission Args
 					vector<string> params = _User->getCustomMissionParams(_SubSteps[i].Dynamic);
 					vector<string> status = _User->getCustomMissionParams(_SubSteps[i].Dynamic+"_STATUS");
 
 					if (params.size() > 1)
 						faunaSheet = CSheetId(params[1]);
-					
+
 					if (params.size() > 2)
 						NLMISC::fromString(params[2], quantity);
-						
+
 					if (status.size() > 0) // Use saved step quantity
 						NLMISC::fromString(status[0], quantity);
 
@@ -319,14 +319,14 @@ class CMissionStepKillFauna : public IMissionStepTemplate
 					}
 					////
 				}
-				
+
 				if (faunaSheet != CSheetId::Unknown)
 				{
 					nbSubSteps++;
 					retParams.push_back(STRING_MANAGER::TParam());
 					retParams.back().Type = STRING_MANAGER::creature_model;
 					retParams.back().SheetId = faunaSheet;
-					
+
 					retParams.push_back(STRING_MANAGER::TParam());
 					retParams.back().Type = STRING_MANAGER::integer;
 					retParams.back().Int = quantity;
@@ -475,7 +475,7 @@ class CMissionStepKillRace : public IMissionStepTemplate
 		}
 		return 0;
 	}
-	
+
 	void getInitState( std::vector<uint32>& ret )
 	{
 		ret.clear();
@@ -501,7 +501,7 @@ class CMissionStepKillRace : public IMissionStepTemplate
 				retParams.push_back(STRING_MANAGER::TParam());
 				retParams.back().Type = STRING_MANAGER::race;
 				retParams.back().Enum = (uint)_SubSteps[i].Race;
-			
+
 				retParams.push_back(STRING_MANAGER::TParam());
 				retParams.back().Type = STRING_MANAGER::integer;
 				retParams.back().Int = subStepStates[i];
@@ -526,7 +526,7 @@ class CMissionStepKillRace : public IMissionStepTemplate
 		else
 			textPtr = &stepText;
 	}
-	
+
 	std::vector< CSubStep > _SubSteps;
 	uint16					_Place;
 
@@ -564,9 +564,9 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 				//// Dynamic Mission Args : #dynamic#
 				if (trim(subs[i]) == "#dynamic#") {
 					subStep.Dynamic = missionData.Name;
-				} 
+				}
 				////
-				else 
+				else
 				{
 					subStep.Alias = CAIAliasTranslator::Invalid;
 					if ( !CMissionParser::parseBotName(subs[i],subStep.Alias,missionData) )
@@ -610,7 +610,7 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 				}
 				else
 				{
-					//// Dynamic Mission Args								
+					//// Dynamic Mission Args
 					vector<string> params = user->getCustomMissionParams(_SubSteps[subStepIndex].Dynamic);
 					if (params.size() < 2) {
 						LOGMISSIONSTEPERROR("kill_npc : invalid dynamic npc");
@@ -620,9 +620,9 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 					{
 						webAppUrl = params[0];
 						string name;
-						
+
 						CAIAliasTranslator::getInstance()->getNPCNameFromAlias(c->getAlias(), name);
-						if ( name == params[1] )
+						if ( NLMISC::strlwr(name) == NLMISC::strlwr(params[1]) )
 						{
 							user->validateDynamicMissionStep(webAppUrl);
 							LOGMISSIONSTEPSUCCESS("kill_npc");
@@ -635,7 +635,7 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 		}
 		return 0;
 	}
-	
+
 	void getInitState( std::vector<uint32>& ret )
 	{
 		ret.clear();
@@ -690,7 +690,7 @@ class CMissionStepKillNpc : public IMissionStepTemplate
 			}
 		}
 	}
-	
+
 	// We don't define getInvolvedBot() here, because 1) we don't want an icon on bots to kill,
 	// and 2) at the moment only one bot can be returned
 
@@ -708,7 +708,7 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 	{
 		TAIAlias	Alias;
 	};
-	
+
 	virtual bool	buildStep( uint32 line, const std::vector< std::string > & script, CMissionGlobalParsingData & globalData, CMissionSpecificParsingData & missionData )
 	{
 		_SourceLine = line;
@@ -721,7 +721,7 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 
 		std::vector< std::string > subs;
 		NLMISC::splitString( script[1],";", subs );
-		
+
 		if ( subs.size() != 1 )
 		{
 			MISLOGSYNTAXERROR("<group_name>");
@@ -729,7 +729,7 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 		}
 
 		_SubSteps.reserve(1);
-		
+
 		{
  			CMissionParser::removeBlanks( subs[0] );
 			std::vector< TAIAlias > aliases;
@@ -766,7 +766,7 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 		}
 		return 0;
 	}
-	
+
 	void getInitState( std::vector<uint32>& ret )
 	{
 		ret.clear();
@@ -776,7 +776,7 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 			ret[i] = 1;
 		}
 	}
-	
+
 	virtual void getTextParams( uint & nbSubSteps, const std::string* & textPtr,TVectorParamCheck& retParams, const std::vector<uint32>& subStepStates)
 	{
 		/// overloaded text in script
@@ -795,7 +795,7 @@ class CMissionStepKillGroup : public IMissionStepTemplate
 	{
 		return true;
 	}
-	
+
 	std::vector< CSubStep > _SubSteps;
 	std::string Target;
 
@@ -817,7 +817,7 @@ class CMissionStepKillFaction : public IMissionStepTemplate
 			MISLOGSYNTAXERROR("<faction> <quantity> [: <place>]");
 			return false;
 		}
-	
+
 		std::vector< std::string > args;
 		CMissionParser::tokenizeString( script[1]," \t", args );
 		if ( args.size() != 2 )
@@ -918,7 +918,7 @@ class CMissionStepKillFaction : public IMissionStepTemplate
 		retParams.push_back(STRING_MANAGER::TParam(STRING_MANAGER::faction));
 		retParams.back().Enum = _Faction;
 		retParams.push_back(STRING_MANAGER::TParam(STRING_MANAGER::integer, sint32(_Quantity)));
-				
+
 		if ( _Place != 0xFFFF )
 		{
 			STRING_MANAGER::TParam param;
@@ -937,7 +937,7 @@ class CMissionStepKillFaction : public IMissionStepTemplate
 		}
 		else
 			textPtr = &stepText;
-		
+
 	}
 
 	/// Faction as defined in CStaticFame
@@ -1069,7 +1069,7 @@ class CMissionStepKillByName : public IMissionStepTemplate
 		}
 		return 0;
 	}
-	
+
 	void getInitState( std::vector<uint32>& ret )
 	{
 		ret.clear();
@@ -1205,7 +1205,7 @@ class CMissionStepKillPlayer : public IMissionStepTemplate
 			else
 			{
 				sint32 victimFame = CFameInterface::getInstance().getFameIndexed(victim->getId(), _SubSteps[subStepIndex].Clan);
-				if ( (victimFame > _SubSteps[subStepIndex].MinLevel) && 
+				if ( (victimFame > _SubSteps[subStepIndex].MinLevel) &&
 					 (victimFame < _SubSteps[subStepIndex].MaxLevel) )
 				{
 					if ( _Place != 0xFFFF )
@@ -1247,7 +1247,7 @@ class CMissionStepKillPlayer : public IMissionStepTemplate
 		}
 		return 0;
 	}
-	
+
 
 	void getInitState( std::vector<uint32>& ret )
 	{
@@ -1278,7 +1278,7 @@ class CMissionStepKillPlayer : public IMissionStepTemplate
 				retParams.push_back(STRING_MANAGER::TParam());
 				retParams.back().Type = STRING_MANAGER::faction;
 				retParams.back().Enum = _SubSteps[i].Clan;
-	
+
 				retParams.push_back(STRING_MANAGER::TParam());
 				retParams.back().Type = STRING_MANAGER::integer;
 				retParams.back().Int = _SubSteps[i].MinLevel;
