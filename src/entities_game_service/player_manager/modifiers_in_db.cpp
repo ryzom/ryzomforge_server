@@ -101,6 +101,7 @@ void CModifiersInDB::writeInDatabase(CCDBSynchronised &database)
 			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(i).setSHEET(database, Bonus[i].SheetId);
 //			database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Bonus.Disable[i], 1);
 			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(i).setDISABLED(database, true);
+			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(i).setDISABLED_TIME(database, Bonus[i].ActivationDate);
 		}
 	}
 	for (uint i = 0 ; i < NbMalusModifiers ; ++i)
@@ -111,6 +112,7 @@ void CModifiersInDB::writeInDatabase(CCDBSynchronised &database)
 			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(i).setSHEET(database, Malus[i].SheetId);
 //			database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Malus.Disable[i], 1);
 			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(i).setDISABLED(database, true);
+			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(i).setDISABLED_TIME(database, Malus[i].ActivationDate);
 		}
 	}
 }
@@ -126,6 +128,7 @@ void CModifiersInDB::update(CCDBSynchronised &database)
 			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(i).setSHEET(database, CSheetId::Unknown);
 //			database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Bonus.Disable[i], 0);
 			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(i).setDISABLED(database, false);
+			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(i).setDISABLED_TIME(database, 0);
 			Bonus[i].init();
 		}
 	}
@@ -137,12 +140,13 @@ void CModifiersInDB::update(CCDBSynchronised &database)
 			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(i).setSHEET(database, CSheetId::Unknown);
 //			database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Malus.Disable[i], 0);
 			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(i).setDISABLED(database, false);
+			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(i).setDISABLED_TIME(database, 0);
 			Malus[i].init();
 		}
 	}
 }
 
-sint8 CModifiersInDB::addEffect(const NLMISC::CSheetId &sheetId, bool bonus, CCDBSynchronised &database)
+sint8 CModifiersInDB::addEffect(const NLMISC::CSheetId &sheetId, bool bonus, NLMISC::TGameCycle endTime, CCDBSynchronised &database)
 {
 	if (sheetId == NLMISC::CSheetId::Unknown)
 		return (sint8)-1;
@@ -167,12 +171,14 @@ sint8 CModifiersInDB::addEffect(const NLMISC::CSheetId &sheetId, bool bonus, CCD
 	if (freeSlot != -1)
 	{
 		modifiers[freeSlot].SheetId = sheetId;
+		modifiers[freeSlot].ActivationDate = endTime;
 		if(bonus)
 		{
 //			database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Bonus.Sheet[freeSlot], sheetId.asInt() );
 			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(freeSlot).setSHEET(database, sheetId );
 //			database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Bonus.Disable[freeSlot], 0);
 			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(freeSlot).setDISABLED(database, false);
+			CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(freeSlot).setDISABLED_TIME(database, endTime);
 		}
 		else
 		{
@@ -180,6 +186,7 @@ sint8 CModifiersInDB::addEffect(const NLMISC::CSheetId &sheetId, bool bonus, CCD
 			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(freeSlot).setSHEET(database, sheetId );
 //			database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Malus.Disable[freeSlot], 0);
 			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(freeSlot).setDISABLED(database, false);
+			CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(freeSlot).setDISABLED_TIME(database, endTime);
 		}
 	}
 
@@ -200,6 +207,7 @@ void CModifiersInDB::removeEffect(uint8 index, bool bonus, CCDBSynchronised &dat
 		CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(index).setSHEET(database, CSheetId::Unknown );
 //		database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Bonus.Disable[index], 0);
 		CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(index).setDISABLED(database, false);
+		CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(index).setDISABLED_TIME(database, 0);
 	}
 	else
 	{
@@ -207,6 +215,7 @@ void CModifiersInDB::removeEffect(uint8 index, bool bonus, CCDBSynchronised &dat
 		CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(index).setSHEET(database, CSheetId::Unknown);
 //		database.setProp( CCharacter::getDataIndexReminder()->Modifiers.Malus.Disable[index], 0);
 		CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(index).setDISABLED(database, false);
+		CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(index).setDISABLED_TIME(database, 0);
 	}
 }
 
