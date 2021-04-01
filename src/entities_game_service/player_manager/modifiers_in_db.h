@@ -81,6 +81,9 @@ struct CModifiersInDB
 
 	/// disable an effect
 	void disableEffect(uint8 index, bool bonus, NLMISC::TGameCycle activationDate, CCDBSynchronised &database);
+
+	/// update an effect activation date
+	void updateEffect(uint8 index, bool bonus, NLMISC::TGameCycle activationDate, CCDBSynchronised &database);
 	
 private:
 	void _addBonus(const CModifierInDB& bonus);

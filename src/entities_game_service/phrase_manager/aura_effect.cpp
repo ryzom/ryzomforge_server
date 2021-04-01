@@ -162,6 +162,10 @@ void CAuraRootEffect::createEffectOnEntity(CEntityBase *entity, CEntityBase *cre
 			entity->addSabrinaEffect(effect);
 			character->useAura(_PowerType, _ActivationDate, _ActivationDate + _TargetDisableTime, creator->getId());
 
+			// CAuraBaseEffect has short (~2sec) AurasUpdateFrequency timer as it needs to update in-range players.
+			// Send (our) CAuraRootEffect timer to client instead
+			character->updateEffectInDB(effect->getEffectIndexInDB(), EFFECT_FAMILIES::isEffectABonus(effect->getFamily()), getEndDate());
+
 			//send message to newly affected entity
 			SM_STATIC_PARAMS_1(params, STRING_MANAGER::power_type);
 			params[0].Enum = _PowerType;

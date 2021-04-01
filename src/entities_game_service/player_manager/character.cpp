@@ -22733,6 +22733,13 @@ void CCharacter::disableEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle a
 
 //------------------------------------------------------------------------------
 
+void CCharacter::updateEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate)
+{
+	_ModifiersInDB.updateEffect(index, bonus, activationDate, _PropertyDatabase);
+}
+
+//------------------------------------------------------------------------------
+
 sint32 CCharacter::getWeightMalus()
 {
 	sint32 maxWeight

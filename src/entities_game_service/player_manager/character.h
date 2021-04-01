@@ -2029,6 +2029,9 @@ public:
 	/// disable effect
 	void disableEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate);
 
+	/// update effect activation date
+	void updateEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate);
+
 	// return the carried weight
 	uint32 getCarriedWeight();
 	// get the weight malus

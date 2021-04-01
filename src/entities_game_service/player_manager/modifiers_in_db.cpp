@@ -246,6 +246,22 @@ void CModifiersInDB::disableEffect(uint8 index, bool bonus, NLMISC::TGameCycle a
 	}
 }
 
+void CModifiersInDB::updateEffect(uint8 index, bool bonus, NLMISC::TGameCycle activationDate, CCDBSynchronised &database)
+{
+	if ( (bonus && index >= NbBonusModifiers) || (!bonus && index >= NbMalusModifiers) )
+		return;
+
+	std::vector<CModifierInDB> &modifiers = bonus ? Bonus : Malus;
+	const std::string type = bonus ? "BONUS:" : "MALUS:";
+
+	modifiers[index].ActivationDate = activationDate;
+
+	if(bonus)
+		CBankAccessor_PLR::getMODIFIERS().getBONUS().getArray(index).setDISABLED_TIME(database, activationDate);
+	else
+		CBankAccessor_PLR::getMODIFIERS().getMALUS().getArray(index).setDISABLED_TIME(database, activationDate);
+}
+
 void CModifiersInDB::_addBonus(const CModifierInDB& bonus)
 {
 	// check whether the bonus already exists in the bonus vector
