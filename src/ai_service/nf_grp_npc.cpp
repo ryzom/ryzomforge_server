@@ -3088,6 +3088,42 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 }
 
 
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection setParent_s_
+
+A a link child -> parent from child
+
+
+Arguments: parent(direction)
+@param[in] the name of group who will be the parent of this group
+
+@code
+()setParent("group_name");
+@endcode
+
+*/
+
+void setParent_s_(CStateInstance* entity, CScriptStack& stack)
+{
+
+	string parent = stack.top();
+
+	std::vector<CGroup*> grps;
+	entity->getGroup()->getAIInstance()->findGroup(grps, parent);
+	if (grps.size() > 0)
+	{
+		CGroup* parentGroup = grps.back();
+		CGroupNpc* parentNpcGroup = NLMISC::safe_cast<CGroupNpc*>(parentGroup);
+
+		CGroup* group = entity->getGroup();
+		CGroupNpc* npcGroup = NLMISC::safe_cast<CGroupNpc*>(group);
+		if (npcGroup && parentNpcGroup)
+			npcGroup->getPersistentStateInstance()->setParentStateInstance(parentNpcGroup->getPersistentStateInstance());
+	}
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -3215,6 +3251,7 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, maxHitRange_f_);
 
 	REGISTER_NATIVE_FUNC(functions, setEventCode_sss_);
+	REGISTER_NATIVE_FUNC(functions, setParent_s_);
 	REGISTER_NATIVE_FUNC(functions, addHealGroup_s_);
 
 	REGISTER_NATIVE_FUNC(functions, addUserModel_sss_);
