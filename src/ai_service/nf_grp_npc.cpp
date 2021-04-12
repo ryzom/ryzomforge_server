@@ -2850,12 +2850,12 @@ void setUserModel_s_(CStateInstance* entity, CScriptStack& stack)
 	{
 		CBot* bot = *botIt;
 
-		//if (!bot->isSpawned()) return;
-
 		if (bot->getRyzomType() == RYZOMID::npc)
 		{
 			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
 			botNpc->setUserModelId("ARK_"+userModel);
+			if (bot->isSpawned())
+				bot->getSpawnObj()->sendInfoToEGS();
 		}
 	}
 }
@@ -2892,6 +2892,8 @@ void setCustomLoot_s_(CStateInstance* entity, CScriptStack& stack)
 		{
 			CBotNpc* botNpc = NLMISC::safe_cast<CBotNpc*>(bot);
 			botNpc->setCustomLootTableId(customTable);
+			if (bot->isSpawned())
+				bot->getSpawnObj()->sendInfoToEGS();
 		}
 	}
 }
@@ -3034,13 +3036,17 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 	code = scriptHex_decode(code);
 	vector<string> lines_of_code;
 	NLMISC::splitString(code, "\n", lines_of_code);
+	uint32 line = 0;
 	if (!lines_of_code.empty())
 	{
+		nlinfo("=== Code ===");
 		FOREACHC(it, vector<string>, lines_of_code)
 		{
-			nlinfo("Code: %s", (*it).c_str());
+			nlinfo("#%d %s", line, (*it).c_str());
 			eventAction->Args.push_back(*it);
+			line++;
 		}
+		nlinfo("=== * ===");
 	}
 
 	// Register event action
