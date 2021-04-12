@@ -3088,6 +3088,68 @@ void setEventCode_sss_(CStateInstance* entity, CScriptStack& stack)
 }
 
 
+
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection addHealGroup_s_
+
+Add a link to be able to heal a group
+
+
+Arguments: group(direction)
+@param[in] the name of group who will able to heal
+
+@code
+()addHealGroup("group_name");
+@endcode
+
+*/
+
+void addHealGroup_s_(CStateInstance* entity, CScriptStack& stack)
+{
+
+	string healGroup = stack.top();
+
+	std::vector<CGroup*> healGrps;
+	entity->getGroup()->getAIInstance()->findGroup(healGrps, healGroup);
+
+	CGroup* group = entity->getGroup();
+	CGroupNpc* npcGroup = NLMISC::safe_cast<CGroupNpc*>(group);
+
+	for (uint i=0; i<healGrps.size(); ++i)
+	{
+		CGroupNpc* healNpcGroup = NLMISC::safe_cast<CGroupNpc*>(healGrps[i]);
+		if (healNpcGroup)
+			npcGroup->addHealGroup(healNpcGroup);
+	}
+}
+
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection resetHealGroups_
+
+Add a link to be able to heal a group
+
+@code
+()resetHealGroups();
+@endcode
+
+*/
+
+void resetHealGroups_(CStateInstance* entity, CScriptStack& stack)
+{
+	CGroup* group = entity->getGroup();
+	CGroupNpc* npcGroup = NLMISC::safe_cast<CGroupNpc*>(group);
+	npcGroup->resetHealGroups();
+}
+
+
+
+
+
 std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 {
 	std::map<std::string, FScrptNativeFunc> functions;
@@ -3153,6 +3215,7 @@ std::map<std::string, FScrptNativeFunc> nfGetNpcGroupNativeFunctions()
 	REGISTER_NATIVE_FUNC(functions, maxHitRange_f_);
 
 	REGISTER_NATIVE_FUNC(functions, setEventCode_sss_);
+	REGISTER_NATIVE_FUNC(functions, addHealGroup_s_);
 
 	REGISTER_NATIVE_FUNC(functions, addUserModel_sss_);
 	REGISTER_NATIVE_FUNC(functions, addCustomLoot_ss_);
