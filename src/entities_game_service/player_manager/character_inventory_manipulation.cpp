@@ -188,7 +188,7 @@ void CCharacter::initInventoriesDb()
 		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 		if (p->isTrialPlayer() && _BaseParryLevel > 125)
 			_BaseParryLevel = 125;
-		
+
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
 		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
@@ -1165,7 +1165,7 @@ void CCharacter::unequipCharacter(INVENTORIES::TInventory invId, uint32 slot, bo
 		CPlayer* p = PlayerManager.getPlayer(PlayerManager.getPlayerId(getId()));
 		if (p->isTrialPlayer() && _BaseParryLevel > 125)
 			_BaseParryLevel = 125;
-		
+
 		_CurrentParryLevel = max(sint32(0), _BaseParryLevel + _ParryModifier);
 		//		_PropertyDatabase.setProp(_DataIndexReminder->CHARACTER_INFO.ParryBase, _BaseParryLevel);
 		CBankAccessor_PLR::getCHARACTER_INFO().getPARRY().setBase(
@@ -1507,7 +1507,7 @@ bool CCharacter::checkPreRequired(const CGameItemPtr &item, bool equipCheck)
 			requiredRespected = false;
 		}
 	}
-	
+
 	if (requiredRespected == false && equipCheck)
 	{
 		PHRASE_UTILITIES::sendDynamicSystemMessage(_EntityRowId, "REQUIRED_EQUIP");
@@ -3255,10 +3255,10 @@ void CCharacter::useItem(uint32 slot)
 					if (factionIndex != CStaticFames::INVALID_FACTION_INDEX)
 					{
 						const sint32 fame = CFameInterface::getInstance().getFameIndexed(getId(), factionIndex);
-						if (fame >= 33*6000) // 198000
+						if (fame >= 33*kFameMultipler) // 198000
 						{
 							destroy = false;
-							if (fame < 60*6000 && item->getStaticForm()->TpEcosystem == 7) // 360000
+							if (fame < 60*kFameMultipler && item->getStaticForm()->TpEcosystem == 7) // 360000
 								destroy = true;
 
 							if (!destroy)
@@ -3312,8 +3312,7 @@ void CCharacter::useItem(uint32 slot)
 				fx.unpack(visualFx.getValue());
 
 				if (allegeance.first != PVP_CLAN::None && allegeance.first != PVP_CLAN::Neutral
-						&& CFameInterface::getInstance().getFameIndexed(_Id, PVP_CLAN::getFactionIndex(allegeance.first))
-						>= 600000)
+						&& CFameInterface::getInstance().getFameIndexed(_Id, PVP_CLAN::getFactionIndex(allegeance.first)) >= 100*kFameMultipler)
 				{
 					if (allegeance.first == PVP_CLAN::Kami)
 					{

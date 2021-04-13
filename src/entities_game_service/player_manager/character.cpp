@@ -7686,10 +7686,21 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 
 		CPetCommandMsg::TCommand petCommand;
 
+
+		const CStaticItem* form = CSheets::getForm(_PlayerPets[petIndex].TicketPetSheetId);
+
 		switch ((ANIMALS_ORDERS::EBeastOrder)command)
 		{
 
 		case ANIMALS_ORDERS::ENTER_BAG:
+			if (!form || form->Type != ITEM_TYPE::ANIMAL_TICKET) {
+				if (!form)
+					nlinfo("Not form");
+				else
+					nlinfo("Not Anima but %s", ITEM_TYPE::toString(form->Type).c_str());
+				continue;
+			}
+
 			_PlayerPets[petIndex].PetStatus = CPetAnimal::in_bag;
 			if (_PlayerPets[petIndex].IsInBag)
 				continue;
@@ -11965,9 +11976,21 @@ void CCharacter::setOrganization(uint32 org)
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(1).setVALUE(_PropertyDatabase, _Organization);
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(2).setVALUE(_PropertyDatabase, _OrganizationStatus);
 	CBankAccessor_PLR::getUSER().getRRPS_LEVELS(3).setVALUE(_PropertyDatabase, _OrganizationPoints);
-	CPVPManager2::getInstance()->updateFactionChannel(this);
 
+	if (org != 0)
+	{
+		setDeclaredCult(PVP_CLAN::Neutral);
+		setDeclaredCiv(PVP_CLAN::Neutral);
+	}
+
+	CPVPManager2::getInstance()->updateFactionChannel(this);
 	updateJewelsTags(false);
+
+	// Make sure fame values are properly capped.
+	CFameManager::getInstance().enforceFameCaps(getId(), org, getAllegiance());
+
+	// set tribe fame threshold and clamp fame if necessary
+	CFameManager::getInstance().setAndEnforceTribeFameCap(getId(), org, getAllegiance());
 }
 
 //-----------------------------------------------------------------------------
@@ -14335,7 +14358,6 @@ bool CCharacter::autoFillExchangeView()
 	CMission* currentMission = NULL;
 	CGameItemPtr invItem;
 	uint stepCounter, candidateCounter, totalItemsInBag, itemsSeenCount;
-	CActiveStepPD activeStep;
 	CMissionTemplate* missionTemplate;
 	std::map<uint32, CActiveStepPD>::iterator stepIterator;
 	std::vector<IMissionStepTemplate::CSubStep> validateSteps;
@@ -14370,6 +14392,20 @@ bool CCharacter::autoFillExchangeView()
 			break;
 
 		validateSteps = missionTemplate->Steps[*itSet - 1]->getSubSteps();
+
+		// get gift step from mission
+		const CActiveStepPD *botGiftStep = currentMission->getSteps(*itSet);
+		if (botGiftStep)
+		{
+			// fill in remaining quantities
+			for(uint i = 0; i < validateSteps.size(); ++i)
+			{
+				const CActiveStepStatePD *gift = botGiftStep->getStates(i+1);
+				if (gift != NULL)
+					validateSteps[i].Quantity = gift->getState();
+			}
+		}
+
 		// the exchange temp inventory thingy has only 8 slots, so very benign failures to put items into it
 		// are possible. Hence merely breaking (doing no further work) as opposed to aborting work done,
 		// and still returning "true". (exchangeWorked == false does not necessarily represent a failure of the whole
@@ -15168,15 +15204,21 @@ string CCharacter::getTargetInfos()
 	}
 	else
 	{
-		string name;
 		CCreature * cTarget = CreatureManager.getCreature(target);
 		if (cTarget)
 		{
+			string name;
+			string title;
 			sint32 petSlot = getPlayerPet(cTarget->getEntityRowId());
 
 			if (petSlot == -1)
-			{
-				CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+	 		{
+		 		CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+	 			if (name.find('$') != string::npos)
+				{
+					title = name.substr(name.find('$')+1);
+					name = name.substr(0, name.find('$'));
+				}
 				msg += name+"|";
 			}
 			else
@@ -15196,7 +15238,7 @@ string CCharacter::getTargetInfos()
 			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
 
-			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender());
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender())+"|"+title;
 		}
 	}
 
@@ -15888,10 +15930,10 @@ void CCharacter::sendUrl(const string &url)
 	string control;
 	string salt = toString(getLastConnectedDate())+ArkSalt.get();
 	string playerPos = getPositionInfos();
-	strFindReplace(playerPos, " ", "%20");
+	while(strFindReplace(playerPos, " ", "%20"));
 	string targetInfos = getTargetInfos();
 	string serverInfos = getServerInfos(getState().X / 1000., getState().Y / 1000.);
-	strFindReplace(targetInfos, " ", "%20");
+	while(strFindReplace(targetInfos, " ", "%20"));
 	string final_url;
 
 	if (url.find("$(") != string::npos )
@@ -15908,6 +15950,9 @@ void CCharacter::sendUrl(const string &url)
 	{
 		final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos+"&server_infos="+serverInfos;
 	}
+
+	while(strFindReplace(final_url, "#", "%23"));
+	while(strFindReplace(final_url, "$", "%24"));
 
 	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
@@ -16627,7 +16672,7 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 			sint32	marauderFame = CFameInterface::getInstance().getFameIndexed(_Id, marauderIdx);
 			if (factionIndex != marauderIdx)
 			{
-				sint32 maxOtherfame = -100*6000;
+				sint32 maxOtherfame = -100*kFameMultipler;
 				for (uint8 fameIdx = 0; fameIdx < 7; fameIdx++)
 				{
 					if (fameIdx == marauderIdx)
@@ -16639,11 +16684,16 @@ void CCharacter::setFameValuePlayer(uint32 factionIndex, sint32 playerFame, sint
 						maxOtherfame = fame;
 				}
 
-				// Marauder fame is when player have negative fame in other clans
-				maxOtherfame = -maxOtherfame;
-
-				if (marauderFame < 50 * 6000 || maxOtherfame < 50 * 6000) {
-					CFameManager::getInstance().setEntityFame(_Id, marauderIdx, maxOtherfame, false);
+				if (marauderFame < 50*kFameMultipler)
+				{
+					if (maxOtherfame < -50*kFameMultipler) // Cap to 50
+						maxOtherfame = -50*kFameMultipler;
+					CFameManager::getInstance().setEntityFame(_Id, marauderIdx, -maxOtherfame, false);
+				}
+				else
+				{
+					if (maxOtherfame > -40*kFameMultipler)
+						CFameManager::getInstance().setEntityFame(_Id, marauderIdx, -maxOtherfame, false);
 				}
 			}
 
@@ -16728,15 +16778,15 @@ void CCharacter::resetFameDatabase()
 	// Check fames and fix bad values
 	if (!haveAnyPrivilege())
 	{
-		CFameManager::getInstance().enforceFameCaps(getId(), getAllegiance());
-		CFameManager::getInstance().setAndEnforceTribeFameCap(getId(), getAllegiance());
+		CFameManager::getInstance().enforceFameCaps(getId(), getOrganization(), getAllegiance());
+		CFameManager::getInstance().setAndEnforceTribeFameCap(getId(), getOrganization(), getAllegiance());
 	}
 
 	for (uint i = 0; i < CStaticFames::getInstance().getNbFame(); ++i)
 	{
 		// update player fame info
 		sint32 fame = fi.getFameIndexed(_Id, i, false, true);
-		sint32 maxFame = CFameManager::getInstance().getMaxFameByFactionIndex(getAllegiance(), i);
+		sint32 maxFame = CFameManager::getInstance().getMaxFameByFactionIndex(getAllegiance(), getOrganization(), i);
 		setFameValuePlayer(i, fame, maxFame, 0);
 	}
 }
@@ -20387,9 +20437,9 @@ bool CCharacter::setDeclaredCult(PVP_CLAN::TPVPClan newClan)
 		{
 			// No problems, let the change happen.
 			// Make sure fame values are properly capped.
-			CFameManager::getInstance().enforceFameCaps(this->getId(), this->getAllegiance());
+			CFameManager::getInstance().enforceFameCaps(this->getId(), this->getOrganization(), this->getAllegiance());
 			// set tribe fame threshold and clamp fame if necessary
-			CFameManager::getInstance().setAndEnforceTribeFameCap(this->getId(), this->getAllegiance());
+			CFameManager::getInstance().setAndEnforceTribeFameCap(this->getId(), this->getOrganization(), this->getAllegiance());
 			// handle with faction channel
 			CPVPManager2::getInstance()->updateFactionChannel(this);
 			// write new allegiance in database
@@ -20448,9 +20498,9 @@ bool CCharacter::setDeclaredCiv(PVP_CLAN::TPVPClan newClan)
 		{
 			// No problems, let the change happen.
 			// Make sure fame values are properly capped.
-			CFameManager::getInstance().enforceFameCaps(this->getId(), this->getAllegiance());
+			CFameManager::getInstance().enforceFameCaps(this->getId(), this->getOrganization(), this->getAllegiance());
 			// set tribe fame threshold and clamp fame if necessary
-			CFameManager::getInstance().setAndEnforceTribeFameCap(this->getId(), this->getAllegiance());
+			CFameManager::getInstance().setAndEnforceTribeFameCap(this->getId(), this->getOrganization(), this->getAllegiance());
 			// handle with faction channel
 			CPVPManager2::getInstance()->updateFactionChannel(this);
 			// write new allegiance in database

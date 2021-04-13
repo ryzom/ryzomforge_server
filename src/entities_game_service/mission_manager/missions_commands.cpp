@@ -2099,6 +2099,15 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 		return true;
 	}
 
+	CMirrorPropValue<TYPE_VISUAL_FX> visualFx(TheDataset, c->getEntityRowId(), DSPropertyVISUAL_FX);
+	CVisualFX fx;
+	fx.unpack(visualFx.getValue());
+	fx.Aura = MAGICFX::NoAura;
+	sint64 prop;
+	fx.pack(prop);
+	visualFx = (sint16)prop;
+
+
 	c->teleportCharacter(x,y,z,allowPetTp,true,h,0xFF,cell);
 
 	if (cont)
@@ -2111,6 +2120,27 @@ NLMISC_COMMAND(teleportMe, "teleport", "<uid> [x,y,z,h|player name|bot name] tel
 
 	log.displayNL("OK");
 
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setAuraFx, "setAuraFx", "<uid> aura")
+{
+	if (args.size() != 2)
+		return false;
+
+	GET_ACTIVE_CHARACTER
+
+	CMirrorPropValue<TYPE_VISUAL_FX> visualFx(TheDataset, c->getEntityRowId(), DSPropertyVISUAL_FX);
+	CVisualFX fx;
+	fx.unpack(visualFx.getValue());
+
+	if (args[1] == "marauder")
+		fx.Aura = MAGICFX::TeleportMarauder;
+
+	sint64 prop;
+	fx.pack(prop);
+	visualFx = (sint16)prop;
 	return true;
 }
 
@@ -2563,6 +2593,54 @@ NLMISC_COMMAND(temporaryRename, "rename a player for the event", "<uid> <new nam
 
 	c->registerName(newName);
 
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setTitle, "set player title", "<uid> <title>")
+{
+	if (args.size() != 2) {
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+	TDataSetRow row = c->getEntityRowId();
+	c->setNewTitle(args[1]);
+	string fullname = c->getName().toString()+"$"+args[1]+"#"+c->getTagPvPA()+"#"+c->getTagPvPB()+"#"+c->getTagA()+"#"+c->getTagB()+"$";
+	ucstring name;
+	name.fromUtf8(fullname);
+	nlinfo("Set title : %s", name.toUtf8().c_str());
+	NLNET::CMessage	msgout("CHARACTER_NAME");
+	msgout.serial(row);
+	msgout.serial(name);
+	sendMessageViaMirror("IOS", msgout);
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setTag, "set player title", "<uid> <tag> <value>")
+{
+	if (args.size() != 3) {
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+	TDataSetRow row = c->getEntityRowId();
+	if (args[1] == "pvpA") c->setTagPvPA(args[2]);
+	if (args[1] == "pvpB") c->setTagPvPB(args[2]);
+	if (args[1] == "A") c->setTagA(args[2]);
+	if (args[1] == "B") c->setTagB(args[2]);
+	string fullname = c->getName().toString()+"$"+c->getNewTitle()+"#"+c->getTagPvPA()+"#"+c->getTagPvPB()+"#"+c->getTagA()+"#"+c->getTagB()+"$";
+	ucstring name;
+	name.fromUtf8(fullname);
+	NLNET::CMessage	msgout("CHARACTER_NAME");
+	msgout.serial(row);
+	msgout.serial(name);
+	sendMessageViaMirror("IOS", msgout);
 	return true;
 }
 
