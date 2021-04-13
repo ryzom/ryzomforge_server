@@ -2426,6 +2426,49 @@ void getPlayerStat_ss_f(CStateInstance* entity, CScriptStack& stack)
 
 }
 
+//----------------------------------------------------------------------------
+/** @page code
+
+@subsection getPlayerPosition_ss_ff
+Get player position (x or y).
+
+Arguments: s(playerEidAsString), s(statName) -> s(result)
+@param[in] playerEidAsString is EntityId as string from the player we want infos
+@param[in] axis ("X" or "Y")
+@param[out] value is a the value of the parameter
+
+@code
+($playerEid)getCurrentPlayerEid();
+(x, y)getPlayerPosition($playerEid);
+@endcode
+*/
+void getPlayerPosition_s_ff(CStateInstance* entity, CScriptStack& stack)
+{
+	std::string funName = "getPlayerPosition_s_ff";
+	// reaed input
+	std::string statName = ((std::string)stack.top()); stack.pop();
+	std::string playerEidStr = ((std::string)stack.top()); stack.pop();
+
+
+	// get Dataset of the player to have access to mirror values
+	NLMISC::CEntityId playerEid;
+	playerEid.fromString(playerEidStr.c_str());
+	TDataSetRow playerRow = TheDataset.getDataSetRow( playerEid );
+	if (! TheDataset.isAccessible( playerRow  ) )
+	{
+		nlwarning("Try to call %s with on a player '%s' that is not accessible. The isPlayerAlived function must be called to be sure that the palyer is still alived.", funName.c_str(), playerEidStr.c_str() );
+		stack.push((float)0);
+		return;
+	}
+
+	CMirrorPropValue<sint32> mirrorSymbol( TheDataset, playerRow, DSPropertyPOSY );
+	stack.push((float)mirrorSymbol.getValue());
+	CMirrorPropValue<sint32> mirrorSymbol2( TheDataset, playerRow, DSPropertyPOSX );
+	stack.push((float)mirrorSymbol2.getValue());
+	return;
+
+}
+
 /** @page code
 
 @subsection getPlayerDistance_fs_f
@@ -4858,6 +4901,7 @@ std::map<std::string, FScrptNativeFunc> nfGetGroupNativeFunctions()
 	// Boss functions (Player infos)
 	REGISTER_NATIVE_FUNC(functions, isPlayerAlived_s_f);
 	REGISTER_NATIVE_FUNC(functions, getPlayerStat_ss_f);
+	REGISTER_NATIVE_FUNC(functions, getPlayerPosition_s_ff);
 	REGISTER_NATIVE_FUNC(functions, getPlayerDistance_fs_f);
 	REGISTER_NATIVE_FUNC(functions, getCurrentPlayerEid__s);
 	REGISTER_NATIVE_FUNC(functions, queryEgs_sscfs_);

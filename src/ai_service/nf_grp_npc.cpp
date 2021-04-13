@@ -2243,7 +2243,7 @@ Arguments: c(group1), s(botname1), c(group2), s(botname2),  ->
 
 @code
 (@group1)group_name1.context();
-(@group1)group_name2.context();
+(@group2)group_name2.context();
 ()facing(@group1, "bob", @group2, "bobette");
 @endcode
 
