@@ -564,9 +564,8 @@ CCharacter::CCharacter()
 	_DeathPenaltyTimer.setRemaining(1, new CDeathPenaltiesTimerEvent(this), 1);
 	_BarUpdateTimer.setRemaining(1, new CCharacterBarUpdateTimerEvent(this), 1);
 	_BuildingExitZone = 0xffff;
-	_BuildingExitPos = CVector();
-	_BuildingExitPos.x = 0;
-	_BuildingExitPos.y = 0;
+	_BuildingExitPos = CVector(0, 0, 0);
+	_OutOutpostPos = CVector(0, 0, 0);
 	_RespawnMainLandInTown = false;
 	_CurrentPVPZone = CAIAliasTranslator::Invalid;
 	_CurrentOutpostZone = CAIAliasTranslator::Invalid;
@@ -20884,10 +20883,20 @@ void CCharacter::outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side)
 		// his guild doesn't participate in outpost conflict but player don't made a choice when op is under attack => random
 		if (neutral && outpostInFire)
 		{
-			if (uint32(RandomGenerator.rand(1)) == 0)
-				setOutpostSide(OUTPOSTENUMS::OutpostOwner);
+
+			if (outpost->getName().substr(0, 14) == "outpost_nexus_")
+			{
+				nlinfo("Player are neutral in %s in fire : ", outpost->getName().c_str());
+				setOutpostSide(OUTPOSTENUMS::UnknownPVPSide);
+
+			}
 			else
-				setOutpostSide(OUTPOSTENUMS::OutpostAttacker);
+			{
+				if (uint32(RandomGenerator.rand(1)) == 0)
+					setOutpostSide(OUTPOSTENUMS::OutpostOwner);
+				else
+					setOutpostSide(OUTPOSTENUMS::OutpostAttacker);
+			}
 		}
 		else
 			// his guild doesn't participate in outpost conflict so he can choose the side he wants
@@ -22979,6 +22988,15 @@ void CCharacter::setBuildingExitPos(sint32 x, sint32 y, sint32 cell)
 	_BuildingExitPos.y = y;
 	_BuildingExitPos.z = cell;
 }
+
+//------------------------------------------------------------------------------
+
+void CCharacter::setOutOutpostPos(sint32 x, sint32 y)
+{
+	_OutOutpostPos.x = x;
+	_OutOutpostPos.y = y;
+}
+
 
 
 //------------------------------------------------------------------------------
