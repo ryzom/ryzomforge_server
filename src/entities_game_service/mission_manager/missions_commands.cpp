@@ -1023,6 +1023,92 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 	return true;
 }
 
+
+
+string getJewelEnchantAttr(CSheetId sbrick)
+{
+	const CStaticBrick * brick = CSheets::getSBrickForm(sbrick);
+	if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
+	{
+		if (brick->Params.size() > 0)
+		{
+			const TBrickParam::IId* param = brick->Params[0];
+			CSBrickParamJewelAttrs *sbrickParam = (CSBrickParamJewelAttrs*)param;
+			if (param->id() == TBrickParam::JEWEL_ATTRS)
+				return sbrickParam->Attribute;
+		}
+	}
+	return "";
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(checkInventoryItems, "Check items from a characters inventory", "<uid> <inventory> <sheetnames> <quality> <quantity>")
+{
+	if (args.size () < 5)
+	{
+		log.displayNL("ERR: Invalid number of parameters. Parameters: <inventory> <sheetnames> <quality> <quantity>");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+	std::map<string, uint32> need_items;
+
+	string selected_inv = args[1];
+
+	std::vector<string> sheet_names;
+	NLMISC::splitString(args[2], ",", sheet_names);
+	std::vector<string> qualities;
+	NLMISC::splitString(args[3], ",", qualities);
+	std::vector<string> quantities;
+	NLMISC::splitString(args[4], ",", quantities);
+
+	for (uint32 i=0; i < std::min(quantities.size(), std::min(qualities.size(), sheet_names.size())); i++)
+	{
+		uint32 quantity = 0;
+		fromString(quantities[i], quantity);
+		need_items.insert(make_pair(sheet_names[i]+":"+qualities[i], quantity));
+	}
+
+	std::map<uint32, uint32> slots;
+	std::map<string, uint32>::iterator itNeedItems;
+
+	// Save list of slots and quantities to delete
+	CInventoryPtr inventory = getInventory(c, selected_inv);
+	if (inventory != NULL)
+	{
+		for (uint32 j = 0; j < inventory->getSlotCount(); j++)
+		{
+			CGameItemPtr itemPtr = inventory->getItem(j);
+			if (itemPtr != NULL)
+			{
+				string sheet = itemPtr->getSheetId().toString();
+				uint32 item_quality = itemPtr->quality();
+				itNeedItems = need_items.find(sheet+":"+NLMISC::toString("%d", item_quality));
+				if (itNeedItems != need_items.end() && (*itNeedItems).second > 0)
+				{
+					uint32 quantity = std::min((*itNeedItems).second, itemPtr->getStackSize());
+					slots.insert(make_pair(j, quantity));
+					(*itNeedItems).second -= quantity;
+				}
+			}
+		}
+
+		// Check if all items has been found
+		for (itNeedItems = need_items.begin(); itNeedItems != need_items.end(); ++itNeedItems)
+		{
+			if ((*itNeedItems).second != 0) {
+				log.displayNL("ERR: Not enough items.");
+				return false;
+			}
+		}
+	}
+
+	log.displayNL("OK");
+	return true;
+}
+
+
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(enchantEquipedItem, "enchantEquipedItem", "<uid> <slotname> <sheet1>,[<sheet2> ...] [<maxSpaLoad>]")
 {
@@ -1036,20 +1122,31 @@ NLMISC_COMMAND(enchantEquipedItem, "enchantEquipedItem", "<uid> <slotname> <shee
 
 	string selected_slot = args[1];
 
+	bool isTag = false;
+
 	std::vector<CSheetId> sheets;
 	if (args[2] != "*")
 	{
 		std::vector<string> sheet_names;
 		NLMISC::splitString(args[2], ",", sheet_names);
 		for (uint32 i=0; i<sheet_names.size(); i++)
-			sheets.push_back(CSheetId(sheet_names[i]));
+		{
+			CSheetId sheet = CSheetId(sheet_names[i]);
+			if (getJewelEnchantAttr(sheet) == "tag")
+				isTag = true;
+			sheets.push_back(sheet);
+		}
 	}
 
 	CGameItemPtr itemPtr = c->getItem(INVENTORIES::equipment, SLOT_EQUIPMENT::stringToSlotEquipment(selected_slot));
 	if (itemPtr != NULL)
 	{
+		if (isTag)
+			itemPtr->getJewelNonTagsEnchantments(sheets);
+		else
+			itemPtr->getJewelTagsEnchantments(sheets);
+
 		itemPtr->applyEnchantment(sheets);
-		c->updateJewelsTags(false);
 
 		if (args.size() > 3)
 		{
@@ -2563,6 +2660,54 @@ NLMISC_COMMAND(temporaryRename, "rename a player for the event", "<uid> <new nam
 	return true;
 }
 
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setTitle, "set player title", "<uid> <title>")
+{
+	if (args.size() != 2) {
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+	TDataSetRow row = c->getEntityRowId();
+	c->setNewTitle(args[1]);
+	string fullname = c->getName().toString()+"$"+args[1]+"#"+c->getTagPvPA()+"#"+c->getTagPvPB()+"#"+c->getTagA()+"#"+c->getTagB()+"$";
+	ucstring name;
+	name.fromUtf8(fullname);
+	nlinfo("Set title : %s", name.toUtf8().c_str());
+	NLNET::CMessage	msgout("CHARACTER_NAME");
+	msgout.serial(row);
+	msgout.serial(name);
+	sendMessageViaMirror("IOS", msgout);
+	return true;
+}
+
+//----------------------------------------------------------------------------
+NLMISC_COMMAND(setTag, "set player title", "<uid> <tag> <value>")
+{
+	if (args.size() != 3) {
+		log.displayNL("ERR: invalid arg count");
+		return false;
+	}
+
+	GET_ACTIVE_CHARACTER
+
+	TDataSetRow row = c->getEntityRowId();
+	if (args[1] == "pvpA") c->setTagPvPA(args[2]);
+	if (args[1] == "pvpB") c->setTagPvPB(args[2]);
+	if (args[1] == "A") c->setTagA(args[2]);
+	if (args[1] == "B") c->setTagB(args[2]);
+	string fullname = c->getName().toString()+"$"+c->getNewTitle()+"#"+c->getTagPvPA()+"#"+c->getTagPvPB()+"#"+c->getTagA()+"#"+c->getTagB()+"$";
+	ucstring name;
+	name.fromUtf8(fullname);
+	NLNET::CMessage	msgout("CHARACTER_NAME");
+	msgout.serial(row);
+	msgout.serial(name);
+	sendMessageViaMirror("IOS", msgout);
+	return true;
+}
+
 //-----------------------------------------------
 NLMISC_COMMAND(getArkMissions,"dump character ark missions","<uid>")
 {
@@ -3718,6 +3863,8 @@ NLMISC_COMMAND(getPlayerGuild, "get player guild informations", "<uid>")
 			else
 				log.displayNL("Member");
 
+			log.displayNL("%d", c->getGuildId());
+			log.displayNL("%s", guild->getName().toString().c_str());
 			return true;
 		}
 	}
