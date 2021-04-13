@@ -90,7 +90,7 @@ void CFameContainer::serial(NLMISC::IStream &f)
 		{
 			uint32 size = _FactionInfos.size();
 			f.serial(size);
-			
+
 			std::map<uint32, TFameContainerEntry>::iterator first(_FactionInfos.begin()), last(_FactionInfos.end());
 			for (; first != last; ++first)
 			{
@@ -105,7 +105,7 @@ void CFameContainer::serial(NLMISC::IStream &f)
 		}
 	}
 	else
-	{	
+	{
 		// serial old fame save
 		vector<sint32>		fames;
 		vector<sint32>		memories;
@@ -154,9 +154,9 @@ CFameManager::CFameManager()
 	//array of callback items
 	NLNET::TUnifiedCallbackItem _cbArray[] =
 	{
-		{ "FAME_DELTA",				cbFameDelta		}, 
+		{ "FAME_DELTA",				cbFameDelta		},
 	};
-	
+
 	// register call back for fame manager
 	CUnifiedNetwork::getInstance()->addCallbackArray( _cbArray, sizeof(_cbArray) / sizeof(_cbArray[0]) );
 
@@ -234,7 +234,7 @@ void CFameManager::mirrorIsReady()
 	const static std::string fameMemory("FameMemory");
 	const static std::string firstFame("Fame_0");
 
-	
+
 //	Mirror.declareEntityTypeOwner( RYZOMID::guild,		5000	);		// max number of guild
 //	Mirror.declareEntityTypeOwner( RYZOMID::civilisation,		10	);	// max number of civilisation
 
@@ -245,7 +245,7 @@ void CFameManager::mirrorIsReady()
 	TheFameDataset.declareProperty( civilisation, PSOReadWrite );
 	TheFameDataset.declareProperty( guild,		PSOReadWrite );
 	TheFameDataset.declareProperty( fameMemory,		PSOReadWrite );
-	
+
 	for (uint i=0; i<MAX_FACTION; ++i)
 	{
 		string propName = toString("Fame_%u", i);
@@ -305,7 +305,7 @@ void CFameManager::addPlayer(const CEntityId &playerId, const EGSPD::CFameContai
 		TFameOwnerWrite *fow = new TFameOwnerWrite(TheFameDataset, entityIndex);
 		_FamesOwners.insert(make_pair(entityIndex, fow));
 		fow->FameMemory = memoryIndex;
-		
+
 		// restore the fame value
 		for ( map<CSheetId,EGSPD::CFameContainerEntryPD>::const_iterator it = fameContainer.getEntriesBegin(); it != fameContainer.getEntriesEnd(); ++it )
 		{
@@ -331,7 +331,7 @@ void CFameManager::addPlayer(const CEntityId &playerId, const EGSPD::CFameContai
 			//		fow->Fames[faction] = CStaticFames::getInstance().getStaticFameIndexed(PVP_CLAN::getFactionIndex(playerRace), faction);
 			}
 		}
-		
+
 		fow->LastGuildStatusChange = fameContainer.getLastGuildStatusChange();
 		/// update the guild memory
 		updatePlayerFame(entityIndex);
@@ -393,7 +393,7 @@ void CFameManager::savePlayerFame(const NLMISC::CEntityId &playerId, EGSPD::CFam
 						EGS_PD_AST(entry);
 						entry->setFameMemory( it->second->Fames[i] );
 					}
-					
+
 //					fameContainer._FamesMemory.resize(MAX_FACTION);
 //					for (uint i=0; i<MAX_FACTION; ++i)
 //						fameContainer._FamesMemory[i] = it->second->Fames[i];
@@ -578,7 +578,7 @@ void CFameManager::saveGuildFame(const NLMISC::CEntityId &guildId, EGSPD::CFameC
 					entry->setLastFameChangeTrend( it->second->LastFameChangeTrends[i] );
 				}
 			}
-			
+
 //			fameContainer._Fames.resize(MAX_FACTION);
 //				fameContainer._Fames[i] = it->second->Fames[i];
 		}
@@ -629,7 +629,7 @@ void CFameManager::removeGuild(const CEntityId &guildId)
 void CFameManager::setGuildCivilisation( const NLMISC::CEntityId & guildId, EGSPD::CPeople::TPeople civilisation )
 {
 	TDataSetRow guildIndex = TheFameDataset.getDataSetRow(guildId);
-	
+
 	// check if the civ exists
 	uint8 id = EGSPD::getCivilisationId( civilisation );
 	if ( id == 0xFF )
@@ -639,14 +639,14 @@ void CFameManager::setGuildCivilisation( const NLMISC::CEntityId & guildId, EGSP
 	}
 	CEntityId civId(RYZOMID::civilisation, id);
 	TDataSetRow civIndex = TheFameDataset.getDataSetRow(civId);
-	
+
 	TFameContainer::iterator it = _FamesOwners.find( civIndex );
 	if ( it == _FamesOwners.end() )
 	{
 		nlwarning("FAME:setPlayerCivilisation-> unknown civ eId %s", civId.toString().c_str(), id );
 		return;
 	}
-	
+
 	// check if the player exists
 	it = _FamesOwners.find( guildIndex );
 	if ( it == _FamesOwners.end() )
@@ -675,7 +675,7 @@ void CFameManager::setPlayerCivilisation( const NLMISC::CEntityId & playerId, EG
 	}
 	CEntityId civId(RYZOMID::civilisation, id);
 	TDataSetRow civIndex = TheFameDataset.getDataSetRow(civId);
-	
+
 	TFameContainer::iterator it = _FamesOwners.find( civIndex );
 	if ( it == _FamesOwners.end() )
 	{
@@ -795,7 +795,7 @@ void CFameManager::cbFameDelta( NLNET::CMessage& msgin, const std::string &servi
 	msgin.serial(propagate);
 
 	getInstance().addFameIndexed(entityId, faction, deltaFame, serviceName, propagate);
-	
+
 	// We don't inform the client right now, the timer will take care of this
 	//character->sendEventForMissionAvailabilityCheck();
 }
@@ -838,9 +838,12 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 	fameMsgParams[1].Int = propagationType;
 
 	double fame = fow.Fames[faction];
+
+	CCharacter* character = PlayerManager.getChar( entityId );
+	bool isMarauder = (character && character->getOrganization() == 5);
+
 	if (fame == NO_FAME)
 	{
-		CCharacter* character = PlayerManager.getChar( entityId );
 		if (character)
 			fame = CStaticFames::getInstance().getStaticFameIndexed(PVP_CLAN::getFactionIndex(PVP_CLAN::getClanFromPeople(character->getRace())), faction);
 		else
@@ -849,6 +852,7 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 
 	const double FAME_GAIN_FACTOR = (FameAbsoluteMax/25.0)+FameAbsoluteMax;
 	double realDeltaFame = 0.;
+
 	// Non linear fame gain
 	if (deltaFame > 1)
 	{
@@ -866,6 +870,15 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 			realDeltaFame = ((FAME_GAIN_FACTOR - fame) / FameAbsoluteMax) * deltaFame;
 	}
 
+	if (realDeltaFame > 3*6000)
+		realDeltaFame = 3*6000;
+
+	if (realDeltaFame < -3*6000)
+		realDeltaFame = -3*6000;
+
+	if (!isMarauder && realDeltaFame < 0)
+		realDeltaFame /= 10;
+
 	fame += realDeltaFame;
 
 	fameMsgParams[2].Int = (uint32)(abs(realDeltaFame));
@@ -882,13 +895,13 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 			entityId.toString().c_str(),
 			sint32(fame));
 		// just update one player DB
-		// retreive the char info 
+		// retreive the char info
 		CCharacter *c =  PlayerManager.getChar(entityId);
 		// See if still qualify to have declaration
 		if ( c )
 		{
 			// Bound the fame based on current allegiance.
-			sint32 maxFame = getMaxFameByFactionIndex(c->getAllegiance(), faction);
+			sint32 maxFame = getMaxFameByFactionIndex(c->getAllegiance(), c->getOrganization(), faction);
 			clamp(fame,FameAbsoluteMin,maxFame);
 			// Check to make sure player still qualifies to be in declared allegiances.
 			c->verifyClanAllegiance(PVP_CLAN::getClanFromIndex(faction), sint32(fame));
@@ -919,7 +932,7 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 		if ( g )
 		{
 			// Bound the fame based on current allegiance.
-			sint32 maxFame = getMaxFameByFactionIndex(g->getAllegiance(), faction);
+			sint32 maxFame = getMaxFameByFactionIndex(g->getAllegiance(), 0, faction);
 			clamp(fame,FameAbsoluteMin,maxFame);
 			g->verifyClanAllegiance(PVP_CLAN::getClanFromIndex(faction), sint32(fame));
 			g->setFameValueGuild(faction, sint32(fame), maxFame, fow.LastFameChangeTrends[faction]);
@@ -944,7 +957,7 @@ void CFameManager::addFameIndexed(const CEntityId &entityId, uint32 faction, sin
 				{
 					gf = fi.getFameIndexed(TheFameDataset.getEntityId(fow->Guild()), faction, false, true);
 				}
-				
+
 				nldebug("FAME: Updating guild fame for entityId %s as G:%d",
 					entityId.toString().c_str(),
 					sint32(fame));
@@ -1075,7 +1088,7 @@ sint32	CFameManager::getFameIndexed(const CEntityId &entityId, uint32 factionInd
 		else
 			fame = 0;
 	}
-	
+
 	// clamp fame upper bound to neutral max if entity is declared as "None"
 	if( character)
 	{
@@ -1225,20 +1238,24 @@ void CFameManager::setEntityFame(const NLMISC::CEntityId & entityId, uint32 fact
 	{
 		nldebug("FAME: set fame for character %s as P:%d", entityId.toString().c_str(), fame);
 
-		sint32 maxFame = getMaxFameByFactionIndex(ch->getAllegiance(), faction);
+		sint32 maxFame = getMaxFameByFactionIndex(ch->getAllegiance(), ch->getOrganization(), faction);
 		ch->setFameValuePlayer(faction, fame, maxFame, fow.LastFameChangeTrends[faction]);
 
-		SM_STATIC_PARAMS_1(params, STRING_MANAGER::faction);
+		/*
+		SM_STATIC_PARAMS_3(params, STRING_MANAGER::faction, STRING_MANAGER::integer, STRING_MANAGER::integer);
 		params[0].Enum = faction;
+		params[1].Int = 0;
+		params[2].Int = abs(deltaFame);
 
 		if (deltaFame > 0)
 			CCharacter::sendDynamicSystemMessage( ch->getEntityRowId(), "FAME_GAIN_CHAR", params );
 		else
 			CCharacter::sendDynamicSystemMessage( ch->getEntityRowId(), "FAME_LOST_CHAR", params );
-	} 
+		*/
+	}
 	else if(gu)
 	{
-		sint32 maxFame = getMaxFameByFactionIndex(gu->getAllegiance(), faction);
+		sint32 maxFame = getMaxFameByFactionIndex(gu->getAllegiance(), 0, faction);
 		gu->setFameValueGuild(faction, fame, maxFame, fow.LastFameChangeTrends[faction]);
 	}
 	else
@@ -1262,8 +1279,20 @@ sint32 CFameManager::getStartFame(PVP_CLAN::TPVPClan playerClan, PVP_CLAN::TPVPC
 }
 
 // - getMaxFameByClan: playerClan must be Neutral or the same type (Cult or Clan) as targetClan, targetClan must be any non-neutral clan.
-sint32 CFameManager::getMaxFameByClan(std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> playerClans, PVP_CLAN::TPVPClan targetClan)
+sint32 CFameManager::getMaxFameByClan(std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> playerClans, uint32 organization, PVP_CLAN::TPVPClan targetClan)
 {
+	if (targetClan == PVP_CLAN::Marauder)
+	{
+		if (organization == 5)
+			return 100*kFameMultipler;
+		return 30*kFameMultipler;
+	}
+
+	if (organization == 5) // marauder
+	{
+		return -40*kFameMultipler;
+	}
+
 	// Local variables for the lookup values.
 	int playerLookup, targetLookup;
 
@@ -1320,25 +1349,26 @@ sint32 CFameManager::getMaxFameByClan(std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TP
 		}
 	}
 
+
 	// Wasn't caught above, probably a tribe.  Return a default value.
 	return FameMaxDefault;
 }
 
-sint32 CFameManager::getMaxFameByFactionIndex(std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance, uint32 factionIndex)
+sint32 CFameManager::getMaxFameByFactionIndex(std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance, uint32 organization, uint32 factionIndex)
 {
 	PVP_CLAN::TPVPClan	pvpClan;
 
 	// try first with a clan
 	pvpClan= PVP_CLAN::getClanFromIndex(factionIndex);
 	if(pvpClan != PVP_CLAN::Unknown)
-		return getMaxFameByClan(allegiance, pvpClan);
+		return getMaxFameByClan(allegiance, organization, pvpClan);
 	// search for tribe
 	else
 	{
 		// No allegiance? => Max
 		if( allegiance.first == PVP_CLAN::None || allegiance.second == PVP_CLAN::None )
 			return FameAbsoluteMax;
-		
+
 		// look up in the tribe threshold clamp array
 		const vector<CStaticFames::CTribeCultThresholdPerCiv> &tribeThres= CStaticFames::getInstance().getTribeThresholdVector();
 		if(tribeThres.empty())
@@ -1353,45 +1383,54 @@ sint32 CFameManager::getMaxFameByFactionIndex(std::pair<PVP_CLAN::TPVPClan, PVP_
 			if(ttIndex>=tribeThres.size())
 				return FameMaxDefault;
 
-			// get the 
+			// get the
 			const CStaticFames::CTribeCultThreshold * tc = 0;
-			
-			switch( allegiance.second )
+
+			if (organization == 5) // marauder
 			{
-			case PVP_CLAN::Matis:
-				tc = &tribeThres[ttIndex].Matis;
-				break;
-			case PVP_CLAN::Fyros:
-				tc = &tribeThres[ttIndex].Fyros;
-				break;
-			case PVP_CLAN::Tryker:
-				tc = &tribeThres[ttIndex].Tryker;
-				break;
-			case PVP_CLAN::Zorai:
-				tc = &tribeThres[ttIndex].Zorai;
-				break;
-			case PVP_CLAN::Neutral:
-				tc = &tribeThres[ttIndex].Neutral;
-				break;
-			default:
-				//nlwarning("Character %s have bad civilization allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.second, PVP_CLAN::toString(allegiance.second).c_str());
-				return FameMaxDefault;
+				tc = &tribeThres[ttIndex].Marauder;
+				return tc->getMarauder();
 			}
-			
-			switch(allegiance.first)
+			else
 			{
-			case PVP_CLAN::Kami:
-				return tc->getKami();
-				break;
-			case PVP_CLAN::Karavan:
-				return tc->getKaravan();
-				break;
-			case PVP_CLAN::Neutral:
-				return tc->getNeutral();
-				break;
-			default:
-				//nlwarning("Character %s have bad cult allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.first, PVP_CLAN::toString(allegiance.first).c_str());
-				return FameMaxDefault;
+
+				switch( allegiance.second )
+				{
+				case PVP_CLAN::Matis:
+					tc = &tribeThres[ttIndex].Matis;
+					break;
+				case PVP_CLAN::Fyros:
+					tc = &tribeThres[ttIndex].Fyros;
+					break;
+				case PVP_CLAN::Tryker:
+					tc = &tribeThres[ttIndex].Tryker;
+					break;
+				case PVP_CLAN::Zorai:
+					tc = &tribeThres[ttIndex].Zorai;
+					break;
+				case PVP_CLAN::Neutral:
+					tc = &tribeThres[ttIndex].Neutral;
+					break;
+				default:
+					//nlwarning("Character %s have bad civilization allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.second, PVP_CLAN::toString(allegiance.second).c_str());
+					return FameMaxDefault;
+				}
+
+				switch(allegiance.first)
+				{
+				case PVP_CLAN::Kami:
+					return tc->getKami();
+					break;
+				case PVP_CLAN::Karavan:
+					return tc->getKaravan();
+					break;
+				case PVP_CLAN::Neutral:
+					return tc->getNeutral();
+					break;
+				default:
+					//nlwarning("Character %s have bad cult allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.first, PVP_CLAN::toString(allegiance.first).c_str());
+					return FameMaxDefault;
+				}
 			}
 		}
 	}
@@ -1416,7 +1455,7 @@ void CFameManager::doInitTribeThresholdIndex()
 }
 
 
-void CFameManager::enforceFameCaps(const NLMISC::CEntityId &entityId, std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance)
+void CFameManager::enforceFameCaps(const NLMISC::CEntityId &entityId, uint32 organization, std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance)
 {
 	const TDataSetRow rowId = TheFameDataset.getDataSetRow(entityId);
 	TFameContainer::iterator it = _FamesOwners.find(rowId);
@@ -1447,6 +1486,51 @@ void CFameManager::enforceFameCaps(const NLMISC::CEntityId &entityId, std::pair<
 	sint32 fame;
 	sint32 maxFame;
 
+	if (organization == 5) // marauder
+	{
+		for (int looper = PVP_CLAN::BeginCults; looper <= PVP_CLAN::EndCults; looper++)
+		{
+			theFactionIndex = PVP_CLAN::getFactionIndex((PVP_CLAN::TPVPClan)looper);
+			fame = fow.Fames[theFactionIndex];
+			maxFame = -30*kFameMultipler;
+			if( fame != NO_FAME)
+			{
+				clamp(fame,FameAbsoluteMin, maxFame);
+				fow.Fames[theFactionIndex] = fame;
+			}
+			if (ch)
+			{
+				ch->setFameValuePlayer(theFactionIndex, fame, maxFame, fow.LastFameChangeTrends[theFactionIndex]);
+			}
+			if (gu)
+			{
+				gu->setFameValueGuild(theFactionIndex, fame, maxFame, fow.LastFameChangeTrends[theFactionIndex]);
+			}
+		}
+
+		for (int looper = PVP_CLAN::BeginCivs; looper <= PVP_CLAN::EndCivs; looper++)
+		{
+			theFactionIndex = PVP_CLAN::getFactionIndex((PVP_CLAN::TPVPClan)looper);
+			fame = fow.Fames[theFactionIndex];
+			maxFame = -30*kFameMultipler;
+			if( fame != NO_FAME)
+			{
+				clamp(fame,FameAbsoluteMin,maxFame);
+				fow.Fames[theFactionIndex] = fame;
+			}
+			if (ch)
+			{
+				ch->setFameValuePlayer(theFactionIndex, fame, maxFame, fow.LastFameChangeTrends[theFactionIndex]);
+			}
+			if (gu)
+			{
+				gu->setFameValueGuild(theFactionIndex, fame, maxFame, fow.LastFameChangeTrends[theFactionIndex]);
+			}
+		}
+
+		return;
+	}
+
 	// Check cults, first member of allegiance
 	PVP_CLAN::TPVPClan theCult = allegiance.first;
 	if (theCult != PVP_CLAN::None)
@@ -1455,7 +1539,7 @@ void CFameManager::enforceFameCaps(const NLMISC::CEntityId &entityId, std::pair<
 		{
 			theFactionIndex = PVP_CLAN::getFactionIndex((PVP_CLAN::TPVPClan)looper);
 			fame = fow.Fames[theFactionIndex];
-			maxFame = getMaxFameByClan(allegiance,(PVP_CLAN::TPVPClan)looper);
+			maxFame = getMaxFameByClan(allegiance, organization, (PVP_CLAN::TPVPClan)looper);
 			if( fame != NO_FAME)
 			{
 				clamp(fame,FameAbsoluteMin,maxFame);
@@ -1479,12 +1563,12 @@ void CFameManager::enforceFameCaps(const NLMISC::CEntityId &entityId, std::pair<
 		{
 			theFactionIndex = PVP_CLAN::getFactionIndex((PVP_CLAN::TPVPClan)looper);
 			fame = fow.Fames[theFactionIndex];
-			maxFame = getMaxFameByClan(allegiance,(PVP_CLAN::TPVPClan)looper);
+			maxFame = getMaxFameByClan(allegiance, organization, (PVP_CLAN::TPVPClan)looper);
 			if( fame != NO_FAME)
 			{
 				clamp(fame,FameAbsoluteMin,maxFame);
 				fow.Fames[theFactionIndex] = fame;
-			}	
+			}
 			if (ch)
 			{
 				ch->setFameValuePlayer(theFactionIndex, fame, maxFame, fow.LastFameChangeTrends[theFactionIndex]);
@@ -1497,7 +1581,7 @@ void CFameManager::enforceFameCaps(const NLMISC::CEntityId &entityId, std::pair<
 	}
 }
 
-void CFameManager::setAndEnforceTribeFameCap(const NLMISC::CEntityId &entityId, std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance)
+void CFameManager::setAndEnforceTribeFameCap(const NLMISC::CEntityId &entityId, uint32 organization, std::pair<PVP_CLAN::TPVPClan, PVP_CLAN::TPVPClan> allegiance)
 {
 	const TDataSetRow rowId = TheFameDataset.getDataSetRow(entityId);
 	TFameContainer::iterator it = _FamesOwners.find(rowId);
@@ -1533,45 +1617,53 @@ void CFameManager::setAndEnforceTribeFameCap(const NLMISC::CEntityId &entityId, 
 	for( vector<CStaticFames::CTribeCultThresholdPerCiv>::const_iterator it = CStaticFames::getInstance().getTribeThresholdVector().begin(); it != CStaticFames::getInstance().getTribeThresholdVector().end(); ++it )
 	{
 		theFactionIndex = (*it).FameIndex;
-	
-		switch( allegiance.second )
+
+		if (organization == 5) // marauder
 		{
-		case PVP_CLAN::Matis:
-			tc = &(*it).Matis;
-			break;
-		case PVP_CLAN::Fyros:
-			tc = &(*it).Fyros;
-			break;
-		case PVP_CLAN::Tryker:
-			tc = &(*it).Tryker;
-			break;
-		case PVP_CLAN::Zorai:
-			tc = &(*it).Zorai;
-			break;
-		case PVP_CLAN::Neutral:
-			tc = &(*it).Neutral;
-			break;
-		default:
-			nlwarning("Character %s have bad civilization allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.second, PVP_CLAN::toString(allegiance.second).c_str());
-			return;
+			tc = &(*it).Marauder;
+			threshold = tc->getMarauder();
+		}
+		else
+		{
+			switch( allegiance.second )
+			{
+			case PVP_CLAN::Matis:
+				tc = &(*it).Matis;
+				break;
+			case PVP_CLAN::Fyros:
+				tc = &(*it).Fyros;
+				break;
+			case PVP_CLAN::Tryker:
+				tc = &(*it).Tryker;
+				break;
+			case PVP_CLAN::Zorai:
+				tc = &(*it).Zorai;
+				break;
+			case PVP_CLAN::Neutral:
+				tc = &(*it).Neutral;
+				break;
+			default:
+				nlwarning("Character %s have bad civilization allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.second, PVP_CLAN::toString(allegiance.second).c_str());
+				return;
+			}
+
+			switch(allegiance.first)
+			{
+			case PVP_CLAN::Kami:
+				threshold = tc->getKami();
+				break;
+			case PVP_CLAN::Karavan:
+				threshold = tc->getKaravan();
+				break;
+			case PVP_CLAN::Neutral:
+				threshold = tc->getNeutral();
+				break;
+			default:
+				nlwarning("Character %s have bad cult allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.first, PVP_CLAN::toString(allegiance.first).c_str());
+				return;
+			}
 		}
 
-		switch(allegiance.first)
-		{
-		case PVP_CLAN::Kami:
-			threshold = tc->getKami();
-			break;
-		case PVP_CLAN::Karavan:
-			threshold = tc->getKaravan();
-			break;
-		case PVP_CLAN::Neutral:
-			threshold = tc->getNeutral();
-			break;
-		default:
-			nlwarning("Character %s have bad cult allegiance...'%d/%s' !", entityId.toString().c_str(), allegiance.first, PVP_CLAN::toString(allegiance.first).c_str());
-			return;
-		}
-	
 		fame = fow.Fames[theFactionIndex];
 		if( fame != NO_FAME )
 		{
@@ -1601,10 +1693,10 @@ void CFameManager::thresholdChanged(NLMISC::IVariable &var)
 //	TDataSetRow index;
 //	if ( Mirror.mirrorIsReady() )
 //		index = TheFameDataset.getDataSetRow(eId);
-//	
+//
 //	std::string name;
 //	uint32 value;
-//	
+//
 //	f.xmlPush("fames");
 //
 //	if ( f.isReading() )
@@ -1627,13 +1719,13 @@ void CFameManager::thresholdChanged(NLMISC::IVariable &var)
 //	}
 //	else
 //	{
-//		const std::vector<NLMISC::TStringId> & fameIds = CStaticFames::getInstance().getFactionNames();		
+//		const std::vector<NLMISC::TStringId> & fameIds = CStaticFames::getInstance().getFactionNames();
 //		uint32 size = fameIds.size();
 //
 //		f.xmlPush("size");
 //			f.serial(size);
 //		f.xmlPop();
-//		
+//
 //		for (uint i = 0; i < size; i++ )
 //		{
 //			std::string name = CStringMapper::unmap( fameIds[i] );
@@ -1760,8 +1852,8 @@ void CFameManager::updateFameTrend(const TDataSetRow &entityIndex)
 				CCharacter *character = PlayerManager.getChar(eid);
 				if (character == NULL)
 				{
-					nlwarning("Can't find character '%s' (from fame row index %u) in player manager !", 
-						eid.toString().c_str(), 
+					nlwarning("Can't find character '%s' (from fame row index %u) in player manager !",
+						eid.toString().c_str(),
 						entityIndex.toString().c_str());
 					return;
 				}
@@ -1771,8 +1863,8 @@ void CFameManager::updateFameTrend(const TDataSetRow &entityIndex)
 				CGuild *guild = CGuildManager::getInstance()->getGuildFromId((uint32)(eid.getShortId()));
 				if (guild == NULL)
 				{
-					nlwarning("Can't find guild '%s' (from fame row index %u) in guild manager !", 
-						eid.toString().c_str(), 
+					nlwarning("Can't find guild '%s' (from fame row index %u) in guild manager !",
+						eid.toString().c_str(),
 						entityIndex.toString().c_str());
 					return;
 				}
@@ -1786,7 +1878,7 @@ void CFameManager::updatePlayerFame(const TDataSetRow &playerIndex)
 	CCharacter *character = NULL;
 	TFameContainer::iterator it(_FamesOwners.find(playerIndex));
 	double		alpha = 1.0f;
-	
+
 
 	if (it == _FamesOwners.end())
 	{
@@ -1826,7 +1918,7 @@ void CFameManager::updatePlayerFame(const TDataSetRow &playerIndex)
 					TheFameDataset.getEntityId(playerIndex).toString().c_str());
 				return;
 			}
-			
+
 			TFameOwnerWrite *guildFame = it->second;
 
 			if (now - fow->LastGuildStatusChange > FameMemoryInterpolation)
@@ -1848,7 +1940,7 @@ void CFameManager::updatePlayerFame(const TDataSetRow &playerIndex)
 
 				for (uint i=0; i<MAX_FACTION; ++i)
 				{
-					sint32 gf = guildFame->Fames[i]; 
+					sint32 gf = guildFame->Fames[i];
 					sint32 hf = fow->LastGuildFame[i];
 
 					if (gf == NO_FAME && hf == NO_FAME)
@@ -2005,7 +2097,7 @@ NLMISC_COMMAND (declareCharacterCult, "Make character declare a specific cult.",
 
 	// Second argument is a clan.
 	PVP_CLAN::TPVPClan theClan = PVP_CLAN::fromString(args[1]);
-	
+
 	if (theClan == PVP_CLAN::Unknown)
 	{
 		log.displayNL("Invalid clan name specified.");
@@ -2042,7 +2134,7 @@ NLMISC_COMMAND (declareCharacterCiv, "Make character declare a specific civiliza
 
 	// Second argument is a clan.
 	PVP_CLAN::TPVPClan theClan = PVP_CLAN::fromString(args[1]);
-	
+
 	if (theClan == PVP_CLAN::Unknown)
 	{
 		log.displayNL("Invalid clan name specified.");
@@ -2072,7 +2164,7 @@ NLMISC_COMMAND (adjustCharacterFame, "For a character, adjust a specific clan by
 
 	// Second argument is a clan.
 	PVP_CLAN::TPVPClan theClan = PVP_CLAN::fromString(args[1]);
-	
+
 	uint32 factionIndex;
 
 	if (theClan == PVP_CLAN::Unknown)
@@ -2126,7 +2218,7 @@ NLMISC_COMMAND (declareGuildCult, "Make guild declare a specific cult", "<Guild 
 
 	// Second argument is a clan.
 	PVP_CLAN::TPVPClan theClan = PVP_CLAN::fromString(args[1]);
-	
+
 	if (theClan == PVP_CLAN::Unknown)
 	{
 		log.displayNL("Invalid clan name specified.");
@@ -2162,7 +2254,7 @@ NLMISC_COMMAND (declareGuildCiv, "Make guild declare a specific civilization", "
 
 	// Second argument is a clan.
 	PVP_CLAN::TPVPClan theClan = PVP_CLAN::fromString(args[1]);
-	
+
 	if (theClan == PVP_CLAN::Unknown)
 	{
 		log.displayNL("Invalid clan name specified.");
@@ -2199,7 +2291,7 @@ NLMISC_COMMAND (adjustGuildFame, "For a guild, adjust a specific clan by indicat
 
 	// Second argument is a clan.
 	PVP_CLAN::TPVPClan theClan = PVP_CLAN::fromString(args[1]);
-	
+
 	if (theClan == PVP_CLAN::Unknown)
 	{
 		log.displayNL("Invalid clan name specified.");
@@ -2234,7 +2326,7 @@ NLMISC_COMMAND (testit, "testit", "")
 	}
 
 	//int retval = CFameManager::getInstance().getStartFame(pCiv,tClan);
-	int retval = CFameManager::getInstance().getMaxFameByClan(std::make_pair(pCult,pCiv),tClan);
+	int retval = CFameManager::getInstance().getMaxFameByClan(std::make_pair(pCult,pCiv),0,tClan);
 	log.displayNL("Fame value = %d.", retval);
 
 	return true;

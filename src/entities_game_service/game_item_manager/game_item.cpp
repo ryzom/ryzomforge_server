@@ -1217,7 +1217,9 @@ CGameItemPtr CGameItem::getItemCopy()
 //-----------------------------------------------
 uint32 CGameItem::sendNameId(CCharacter * user)
 {
-	nlassert( _Form != 0 );
+	if (!_Form)
+		return 0;
+
 	if( _Form->Family != ITEMFAMILY::SCROLL_R2 )
 	{
 		if ( ! _PhraseId.empty() )
@@ -4407,7 +4409,8 @@ uint16 CGameItem::getClientEnchantValue() const
 	}
 	if ( sabrinaValue != 0)
 	{
-		return uint8( 1 + sapLoad / (uint32)(sabrinaValue * sabrinaRelativeValue) );
+		// client side value is limited to 10bits
+		return std::min(uint(999), uint(1 + sapLoad / (uint32)(sabrinaValue * sabrinaRelativeValue)));
 	}
 	else
 	{

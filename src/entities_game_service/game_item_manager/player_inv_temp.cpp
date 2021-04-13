@@ -117,6 +117,8 @@ void CTempInventory::clearDisp(uint32 slot)
 	tempEntry.setQUALITY(_Char->_PropertyDatabase, 0);
 //	_Char->_PropertyDatabase.setProp(sDBPath+":QUANTITY",			0);
 	tempEntry.setQUANTITY(_Char->_PropertyDatabase, 0);
+	tempEntry.setSERIAL(_Char->_PropertyDatabase, 0);
+	tempEntry.setCREATE_TIME(_Char->_PropertyDatabase, 0);
 //	_Char->_PropertyDatabase.setProp(sDBPath+":USER_COLOR",			0);
 	tempEntry.setUSER_COLOR(_Char->_PropertyDatabase, 0);
 //	_Char->_PropertyDatabase.setProp(sDBPath+":WEIGHT",				0);
