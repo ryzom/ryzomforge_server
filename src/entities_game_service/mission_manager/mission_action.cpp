@@ -148,7 +148,7 @@ void logMissionActionLaunch(uint32 line, CMission *m, const string &ActionNameAn
 {
 	if (!VerboseMissions) return;
 	string sTmp = "sline:" + toString(line) + " ";
-	
+
 	std::vector<TDataSetRow> entities;
 	m->getEntities( entities );
 	for ( uint i  = 0; i < entities.size(); i++)
@@ -156,15 +156,15 @@ void logMissionActionLaunch(uint32 line, CMission *m, const string &ActionNameAn
 		CCharacter *pChar = PlayerManager.getChar(entities[i]);
 		sTmp += "user:" + pChar->getId().toString() + " ";
 	}
-	
+
 	TAIAlias alias = m->getTemplateId();
 	sTmp += "miss:" + CPrimitivesParser::aliasToString(alias);
 	CMissionTemplate *templ = CMissionManager::getInstance()->getTemplate( alias );
 	if (templ != NULL)
 		sTmp += ",'" + templ->getMissionName() + "' ";
-	
+
 	sTmp += "EXEC " + ActionNameAndParams;
-	
+
 	MISDBG("%s", sTmp.c_str());
 }
 #define LOGMISSIONACTION(xxxx) logMissionActionLaunch(_SourceLine, instance, xxxx)
@@ -252,7 +252,7 @@ static bool evaluateSDBExpr(const std::string &sdbExpr, double &res, bool ignore
 			}
 			if (i == sdbExpr.size() || varName.empty())
 				return false;
-			
+
 			if (!CStatDB::getInstance()->valueGet(varName, varValue))
 			{
 				if (!ignoreUnknownVar)
@@ -298,7 +298,7 @@ protected:
 	{
 		return CMissionParser::solveTextsParams( _SourceLine, _Params, missionData );
 	}
-	
+
 	string	_Text;
 	TVectorParamCheck _Params;
 };
@@ -352,7 +352,7 @@ class CMissionActionBotChat :public CMissionActionText
 		// get speaking bot
 		if ( !CMissionParser::parseBotName(script[2],_Bot,missionData) )
 			return false;
-		
+
 		return CMissionParser::parseParamText(line, script[3], _Text, _Params );
 	}
 
@@ -375,7 +375,7 @@ class CMissionActionBotChat :public CMissionActionText
 		std::vector<TDataSetRow> entities;
 		instance->getEntities( entities );
 		TVectorParamCheck params = _Params;
-		
+
 		CMissionParser::solveBotNames(params,CAIAliasTranslator::getInstance()->getEntityId(instance->getGiver()));
 
 		// 2 different loop : avoid multi test on chat type
@@ -398,7 +398,7 @@ class CMissionActionBotChat :public CMissionActionText
 			}
 		}
 	};
-	
+
 	TAIAlias				_Bot;
 	CChatGroup::TGroupType	_ChatMode;
 
@@ -441,7 +441,7 @@ protected:
 	}
 		return true;
 	}
-	
+
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
 		LOGMISSIONACTION("popup_msg");
@@ -511,16 +511,16 @@ class CMissionActionSetDesc : public IMissionAction
 			return false;
 		return true;
 	}
-	
+
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
 		LOGMISSIONACTION("set_desc");
 		instance->overrideDesc( _DescIndex );
 	};
-	
+
 	// index of this description in the template
 	uint32	_DescIndex;
-	
+
 	MISSION_ACTION_GETNEWPTR(CMissionActionSetDesc)
 };
 MISSION_REGISTER_ACTION(CMissionActionSetDesc,"set_desc");
@@ -571,7 +571,7 @@ class CMissionActionRecvItem : public IMissionAction
 				ret = false;
 			}
 			missionData.ChatParams.push_back( make_pair( args[0], STRING_MANAGER::item ) );
-			
+
 			_Quality = 1;
 			if ( args.size() == 3 )
 			{
@@ -603,7 +603,7 @@ class CMissionActionRecvItem : public IMissionAction
 			}
 		}
 
-		
+
 		if ( _Quantity == 0 )
 		{
 			MISLOGERROR("quantity = 0");
@@ -937,12 +937,12 @@ class CMissionActionRecvNamedItem : public IMissionAction
 			MISLOGERROR("bad named item format");
 			return false;
 		}
-			
+
 		// read quantity
 		_Quantity = 1;
 		if ( args.size() >= 2)
 			NLMISC::fromString(args[1], _Quantity);
-		
+
 		// read group
 		_Group = false;
 		if ( script.size() == 3 )
@@ -1176,12 +1176,12 @@ public:
 
 		vector<string> args;
 		CMissionParser::tokenizeString( script[1]," \t",args );
-		
+
 		// read the quantity, or 1 by default
 		_Quantity = 1;
 		if ( args.size() >= 2)
 			NLMISC::fromString(args[1], _Quantity);
-		
+
 		// If the name of the item macthes one of the special defined mission items for this mission
 		uint i = 0;
 		for (; i < missionData.Items.size(); i++ )
@@ -1198,7 +1198,7 @@ public:
 				break;
 			}
 		}
-		
+
 		// If no special mission item found, get a sheetid/quality
 		if ( i == missionData.Items.size() )
 		{
@@ -1211,7 +1211,7 @@ public:
 				ret = false;
 			}
 			missionData.ChatParams.push_back( make_pair( args[0], STRING_MANAGER::item ) );
-			
+
 			// read the minimum quality to destroy (1 if not specified)
 			_Quality = 1;
 			if ( args.size() == 3 )
@@ -1224,7 +1224,7 @@ public:
 				}
 			}
 		}
-		
+
 		// Bad quantity?
 		if ( _Quantity == 0 )
 		{
@@ -1240,10 +1240,10 @@ public:
 	uint16		_Quality;
 	uint16		_Quantity;
 };
-	
+
 /// we destroy the item of the user in its inventory
 // -----------------------------------------------------------------------------
-class CMissionActionDestroyItem : 
+class CMissionActionDestroyItem :
  public IMissionAction,
  private CMissionBaseItemSelector
 {
@@ -1379,7 +1379,7 @@ MISSION_REGISTER_ACTION(CMissionActionDestroyItem,"destroy_item");
 
 /// We test if the user has the requested item in its inventory
 // ----------------------------------------------------------------------------
-class CMissionActionCondJumpIfItemInInv : 
+class CMissionActionCondJumpIfItemInInv :
  public CMissionActionJump,
  private CMissionBaseItemSelector
 {
@@ -1392,10 +1392,10 @@ public:
 			MISLOGSYNTAXERROR("<item> [<quantity>] [<quality>]:<label>");
 			return false;
 		}
-		
+
 		// Build the item filter
 		bool	ret= CMissionBaseItemSelector::buildItemFilter(line, script, missionData);
-		
+
 		Label = CMissionParser::getNoBlankString(script[2]);
 		missionData.Jumps.push_back( Label );
 		return ret;
@@ -1404,7 +1404,7 @@ public:
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
 		LOGMISSIONACTION("if_item_in_inv");
-		
+
 		// For all entities affected by the mission
 		std::vector<TDataSetRow> entities;
 		instance->getEntities(entities);
@@ -1422,7 +1422,7 @@ public:
 				quantityDetected+= user->selectItems(INVENTORIES::bag, _SheetId, _Quality);
 				for(uint pa=0;pa<INVENTORIES::max_pet_animal;pa++)
 					quantityDetected+= user->selectItems(INVENTORIES::TInventory(INVENTORIES::pet_animal + pa), _SheetId, _Quality);
-				
+
 				// if not enough requested items, fail!
 				if(quantityDetected<_Quantity)
 					return;
@@ -1432,7 +1432,7 @@ public:
 		// ok all palyer have the request in their bag!
 		CMissionActionJump::launch( instance, eventList );
 	}
-	
+
 	MISSION_ACTION_GETNEWPTR(CMissionActionCondJumpIfItemInInv)
 };
 MISSION_REGISTER_ACTION(CMissionActionCondJumpIfItemInInv,"if_item_in_inv");
@@ -1555,16 +1555,16 @@ class CMissionActionLearnAction : public IMissionAction
 
 				if (_Npc == CAIAliasTranslator::Invalid)
 				{
-					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
-						toString("MIS_RECV_ACTION_%u", _ActionSheets.size()), 
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(),
+						toString("MIS_RECV_ACTION_%u", _ActionSheets.size()),
 						params);
 				}
 				else
 				{
 					STRING_MANAGER::TParam p(STRING_MANAGER::bot, _Npc);
 					params.push_back(p);
-					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
-						toString("MIS_RECV_ACTION_NPC_%u", _ActionSheets.size()), 
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(),
+						toString("MIS_RECV_ACTION_NPC_%u", _ActionSheets.size()),
 						params);
 				}
 			}
@@ -1699,16 +1699,16 @@ class CMissionActionLearnBrick : public IMissionAction
 
 				if (_Npc == CAIAliasTranslator::Invalid)
 				{
-					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
-						toString("MIS_RECV_BRICK_%u", _BrickSheets.size()), 
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(),
+						toString("MIS_RECV_BRICK_%u", _BrickSheets.size()),
 						params);
 				}
 				else
 				{
 					STRING_MANAGER::TParam p(STRING_MANAGER::bot, _Npc);
 					params.push_back(p);
-					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
-						toString("MIS_RECV_BRICK_NPC_%u", _BrickSheets.size()), 
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(),
+						toString("MIS_RECV_BRICK_NPC_%u", _BrickSheets.size()),
 						params);
 				}
 			}
@@ -1843,16 +1843,16 @@ class CMissionActionUnlearnBrick : public IMissionAction
 
 				if (_Npc == CAIAliasTranslator::Invalid)
 				{
-					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
-						toString("MIS_REMV_BRICK_%u", _BrickSheets.size()), 
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(),
+						toString("MIS_REMV_BRICK_%u", _BrickSheets.size()),
 						params);
 				}
 				else
 				{
 					STRING_MANAGER::TParam p(STRING_MANAGER::bot, _Npc);
 					params.push_back(p);
-					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(), 
-						toString("MIS_REMV_BRICK_NPC_%u", _BrickSheets.size()), 
+					PHRASE_UTILITIES::sendDynamicSystemMessage(user->getEntityRowId(),
+						toString("MIS_REMV_BRICK_NPC_%u", _BrickSheets.size()),
 						params);
 				}
 			}
@@ -1879,7 +1879,7 @@ class CMissionActionRecvMoney : public IMissionAction
 			MISLOGSYNTAXERROR("<money> [: guild] OR <item><quality><factor> *[;<item><quality><factor>]");
 			return false;
 		}
-		
+
 		_Amount = 0;
 		vector<string> multiArgs;
 		CMissionParser::tokenizeString( script[1],";",multiArgs );
@@ -2034,7 +2034,7 @@ class CMissionActionRecvFame : public IMissionAction
 		}
 
 		return true;
-		
+
 	}
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
@@ -2143,7 +2143,7 @@ class CMissionActionRecvXp : public IMissionAction
 
 		std::vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		// distribute XP among all entities
 		for (uint32 i = 0; i < entities.size(); i++)
 		{
@@ -2269,7 +2269,7 @@ class CMissionActionEmote : public IMissionAction
 		// get speaking bot
 		if ( !CMissionParser::parseBotName(vars[0],_Bot,missionData) )
 			ret = false;
-		
+
 		uint32 emoteId = 0;
 		string sEmote = CMissionParser::getNoBlankString(vars[1]);
 		if ( !CMissionManager::getInstance()->getEmoteId(sEmote, emoteId) )
@@ -2321,7 +2321,7 @@ class CMissionActionEmote : public IMissionAction
 
 		double dx = (double) ( user->getState().X - bot->getState().X );
 		double dy = (double) ( user->getState().Y - bot->getState().Y );
-		
+
 		// send the heading to AI
 		CSetBotHeadingMsg msg;
 		msg.BotRowId = bot->getEntityRowId();
@@ -2375,7 +2375,7 @@ IMissionAction* CMissionActionJump::getNewPtr()
 {
 	CMissionActionJump * ptr = new CMissionActionJump;
 	*ptr = *this;
-	return ptr; 
+	return ptr;
 }
 MISSION_REGISTER_ACTION(CMissionActionJump,"jump");
 
@@ -2640,7 +2640,7 @@ class CMissionActionEnd : public IMissionAction
 			MISLOGSYNTAXERROR("no param expected");
 			return false;
 		}
-		
+
 		return true;
 	}
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
@@ -2789,7 +2789,7 @@ class CMissionActionFailMissionCat : public IMissionAction
 				}
 
 				// and the main mission template category
-				if (!bFailed) // do not fail a mission twice 
+				if (!bFailed) // do not fail a mission twice
 				{
 					pMissTemplate = pMM->getTemplate(pMiss->getMainMissionTemplateId());
 					if (pMissTemplate != NULL)
@@ -2857,7 +2857,7 @@ class CMissionActionCompassNpc : public IMissionAction
 								sint32 y;
 								string textName;
 								c->getPositionCheck(toUpper(templ->getMissionName()), x, y, textName);
-								
+
 								SM_STATIC_PARAMS_1(textParams, STRING_MANAGER::literal);
 								textParams[0].Literal.fromUtf8(textName);
 								uint32 txtId = STRING_MANAGER::sendStringToClient( c->getEntityRowId(), "LITERAL", textParams );
@@ -2952,7 +2952,7 @@ class CMissionActionRemoveCompassNpc : public IMissionAction
 			alias = instance->getGiver();
 		else
 			alias = Alias;
-		
+
 		instance->removeCompassBot(alias);
 	}
 	TAIAlias Alias;
@@ -3017,7 +3017,7 @@ class CMissionActionAIEvent : public IMissionAction
 			MISLOGSYNTAXERROR("<group>;<event number>*[;<param>]");
 			return false;
 		}
-		
+
 		string sGroup = CMissionParser::getNoBlankString(args[0]);
 		CAIAliasTranslator::getInstance()->getGroupAliasesFromName(sGroup, Groups);
 		if ( Groups.empty() )
@@ -3057,7 +3057,7 @@ class CMissionActionAIEvent : public IMissionAction
 			{
 				const CMissionTemplate * templ = CMissionManager::getInstance()->getTemplate( instance->getTemplateId() );
 				nlassert(templ);
-				LOGMISSIONACTION("ai_event : can't send event '" + toString(EventId) + "' from mission '" + 
+				LOGMISSIONACTION("ai_event : can't send event '" + toString(EventId) + "' from mission '" +
 							templ->getMissionName() + "' : mission giver invalid, can't retrieve AI instance");
 			}
 		}
@@ -3109,7 +3109,7 @@ class CMissionActionDayPeriod : public IMissionAction
 			MISLOGSYNTAXERROR("<hour> <min>; <hour> <min>");
 			return false;
 		}
-		
+
 		vector<string> args;
 		splitString(script[1],";",args);
 		if ( args.size() != 2)
@@ -3117,7 +3117,7 @@ class CMissionActionDayPeriod : public IMissionAction
 			MISLOGSYNTAXERROR("<hour> <min>; <hour> <min>");
 			return false;
 		}
-		
+
 		vector<string> params;
 		CMissionParser::tokenizeString(args[0]," \t",params);
 		if ( params.size() != 2 )
@@ -3207,13 +3207,13 @@ class CMissionActionSeason : public IMissionAction
 		}
 		return true;
 	}
-	
+
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
 		LOGMISSIONACTION("season");
 		instance->setSeason(Season);
 	}
-	
+
 	EGSPD::CSeason::TSeason Season;
 
 	MISSION_ACTION_GETNEWPTR(CMissionActionSeason)
@@ -3236,7 +3236,7 @@ public:
 		}
 		return true;
 	}
-	
+
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
 		LOGMISSIONACTION("reward");
@@ -3282,11 +3282,11 @@ public:
 			bool ret = true;
 			vector<string> args;
 			CMissionParser::tokenizeString( script[1]," \t",args );
-			
+
 			uint16 quantity = 1;
 			if ( args.size() >= 2)
 				NLMISC::fromString(args[1], quantity);
-			
+
 			for (uint i = 0; i < items.size(); i++ )
 			{
 				if ( !nlstricmp( items[i].first , args[0] ) )
@@ -3300,14 +3300,14 @@ public:
 					return true;
 				}
 			}
-			
+
 			CSheetId sheet = CSheetId( CMissionParser::getNoBlankString(args[0]) + ".sitem" );
 			if ( sheet == CSheetId::Unknown )
 			{
 				MISLOG("sline:%u  syntax error sheetId '%s' is unknon", line, (CMissionParser::getNoBlankString(args[0]) + ".sitem").c_str() ) ;
 				ret = false;
 			}
-			
+
 			uint16 quality = 1;
 			if ( args.size() == 3 )
 			{
@@ -3352,7 +3352,7 @@ public:
 	vector<CSheetId>					Phrases;
 	vector< pair<CMissionItem,uint16> >	MissionItems;
 	vector<CItemDesc>					StdItems;
-		
+
 
 	MISSION_ACTION_GETNEWPTR(CMissionActionRewardGroup)
 };
@@ -3465,7 +3465,7 @@ protected:
 			LOGMISSIONACTION("teleport : invalid tp index " + toString(DestinationIdx) + "TP is NULL");
 			return;
 		}
-		
+
 		sint32 x,y,z;
 		float heading;
 		for ( uint i = 0; i < entities.size(); i++ )
@@ -3519,7 +3519,7 @@ protected:
 		LOGMISSIONACTION("teleport_x_y");
 		vector<TDataSetRow> entities;
 		instance->getEntities( entities );
-		
+
 		for ( uint i = 0; i < entities.size(); i++ )
 		{
 			CCharacter * user = PlayerManager.getChar( entities[i] );
@@ -3802,7 +3802,7 @@ class CMissionActionGiveOutpostControl : public IMissionAction
 				{
 					if (guild->getOwnedCharge()->getOutpost() != op)
 					{
-						nlwarning("GiveOutpostControl : the guild '%s' is associated to outpost '%s', NOT to '%s'", 
+						nlwarning("GiveOutpostControl : the guild '%s' is associated to outpost '%s', NOT to '%s'",
 							guild->getGuildName().toString().c_str(),
 							guild->getOwnedCharge()->getOutpost()->getName().c_str(),
 							_OutpostName.c_str());
@@ -4109,7 +4109,7 @@ class CMissionActionCancelOutside: public IMissionAction
 		CMissionManager::getInstance()->cleanPlaceConstraint( instance, Place );
 	}
 	uint16 Place;
-	
+
 	MISSION_ACTION_GETNEWPTR(CMissionActionCancelOutside)
 };
 MISSION_REGISTER_ACTION(CMissionActionCancelOutside,"cancel_outside");
@@ -4119,7 +4119,7 @@ class CMissionActionSpawnMission: public IMissionAction
 {
 protected:
 
-	TAIAlias	Mission;	
+	TAIAlias	Mission;
 	TAIAlias	NPCOwner;	// NPC giver the mission have to be attached at spawn time
 	bool		Guild;
 
@@ -4140,7 +4140,7 @@ protected:
 			MISLOGERROR1("invalid mission '%s'", name.c_str());
 			return false;
 		}
-		
+
 		// Get the owner of the mission that will be spawn
 
 		name = CMissionParser::getNoBlankString( script[2] );
@@ -4158,7 +4158,7 @@ protected:
 				MISLOG("sline:%u WARNING %s : name '%s' give multiple aliases", line, script[0].c_str(), name.c_str());
 			}
 		}
-		
+
 		NPCOwner = CAIAliasTranslator::Invalid;
 		if (vRet.size() > 0)
 			NPCOwner = vRet[0];
@@ -4183,6 +4183,8 @@ protected:
 		if (NPCOwner == CAIAliasTranslator::Invalid)
 		{
 			CAIAliasTranslator::getInstance()->getNPCNameFromAlias(instance->getGiver(), sDebugBotName);
+			if (sDebugBotName.find('$') != string::npos)
+				sDebugBotName = sDebugBotName.substr(0, sDebugBotName.find('$'));
 			nlassert(instance);
 			CMissionEventAddMission * event = new CMissionEventAddMission( instance->getGiver(), Mission, mainMission, Guild );
 			eventList.push_back( event );
@@ -4190,6 +4192,8 @@ protected:
 		else
 		{
 			CAIAliasTranslator::getInstance()->getNPCNameFromAlias(NPCOwner, sDebugBotName);
+			if (sDebugBotName.find('$') != string::npos)
+				sDebugBotName = sDebugBotName.substr(0, sDebugBotName.find('$'));
 			CMissionEventAddMission * event = new CMissionEventAddMission( NPCOwner, Mission, mainMission, Guild );
 			eventList.push_back( event );
 		}
@@ -4248,9 +4252,9 @@ class CMissionActionEncycloUnlock : public IMissionAction
 {
 	uint32 AlbumNb;
 	uint32 ThemaNb;
-	
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-						CMissionGlobalParsingData & globalData, 
+
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+						CMissionGlobalParsingData & globalData,
 						CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4267,7 +4271,7 @@ class CMissionActionEncycloUnlock : public IMissionAction
 			MISLOGSYNTAXERROR("<album> <thema>");
 			return false;
 		}
-		
+
 		NLMISC::fromString(vars[0], AlbumNb);
 		NLMISC::fromString(vars[1], ThemaNb);
 
@@ -4301,8 +4305,8 @@ MISSION_REGISTER_ACTION(CMissionActionEncycloUnlock,"encyclo_unlock");
 class CMissionActionGameEventSubscribe : public IMissionAction
 {
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4315,7 +4319,7 @@ class CMissionActionGameEventSubscribe : public IMissionAction
 		LOGMISSIONACTION("game_event_subscribe");
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		for (uint32 i = 0; i < entities.size(); ++i)
 		{
 			CCharacter *pChar = PlayerManager.getChar(entities[i]);
@@ -4336,8 +4340,8 @@ MISSION_REGISTER_ACTION(CMissionActionGameEventSubscribe,"game_event_subscribe")
 class CMissionActionGameEventReset : public IMissionAction
 {
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4350,7 +4354,7 @@ class CMissionActionGameEventReset : public IMissionAction
 		LOGMISSIONACTION("game_event_reset");
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		for (uint32 i = 0; i < entities.size(); ++i)
 		{
 			CCharacter *pChar = PlayerManager.getChar(entities[i]);
@@ -4372,8 +4376,8 @@ class CMissionActionSetEventFaction : public IMissionAction
 {
 	string EventFaction;
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-						CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+						CMissionGlobalParsingData & globalData,
 						CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4415,8 +4419,8 @@ class CMissionActionSetRespawnPoints : public IMissionAction
 	vector<uint16>			_RespawnPoints;
 	bool					_HideOthers;
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4490,7 +4494,7 @@ class CMissionActionSetRespawnPoints : public IMissionAction
 		LOGMISSIONACTION("set_respawn_points");
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		for (uint32 i = 0; i < entities.size(); ++i)
 		{
 			CCharacter *pChar = PlayerManager.getChar(entities[i]);
@@ -4514,8 +4518,8 @@ class CMissionActionSDBSet : public IMissionAction
 	string _SDBPath;
 	sint32 _SDBValue;
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4552,8 +4556,8 @@ class CMissionActionSDBAdd : public IMissionAction
 	string _SDBPath;
 	sint32 _SDBDelta;
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4590,8 +4594,8 @@ class CMissionActionSDBPlayerAdd : public IMissionAction
 	string _SDBPath;
 	sint32 _SDBDelta;
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -4614,7 +4618,7 @@ class CMissionActionSDBPlayerAdd : public IMissionAction
 		LOGMISSIONACTION("sdb_player_add");
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		for (uint32 i = 0; i < entities.size(); ++i)
 		{
 			CCharacter *pChar = PlayerManager.getChar(entities[i]);
@@ -4990,7 +4994,7 @@ class CMissionActionCondJumpGuildCiv : public CMissionActionJump
 };
 MISSION_REGISTER_ACTION(CMissionActionCondJumpGuildCiv,"if_guild_civ");
 
-							  
+
 // ----------------------------------------------------------------------------
 class CMissionActionCondJumpGuildFame : public CMissionActionJump
 {
@@ -5070,7 +5074,7 @@ public:
 			MISLOGSYNTAXERROR("<label>");
 			return false;
 		}
-		
+
 		Label = CMissionParser::getNoBlankString(script[1]);
 		missionData.Jumps.push_back( Label );
 		return true;
@@ -5083,7 +5087,7 @@ public:
 		instance->getEntities( entities );
 		if ( entities.empty() )
 			return;
-		
+
 		// If player have a trial account, do not jump
 		for (uint i = 0 ; i < entities.size(); ++i)
 		{
@@ -5103,7 +5107,7 @@ public:
 		}
 		CMissionActionJump::launch( instance, eventList );
 	}
-	
+
 	MISSION_ACTION_GETNEWPTR(CMissionActionCondJumpNoTrial)
 };
 MISSION_REGISTER_ACTION(CMissionActionCondJumpNoTrial,"if_no_trial");
@@ -5220,8 +5224,8 @@ class CMissionActionSDBSetPVPPath : public IMissionAction
 {
 	string _SDBPath;
 
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -5242,7 +5246,7 @@ class CMissionActionSDBSetPVPPath : public IMissionAction
 		LOGMISSIONACTION("sdb_set_pvp_path");
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		for (uint32 i = 0; i < entities.size(); ++i)
 		{
 			CCharacter *pChar = PlayerManager.getChar(entities[i]);
@@ -5263,8 +5267,8 @@ MISSION_REGISTER_ACTION(CMissionActionSDBSetPVPPath,"sdb_set_pvp_path");
 // ----------------------------------------------------------------------------
 class CMissionActionSDBClearPVPPath : public IMissionAction
 {
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -5282,7 +5286,7 @@ class CMissionActionSDBClearPVPPath : public IMissionAction
 		LOGMISSIONACTION("sdb_clear_pvp_path");
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		for (uint32 i = 0; i < entities.size(); ++i)
 		{
 			CCharacter *pChar = PlayerManager.getChar(entities[i]);
@@ -5364,7 +5368,7 @@ class CMissionActionCondJumpFactionPoint : public CMissionActionJump
 			CMissionActionJump::launch( instance, eventList );
 		}
 	}
-	
+
 	bool evaluateFPExpr(double & res, CCharacter * c)
 	{
 		string numExpr;
@@ -5383,7 +5387,7 @@ class CMissionActionCondJumpFactionPoint : public CMissionActionJump
 				}
 				if (i == _FPExpr.size() || factionName.empty())
 					return false;
-				
+
 				PVP_CLAN::TPVPClan clan = PVP_CLAN::fromString(factionName);
 				if (clan < PVP_CLAN::BeginClans || clan > PVP_CLAN::EndClans)
 					return false;
@@ -5417,9 +5421,9 @@ MISSION_REGISTER_ACTION(CMissionActionCondJumpFactionPoint,"if_faction_point");
 class CMissionActionHandleRelease : public IMissionAction
 {
 	TAIAlias GroupAlias;
-	
-	bool buildAction (	uint32 line, const std::vector< std::string > & script, 
-		CMissionGlobalParsingData & globalData, 
+
+	bool buildAction (	uint32 line, const std::vector< std::string > & script,
+		CMissionGlobalParsingData & globalData,
 		CMissionSpecificParsingData & missionData	)
 	{
 		_SourceLine = line;
@@ -5439,14 +5443,14 @@ class CMissionActionHandleRelease : public IMissionAction
 		GroupAlias = aliases[0];
 		return true;
 	}
-	
+
 	void launch(CMission* instance, std::list< CMissionEvent * > & eventList)
 	{
 		LOGMISSIONACTION("handle_release");
 
 		vector<TDataSetRow> entities;
 		instance->getEntities(entities);
-		
+
 		for (uint32 i = 0; i < entities.size(); ++i)
 		{
 			CCharacter *pChar = PlayerManager.getChar(entities[i]);
@@ -5458,7 +5462,7 @@ class CMissionActionHandleRelease : public IMissionAction
 			pChar->delHandledAIGroup(instance, GroupAlias);
 		}
 	}
-	
+
 	MISSION_ACTION_GETNEWPTR(CMissionActionHandleRelease)
 };
 MISSION_REGISTER_ACTION(CMissionActionHandleRelease, "handle_release");

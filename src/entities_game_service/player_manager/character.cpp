@@ -7653,10 +7653,21 @@ void CCharacter::sendAnimalCommand(uint8 petIndexCode, uint8 command)
 
 		CPetCommandMsg::TCommand petCommand;
 
+
+		const CStaticItem* form = CSheets::getForm(_PlayerPets[petIndex].TicketPetSheetId);
+
 		switch ((ANIMALS_ORDERS::EBeastOrder)command)
 		{
 
 		case ANIMALS_ORDERS::ENTER_BAG:
+			if (!form || form->Type != ITEM_TYPE::ANIMAL_TICKET) {
+				if (!form)
+					nlinfo("Not form");
+				else
+					nlinfo("Not Anima but %s", ITEM_TYPE::toString(form->Type).c_str());
+				continue;
+			}
+
 			_PlayerPets[petIndex].PetStatus = CPetAnimal::in_bag;
 			if (_PlayerPets[petIndex].IsInBag)
 				continue;
@@ -14258,7 +14269,6 @@ bool CCharacter::autoFillExchangeView()
 	CMission* currentMission = NULL;
 	CGameItemPtr invItem;
 	uint stepCounter, candidateCounter, totalItemsInBag, itemsSeenCount;
-	CActiveStepPD activeStep;
 	CMissionTemplate* missionTemplate;
 	std::map<uint32, CActiveStepPD>::iterator stepIterator;
 	std::vector<IMissionStepTemplate::CSubStep> validateSteps;
@@ -14293,6 +14303,20 @@ bool CCharacter::autoFillExchangeView()
 			break;
 
 		validateSteps = missionTemplate->Steps[*itSet - 1]->getSubSteps();
+
+		// get gift step from mission
+		const CActiveStepPD *botGiftStep = currentMission->getSteps(*itSet);
+		if (botGiftStep)
+		{
+			// fill in remaining quantities
+			for(uint i = 0; i < validateSteps.size(); ++i)
+			{
+				const CActiveStepStatePD *gift = botGiftStep->getStates(i+1);
+				if (gift != NULL)
+					validateSteps[i].Quantity = gift->getState();
+			}
+		}
+
 		// the exchange temp inventory thingy has only 8 slots, so very benign failures to put items into it
 		// are possible. Hence merely breaking (doing no further work) as opposed to aborting work done,
 		// and still returning "true". (exchangeWorked == false does not necessarily represent a failure of the whole
@@ -15091,15 +15115,21 @@ string CCharacter::getTargetInfos()
 	}
 	else
 	{
-		string name;
 		CCreature * cTarget = CreatureManager.getCreature(target);
 		if (cTarget)
 		{
+			string name;
+			string title;
 			sint32 petSlot = getPlayerPet(cTarget->getEntityRowId());
 
 			if (petSlot == -1)
-			{
-				CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+	 		{
+		 		CAIAliasTranslator::getInstance()->getNPCNameFromAlias(CAIAliasTranslator::getInstance()->getAIAlias(target), name);
+	 			if (name.find('$') != string::npos)
+				{
+					title = name.substr(name.find('$')+1);
+					name = name.substr(0, name.find('$'));
+				}
 				msg += name+"|";
 			}
 			else
@@ -15119,7 +15149,7 @@ string CCharacter::getTargetInfos()
 			CMirrorPropValueRO<TYPE_CELL> srcCell(TheDataset, dsr, DSPropertyCELL);
 			sint32 cell = srcCell;
 
-			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender());
+			msg += toString("%.2f|%.2f|%.2f|%.2f|%.4f|%d|", dist, x, y, z, h, cell)+cTarget->getType().toString()+"|"+EGSPD::CPeople::toString(cTarget->getRace())+"|"+toString("%d", cTarget->getGender())+"|"+title;
 		}
 	}
 
@@ -15810,10 +15840,10 @@ void CCharacter::sendUrl(const string &url)
 	string control;
 	string salt = toString(getLastConnectedDate())+ArkSalt.get();
 	string playerPos = getPositionInfos();
-	strFindReplace(playerPos, " ", "%20");
+	while(strFindReplace(playerPos, " ", "%20"));
 	string targetInfos = getTargetInfos();
 	string serverInfos = getServerInfos(getState().X / 1000., getState().Y / 1000.);
-	strFindReplace(targetInfos, " ", "%20");
+	while(strFindReplace(targetInfos, " ", "%20"));
 	string final_url;
 
 	if (url.find("$(") != string::npos )
@@ -15830,6 +15860,9 @@ void CCharacter::sendUrl(const string &url)
 	{
 		final_url = url + toString("&urlidx=%d", getUrlIndex())+"&player_pos="+playerPos+"&target_infos="+targetInfos+"&server_infos="+serverInfos;
 	}
+
+	while(strFindReplace(final_url, "#", "%23"));
+	while(strFindReplace(final_url, "$", "%24"));
 
 	control = "&hmac="+ getHMacSHA1((uint8*)&final_url[0], (uint32)final_url.size(), (uint8*)&salt[0], (uint32)salt.size()).toString();
 
@@ -21144,9 +21177,6 @@ uint32 CPetAnimal::getAnimalMaxBulk()
 
 		if (formBag)
 		{
-			// zig inventories have bulk proportionnal to size (size is 1->250)
-			if (creatureBagSheet == CSheetId("zig_inventory.sitem") && Size > 0)
-				return max((uint32)10, (uint32)ceil((formBag->BulkMax*Size)/100));
 			return formBag->BulkMax;
 		}
 	}
