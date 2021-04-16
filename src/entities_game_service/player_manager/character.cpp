@@ -21281,6 +21281,8 @@ uint32 CPetAnimal::getAnimalMaxBulk()
 
 		if (formBag)
 		{
+			if (creatureBagSheet == CSheetId("zig_inventory.sitem"))
+				return formBag->BulkMax*1.5;
 			return formBag->BulkMax;
 		}
 	}
