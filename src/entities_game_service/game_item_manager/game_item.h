@@ -685,6 +685,11 @@ public :
 	/// set Required Faction
 	inline void setRequiredFaction(const std::string & str){ _RequiredFaction = str;}
 
+	/// get Required Powo
+	inline const std::string & getRequiredPowo() const { return _RequiredPowo;}
+	/// set Required Pow
+	inline void setRequiredPowo(const std::string & str){ _RequiredPowo = str;}
+
 	inline bool getLockedByOwner() const { return _LockedByOwner; }
 	void setLockedByOwner(bool value);
 
@@ -958,6 +963,7 @@ private:
 	// required skill
 	bool				_UseNewSystemRequirement;
 	std::string			_RequiredFaction;
+	std::string			_RequiredPowo;
 	SKILLS::ESkills		_RequiredSkill;
 	uint16				_RequiredSkillLevel;
 	SKILLS::ESkills		_RequiredSkill2;
