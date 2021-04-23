@@ -4090,6 +4090,7 @@ private:
 	bool _PowoCanTeleport;
 	bool _PowoCanSpeedUp;
 	bool _PowoCanDP;
+	bool _PowoCanRetry;
 
 	bool _PowoCanAccesRoomInv;
 	bool _PowoCanAccessGuildInv;
@@ -4151,7 +4152,7 @@ public:
 		if (flag == "xp")
 			return _PowoCanXP;
 
-		if (flag == "dead")
+		if (flag == "nodead")
 			return _PowoCantDead;
 
 		if (flag == "teleport")
@@ -4162,6 +4163,9 @@ public:
 
 		if (flag == "dp")
 			return _PowoCanDP;
+
+		if (flag == "retry")
+			return _PowoCanRetry;
 
 		if (flag == "guild_inv")
 			return _PowoCanAccessGuildInv;
@@ -4177,7 +4181,7 @@ public:
 		if (flag == "xp")
 			_PowoCanXP = value;
 
-		else if (flag == "dead")
+		else if (flag == "nodead")
 			_PowoCantDead = value;
 
 		else if (flag == "teleport")
@@ -4188,6 +4192,9 @@ public:
 
 		else if (flag == "dp")
 			_PowoCanDP = value;
+
+		else if (flag == "retry")
+			_PowoCanRetry = value;
 
 		else if (flag == "guild_inv")
 			_PowoCanAccessGuildInv = value;
@@ -4205,6 +4212,7 @@ public:
 		_PowoCanTeleport = false;
 		_PowoCanSpeedUp = false;
 		_PowoCanDP = false;
+		_PowoCanRetry = true;
 	}
 
 	void resetTodayGuildPoints()

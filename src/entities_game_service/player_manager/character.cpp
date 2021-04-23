@@ -564,7 +564,7 @@ CCharacter::CCharacter()
 	_DeathPenaltyTimer.setRemaining(1, new CDeathPenaltiesTimerEvent(this), 1);
 	_BarUpdateTimer.setRemaining(1, new CCharacterBarUpdateTimerEvent(this), 1);
 	_BuildingExitZone = 0xffff;
-	_BuildingExitPos = CVector();
+	_BuildingExitPos = CVector(0, 0, 0);
 	_BuildingExitPos.x = 0;
 	_BuildingExitPos.y = 0;
 	_RespawnMainLandInTown = false;
@@ -5644,6 +5644,25 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
 		getRespawnPoints().setArkRespawnpoint(0, 0, 0);
+
+		CInventoryPtr childSrc = getInventory(INVENTORIES::bag);
+		if (childSrc != NULL)
+		{
+			for (uint j = 0; j < childSrc->getSlotCount(); j++)
+			{
+				CGameItemPtr itemPtr = childSrc->getItem(j);
+				if (itemPtr != NULL)
+				{
+					if (!itemPtr->getRequiredPowo().empty())
+					{
+						if (itemPtr->getRequiredPowo() != _PowoScope)
+							GameItemManager.destroyItem(itemPtr);
+						else
+							unequipCharacter(childSrc->getInventoryId(), itemPtr->getRefInventorySlot());
+					}
+				}
+			}
+		}
 	}
 	else if (_PowoCell == 0)
 		CBuildingManager::getInstance()->removePlayerFromRoom(this);
@@ -21144,9 +21163,8 @@ uint32 CPetAnimal::getAnimalMaxBulk()
 
 		if (formBag)
 		{
-			// zig inventories have bulk proportionnal to size (size is 1->250)
-			if (creatureBagSheet == CSheetId("zig_inventory.sitem") && Size > 0)
-				return max((uint32)10, (uint32)ceil((formBag->BulkMax*Size)/100));
+			if (creatureBagSheet == CSheetId("zig_inventory.sitem"))
+				return formBag->BulkMax*1.5;
 			return formBag->BulkMax;
 		}
 	}
