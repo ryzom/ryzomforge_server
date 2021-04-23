@@ -1250,6 +1250,7 @@ CGameItemPtr CGameItem::getItemCopy()
 	item->_LostHPremains = 0.0f;
 	item->_PhraseId = _PhraseId;
 	item->_RequiredFaction = _RequiredFaction;
+	item->_RequiredPowo = _RequiredPowo;
 	item->computeItemWornState();
 
 	log_Item_Create(item->getItemId(), item->getSheetId(), item->getStackSize(), item->quality());
@@ -1425,6 +1426,7 @@ void CGameItem::clear()
 	_TypeSkillMods.clear();
 	_PhraseId.clear();
 	_RequiredFaction.clear();
+	_RequiredPowo.clear();
 	_CustomText.clear();
 }
 
