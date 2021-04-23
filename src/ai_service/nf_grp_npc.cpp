@@ -2639,7 +2639,8 @@ void rename_s_(CStateInstance* entity, CScriptStack& stack)
 {
 	string newName = (string)stack.top(); stack.pop();
 	ucstring name;
-	name.fromUtf8(newName);	CGroup* group = entity->getGroup();
+	name.fromUtf8(newName);
+	CGroup* group = entity->getGroup();
 
 	if (group->isSpawned())
 	{
