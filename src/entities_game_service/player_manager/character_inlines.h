@@ -805,14 +805,6 @@ inline NLMISC::CVector CCharacter::getBuildingExitPos() const
 	return _BuildingExitPos;
 }
 
-//------------------------------------------------------------------------------
-
-inline NLMISC::CVector CCharacter::getOutOutpostPos() const
-{
-	return _OutOutpostPos;
-}
-
-
 
 //------------------------------------------------------------------------------
 
