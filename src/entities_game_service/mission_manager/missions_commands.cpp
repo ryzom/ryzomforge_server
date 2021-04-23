@@ -1028,7 +1028,7 @@ NLMISC_COMMAND(deleteInventoryItems, "Delete items from a characters inventory",
 string getJewelEnchantAttr(CSheetId sbrick)
 {
 	const CStaticBrick * brick = CSheets::getSBrickForm(sbrick);
-	if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
+	if (brick && (brick->Family == BRICK_FAMILIES::BSGMC || brick->Family == BRICK_FAMILIES::BSGMCB))
 	{
 		if (brick->Params.size() > 0)
 		{
@@ -1044,13 +1044,13 @@ string getJewelEnchantAttr(CSheetId sbrick)
 
 //enchantEquipedItem 530162 WristR jmod_focus_tryker_1.sbrick
 //enchantEquipedItem 530162 Neck tag_fyros_3.sbrick
-//enchantEquipedItem 530162 Neck jrez_fulllife_tryker.sbrick
+//enchantEquipedItem 530162 Neck jrez_fulllife_tryker.sbrick,jboost2.sbrick
 //----------------------------------------------------------------------------
 NLMISC_COMMAND(enchantEquipedItem, "enchantEquipedItem", "<uid> <slotname> <sheet1>,[<sheet2> ...] [<maxSpaLoad>]")
 {
 	if (args.size () < 3)
 	{
-		log.displayNL("ERR: Invalid number of parameters. Parameters: <inventory> <sheetnames> <quality> <quantity>");
+		log.displayNL("ERR: Invalid number of parameters. Parameters: <uid> <slotname> <sheet1>,[<sheet2> ...] [<maxSpaLoad>]");
 		return false;
 	}
 

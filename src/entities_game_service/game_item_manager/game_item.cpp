@@ -1101,13 +1101,13 @@ void CGameItem::getJewelTagsEnchantments( vector< CSheetId >& sheets )
 
 void CGameItem::getJewelNonTagsEnchantments( vector< CSheetId >& sheets )
 {
-	if (_Enchantment .empty())
+	if (_Enchantment.empty())
 		return;
 
 	for ( uint i = 0; i< _Enchantment.size(); i++ )
 	{
 		const CStaticBrick * brick = CSheets::getSBrickForm(_Enchantment[i]);
-		if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
+		if (brick && (brick->Family == BRICK_FAMILIES::BSGMC || brick->Family == BRICK_FAMILIES::BSGMCB))
 		{
 			if (brick->Params.size() > 0)
 			{

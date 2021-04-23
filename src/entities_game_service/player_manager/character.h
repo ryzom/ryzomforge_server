@@ -2618,7 +2618,7 @@ public:
 	std::string getDontTranslate() const;
 	void setDontTranslate(const std::string &langs);
 
-	CSBrickParamJewelAttrs *getJewelAttrs(const std::string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot);
+	CSBrickParamJewelAttrs getJewelAttrs(const std::string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot, NLMISC::CSheetId &usedSheet);
 
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
@@ -3757,7 +3757,7 @@ private:
 	uint32 _MagicProtection[PROTECTION_TYPE::NB_PROTECTION_TYPE];
 	uint32 _MaxAbsorption;
 
-	CSBrickParamJewelAttrs* _JewelEnchants[SLOT_EQUIPMENT::NB_SLOT_EQUIPMENT];
+	CSBrickParamJewelAttrs _JewelEnchants[SLOT_EQUIPMENT::NB_SLOT_EQUIPMENT];
 
 	// current resistance for each type of magic resistance
 	uint32 _MagicResistance[RESISTANCE_TYPE::NB_RESISTANCE_TYPE];
