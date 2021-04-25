@@ -22726,9 +22726,9 @@ void CCharacter::removeEffectInDB(uint8 index, bool bonus)
 
 //------------------------------------------------------------------------------
 
-void CCharacter::disableEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate)
+void CCharacter::disableEffectInDB(uint8 index, bool bonus, const NLMISC::CSheetId &sheetId, NLMISC::TGameCycle activationDate)
 {
-	_ModifiersInDB.disableEffect(index, bonus, activationDate, _PropertyDatabase);
+	_ModifiersInDB.disableEffect(index, bonus, sheetId, activationDate, _PropertyDatabase);
 }
 
 //------------------------------------------------------------------------------

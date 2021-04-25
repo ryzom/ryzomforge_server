@@ -2027,7 +2027,7 @@ public:
 	void removeEffectInDB(uint8 index, bool bonus = true);
 
 	/// disable effect
-	void disableEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate);
+	void disableEffectInDB(uint8 index, bool bonus, const NLMISC::CSheetId &sheetId, NLMISC::TGameCycle activationDate);
 
 	/// update effect activation date
 	void updateEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate);

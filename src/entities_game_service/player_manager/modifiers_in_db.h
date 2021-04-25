@@ -80,7 +80,7 @@ struct CModifiersInDB
 	void removeEffect(uint8 index, bool bonus, CCDBSynchronised &database);
 
 	/// disable an effect
-	void disableEffect(uint8 index, bool bonus, NLMISC::TGameCycle activationDate, CCDBSynchronised &database);
+	void disableEffect(uint8 index, bool bonus, const NLMISC::CSheetId &sheetId, NLMISC::TGameCycle activationDate, CCDBSynchronised &database);
 
 	/// update an effect activation date
 	void updateEffect(uint8 index, bool bonus, NLMISC::TGameCycle activationDate, CCDBSynchronised &database);

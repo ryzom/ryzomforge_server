@@ -278,7 +278,7 @@ void CAuraBaseEffect::removed()
 		if (_IsFromConsumable)
 			player->removeEffectInDB((uint8)_EffectIndexInDB, true);
 		else
-			player->disableEffectInDB( (uint8)_EffectIndexInDB,true, _DisabledEndDate);
+			player->disableEffectInDB( (uint8)_EffectIndexInDB,true, getAssociatedSheetId(), _DisabledEndDate);
 	}
 } // removed //
 
