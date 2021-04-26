@@ -919,7 +919,9 @@ TAIAlias COutpostManager::getOutpostFromUserPosition( CCharacter *user ) const
 		float distance;
 		if( outpost->contains(vect, distance, nearPos) )
 		{
-			if (outpost->getName().substr(0, 14) == "outpost_nexus_")
+				OUTPOSTENUMS::TOutpostState state = outpost->getState();
+				bool outpostInFire = state == OUTPOSTENUMS::AttackBefore || state == OUTPOSTENUMS::AttackRound || state == OUTPOSTENUMS::DefenseBefore || state == OUTPOSTENUMS::DefenseRound;
+			if (outpost->getName().substr(0, 14) == "outpost_nexus_" && outpostInFire)
 			{
 				nlinfo("DISTANCE TO OUTPOST = %f", distance);
 				if (distance > 20.f && user->getOutpostSide() == OUTPOSTENUMS::UnknownPVPSide)
