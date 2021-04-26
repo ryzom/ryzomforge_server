@@ -434,6 +434,9 @@ public :
 	void consumeSapLoad( uint32 sapConsumed );
 	// apply an enchantment to item
 	void applyEnchantment( const std::vector< NLMISC::CSheetId >& action );
+	// get jewel enchantements if are tags or not
+	void getJewelTagsEnchantments( std::vector< NLMISC::CSheetId >& sheets );
+	void getJewelNonTagsEnchantments( std::vector< NLMISC::CSheetId >& sheets );
 	// get enchantment
 	const std::vector< NLMISC::CSheetId >& getEnchantment() const { return _Enchantment; }
 	// set sapLoad for recharge sap item
@@ -684,6 +687,11 @@ public :
 	inline const std::string & getRequiredFaction() const { return _RequiredFaction;}
 	/// set Required Faction
 	inline void setRequiredFaction(const std::string & str){ _RequiredFaction = str;}
+
+	/// get Required Powo
+	inline const std::string & getRequiredPowo() const { return _RequiredPowo;}
+	/// set Required Pow
+	inline void setRequiredPowo(const std::string & str){ _RequiredPowo = str;}
 
 	inline bool getLockedByOwner() const { return _LockedByOwner; }
 	void setLockedByOwner(bool value);
@@ -958,6 +966,7 @@ private:
 	// required skill
 	bool				_UseNewSystemRequirement;
 	std::string			_RequiredFaction;
+	std::string			_RequiredPowo;
 	SKILLS::ESkills		_RequiredSkill;
 	uint16				_RequiredSkillLevel;
 	SKILLS::ESkills		_RequiredSkill2;

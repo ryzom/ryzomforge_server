@@ -1047,7 +1047,7 @@ inline bool CCharacter::checkRequiredFaction(std::string faction) const
 
 inline bool CCharacter::checkRequiredFame(std::string faction, sint32 fame) const
 {
-	if (faction == "")
+	if (faction == "" || faction == "*")
 		return true;
 
 	uint32 fameIdx = PVP_CLAN::getFactionIndex(PVP_CLAN::fromString(faction));
