@@ -10300,10 +10300,10 @@ void CCharacter::setDatabase()
 	CBankAccessor_PLR::getFAME().setCIV_ALLEGIANCE(_PropertyDatabase, _DeclaredCiv);
 	// activate effects active on character
 	_PersistentEffects.activate();
-	// activate forbid power end date, infective aura end date and consumable overdose timer
-	_ForbidPowerDates.activate();
-	_IneffectiveAuras.activate();
-	_ConsumableOverdoseEndDates.activate();
+	// cleanup expired forbid power, infective aura, and consumable overdose timer
+	_ForbidPowerDates.cleanVector();
+	_IneffectiveAuras.cleanVector();
+	_ConsumableOverdoseEndDates.cleanVector();
 	// init the RRPs
 	// RingRewardPoints.initDb();
 } // setDatabase //
@@ -16787,7 +16787,7 @@ void CCharacter::setPowerFlagDates()
 	{
 		uint32 flag = BRICK_FLAGS::powerTypeToFlag((*it).PowerType) - BRICK_FLAGS::BeginPowerFlags;
 
-		if ((*it).ActivationDate <= time && _ForbidPowerDates.doNotClear == false)
+		if ((*it).ActivationDate <= time)
 		{
 			// erase returns an iterator that designates the first element remaining beyond any elements removed, or
 			// end() if no such element exists.
