@@ -20914,6 +20914,9 @@ void CCharacter::outpostOpenChooseSideDialog(TAIAlias outpostId)
 		return;
 	}
 
+	uint8 type = (uint8)outpost->getPvpType();
+
+	bms.serial(type);
 	bms.serial(outpostInFire);
 	bms.serial(playerGuildInConflict);
 	bms.serial(playerGuildIsAttacker);
@@ -21039,7 +21042,7 @@ void CCharacter::outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side)
 			if (outpost->getName().substr(0, 14) == "outpost_nexus_")
 			{
 				nlinfo("Player are neutral in %s in fire : ", outpost->getName().c_str());
-				setOutpostSide(OUTPOSTENUMS::UnknownPVPSide);
+				//setOutpostSide(OUTPOSTENUMS::UnknownPVPSide);
 
 			}
 			else

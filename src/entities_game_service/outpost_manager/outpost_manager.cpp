@@ -49,7 +49,9 @@ using namespace NLNET;
 //COutpostManager* COutpostManager::_Instance = NULL;
 
 extern NLMISC::CVariable<bool>    		UseBS;
+
 CVariable<bool> LoadOutposts("egs", "LoadOutposts", "If false outposts won't be loaded", true, 0, true );
+CVariable<bool> OutpostInTestTeleportOutNeutrals("egs", "OutpostInTestTeleportOutNeutrals", "If true, teleport out of OP zone the neutrals", false, 0, true );
 
 CFileDisplayer OutpostDisplayer("outposts.log");
 CLog OutpostDbgLog(CLog::LOG_DEBUG), OutpostInfLog(CLog::LOG_INFO), OutpostWrnLog(CLog::LOG_WARNING), OutpostErrLog(CLog::LOG_ERROR);
@@ -919,26 +921,23 @@ TAIAlias COutpostManager::getOutpostFromUserPosition( CCharacter *user ) const
 		float distance;
 		if( outpost->contains(vect, distance, nearPos) )
 		{
-			if (outpost->getName().substr(0, 14) == "outpost_nexus_")
+			if (OutpostInTestTeleportOutNeutrals.get())
 			{
-				nlinfo("DISTANCE TO OUTPOST = %f", distance);
-				if (distance > 20.f && user->getOutpostSide() == OUTPOSTENUMS::UnknownPVPSide)
+				OUTPOSTENUMS::TOutpostState state = outpost->getState();
+				bool outpostInFire = state == OUTPOSTENUMS::AttackBefore || state == OUTPOSTENUMS::AttackRound || state == OUTPOSTENUMS::DefenseBefore || state == OUTPOSTENUMS::DefenseRound;
+				if (outpost->getName().substr(0, 14) == "outpost_nexus_" && outpostInFire)
 				{
-					CVector outPos = user->getOutOutpostPos();
-					user->teleportCharacter(outPos.x*1000.f, outPos.y*1000.f);
-					return CAIAliasTranslator::Invalid;
+					nlinfo("DISTANCE TO OUTPOST = %f", distance);
+					if (distance > 20.f && user->getOutpostSide() == OUTPOSTENUMS::UnknownPVPSide)
+					{
+						CVector outPos = user->getOutOutpostPos();
+						user->teleportCharacter(outPos.x*1000.f, outPos.y*1000.f);
+						return CAIAliasTranslator::Invalid;
+					}
 				}
 			}
 
-			// Maybe we should check here that user is owner of the outpost
-		//	if( outpost->isCharacterInConflict(user) )
-		//	{
-				return outpost->getAlias();
-		//	}
-		//	else
-		//	{
-		//		OUTPOST_DBG("<CPVPManager::getPVPZoneFromUserPosition> user not in conflict");
-		//	}
+			return outpost->getAlias();
 		}
 	}
 
