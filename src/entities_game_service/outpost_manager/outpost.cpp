@@ -76,6 +76,8 @@ static uint32 const hours = 60*minutes;
 static uint32 const days = 24*hours;
 
 CVariable<uint32> OutpostFightRoundCount("egs","OutpostFightRoundCount","number of rounds in an outpost fight", 24, 0, true);
+CVariable<uint32> OutpostInTestFightRoundCount("egs","OutpostInTestFightRoundCount","number of rounds in an outpost (in test) fight", 11, 0, true);
+CVariable<float> OutpostInTestFightSquadCount("egs", "OutpostInTestFightSquadCount", "Coef for squad count per round", 1.2f, 0, true );
 CVariable<uint32> OutpostFightRoundTime("egs","OutpostFightRoundTime","time of a round in an outpost fight, in seconds", 5*minutes, 0, true);
 CVariable<uint32> OutpostLevelDecrementTime("egs","OutpostLevelDecrementTime","time to decrement an outpost level in seconds (in peace time)", 2*days, 0, true);
 CVariable<uint32> OutpostEditingConcurrencyCheckDelay("egs", "OutpostEditingConcurrencyCheckDelay", "delay in ticks used to check if 2 actions for editing an outpost are concurrent", 50, 0, true );
@@ -2393,6 +2395,11 @@ void COutpost::actionPayBackMoneySpent()
 //----------------------------------------------------------------------------
 uint32 COutpost::computeRoundCount() const
 {
+	///// Nexus test : only 11 rounds
+	if (getName().substr(0, 14) == "outpost_nexus_")
+		return OutpostInTestFightRoundCount.get();
+	//////
+
 	return std::min(OutpostFightRoundCount.get(), OUTPOSTENUMS::OUTPOST_MAX_SQUAD_SPAWNED);
 }
 
@@ -2423,13 +2430,24 @@ uint32 COutpost::computeSpawnDelay(uint32 roundLevel) const
 //----------------------------------------------------------------------------
 uint32 COutpost::computeSquadCountA(uint32 roundLevel) const
 {
-	return (uint32)ceil((float)(roundLevel+1)/2.f);
+
+	///// Nexus test : Number of squad increase faster
+	if (getName().substr(0, 14) == "outpost_nexus_")
+		return (uint32)ceil((float)(roundLevel+1)/OutpostInTestFightSquadCount.get());
+	//////
+
+	return (uint32)ceil((float)(roundLevel+1)/1.5f);
 }
 
 //----------------------------------------------------------------------------
 uint32 COutpost::computeSquadCountB(uint32 roundLevel) const
 {
-	return (uint32)floor((float)(roundLevel+1)/2.f);
+	///// Nexus test : Number of squad increase faster
+	if (getName().substr(0, 14) == "outpost_nexus_")
+		return (uint32)floor((float)(roundLevel+1)/OutpostInTestFightSquadCount.get());
+	//////
+
+	return (uint32)floor((float)(roundLevel+1)/1.5f);
 }
 
 //----------------------------------------------------------------------------

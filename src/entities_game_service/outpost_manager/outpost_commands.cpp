@@ -98,12 +98,14 @@ NLMISC_COMMAND(outpostChallengeByGuild, "Challenges an outpost", "<outpost_id> <
 
 	string error = COutpost::getErrorString(outpost->challengeOutpost( guild ));
 	if (error == "OUTPOST_ERROR_NONE")
+	{
+		if (args.size() > 2)
+			outpost->setPvpType(OUTPOSTENUMS::toPVPType(args[2]));
 		log.displayNL("OK");
+	}
 	else
 		log.displayNL("ERR: %s", error.c_str());
 
-	if (args.size() > 2)
-		outpost->setPvpType(OUTPOSTENUMS::toPVPType(args[2]));
 	return true;
 }
 
