@@ -547,6 +547,11 @@ CCharacter::CCharacter()
 	for (uint i = 0; i < SCORES::NUM_SCORES; ++i)
 		_ScorePermanentModifiers[i] = 0;
 
+	// init jewel enchantement
+	for (uint i = 0; i < SLOT_EQUIPMENT::NB_SLOT_EQUIPMENT; ++i)
+		_JewelEnchants[i] = CSBrickParamJewelAttrs();
+
+
 	// init owner character for CItemsForSale class member
 	_ItemsInShopStore = new CItemsForSale;
 	_ItemsInShopStore->setOwnerCharacter(this);
@@ -564,7 +569,7 @@ CCharacter::CCharacter()
 	_DeathPenaltyTimer.setRemaining(1, new CDeathPenaltiesTimerEvent(this), 1);
 	_BarUpdateTimer.setRemaining(1, new CCharacterBarUpdateTimerEvent(this), 1);
 	_BuildingExitZone = 0xffff;
-	_BuildingExitPos = CVector();
+	_BuildingExitPos = CVector(0, 0, 0);
 	_BuildingExitPos.x = 0;
 	_BuildingExitPos.y = 0;
 	_RespawnMainLandInTown = false;
@@ -2018,19 +2023,60 @@ void CCharacter::respawn(sint32 x, sint32 y, sint32 z, float heading, bool apply
 //---------------------------------------------------
 void CCharacter::applyRespawnEffects(bool applyDP)
 {
+	CSheetId usedSheet;
+	CSBrickParamJewelAttrs sbrickParam = getJewelAttrs("rez", SLOT_EQUIPMENT::NECKLACE, usedSheet);
+	SM_STATIC_PARAMS_1(params, STRING_MANAGER::sbrick);
+	params[0].SheetId = usedSheet;
 
 	if (applyDP)
 	{
+		// Check if in Powo and don't have dp flag
+		if (getPowoCell() != 0 && !getPowoFlag("dp"))
+			_NextDeathPenaltyFactor = 0;
+
+		if (sbrickParam.ParsedOk && sbrickParam.Value == "noDP" && (rand() % 100) < sbrickParam.Modifier)
+		{
+			sendDynamicSystemMessage(_Id, "ALLEGORY_EFFECT_TRIGGERED", params);
+			_NextDeathPenaltyFactor = 0;
+		}
+
 		if (_NextDeathPenaltyFactor != 0)
 			_DeathPenalties->addDeath(*this, _NextDeathPenaltyFactor);
 
 		resetNextDeathPenaltyFactor();
 	}
 
-	_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base / 10;
-	_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base / 10;
-	_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base / 10;
-	_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base / 10;
+	if (sbrickParam.ParsedOk && sbrickParam.Value == "halfLife" && (rand() % 100) < sbrickParam.Modifier)
+	{
+		sendDynamicSystemMessage(_Id, "ALLEGORY_EFFECT_TRIGGERED", params);
+		_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base / 2;
+		_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base / 2;
+		_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base / 2;
+		_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base / 2;
+	}
+	else if (sbrickParam.ParsedOk && sbrickParam.Value == "goodLife" && (rand() % 100) < sbrickParam.Modifier)
+	{
+		sendDynamicSystemMessage(_Id, "ALLEGORY_EFFECT_TRIGGERED", params);
+		_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base / 1.33333;
+		_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base / 1.33333;
+		_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base / 1.33333;
+		_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base / 1.33333;
+	}
+	else if (sbrickParam.ParsedOk && sbrickParam.Value == "fullLife" && (rand() % 100) < sbrickParam.Modifier)
+	{
+		sendDynamicSystemMessage(_Id, "ALLEGORY_EFFECT_TRIGGERED", params);
+		_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base;
+		_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base;
+		_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base;
+		_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base;
+	}
+	else
+	{
+		_PhysScores._PhysicalScores[SCORES::hit_points].Current = _PhysScores._PhysicalScores[SCORES::hit_points].Base / 10;
+		_PhysScores._PhysicalScores[SCORES::stamina].Current = _PhysScores._PhysicalScores[SCORES::stamina].Base / 10;
+		_PhysScores._PhysicalScores[SCORES::sap].Current = _PhysScores._PhysicalScores[SCORES::sap].Base / 10;
+		_PhysScores._PhysicalScores[SCORES::focus].Current = _PhysScores._PhysicalScores[SCORES::focus].Base / 10;
+	}
 	_Mode = MBEHAV::NORMAL;
 	_Behaviour = MBEHAV::IDLE;
 	_IsDead = false;
@@ -5644,6 +5690,25 @@ void CCharacter::teleportCharacter(sint32 x, sint32 y, sint32 z, bool teleportWi
 		_PowoCell = 0;
 		CBuildingManager::getInstance()->removePlayerFromRoom(this, false);
 		getRespawnPoints().setArkRespawnpoint(0, 0, 0);
+
+		CInventoryPtr childSrc = getInventory(INVENTORIES::bag);
+		if (childSrc != NULL)
+		{
+			for (uint j = 0; j < childSrc->getSlotCount(); j++)
+			{
+				CGameItemPtr itemPtr = childSrc->getItem(j);
+				if (itemPtr != NULL)
+				{
+					if (!itemPtr->getRequiredPowo().empty())
+					{
+						if (itemPtr->getRequiredPowo() != _PowoScope)
+							GameItemManager.destroyItem(itemPtr);
+						else
+							unequipCharacter(childSrc->getInventoryId(), itemPtr->getRefInventorySlot());
+					}
+				}
+			}
+		}
 	}
 	else if (_PowoCell == 0)
 		CBuildingManager::getInstance()->removePlayerFromRoom(this);
@@ -11797,8 +11862,21 @@ void CCharacter::setDontTranslate(const string &langs)
 
 
 //-----------------------------------------------------------------------------
-CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot)
+CSBrickParamJewelAttrs CCharacter::getJewelAttrs(const string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot, CSheetId &usedSheet)
 {
+
+	string contName;
+	string regionName;
+	const CRegion* region = NULL;
+	const CContinent * cont = NULL;
+	CZoneManager::getInstance().getRegion(getState().X ,getState().Y, &region, &cont);
+	if (region)
+		regionName = region->getName();
+	if (cont)
+		contName = cont->getName();
+
+	CSBrickParamJewelAttrs returnSBrickParam;
+	CSBrickParamJewelAttrs* boostSBrickParam = NULL;
 
 	CInventoryPtr inv = getInventory(INVENTORIES::equipment);
 	if (inv)
@@ -11814,22 +11892,51 @@ CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_
 					for (uint i = 0; i < enchant.size(); i++)
 					{
 						const CStaticBrick * brick = CSheets::getSBrickForm(enchant[i]);
-						if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
+
+						if (brick && brick->Family == BRICK_FAMILIES::BSGMCB)
+						{
+							if (brick->Params.size() > 0)
+							{
+								const TBrickParam::IId* param = brick->Params[0];
+								boostSBrickParam = (CSBrickParamJewelAttrs*)param;
+							}
+						}
+						else if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
 						{
 							if (brick->Params.size() > 0)
 							{
 								const TBrickParam::IId* param = brick->Params[0];
 								CSBrickParamJewelAttrs *sbrickParam = (CSBrickParamJewelAttrs*)param;
+
 								if (param->id() == TBrickParam::JEWEL_ATTRS && sbrickParam->Attribute == attribute)
 								{
+									bool valid = true;
 									// Check required fame (if no required faction, check are ok)
-									if (checkRequiredFame(sbrickParam->RequiredFaction, sbrickParam->RequiredFame))
+									if (!checkRequiredFame(sbrickParam->RequiredFaction, sbrickParam->RequiredFame))
+										valid = false;
+									// Require a faction/nation/org only for fame up to 30
+									else if (sbrickParam->RequiredFame >= 30 && !checkRequiredFaction(sbrickParam->RequiredFaction))
+										valid = false;
+
+									if (!sbrickParam->RequiredZones.empty())
 									{
-										// Require a faction/nation/org only for fame up to 30
-										if (sbrickParam->RequiredFame < 30 || checkRequiredFaction(sbrickParam->RequiredFaction))
+										bool zoneValid = false;
+										vector<string> zones;
+										NLMISC::splitString(sbrickParam->RequiredZones, ",", zones);
+										for (uint z = 0; z < zones.size(); z++)
 										{
-											return sbrickParam;
+											if (zones[z] == contName || zones[z] == regionName)
+												zoneValid = true;
 										}
+
+										if (!zoneValid)
+											valid = false;
+									}
+
+									if (valid)
+									{
+										usedSheet = enchant[i];
+										returnSBrickParam.copy(*sbrickParam);
 									}
 								}
 							}
@@ -11846,23 +11953,59 @@ CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_
 				vector< CSheetId > enchant = item->getEnchantment();
 				for (uint i = 0; i < enchant.size(); i++)
 				{
+
 					const CStaticBrick * brick = CSheets::getSBrickForm(enchant[i]);
-					if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
+
+					if (brick && brick->Family == BRICK_FAMILIES::BSGMCB)
+					{
+						if (brick->Params.size() > 0)
+						{
+							const TBrickParam::IId* param = brick->Params[0];
+							boostSBrickParam = (CSBrickParamJewelAttrs*)param;
+						}
+					}
+					else if (brick && brick->Family == BRICK_FAMILIES::BSGMC)
 					{
 						if (brick->Params.size() > 0)
 						{
 							const TBrickParam::IId* param = brick->Params[0];
 							CSBrickParamJewelAttrs *sbrickParam = (CSBrickParamJewelAttrs*)param;
+
 							if (param->id() == TBrickParam::JEWEL_ATTRS && sbrickParam->Attribute == attribute)
 							{
+								bool valid = true;
 								// Check required fame (if no required faction, check are ok)
-								if (checkRequiredFame(sbrickParam->RequiredFaction, sbrickParam->RequiredFame))
+								if (!checkRequiredFame(sbrickParam->RequiredFaction, sbrickParam->RequiredFame))
 								{
-									// Require a faction/nation/org only for fame up to 30
-									if (sbrickParam->RequiredFame < 30 || checkRequiredFaction(sbrickParam->RequiredFaction))
+									valid = false;
+								}
+								else if (sbrickParam->RequiredFame >= 30 && !checkRequiredFaction(sbrickParam->RequiredFaction))
+								{
+									valid = false;
+								}
+
+								if (!sbrickParam->RequiredZones.empty())
+								{
+									bool zoneValid = false;
+									vector<string> zones;
+									NLMISC::splitString(sbrickParam->RequiredZones, ",", zones);
+									for (uint z = 0; z < zones.size(); z++)
 									{
-										return sbrickParam;
+										if (zones[z] == contName || zones[z] == regionName)
+										{
+											zoneValid = true;
+										}
 									}
+
+									if (!zoneValid) {
+										valid = false;
+									}
+								}
+
+								if (valid)
+								{
+									usedSheet = enchant[i];
+									returnSBrickParam.copy(*sbrickParam);
 								}
 							}
 						}
@@ -11872,7 +12015,10 @@ CSBrickParamJewelAttrs *CCharacter::getJewelAttrs(const string &attribute, SLOT_
 		}
 	}
 
-	return NULL;
+	if (boostSBrickParam)
+		returnSBrickParam.Modifier *= boostSBrickParam->Modifier;
+
+	return returnSBrickParam;
 }
 
 //-----------------------------------------------------------------------------
@@ -14269,7 +14415,6 @@ bool CCharacter::autoFillExchangeView()
 	CMission* currentMission = NULL;
 	CGameItemPtr invItem;
 	uint stepCounter, candidateCounter, totalItemsInBag, itemsSeenCount;
-	CActiveStepPD activeStep;
 	CMissionTemplate* missionTemplate;
 	std::map<uint32, CActiveStepPD>::iterator stepIterator;
 	std::vector<IMissionStepTemplate::CSubStep> validateSteps;
@@ -14304,6 +14449,20 @@ bool CCharacter::autoFillExchangeView()
 			break;
 
 		validateSteps = missionTemplate->Steps[*itSet - 1]->getSubSteps();
+
+		// get gift step from mission
+		const CActiveStepPD *botGiftStep = currentMission->getSteps(*itSet);
+		if (botGiftStep)
+		{
+			// fill in remaining quantities
+			for(uint i = 0; i < validateSteps.size(); ++i)
+			{
+				const CActiveStepStatePD *gift = botGiftStep->getStates(i+1);
+				if (gift != NULL)
+					validateSteps[i].Quantity = gift->getState();
+			}
+		}
+
 		// the exchange temp inventory thingy has only 8 slots, so very benign failures to put items into it
 		// are possible. Hence merely breaking (doing no further work) as opposed to aborting work done,
 		// and still returning "true". (exchangeWorked == false does not necessarily represent a failure of the whole
@@ -15167,6 +15326,7 @@ void CCharacter::setCurrentRegion(uint16 region)
 {
 	_CurrentRegion = region;
 	updateMagicProtectionAndResistance();
+	updateJewelsModifiers();
 }
 
 //-----------------------------------------------
@@ -18467,11 +18627,15 @@ void CCharacter::onDisconnection(bool bCrashed)
 	// Remove handledAIGroups for all missions of the player
 	despawnAllHandledAIGroup();
 
+	updateJewelsModifiers(true);
+
 	// update for the unified entity locator
 	if (IShardUnifierEvent::getInstance() != NULL && _Enter)
 	{
 		IShardUnifierEvent::getInstance()->charDisconnected(_Id);
 	}
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -20750,6 +20914,9 @@ void CCharacter::outpostOpenChooseSideDialog(TAIAlias outpostId)
 		return;
 	}
 
+	uint8 type = (uint8)outpost->getPvpType();
+
+	bms.serial(type);
 	bms.serial(outpostInFire);
 	bms.serial(playerGuildInConflict);
 	bms.serial(playerGuildIsAttacker);
@@ -20871,10 +21038,20 @@ void CCharacter::outpostSideChosen(bool neutral, OUTPOSTENUMS::TPVPSide side)
 		// his guild doesn't participate in outpost conflict but player don't made a choice when op is under attack => random
 		if (neutral && outpostInFire)
 		{
-			if (uint32(RandomGenerator.rand(1)) == 0)
-				setOutpostSide(OUTPOSTENUMS::OutpostOwner);
+
+			if (outpost->getName().substr(0, 14) == "outpost_nexus_")
+			{
+				nlinfo("Player are neutral in %s in fire : ", outpost->getName().c_str());
+				//setOutpostSide(OUTPOSTENUMS::UnknownPVPSide);
+
+			}
 			else
-				setOutpostSide(OUTPOSTENUMS::OutpostAttacker);
+			{
+				if (uint32(RandomGenerator.rand(1)) == 0)
+					setOutpostSide(OUTPOSTENUMS::OutpostOwner);
+				else
+					setOutpostSide(OUTPOSTENUMS::OutpostAttacker);
+			}
 		}
 		else
 			// his guild doesn't participate in outpost conflict so he can choose the side he wants
@@ -21164,6 +21341,8 @@ uint32 CPetAnimal::getAnimalMaxBulk()
 
 		if (formBag)
 		{
+			if (creatureBagSheet == CSheetId("zig_inventory.sitem"))
+				return formBag->BulkMax*1.5;
 			return formBag->BulkMax;
 		}
 	}
@@ -21392,7 +21571,7 @@ void CCharacter::updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills ski
 }
 
 //----------------------------------------------------------------------------
-void CCharacter::updateJewelsTags(bool remove, bool update)
+void CCharacter::updateJewelsTags(bool justRemove, bool update)
 {
 	if (!getEnterFlag() || !getOnLineStatus())
 	return;
@@ -21407,24 +21586,25 @@ void CCharacter::updateJewelsTags(bool remove, bool update)
 	setTagPvPA("");
 	setTagPvPB("");
 
-	if (remove)
+	if (justRemove)
 		return;
 
-	CSBrickParamJewelAttrs *sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::HEADDRESS);
-	if (sbrickParam)
-		setTagA(sbrickParam->Value);
+	CSheetId usedSheet;
+	CSBrickParamJewelAttrs sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::HEADDRESS, usedSheet);
+	if (sbrickParam.ParsedOk)
+		setTagA(sbrickParam.Value);
 
-	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::NECKLACE);
-	if (sbrickParam)
-		setTagB(sbrickParam->Value);
+	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::NECKLACE, usedSheet);
+	if (sbrickParam.ParsedOk)
+		setTagB(sbrickParam.Value);
 
-	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::EARL);
-	if (sbrickParam)
-		setTagPvPA(sbrickParam->Value);
+	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::EARL, usedSheet);
+	if (sbrickParam.ParsedOk)
+		setTagPvPA(sbrickParam.Value);
 
-	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::EARR);
-	if (sbrickParam)
-		setTagPvPB(sbrickParam->Value);
+	sbrickParam = getJewelAttrs("tag", SLOT_EQUIPMENT::EARR, usedSheet);
+	if (sbrickParam.ParsedOk)
+		setTagPvPB(sbrickParam.Value);
 
 
 	if (!update)
@@ -21434,6 +21614,59 @@ void CCharacter::updateJewelsTags(bool remove, bool update)
 	{
 		registerName();
 	}
+}
+
+//----------------------------------------------------------------------------
+void CCharacter::updateJewelsModifiers(bool justRemove)
+{
+	if (!getEnterFlag())
+	return;
+
+	// Remove previous effects
+	if (_JewelEnchants[SLOT_EQUIPMENT::WRISTL].ParsedOk && _JewelEnchants[SLOT_EQUIPMENT::WRISTL].Attribute == "mod") {
+		CHARACTERISTICS::TCharacteristics ModifiedCharac = CHARACTERISTICS::toCharacteristic(_JewelEnchants[SLOT_EQUIPMENT::WRISTL].Value);
+		getCharacteristics()._PhysicalCharacteristics[ModifiedCharac].Modifier -= _JewelEnchants[SLOT_EQUIPMENT::WRISTL].Modifier;
+	}
+
+	if (_JewelEnchants[SLOT_EQUIPMENT::WRISTR].ParsedOk && _JewelEnchants[SLOT_EQUIPMENT::WRISTR].Attribute == "mod") {
+		CHARACTERISTICS::TCharacteristics ModifiedCharac = CHARACTERISTICS::toCharacteristic(_JewelEnchants[SLOT_EQUIPMENT::WRISTR].Value);
+		getCharacteristics()._PhysicalCharacteristics[ModifiedCharac].Modifier -= _JewelEnchants[SLOT_EQUIPMENT::WRISTR].Modifier;
+	}
+
+	if (justRemove)
+	{
+		_JewelEnchants[SLOT_EQUIPMENT::WRISTL].ParsedOk = false;
+		_JewelEnchants[SLOT_EQUIPMENT::WRISTR].ParsedOk = false;
+		computeMaxValue();
+		return;
+	}
+
+	CHARACTERISTICS::TCharacteristics ModifiedCharacL = CHARACTERISTICS::Unknown;
+
+	CSheetId usedSheet;
+
+	CSBrickParamJewelAttrs sbrickParamL = getJewelAttrs("mod", SLOT_EQUIPMENT::WRISTL, usedSheet);
+	if (sbrickParamL.ParsedOk)
+	{
+		ModifiedCharacL = CHARACTERISTICS::toCharacteristic(sbrickParamL.Value);
+		getCharacteristics()._PhysicalCharacteristics[ModifiedCharacL].Modifier +=  sbrickParamL.Modifier;
+	}
+	_JewelEnchants[SLOT_EQUIPMENT::WRISTL] = sbrickParamL;
+
+	CSBrickParamJewelAttrs sbrickParamR = getJewelAttrs("mod", SLOT_EQUIPMENT::WRISTR, usedSheet);
+	if (sbrickParamR.ParsedOk)
+	{
+		CHARACTERISTICS::TCharacteristics ModifiedCharac = CHARACTERISTICS::toCharacteristic(sbrickParamR.Value);
+		if (ModifiedCharacL != ModifiedCharac)
+		{
+			getCharacteristics()._PhysicalCharacteristics[ModifiedCharac].Modifier +=  sbrickParamR.Modifier;
+		}
+		else
+			sbrickParamR = NULL;
+	}
+	_JewelEnchants[SLOT_EQUIPMENT::WRISTR] = sbrickParamR;
+
+	computeMaxValue();
 }
 
 //----------------------------------------------------------------------------
@@ -22973,6 +23206,15 @@ void CCharacter::setBuildingExitPos(sint32 x, sint32 y, sint32 cell)
 	_BuildingExitPos.y = y;
 	_BuildingExitPos.z = cell;
 }
+
+//------------------------------------------------------------------------------
+
+void CCharacter::setOutOutpostPos(sint32 x, sint32 y)
+{
+	_OutOutpostPos.x = x;
+	_OutOutpostPos.y = y;
+}
+
 
 
 //------------------------------------------------------------------------------

@@ -2370,6 +2370,12 @@ public:
 	/// get building exit pos
 	NLMISC::CVector getBuildingExitPos() const;
 
+	/// set last outside outpost position
+	void setOutOutpostPos(sint32 x, sint32 y);
+
+	/// get last outside outpost position
+	NLMISC::CVector getOutOutpostPos() const;
+
 	/// set building exit zone
 	void setBuildingExitZone(uint16 zoneIdx);
 
@@ -2439,7 +2445,10 @@ public:
 	void updateParry(ITEMFAMILY::EItemFamily family, SKILLS::ESkills skill);
 
 	// Jewel enchants used for Tags
-	void updateJewelsTags(bool remove, bool update=true);
+	void updateJewelsTags(bool justRemove, bool update=true);
+
+	// Jewel enchants used for Modifiers
+	void updateJewelsModifiers(bool justRemove = false);
 
 	// Jewel equipment or skill or region are changed, recompute protection and resistances
 	void updateMagicProtectionAndResistance();
@@ -2619,7 +2628,7 @@ public:
 	std::string getDontTranslate() const;
 	void setDontTranslate(const std::string &langs);
 
-	CSBrickParamJewelAttrs *getJewelAttrs(const std::string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot);
+	CSBrickParamJewelAttrs getJewelAttrs(const std::string &attribute, SLOT_EQUIPMENT::TSlotEquipment slot, NLMISC::CSheetId &usedSheet);
 
 	uint32 getOrganization() const;
 	uint32 getOrganizationStatus() const;
@@ -3758,6 +3767,8 @@ private:
 	uint32 _MagicProtection[PROTECTION_TYPE::NB_PROTECTION_TYPE];
 	uint32 _MaxAbsorption;
 
+	CSBrickParamJewelAttrs _JewelEnchants[SLOT_EQUIPMENT::NB_SLOT_EQUIPMENT];
+
 	// current resistance for each type of magic resistance
 	uint32 _MagicResistance[RESISTANCE_TYPE::NB_RESISTANCE_TYPE];
 
@@ -3793,6 +3804,7 @@ private:
 
 	uint16 _BuildingExitZone;
 	NLMISC::CVector _BuildingExitPos;
+	NLMISC::CVector _OutOutpostPos;
 
 	// used for force respawn player who are in a mainland in town of this mainland
 	bool _RespawnMainLandInTown;
@@ -4094,6 +4106,7 @@ private:
 	bool _PowoCanTeleport;
 	bool _PowoCanSpeedUp;
 	bool _PowoCanDP;
+	bool _PowoCanRetry;
 
 	bool _PowoCanAccesRoomInv;
 	bool _PowoCanAccessGuildInv;
@@ -4155,7 +4168,7 @@ public:
 		if (flag == "xp")
 			return _PowoCanXP;
 
-		if (flag == "dead")
+		if (flag == "nodead")
 			return _PowoCantDead;
 
 		if (flag == "teleport")
@@ -4166,6 +4179,9 @@ public:
 
 		if (flag == "dp")
 			return _PowoCanDP;
+
+		if (flag == "retry")
+			return _PowoCanRetry;
 
 		if (flag == "guild_inv")
 			return _PowoCanAccessGuildInv;
@@ -4181,7 +4197,7 @@ public:
 		if (flag == "xp")
 			_PowoCanXP = value;
 
-		else if (flag == "dead")
+		else if (flag == "nodead")
 			_PowoCantDead = value;
 
 		else if (flag == "teleport")
@@ -4192,6 +4208,9 @@ public:
 
 		else if (flag == "dp")
 			_PowoCanDP = value;
+
+		else if (flag == "retry")
+			_PowoCanRetry = value;
 
 		else if (flag == "guild_inv")
 			_PowoCanAccessGuildInv = value;
@@ -4209,6 +4228,7 @@ public:
 		_PowoCanTeleport = false;
 		_PowoCanSpeedUp = false;
 		_PowoCanDP = false;
+		_PowoCanRetry = true;
 	}
 
 	void resetTodayGuildPoints()

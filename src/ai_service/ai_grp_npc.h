@@ -45,6 +45,7 @@ public:
 	CGroupNpc& getPersistent() const;
 
 	virtual void spawnBots();
+	virtual void spawnBots(const std::string &name);
 	virtual void despawnBots(bool immediately);
 
 	void update();
@@ -237,6 +238,10 @@ public:
 	void addHandle(TDataSetRow playerRowId, uint32 missionAlias, uint32 DespawnTimeInTick);
 	void delHandle(TDataSetRow playerRowId, uint32 missionAlias);
 
+	void addHealGroup(CGroupNpc *healGroups) { _HealGroups.push_back(healGroups); }
+	std::vector<CGroupNpc*> getHealGroups() { return _HealGroups; }
+	void resetHealGroups() { _HealGroups.clear(); }
+
 	uint32 getTimerWhenNoMoreHandle();
 
 	void setSpawnZone(const CNpcZone *zone) { _SpawnZone = zone; }
@@ -310,6 +315,7 @@ private:
 	bool				_AutoSpawnWhenNoMoreHandle;
 	NLMISC::CVirtualRefPtr<const CNpcZone> _SpawnZone;
 	bool				_RingGrp;//Ring rulez: like a override bandit profile
+	std::vector<CGroupNpc*> _HealGroups;
 
 };
 

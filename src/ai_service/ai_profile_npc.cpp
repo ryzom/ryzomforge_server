@@ -3926,21 +3926,23 @@ void CGrpProfileFaction::checkTargetsAround()
 		const	uint32	playerRadius=assistPlayers||attackPlayers?thisGrpNpc._AggroRange:0;
 		const	uint32	botRadius=assistBots||attackBots?thisGrpNpc._AggroRange:0;
 
-		CCont<CBot >::iterator itBot=_Grp->bots().begin();
-		uint32 cellValue = 0;
-		CBot* bot = *itBot;
-		if (bot)
-		{
-			CSpawnBot* spawnBot = bot->getSpawnObj();
-			if (spawnBot)
-			{
-				CMirrorPropValueRO<uint32> cell( TheDataset, spawnBot->dataSetRow(), DSPropertyCELL );
-				cellValue = cell();
-			} else
-				nlinfo("BOT NOT SPAWN TO GET CELL");
-		}
 
-		Vision.updateBotsAndPlayers(thisGrpNpc.getAIInstance(), centerPos, playerRadius, botRadius, cellValue);
+		for (CCont<CBot>::iterator itBot=_Grp->bots().begin(), itEnd=_Grp->bots().end(); itBot!=itEnd; ++itBot)
+		{
+			uint32 cellValue = 0;
+			CBot* bot = *itBot;
+			if (bot)
+			{
+				CSpawnBot* spawnBot = bot->getSpawnObj();
+				if (spawnBot)
+				{
+					CMirrorPropValueRO<uint32> cell( TheDataset, spawnBot->dataSetRow(), DSPropertyCELL );
+					cellValue = cell();
+					Vision.updateBotsAndPlayers(thisGrpNpc.getAIInstance(), centerPos, playerRadius, botRadius, cellValue);
+					break;
+				}
+			}
+		}
 	}
 
 	// Assist players
@@ -4227,7 +4229,7 @@ void CBotProfileMoveTo::updateProfile(uint ticksSinceLastUpdate)
 		{
 			// get a base pointer to allow virtual call to work
 
-			nlwarning("Follow No Path : %s", _Bot->getPersistent().getOneLineInfoString().c_str());
+			//nlwarning("Follow No Path : %s", _Bot->getPersistent().getOneLineInfoString().c_str());
 		}
 	}
 }

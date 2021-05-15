@@ -80,9 +80,9 @@ CSmartPtr<COutpost> getOutpostFromString(const std::string & outpostString, CLog
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-NLMISC_COMMAND(outpostChallengeByGuild, "Challenges an outpost", "<outpost_id> <guild_name>")
+NLMISC_COMMAND(outpostChallengeByGuild, "Challenges an outpost", "<outpost_id> <guild_name> <type>")
 {
-	if (args.size()!=2)
+	if (args.size() < 2)
 		return false;
 
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
@@ -92,11 +92,20 @@ NLMISC_COMMAND(outpostChallengeByGuild, "Challenges an outpost", "<outpost_id> <
 	CGuild * guild = CGuildManager::getInstance()->getGuildByName( args[1] );
 	if ( guild == NULL )
 	{
-		log.displayNL("Invalid guild '%s'", args[1].c_str());
+		log.displayNL("ERR: Invalid guild '%s'", args[1].c_str());
 		return true;
 	}
 
-	outpost->challengeOutpost( guild );
+	string error = COutpost::getErrorString(outpost->challengeOutpost( guild ));
+	if (error == "OUTPOST_ERROR_NONE")
+	{
+		if (args.size() > 2)
+			outpost->setPvpType(OUTPOSTENUMS::toPVPType(args[2]));
+		log.displayNL("OK");
+	}
+	else
+		log.displayNL("ERR: %s", error.c_str());
+
 	return true;
 }
 
@@ -125,8 +134,13 @@ NLMISC_COMMAND(outpostSimulateTimer0End, "", "<outpost_id> [<absolute end time> 
 			endTime += CTime::getSecondsSince1970();
 	}
 	if (endTime==0) endTime = 1;
-	
+
 	outpost->simulateTimer0End(endTime);
+
+	outpost->updateTimersForClient();
+	outpost->askOutpostDBUpdate();
+	outpost->askGuildDBUpdate(COutpostGuildDBUpdater::STATE_END_DATE);
+
 	return true;
 }
 
@@ -148,7 +162,7 @@ NLMISC_COMMAND(outpostSimulateTimer1End, "", "<outpost_id> [<absolute end time> 
 			endTime += CTime::getSecondsSince1970();
 	}
 	if (endTime==0) endTime = 1;
-	
+
 	outpost->simulateTimer1End(endTime);
 	return true;
 }
@@ -158,7 +172,7 @@ NLMISC_COMMAND(outpostSimulateTimer2End, "", "<outpost_id> [<absolute end time> 
 {
 	if (args.size()<1)
 		return false;
-	
+
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
 		return true;
@@ -171,7 +185,7 @@ NLMISC_COMMAND(outpostSimulateTimer2End, "", "<outpost_id> [<absolute end time> 
 			endTime += CTime::getSecondsSince1970();
 	}
 	if (endTime==0) endTime = 1;
-	
+
 	outpost->simulateTimer2End(endTime);
 	return true;
 }
@@ -289,7 +303,7 @@ NLMISC_COMMAND(outpostAccelerateConstruction, "set all current construction to a
 		NLMISC::fromString(args[0], nNbSecondLeft);
 
 	COutpostManager::getInstance().setConstructionTime(nNbSecondLeft);
-	
+
 	return true;
 }
 
@@ -297,9 +311,9 @@ NLMISC_COMMAND(outpostAccelerateConstruction, "set all current construction to a
 NLMISC_COMMAND(outpostPlayerOutpostInfos, "get the outpost infos of a player", "<player_id>")
 {
 	if (args.size() != 1) return false;
-	
+
 	GET_CHARACTER
-		
+
 	string str;
 	uint32 outpostAlias = c->getOutpostAlias();
 	OUTPOSTENUMS::TPVPSide side = c->getOutpostSide();
@@ -313,7 +327,7 @@ NLMISC_COMMAND(outpostPlayerOutpostInfos, "get the outpost infos of a player", "
 	{
 		str = "no outpost";
 	}
-	
+
 	log.displayNL("Player %s outpost : %s", c->getId().toString().c_str(), str.c_str());
 	return true;
 }
@@ -343,7 +357,7 @@ NLMISC_COMMAND(outpostGiveupOutpost, "Giveup an outpost, letting its ownership t
 {
 	if (args.size()!=2)
 		return false;
-	
+
 	GET_CHARACTER
 
 	CGuildMemberModule * module;
@@ -353,7 +367,7 @@ NLMISC_COMMAND(outpostGiveupOutpost, "Giveup an outpost, letting its ownership t
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[1], log);
 	if (outpost == NULL)
 		return true;
-	
+
 	module->giveupOutpost(outpost->getSheet());
 	return true;
 }
@@ -363,7 +377,7 @@ NLMISC_COMMAND(outpostDisplayGuildOutposts, "Display the outposts owned or being
 {
 	if ( args.size() < 1 )
 		return false;
-	
+
 	GET_CHARACTER
 
 	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
@@ -426,9 +440,9 @@ NLMISC_COMMAND(outpostForceOpenGuildInventory, "", "<player_id>" )
 {
 	if ( args.size() < 1 )
 		return false;
-	
+
 	GET_CHARACTER
-	
+
 	PlayerManager.sendImpulseToClient(eid, "GUILD:OPEN_INVENTORY");
 
 	return true;
@@ -439,11 +453,11 @@ NLMISC_COMMAND(outpostForceCloseGuildInventory, "", "<player_id>" )
 {
 	if ( args.size() < 1 )
 		return false;
-	
+
 	GET_CHARACTER
-	
+
 	PlayerManager.sendImpulseToClient(eid, "GUILD:CLOSE_INVENTORY");
-	
+
 	return true;
 }
 
@@ -451,9 +465,9 @@ NLMISC_COMMAND(outpostForceCloseGuildInventory, "", "<player_id>" )
 NLMISC_COMMAND(outpostSetPlayerPvpSide, "changes the outpost infos of a player", "<player_id> [<outpost_id> attacker|defender]")
 {
 	if (args.size() != 3 && args.size() != 1) return false;
-	
+
 	GET_CHARACTER
-	
+
 	if (args.size()==3)
 	{
 		CSmartPtr<COutpost> outpost = getOutpostFromString(args[1], log);
@@ -470,7 +484,7 @@ NLMISC_COMMAND(outpostSetPlayerPvpSide, "changes the outpost infos of a player",
 			log.displayNL("Invalid side specified");
 			return false;
 		}
-		
+
 		c->setOutpostAlias(outpost->getAlias());
 		c->setOutpostSide(side);
 		OUTPOST_INF("Player %s outpost side set to %s %s", c->getId().toString().c_str(), CPrimitivesParser::aliasToString(outpost->getAlias()).c_str(), side?"attacker":"defender");
@@ -481,7 +495,7 @@ NLMISC_COMMAND(outpostSetPlayerPvpSide, "changes the outpost infos of a player",
 		OUTPOSTENUMS::TPVPSide side = c->getOutpostSide();
 		log.displayNL("Player %s outpost side set to %s %s", c->getId().toString().c_str(), CPrimitivesParser::aliasToString(outpostAlias).c_str(), OUTPOSTENUMS::toString(side).c_str());
 	}
-	
+
 	return true;
 }
 
@@ -489,13 +503,13 @@ NLMISC_COMMAND(outpostSetPlayerPvpSide, "changes the outpost infos of a player",
 NLMISC_COMMAND(outpostSetOutpostToPlayer, "set the player's guild as the owner of the outpost", "<player_id> <outpost_id>")
 {
 	if (args.size() != 2) return false;
-	
+
 	GET_CHARACTER
-		
+
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[1], log);
 	if (outpost == NULL)
 		return true;
-	
+
 	CGuild * guild = CGuildManager::getInstance()->getGuildFromId( c->getGuildId() );
 	if (guild != NULL)
 	{
@@ -517,7 +531,7 @@ NLMISC_COMMAND(outpostSetOutpostOwner, "set the owner of the outpost", "<outpost
 {
 	if (args.size() < 2 || args.size() > 3)
 		return false;
-	
+
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
 		return true;
@@ -565,7 +579,7 @@ NLMISC_COMMAND(outpostSetOutpostOwner, "set the owner of the outpost", "<outpost
 NLMISC_COMMAND(outpostSelectOutpost, "select an outpost to show it info", "<player_id> <outpost_id>")
 {
 	if (args.size() != 2) return false;
-	
+
 	GET_CHARACTER
 
 	// remove previously selected outpost if any
@@ -588,7 +602,7 @@ NLMISC_COMMAND(outpostSelectOutpost, "select an outpost to show it info", "<play
 NLMISC_COMMAND(outpostUnselectOutpost, "unselect an outpost", "<player_id>")
 {
 	if (args.size() != 1) return false;
-	
+
 	GET_CHARACTER
 
 	TAIAlias outpostAlias = c->getSelectedOutpost();
@@ -603,7 +617,7 @@ NLMISC_COMMAND(outpostUnselectOutpost, "unselect an outpost", "<player_id>")
 NLMISC_COMMAND(outpostSetAttackDefenseHour, "Set attack and defense time of an outpost", "<outpost_id> <attack hour (0-23)> <defense hour(0-23)>")
 {
 	if (args.size() != 3) return false;
-	
+
 	// select the wanted outpost
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
@@ -636,7 +650,7 @@ NLMISC_COMMAND(outpostSetAttackDefenseHour, "Set attack and defense time of an o
 NLMISC_COMMAND(outpostSetAttackDefenseDate, "Set attack and defense date of an outpost", "<outpost_id> <Nb days to add at attack/defense date>")
 {
 	if (args.size() != 2) return false;
-	
+
 	// select the wanted outpost
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
@@ -656,12 +670,12 @@ NLMISC_COMMAND(outpostSetAttackDefenseDate, "Set attack and defense date of an o
 NLMISC_COMMAND(outpostSetState, "Set outpost state (Peace/WarDeclaration/AttackBefore/AttackRound/AttackAfter/DefenseBefore/DefenseRound/DefenseAfter)", "<outpost_id> <State>")
 {
 	if (args.size() != 2) return false;
-	
+
 	// select the wanted outpost
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
 		return false;
-		
+
 	OUTPOSTENUMS::TOutpostState state = OUTPOSTENUMS::toOutpostState(args[1]);
 	if(state == OUTPOSTENUMS::UnknownOutpostState)
 	{
@@ -677,7 +691,7 @@ NLMISC_COMMAND(outpostSetState, "Set outpost state (Peace/WarDeclaration/AttackB
 NLMISC_COMMAND(setMemberEntryDate, "Set guild member entry date", "<eid> <entryCycle>")
 {
 	if (args.size() != 2) return false;
-	
+
 	GET_CHARACTER
 
 	uint32 cycleEntryDate;
@@ -732,11 +746,11 @@ NLMISC_COMMAND(outpostUnbanPlayer, "Unban player for an outpost", "<outpost_id> 
 NLMISC_COMMAND(outpostUnbanGuild, "Unban guild for an outpost", "<outpost_id> <guild_name> [<all|atk|def>]")
 {
 	if( args.size() < 2 || args.size() > 3 ) return false;
-	
+
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
 		return false;
-	
+
 	CGuild * guild = CGuildManager::getInstance()->getGuildByName(args[1]);
 	if (guild == NULL)
 	{
@@ -764,13 +778,13 @@ NLMISC_COMMAND(outpostUnbanGuild, "Unban guild for an outpost", "<outpost_id> <g
 NLMISC_COMMAND(outpostBanPlayer, "Ban player for an outpost", "<outpost_id> <eid> [<all|atk|def>]")
 {
 	if( args.size() < 2 || args.size() > 3 ) return false;
-	
+
 	CEntityId eid(args[1]);
-	
+
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
 		return false;
-	
+
 	if(args.size() == 2 || args[2] == string("all") )
 	{
 		outpost->banishPlayerForDefense(eid);
@@ -791,18 +805,18 @@ NLMISC_COMMAND(outpostBanPlayer, "Ban player for an outpost", "<outpost_id> <eid
 NLMISC_COMMAND(outpostBanGuild, "Ban guild for an outpost", "<outpost_id> <guild_name> [<all|atk|def>]")
 {
 	if( args.size() < 2 || args.size() > 3 ) return false;
-	
+
 	CSmartPtr<COutpost> outpost = getOutpostFromString(args[0], log);
 	if (outpost == NULL)
 		return false;
-	
+
 	CGuild * guild = CGuildManager::getInstance()->getGuildByName(args[1]);
 	if (guild == NULL)
 	{
 		log.displayNL("unknown guild : '%s'", args[1].c_str());
 		return true;
 	}
-	
+
 	if(args.size() == 2 || args[2] == string("all") )
 	{
 		outpost->banishGuildForDefense(guild->getId());
