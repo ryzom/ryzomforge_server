@@ -2018,15 +2018,19 @@ public:
 	 * add a bonus effect and write it in DB
 	 * \param sheetId sheetId of the effect brick
 	 * \param bonus true of the effectis a bonus
+	 * \param endDate game cycle when effect ends
 	 * \return index in Db, or  -1 if DB full
 	 */
-	sint8 addEffectInDB(const NLMISC::CSheetId &sheetId, bool bonus = true);
+	sint8 addEffectInDB(const NLMISC::CSheetId &sheetId, bool bonus = true, NLMISC::TGameCycle endDate = 0);
 
 	/// remove bonus effect
 	void removeEffectInDB(uint8 index, bool bonus = true);
 
 	/// disable effect
-	void disableEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate);
+	void disableEffectInDB(uint8 index, bool bonus, const NLMISC::CSheetId &sheetId, NLMISC::TGameCycle activationDate);
+
+	/// update effect activation date
+	void updateEffectInDB(uint8 index, bool bonus, NLMISC::TGameCycle activationDate);
 
 	// return the carried weight
 	uint32 getCarriedWeight();
@@ -2365,6 +2369,12 @@ public:
 
 	/// get building exit pos
 	NLMISC::CVector getBuildingExitPos() const;
+
+	/// set last outside outpost position
+	void setOutOutpostPos(sint32 x, sint32 y);
+
+	/// get last outside outpost position
+	NLMISC::CVector getOutOutpostPos() const;
 
 	/// set building exit zone
 	void setBuildingExitZone(uint16 zoneIdx);
@@ -3794,6 +3804,7 @@ private:
 
 	uint16 _BuildingExitZone;
 	NLMISC::CVector _BuildingExitPos;
+	NLMISC::CVector _OutOutpostPos;
 
 	// used for force respawn player who are in a mainland in town of this mainland
 	bool _RespawnMainLandInTown;
