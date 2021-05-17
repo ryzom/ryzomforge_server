@@ -2888,6 +2888,9 @@ NLMISC_COMMAND(spawnArkMission,"spawn Mission","<uid> <bot_name> <mission_name>"
 		return false;
 	}
 
+	c->removeMission(missionAlias, 0, true);
+	c->removeMissionFromHistories(missionAlias);
+
 	c->endBotChat();
 
 	std::list< CMissionEvent* > eventList;
